@@ -1,0 +1,38 @@
+#server
+#{
+#        listen 80;
+#        server_name static.premierbet.me;
+#       rewrite        ^ https://$server_name$request_uri? permanent;
+#}
+
+server
+{
+        listen 80 default;
+        server_name domain.name;
+
+                
+        location / {
+                expires -1;
+                index index.html$args;
+                try_files $uri$args $uri$args/ $uri/ /index.html$args =404;
+            	proxy_pass http://troot;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr;
+        }
+
+        location /bundle/ {
+                gzip_static on;
+                expires max; 
+        }
+
+        location /api { proxy_pass http://api;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr; }
+        location /specs { proxy_pass http://troot;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr; }
+
+        access_log  /var/log/nginx/echosite.access.log main;
+        error_log  /var/log/nginx/echosite.error.log;
+
+        rewrite ^/api/(.*)$ /api/$1 break;
+                
+        location ~ /\.ht {
+            deny  all;
+        }
+} #server
+

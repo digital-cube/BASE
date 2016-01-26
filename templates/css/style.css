@@ -1,0 +1,107 @@
+  table {
+    border-collapse: collapse;
+    width: 100%;
+}
+.collapse {
+    //display: block;
+}
+th, td {
+    text-align: left;
+    border:0px;
+}
+.margina{
+    margin-top: 10px;
+}
+.label {
+        border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    display: inline;
+    padding: 3px 15px;
+    font-size: 75%;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25em;
+    font-size: 12px;
+}
+.right{float:right;}
+
+.table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 60px;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    border:0px;
+}
+.table-condensed>tbody>tr>td, .table-condensed>tbody>tr>th, .table-condensed>tfoot>tr>td, .table-condensed>tfoot>tr>th, .table-condensed>thead>tr>td, .table-condensed>thead>tr>th {
+    padding:0px;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 0px solid #ddd;
+}
+
+
+.get_bg {
+    background-color: #bce8f1 !important;
+    border-color: #bce8f1 !important;
+    color: #337ab7;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.delete_bg {
+    background-color: #faebcc !important;
+    border-color: #faebcc !important;
+    color: #8a6216;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.put_bg {
+    background-color: #d6e9c6 !important;
+    border-color: #d6e9c6 !important;
+    color: #3c763d;
+
+}
+.bg{
+
+    padding: 5px 10px;
+}
+.post_bg {
+    background-color: #ebccd1 !important;
+    border-color: #ebccd1 !important;
+    color: #a94442;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+
+
+.put_th {
+    background-color: #5cb85c;
+    color: white;
+
+}
+
+
+
+.get_th {
+    background-color: #337ab7;
+    color: white;
+}
+.post_th {
+    background-color: indianred;
+    color: white;
+}
+.delete_th {
+    background-color: #f0ad4e;
+    color: white;
+}
+.bold{font-weight: bold;}
+.siz{font-size: 14px; padding-left:0px; width:25%; text-align:left; border:0; }
+.sizr{font-size: 14px; padding-left:10px; text-align:right; border:0; }
