@@ -1,1 +1,3 @@
 Igor Jeremic <igor@digitalcube.rs>
+Slobodan Dolinic <slobodan@digitalcube.rs>
+Nebojsa Dolas <nebojsa@bemapps.com>
