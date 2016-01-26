@@ -7,7 +7,7 @@ port = 8800
 svc_prefix = 'echo'
 svc_url = 'http://localhost:{}/{}'.format(port, svc_prefix)
 
-support_mail = 'support@digital.com'
+support_mail = 'support@support.com'
 
 logs = {}
 
@@ -26,7 +26,7 @@ for app in APPS:
 
     logs[app_log_name] = _log
 
-log_filename = "{}/digital.log".format(LOG_DIR)
+log_filename = "{}/base.log".format(LOG_DIR)
 log_handler = TimedRotatingFileHandler(log_filename, when="midnight")
 log_formatter = logging.Formatter(
         '%(asctime)-6s %(name)s %(module)s %(funcName)s %(lineno)d - %(levelname)s %(message)s')

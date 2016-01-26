@@ -1,0 +1,16 @@
+__VERSION__ = 1.6
+
+APPS = [
+     '/project_home_dir/mockupecho',
+]
+
+BASE_APPS = [
+     'base_api.users',
+     'base_api.hash2params',
+]
+
+LOG_DIR = '/var/log/base'
+DEBUG = True
+
+APP_DB = None  # leave None - dinamicaly filled
+

@@ -174,9 +174,10 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                 self.set_status(200)
                 if 'http_status' in result:
                     self.set_status(result['http_status'])
+                    del result['http_status']
 
-                response = json.dumps(result)
-                self.write(response)
+                if result != {}:
+                    self.write(json.dumps(result))
 
             else:
                 self.log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method_map_rev[method]]))

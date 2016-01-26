@@ -1,4 +1,4 @@
-# **Base REST API for DigitalCube projects** #
+# **Base REST API** #
 
 * Version 1.0
 * [DigitalCube](http://digitalcube.rs/)
@@ -14,7 +14,7 @@
 * in .bash_profile (or .bashrc):
      - export PYTHONPATH="api/install/dir/digitalbaseapi:$PYTHONPATH"
 * make log dir:
-     - mkdir /var/log/digital (change permissions!!!)
+     - mkdir /var/log/base (change permissions!!!)
 
 ### Use on Your project ###
 
