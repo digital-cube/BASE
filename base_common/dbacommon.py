@@ -18,7 +18,7 @@ __db = None
 def get_md2db():
     global __db
 
-    if __db  and __db.open:
+    if __db and __db.open:
         return __db
 
     __db = MySQLdb.connect(

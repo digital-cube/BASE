@@ -42,6 +42,8 @@ def import_from_settings(imported_modules, app_to_start):
     pkg_dict = __INSTALLED_APPS[app_to_start]
     pm = pkg_dict['pkg']
 
+    # base_config.settings.APP_PORT = pm.SVC_PORT
+
     if hasattr(pm, 'DB_CONF'):
         app_db = importlib.import_module(pm.DB_CONF)
         base_config.settings.APP_DB = app_db.db_config
@@ -91,3 +93,6 @@ def get_pkgs(pkg_map):
                 pkg_map['BASE'][pk.name] = pk
 
 
+def get_app():
+
+    return __STARTED_APP

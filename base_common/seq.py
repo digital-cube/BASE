@@ -117,6 +117,15 @@ class SequencerFactory:
         return id
 
 
-sequencer = SequencerFactory(dbacommon.get_md2db())
+_sequencer = None
+
+
+def sequencer():
+
+    global _sequencer
+    if not _sequencer:
+        _sequencer = SequencerFactory(dbacommon.get_md2db())
+
+    return _sequencer
 
 

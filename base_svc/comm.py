@@ -4,7 +4,7 @@ import json
 import tornado.ioloop
 import tornado.template
 import tornado.web
-from tornado import httpclient
+# from tornado import httpclient
 
 import base_common.msg
 import base_config.settings as csettings
@@ -30,25 +30,45 @@ class BaseAPIRequestHandler:
         return self._map[key]
 
 
-def call(svc_url, location, data, request_timeout=10, force_json=False):
-    print("------------------ comm:call data=", data)
+def call(svc_url, port, location, data, method, request_timeout=10, force_json=False, call_headers=None):
 
-    http_client = httpclient.HTTPClient()
+    import http.client
+    conn = http.client.HTTPConnection(svc_url, 8600)
 
-    if force_json:
-        body = json.dumps(data)
-        headers = tornado.httputil.HTTPHeaders({'content-type': 'application/json'})
-    else:
-        body = urllib.parse.urlencode(data)
-        headers = tornado.httputil.HTTPHeaders({'content-type': 'application/x-www-form-urlencoded'})
+    body = urllib.parse.urlencode(data)
+    _headers = {'content-type': 'application/x-www-form-urlencoded'}
+    conn.request(method, "/"+location, body, headers=_headers)
 
-    url = svc_url + '/' + location
+    response = conn.getresponse()
+    return response.read().decode('utf-8'), response.status
 
-    http_request = httpclient.HTTPRequest(url, method='POST', body=body, request_timeout=request_timeout, headers=headers)
-
-    response = http_client.fetch(http_request)
-
-    return response.body.decode("utf-8")
+    # http_client = httpclient.HTTPClient()
+    #
+    # if force_json:
+    #     body = json.dumps(data)
+    #     _headers = {'content-type': 'application/json'}
+    # else:
+    #     body = urllib.parse.urlencode(data)
+    #     _headers = {'content-type': 'application/x-www-form-urlencoded'}
+    #
+    # if call_headers and isinstance(call_headers,dict):
+    #     _headers.update(call_headers)
+    # headers = tornado.httputil.HTTPHeaders(_headers)
+    # url = svc_url + '/' + location
+    #
+    # http_request = httpclient.HTTPRequest(
+    #         url,
+    #         method=method,
+    #         body=body,
+    #         request_timeout=request_timeout,
+    #         headers=headers)
+    #
+    # response = http_client.fetch(http_request)
+    #
+    # try:
+    #     return response.body.decode("utf-8")
+    # except:
+    #     return response
 
 
 class MainHandler(tornado.web.RequestHandler):

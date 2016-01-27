@@ -1,5 +1,6 @@
 from base_common.dbaexc import ErrorSetSessionToken
 from base_common.dbacommon import qu_esc
+from base_common.seq import sequencer
 
 
 def __get_assigned_token(dbc,log,uid):
@@ -12,7 +13,7 @@ def __get_assigned_token(dbc,log,uid):
     return dbc.fetchone()['id']
 
 
-def get_token(uid, sequencer, dbc, log):
+def get_token(uid, dbc, log):
 
     # RETRIEVE ASSIGNED TOKEN
 
@@ -20,7 +21,7 @@ def get_token(uid, sequencer, dbc, log):
     if __tk:
         return __tk
 
-    __tk = sequencer.new('s')
+    __tk = sequencer().new('s')
 
     try:
         __set_session_token(dbc, uid, __tk)

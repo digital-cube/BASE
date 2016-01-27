@@ -54,7 +54,7 @@ def do_put(request, *args, **kwargs):
         log.critical('Missing data argument for hash2param')
         return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
 
-    h_id = sequencer.new('h')
+    h_id = sequencer().new('h')
 
     h2p = prepare_hash2params_query(h_id, hdata)
     try:

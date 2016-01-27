@@ -3,7 +3,7 @@ from base_lookup.api_messages import msgs
 
 def error(s, **kwargs):
 
-    http_status = 400 # bad request
+    http_status = 400   # bad request
 
     if 'http_status' in kwargs:
         http_status = kwargs['http_status']

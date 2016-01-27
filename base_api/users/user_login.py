@@ -54,7 +54,7 @@ def do_post(request, *args, **kwargs):
     u_id = dbc.fetchone()['id']
 
     # ASSIGN TOKEN
-    tk = get_token(u_id, sequencer, dbc, log)
+    tk = get_token(u_id, dbc, log)
     if not tk:
         return base_common.msg.error('Cannot login user')
 
