@@ -2,25 +2,32 @@
 
 import os
 import sys
-import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from base_svc.comm import call
-from base_api.users.user_register import location
+import base_common.dbatests
 
-data = {
-    'username': 'user92',
-    'password': '123'
-}
+usage = """
+{} svc_port [usename and password]
+""".format(sys.argv[0])
+
+if len(sys.argv) < 2 or \
+        (len(sys.argv) > 2 and len(sys.argv) != 4):
+    print(usage)
+    sys.exit(1)
+
+# data = {
+#     'username': 'user92',
+#     'password': '123'
+# }
 
 svc_url = 'localhost'
-svc_port = 8600
+svc_port = sys.argv[1]
 
-res, status = call(svc_url, svc_port, location, data, 'POST')
-res = json.loads(res)
-if status < 300:
-    print(res['params']['token'])
+if len(sys.argv) == 2:
+    res, status = base_common.dbatests.test_authorize(svc_url, svc_port)
 else:
-    print(res['message'])
+    username = sys.argv[2]
+    password = sys.argv[3]
+    res, status = base_common.dbatests.test_authorize(svc_url, svc_port, username=username, password=password)
 
-
+print(status,'\t', res)
