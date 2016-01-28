@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 
 import tornado.ioloop
@@ -81,13 +82,16 @@ def start_base_service():
 
     entry_points = [entry_point(m) for m in imported_modules]
 
+    baseapi_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+    tpl_dir = os.path.join(baseapi_dir, 'templates')
+
     application = tornado.web.Application([
         (r'^/$', base_svc.comm.MainHandler),
         (r'^/spec.*$', base_svc.comm.MainHandler),
         *entry_points
         ],
-        template_path='templates',
-        static_path='templates',
+        template_path=tpl_dir,
+        static_path=tpl_dir,
         cookie_secret="d1g1t4l", debug=csettings.DEBUG)
 
     try:
