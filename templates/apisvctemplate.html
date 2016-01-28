@@ -78,29 +78,35 @@
                                 {% set bg_stil = s.lower()+'_bg' %}
                               <tbody style="border-top:8px solid white;">
                                 {% if s == 'DELETE' or s == 'POST' or s == 'PUT'  or s == 'GET' %}
-                                 <tr id="package{{s}}{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle" data-toggle="collapse" data-parent="#OrderPackages" data-target=".packageDetails{{s}}{{g}}">
+                                 <tr id="package{{s}}{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle"
+                                     data-toggle="collapse" data-parent="#OrderPackages"
+                                     data-target=".packageDetails{{s}}-{{g}}">
                                     <td style="margin-top:10px;padding:7px;  border-top-left-radius:5px;border-top-right-radius:5px;">
 
                                         {% if type(method[s])!=str %}
 
                                        {% if s == 'GET' %}
-                                         <span class=" label label-primary">{{s}}</span>  - {{appcall['url']}}  <span class="indicator right"> {{method[s]['description']}}</span>
+                                         <span class=" label label-primary">{{s}}</span>  - {{appcall['url']}}
+                                        <span class="indicator right"> {{method[s]['description']}}</span>
                                          {% set clasa = 'get_th ' %}
                                        {% end %}
 
                                        {% if s == 'PUT' %}
-                                        <span class="label label-success">{{s}}</span>  - {{appcall['url']}} <span class="indicator right">  {{method[s]['description']}}</span>
+                                        <span class="label label-success">{{s}}</span>  - {{appcall['url']}}
+                                        <span class="indicator right">  {{method[s]['description']}}</span>
                                          {% set clasa = 'put_th' %}
                                        {% end %}
 
                                        {% if s == 'DELETE' %}
-                                          <span class="label label-warning">{{s}}</span>  - {{appcall['url']}} <span class="indicator right"> {{method[s]['description']}}</span>
+                                          <span class="label label-warning">{{s}}</span>  - {{appcall['url']}}
+                                        <span class="indicator right"> {{method[s]['description']}}</span>
                                          {% set clasa = 'delete_th' %}
                                         {% else %}
                                        {% end %}
 
                                        {% if s == 'POST' %}
-                                       <span class="label label-danger">{{s}}</span>  - {{appcall['url']}} <span class="indicator right"> {{method[s]['description']}}</span>
+                                       <span class="label label-danger">{{s}}</span>  - {{appcall['url']}}
+                                        <span class="indicator right"> {{method[s]['description']}}</span>
                                          {% set clasa = 'post_th' %}
                                        {% end %}
 
@@ -111,7 +117,7 @@
 
                                 {% if s == 'DELETE' or s == 'POST' or s == 'PUT' or s == 'GET' %}
                                     <td colspan="{{s}}{{g}}" class="hiddenRow {{bg_stil}}" >
-                                    <div class="accordion-body {{bg_stil}} collapse packageDetails{{s}}{{g}}" id="accordion{{s}}{{g}}">
+                                    <div class="accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
 
 
                                         {% set ms = method[s]  %}
