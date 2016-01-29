@@ -2,7 +2,7 @@
 Check is user logged
 """
 from base_common.dbatokens import authorized_by_token
-from base_common.dbatokens import close_session_by_token
+from base_common.dbacommon import authenticated_call
 import base_common.msg
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import get_md2db
@@ -15,6 +15,7 @@ location = "user/check"
 request_timeout = 10
 
 
+@authenticated_call
 @app_api_method
 def do_post(request, *args, **kwargs):
     """
@@ -30,8 +31,6 @@ def do_post(request, *args, **kwargs):
     dbc = _db.cursor()
 
     tk = request.auth_token
-    if not authorized_by_token(dbc, tk, log):
-        return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)
 
     q = "select username from users u join session_token t on u.id = t.id_user where t.id = '{}'".format(qu_esc(tk))
     dbc.execute(q)
@@ -42,9 +41,7 @@ def do_post(request, *args, **kwargs):
 
     db_user = dbc.fetchone()
 
-
-    user = {'username':db_user['username']}
-
+    user = {'username': db_user['username']}
 
     return base_common.msg.post_ok(user)
 
