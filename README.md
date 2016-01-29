@@ -5,29 +5,29 @@
 
 ### Requirements ###
 
-* Python3
+* Python3.5+
 * [PIP](https://www.google.rs/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0ahUKEwjFx9KQwKHKAhUECCwKHVYBDDIQFggbMAA&url=https%3A%2F%2Fbootstrap.pypa.io%2Fget-pip.py&usg=AFQjCNE8Fo9j_sgo1hBzEoUT39H85hFDrg)
+* mysql
+* python3.5-dev
+* libmysqlclient-dev
+
 
 ### Setup ###
 
-* pip3 install -r requirements.txt
-* in .bash_profile (or .bashrc):
-     - export PYTHONPATH="api/install/dir/digitalbaseapi:$PYTHONPATH"
-* make log dir:
-     - mkdir /var/log/base (change permissions!!!)
+    * pip3 install -r requirements.txt
+    * make log dir:
+         - mkdir /var/log/base (change permissions!!!)
 
 ### Use on Your project ###
 
-* open project beside digitalbaseapi (digitalbaseapi/mockupecho can be Your base template)
-* if You use pycharm (for Your project):
-     - File -> Settings -> Project -> Project Structure:
-        - Add Content Root (add digitalbaseapi dir)
-        - select config and click on Source button, same for common dir
-* #### Settings ####
-    * register Your application in digitalbaseapi/config/settings.py APPS
+    * open project beside BASE (BASE/mockupecho can be Your base template)
+
+#### Settings ####
+    * register Your application in BASE/config/settings.py APPS
     * configure Your api in Your project's \_\_init\_\_.py
 
 ### Start service ###
-    cd api/install/dir/digitalbaseapi
+    cd api/install/dir/BASE
 
-    python3 service.py
+    python3 basemanager.py
+    * or add link to /usr/local/bin
