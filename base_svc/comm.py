@@ -133,7 +133,16 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.finish('Not Allowed')
 
     def options(self, *args, **kwargs):
-        self.not_allowed()
+        #self.not_allowed()
+        
+        self.set_status(200)
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.set_header('Access-Control-Max-Age', 1000)
+        self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization')
+        #self.write('OK')
+        self.finish('OK')
+
 
     def get(self):
 
@@ -183,6 +192,9 @@ class GeneralPostHandler(tornado.web.RequestHandler):
     def call_api_fun(self, method):
 
         self.set_header('Access-Control-Allow-Origin', '*')
+        #self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE')
+        #self.set_header('Access-Control-Max-Age', 1000)
+        #self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization')
 
         j, ip = self.check()
 
