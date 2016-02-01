@@ -1,7 +1,7 @@
 import os
 import sys
 
-pth = os.path.abspath(os.path.join(os.path.dirname(__file__),'..'))
+pth = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(pth)
 
 from base_svc.comm import call
@@ -20,6 +20,12 @@ class Color:
     DEFAULT = '\033[0m'
 
 
+class WarningLevel:
+    NO_WARNING = 0
+    STRICT = 1  # DEFAULT
+    STRICT_ON_KEY = 2  # ONLY KEY HAS TO BE CHECKED
+
+
 def test_warning(loc, method, result):
     print(Color.BOLD_YELLOW, 'WARNING', loc, method, '-> {}'.format(result) if result else '', Color.DEFAULT)
 
@@ -36,17 +42,15 @@ def test_db_active():
     return True
 
 
-def do_test(svc_port, location, method, token, data, expected_status, expected_data, result):
-
+def do_test(svc_port, location, method, token, data, expected_status, expected_data, result, warning_level):
     _headers = None
     if token:
         _headers = {'Authorization': token}
 
     res, status = call('localhost', svc_port, location, data, method, call_headers=_headers)
-    result.update({'res': res, 'status': status})
     res = json.loads(res) if res else {}
-    # print('R',result)
-    # print('R', res, type(res))
+    res.update({'status': status})
+    result.update(res)
 
     if status != expected_status:
         return False
@@ -54,43 +58,35 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
     if expected_data:
         for k in expected_data:
 
-            if k not in res:
+            if k not in res and warning_level != WarningLevel.NO_WARNING:
                 return False
 
-            if expected_data[k] != res[k]:
-                test_warning(location, method, '{}: {} | expected | {}'.format(k, expected_data[k],res[k]))
+            if expected_data[k] != res[k] and warning_level == WarningLevel.STRICT:
+                test_warning(location, method, '{}: {} | expected | {}'.format(k, expected_data[k], res[k]))
 
     return True
 
 
-def test(svc_port, location, method, token, data, expected_status, expected_data, __result):
+def test(svc_port, location, method, token, data, expected_status, expected_data, warning_level=WarningLevel.STRICT):
+
+    __result = {}
 
     if not test_db_active():
         test_failed('TEST DATABASE NOT ACTIVE', '', '')
         sys.exit(1)
 
-    if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result):
+    if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result, warning_level):
         test_failed(location, method, __result)
         sys.exit(1)
 
     test_passed(location, method, __result)
-
-
-def insert_path_to_sys():
-
-    import os
-    pth = os.path.abspath(os.path.join(os.path.dirname(__file__),'..'))
-    print(pth)
-    sys.path.append(pth)
+    return __result
 
 
 if __name__ == '__main__':
-
     import json
     from base_common.importer import import_from_settings
     from base_common.importer import get_installed_apps
-
-    # insert_path_to_sys()
 
     imported_modules = []
     installed_apps = {}
@@ -104,232 +100,79 @@ if __name__ == '__main__':
 
     result = {}
 
-    # REGISTER TESTS # TODO: PROBLEM WITH IMPORT REGISTRATION QUERY
     import base_api.users.user_register
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_register.location,
-        method='GET',
-        token=None,
-        data={'username':'user1','password':'123'},
-        expected_status=404,
-        expected_data={'message':'GET not implemented'},
-        # expected_data={'message':amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]},
-        __result=result)
 
-    # test(
-    #     svc_port=svc_port,
-    #     location=base_api.users.user_register.location,
-    #     method='POST',
-    #     token=None,
-    #     data={'username':'user1','password':'123'},
-    #     expected_status=200,
-    #     expected_data={'params':amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]},
-    #     # expected_data={'message':amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]},
-    #     __result=result)
+    test(svc_port, base_api.users.user_register.location, 'GET', None,
+         {'username': 'user1@test.loc', 'password': '123'}, 404, {'message': 'GET not implemented'})
+
+    test(svc_port, base_api.users.user_register.location, 'POST', None,
+         {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, WarningLevel.STRICT_ON_KEY)
+
+    test(svc_port, base_api.users.user_register.location, 'POST', None,
+         {'username': 'user1@test.loc', 'password': '123'}, 400, {'message': amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]})
 
     # LOGIN TESTS
     import base_api.users.user_login
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_login.location,
-        method='POST',
-        token=None,
-        data={'username':'user2','password':'123'},
-        expected_status=200,
-        expected_data={'params': {}},
-        __result=result)
 
-    res = result['res']
-    res = json.loads(res)
-    tk = res['params']['token']
-
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_login.location,
-        method='POST',
-        token=None,
-        data={'username':'no_user','password':'123'},
-        expected_status=400,
-        expected_data={'message':amsgs.msgs[amsgs.USER_NOT_FOUND]},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_login.location,
-        method='POST',
-        token=None,
-        data={'userna':'no_user','password':'123'},
-        expected_status=400,
-        expected_data={'message':amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_login.location,
-        method='POST',
-        token=None,
-        data={'username':'no_user','passwo':'123'},
-        expected_status=400,
-        expected_data={'message':amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]},
-        __result=result)
+    tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
+              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''},
+              warning_level=WarningLevel.STRICT_ON_KEY)['token']
+    test(svc_port, base_api.users.user_login.location, 'POST', None,
+         {'username': 'no_user@test.loc', 'password': '123'}, 400, {'message': amsgs.msgs[amsgs.USER_NOT_FOUND]})
+    test(svc_port, base_api.users.user_login.location, 'POST', None, {'userna': 'no_user@test.loc', 'password': '123'},
+         400, {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
+    test(svc_port, base_api.users.user_login.location, 'POST', None, {'username': 'no_user@test.loc', 'passwo': '123'},
+         400, {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
 
     # LOGOUT TESTS
     import base_api.users.user_logout
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_logout.location,
-        method='POST',
-        token=None,
-        data={},
-        expected_status=400,
-        expected_data={'message':amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_logout.location,
-        method='POST',
-        token=tk,
-        data={},
-        expected_status=204,
-        expected_data={},
-        __result=result)
+
+    test(svc_port, base_api.users.user_logout.location, 'POST', None, {}, 400,
+         {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]})
+    test(svc_port, base_api.users.user_logout.location, 'POST', tk, {}, 204, {})
 
     # FORGOT PASSWORD TESTS
     import base_api.users.forgot_password
-    test(
-        svc_port=svc_port,
-        location=base_api.users.forgot_password.location,
-        method='POST',
-        token=None,
-        data={'ername':'user2'},
-        expected_status=404,
-        expected_data={'message': 'POST not implemented'},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.users.forgot_password.location,
-        method='PUT',
-        token=None,
-        data={'ername':'user2'},
-        expected_status=400,
-        expected_data={'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.users.forgot_password.location,
-        method='PUT',
-        token=None,
-        data={'username':'user2'},
-        expected_status=200,
-        expected_data={},
-        __result=result)
+
+    test(svc_port, base_api.users.forgot_password.location, 'POST', None, {'ername': 'user2@test.loc'}, 404,
+         {'message': 'POST not implemented'})
+    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'ername': 'user2@test.loc'}, 400,
+         {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
+    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user2@test.loc'}, 400,
+         {'message': amsgs.msgs[amsgs.USER_NOT_FOUND]})
+    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user1@test.loc'}, 200, {})
 
     # HASHING PARAMETERS TESTS
     import base_api.hash2params.save_hash
-    test(
-        svc_port=svc_port,
-        location=base_api.hash2params.save_hash.location,
-        method='POST',
-        token=None,
-        data={'username':'user2','password':'123'},
-        expected_status=404,
-        expected_data={'message': 'POST not implemented'},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.hash2params.save_hash.location,
-        method='PUT',
-        token=None,
-        data={'dat':'user2'},
-        expected_status=400,
-        expected_data={'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.hash2params.save_hash.location,
-        method='PUT',
-        token=None,
-        data={'data': {'username':'user2'}},
-        expected_status=200,
-        expected_data={},
-        __result=result)
-    res = result['res']
-    res = json.loads(res)
-    htk = res['params']['h']
+
+    test(svc_port, base_api.hash2params.save_hash.location, 'POST', None,
+         {'username': 'user2@test.loc', 'password': '123'}, 404, {'message': 'POST not implemented'})
+    test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'dat': 'user2@test.loc'}, 400,
+         {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
+    htk = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None,
+               {'data': json.dumps({"username": "user2@test.loc"})}, 200, {})['h']
 
     # CHANGE PASSWORD TESTS
     import base_api.users.change_password
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_login.location,
-        method='POST',
-        token=None,
-        data={'username':'user2','password':'123'},
-        expected_status=200,
-        expected_data={'params': {}},
-        __result=result)
 
-    res = result['res']
-    res = json.loads(res)
-    tk = res['params']['token']
+    tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
+              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''},
+              warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
-    test(
-        svc_port=svc_port,
-        location=base_api.users.change_password.location,
-        method='POST',
-        token=None,
-        data={'ername':'user2'},
-        expected_status=400,
-        expected_data={'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.users.change_password.location,
-        method='POST',
-        token=tk,
-        data={'newpassword':'123'},
-        expected_status=400,
-        expected_data={'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.users.change_password.location,
-        method='POST',
-        token=tk,
-        data={'newpassword':'123','oldpassword':'123'},
-        expected_status=200,
-        expected_data={'params': {}},
-        __result=result)
+    test(svc_port, base_api.users.change_password.location, 'POST', None, {'ername': 'user2@test.loc'}, 400,
+         {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
+    test(svc_port, base_api.users.change_password.location, 'POST', tk, {'newpassword': '123'}, 400,
+         {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
+    test(svc_port, base_api.users.change_password.location, 'POST', tk, {'newpassword': '123', 'oldpassword': '123'},
+         200, {'message': amsgs.msgs[amsgs.USER_PASSWORD_CHANGED]})
 
-    # TODO: finish this one
-    # loc = base_api.users.change_password.location[:-2] + '/' + htk
-    # test(
-    #     svc_port=svc_port,
-    #     location=loc,
-    #     method='POST',
-    #     token=None,
-    #     data={'newpassword':'123'},
-    #     expected_status=200,
-    #     expected_data={'params': {}},
-    #     __result=result)
+    loc = base_api.users.change_password.location[:-2] + '/' + htk
+    test(svc_port, loc, 'POST', None, {'newpassword':'123'}, 200, {'message': ''}, result)
 
     # CHECK USER TESTS
     import base_api.users.user_check
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_check.location,
-        method='POST',
-        token=None,
-        data={'username':'user2','password':'123'},
-        expected_status=400,
-        expected_data={'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]},
-        __result=result)
-    test(
-        svc_port=svc_port,
-        location=base_api.users.user_check.location,
-        method='POST',
-        token=tk,
-        data={'username':'user2','password':'123'},
-        expected_status=200,
-        expected_data={'params': {}},
-        __result=result)
 
+    test(svc_port, base_api.users.user_check.location, 'POST', None, {'username': 'user2@test.loc', 'password': '123'},
+         400, {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]})
+    test(svc_port, base_api.users.user_check.location, 'POST', tk, {'username': 'user2@test.loc', 'password': '123'},
+         200, {'username': ''}, warning_level=WarningLevel.STRICT_ON_KEY)
