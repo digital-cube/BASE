@@ -33,10 +33,13 @@ class BaseAPIRequestHandler:
 def call(svc_url, port, location, data, method, request_timeout=10, force_json=False, call_headers=None):
 
     import http.client
-    conn = http.client.HTTPConnection(svc_url, 8600)
+    conn = http.client.HTTPConnection(svc_url, port)
 
     body = urllib.parse.urlencode(data)
     _headers = {'content-type': 'application/x-www-form-urlencoded'}
+    if call_headers:
+        _headers.update(call_headers)
+
     conn.request(method, "/"+location, body, headers=_headers)
 
     response = conn.getresponse()

@@ -22,7 +22,6 @@ CREATE TABLE hash_2_params_historylog (
 	log_time DATETIME NOT NULL,
 	CONSTRAINT hash_2_params_historylog_fk0 FOREIGN KEY (id_hash_2_params) REFERENCES hash_2_params(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
--- ALTER TABLE hash_2_params_historylog ADD CONSTRAINT hash_2_params_historylog_fk0 FOREIGN KEY (id_hash_2_params) REFERENCES hash_2_params(id);
 
 CREATE TABLE IF NOT EXISTS sequencers (
 	id char(2) NOT NULL,
@@ -47,7 +46,6 @@ CREATE TABLE session_token (
   closed boolean DEFAULT FALSE,
 	CONSTRAINT session_token_fk0 FOREIGN KEY (id_user) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
--- ALTER TABLE session_token ADD CONSTRAINT session_token_fk0 FOREIGN KEY (id_user) REFERENCES users(id);
 
 CREATE TABLE mail_queue (
 	id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,

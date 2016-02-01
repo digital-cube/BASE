@@ -54,6 +54,9 @@ def do_post(request, *args, **kwargs):
     except tornado.web.MissingArgumentError:
         return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
 
+    if len(password) < 3:
+        return base_common.msg.error(msgs.PASSWORD_TO_SHORT)
+
     password = format_password(username, password)
 
     _db = get_md2db()
@@ -65,7 +68,7 @@ def do_post(request, *args, **kwargs):
     u_id = sequencer().new('u')
 
     if not u_id:
-        return base_common.msg.error('Error serializing user')
+        return base_common.msg.error(msgs.ERROR_SERIALIZE_USER)
 
     quser = _prepare_user_query(u_id, username, password)
 
@@ -73,7 +76,7 @@ def do_post(request, *args, **kwargs):
         dbc.execute(quser)
     except IntegrityError as e:
         log.critical('User registration: {}'.format(e))
-        return base_common.msg.error('User not registered')
+        return base_common.msg.error(msgs.ERROR_REGISTER_USER)
 
     tk = get_token(u_id, dbc, log)
     if not tk:

@@ -43,6 +43,7 @@
                      <h4>Version: {{items['api_version']}} :</h4>
 
                   {% for i in items %}
+                                {% set g= g+1  %}
 
                         {% if i == 'applications' %}
                           {% for app in items[i] %}
@@ -53,7 +54,6 @@
                               {% set g = 0 %}
                               {% for appc in appl %}
                                 {% set appcall = appl[appc] %}
-                                {% set g= g+1  %}
                                 {% set method = appcall['methods'] %}
 
                             <table>
