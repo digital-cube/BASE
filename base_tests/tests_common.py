@@ -38,7 +38,7 @@ def test_passed(loc, method, result):
     print(Color.BOLD_GREEN, 'PASSED', loc, method, '-> {}'.format(result) if result else '', Color.DEFAULT)
 
 
-def test_db_active():
+def test_db_is_active():
     return True
 
 
@@ -71,7 +71,7 @@ def test(svc_port, location, method, token, data, expected_status, expected_data
 
     __result = {}
 
-    if not test_db_active():
+    if not test_db_is_active():
         test_failed('TEST DATABASE NOT ACTIVE', '', '')
         sys.exit(1)
 
