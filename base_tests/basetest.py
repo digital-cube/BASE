@@ -14,6 +14,7 @@ from base_tests.test_list import hash_save_test
 from base_tests.test_list import hash_retrieve_test
 from base_tests.test_list import user_change_password_test
 from base_tests.test_list import user_check_test
+from base_tests.tests_common import finish_tests
 
 
 def test_base(svc_port):
@@ -45,10 +46,14 @@ def test_base(svc_port):
 
 def run_tests():
 
+    import time
+    time.sleep(3)
+
     svc_port = TEST_PORT
 
     test_base(svc_port)
 
+    finish_tests()
 
 if __name__ == '__main__':
 

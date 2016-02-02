@@ -66,6 +66,14 @@ def entry_point(api_module, allowed=None, denied=None):
            dict(allowed=allowed, denied=denied, apimodule=api_module, log=llog)
 
 
+def start_tests():
+
+        import subprocess
+        import base_tests.basetest
+
+        s = subprocess.Popen(["python3", base_tests.basetest.__file__], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+
+
 def start_base_service():
 
     close_stdout(csettings.DEBUG)
@@ -91,7 +99,7 @@ def start_base_service():
     if b_args.test:
         prepare_test_env()
         svc_port = csettings.TEST_PORT
-        # TODO: start tests after tornado loop and shutdown service on success or error
+        start_tests()
 
     baseapi_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     tpl_dir = os.path.join(baseapi_dir, 'templates')

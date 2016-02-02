@@ -112,5 +112,8 @@ def finish_test_with_error():
 
 
 def finish_tests():
+
+    import tornado.ioloop
     print(Color.BOLD_GREEN, 'FINISH TESTING', Color.DEFAULT)
-    sys.exit()
+    tornado.ioloop.IOLoop.instance().stop()
+    #sys.exit()
