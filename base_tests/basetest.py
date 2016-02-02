@@ -4,6 +4,8 @@ import sys
 pth = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(pth)
 
+from base_config.settings import TEST_PORT
+
 from base_tests.test_list import user_register_test
 from base_tests.test_list import user_login_test
 from base_tests.test_list import user_logout_test
@@ -14,9 +16,7 @@ from base_tests.test_list import user_change_password_test
 from base_tests.test_list import user_check_test
 
 
-if __name__ == '__main__':
-
-    svc_port = 8801
+def test_base(svc_port):
 
     # USER REGISTER TEST
     user_register_test(svc_port)
@@ -41,3 +41,17 @@ if __name__ == '__main__':
 
     # CHECK USER TESTS
     user_check_test(svc_port)
+
+
+def run_tests():
+
+    svc_port = TEST_PORT
+
+    test_base(svc_port)
+
+
+if __name__ == '__main__':
+
+    run_tests()
+
+

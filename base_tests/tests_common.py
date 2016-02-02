@@ -82,3 +82,35 @@ def test(svc_port, location, method, token, data, expected_status, expected_data
     test_passed(location, method, __result)
     return __result
 
+
+def prepare_test_env():
+
+    from collections import namedtuple
+    import base_config.settings
+    import base_common.dbacommon
+
+    db_name = 'test_{}'.format(base_config.settings.APP_DB.db)
+    dbtest = namedtuple('DbTest', 'db, host, user, passwd, charset')
+    db_test = dbtest(
+        db_name,
+        'localhost',
+        base_config.settings.APP_DB.user,
+        base_config.settings.APP_DB.passwd,
+        'utf8')
+    base_config.settings.APP_DB = db_test
+
+    _db = base_common.dbacommon.get_md2db()
+    print('TEST PROSHO')
+
+    # test if test.sql exists
+    # test db connection
+
+
+def finish_test_with_error():
+    print(Color.BOLD_RED, 'ERROR TESTING', Color.DEFAULT)
+    sys.exit(4)
+
+
+def finish_tests():
+    print(Color.BOLD_GREEN, 'FINISH TESTING', Color.DEFAULT)
+    sys.exit()
