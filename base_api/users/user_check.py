@@ -1,7 +1,6 @@
 """
 Check is user logged
 """
-from base_common.dbatokens import authorized_by_token
 from base_common.dbacommon import authenticated_call
 import base_common.msg
 from base_lookup import api_messages as msgs
