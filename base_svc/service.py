@@ -103,6 +103,7 @@ def start_base_service():
 
     baseapi_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     tpl_dir = os.path.join(baseapi_dir, 'templates')
+    st_dir = os.path.join(baseapi_dir, 'static')
 
     application = tornado.web.Application([
         (r'^/$', base_svc.comm.MainHandler),
@@ -110,7 +111,7 @@ def start_base_service():
         *entry_points
         ],
         template_path=tpl_dir,
-        static_path=tpl_dir,
+        static_path=st_dir,
         cookie_secret="d1g1t4l", debug=csettings.DEBUG)
 
     try:
