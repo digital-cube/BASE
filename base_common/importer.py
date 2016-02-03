@@ -2,6 +2,7 @@ import sys
 import importlib
 from base_config.settings import APPS, BASE_APPS, TEST_PORT
 import base_config.settings
+import base_lookup.api_messages
 
 __INSTALLED_APPS = {}
 __STARTED_APP = None
@@ -62,6 +63,12 @@ def import_from_settings(imported_modules, app_to_start):
     if hasattr(pm, 'DB_CONF'):
         app_db = importlib.import_module(pm.DB_CONF)
         base_config.settings.APP_DB = app_db.db_config
+
+    if hasattr(pm, 'MSG_LOOKUP'):
+        _app_msgs = pm.MSG_LOOKUP
+        app_msgs = importlib.import_module('{}.{}'.format(pkg_dict['pkg_name'], _app_msgs))
+        if hasattr(app_msgs, 'msgs') and isinstance(app_msgs.msgs, dict):
+            base_lookup.api_messages.msgs.update(app_msgs.msgs)
 
     for _m in pm.IMPORTS:
         mm = importlib.import_module('{}.{}'.format(pkg_dict['pkg_name'], _m))   # import pkg.module
