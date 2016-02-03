@@ -14,8 +14,8 @@
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="http://getbootstrap.com/dist/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="http://getbootstrap.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-    <!-- <link href="{{static_url('css/style.css')}}" rel="stylesheet"> -->
-    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="{{static_url('css/style.css')}}" rel="stylesheet">
+    <!-- <link href="/static/css/style.css" rel="stylesheet">-->
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="http://getbootstrap.com/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -36,17 +36,9 @@
       </div>
       <div class="row">
           <div class="col-md-12">
-
-
-                              {% set g = 0 %}
-
-		{% set g = 0 %}
-
-
+              {% set g = 0 %}
                      <h4>Version: {{items['api_version']}} :</h4>
-
                   {% for i in items %}
-                    {% set g= g+1  %}
 
                         {% if i == 'applications' %}
                           {% for app in items[i] %}
@@ -57,10 +49,11 @@
                               {% for appc in appl %}
                                 {% set appcall = appl[appc] %}
                                 {% set method = appcall['methods'] %}
+                                {% set g = g+1  %}
 
                             <table>
                                 <tbody style="margin-top:10px;">
-                               <tr>
+                                <tr>
 
                                  <td class=" siz bold ">{{appcall['name']}}</td>
                                  <td class=" siz">{{appcall['url']}}</td>
