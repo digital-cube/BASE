@@ -38,12 +38,13 @@
 
 
 
+		{% set g = 0 %}
 
 
                      <h4>Version: {{items['api_version']}} :</h4>
 
                   {% for i in items %}
-                                {% set g= g+1  %}
+                    {% set g= g+1  %}
 
                         {% if i == 'applications' %}
                           {% for app in items[i] %}
@@ -51,7 +52,6 @@
                                 {% if app!=items['api_version'] %}
                                 <h3> -{{app}}</h3>
                                 {% end %}
-                              {% set g = 0 %}
                               {% for appc in appl %}
                                 {% set appcall = appl[appc] %}
                                 {% set method = appcall['methods'] %}
@@ -78,7 +78,7 @@
                                 {% set bg_stil = s.lower()+'_bg' %}
                               <tbody style="border-top:8px solid white;">
                                 {% if s == 'DELETE' or s == 'POST' or s == 'PUT'  or s == 'GET' %}
-                                 <tr id="package{{s}}{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle"
+                                 <tr id="package{{s}}-{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle"
                                      data-toggle="collapse" data-parent="#OrderPackages"
                                      data-target=".packageDetails{{s}}-{{g}}">
                                     <td style="margin-top:10px;padding:7px;  border-top-left-radius:5px;border-top-right-radius:5px;">
@@ -116,7 +116,7 @@
                                  </tr>
 
                                 {% if s == 'DELETE' or s == 'POST' or s == 'PUT' or s == 'GET' %}
-                                    <td colspan="{{s}}{{g}}" class="hiddenRow {{bg_stil}}" >
+                                    <td colspan="{{s}}-{{g}}" class="hiddenRow {{bg_stil}}" >
                                     <div class="accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
 
 
