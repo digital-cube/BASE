@@ -9,7 +9,6 @@ from base_common.dbacommon import format_password
 from base_common.dbacommon import get_md2db
 from base_common.dbacommon import qu_esc
 from base_common.dbatokens import get_token
-from base_common.seq import sequencer
 from base_lookup import api_messages as msgs
 
 
@@ -37,7 +36,7 @@ def do_post(request, *args, **kwargs):
         password = request.get_argument('password')
     except tornado.web.MissingArgumentError:
         log.critical('Missing argument')
-        return base_common.msg.error('Missing argument')
+        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
 
     password = format_password(username, password)
 
@@ -56,7 +55,7 @@ def do_post(request, *args, **kwargs):
     # ASSIGN TOKEN
     tk = get_token(u_id, dbc, log)
     if not tk:
-        return base_common.msg.error('Cannot login user')
+        return base_common.msg.error(msgs.ERROR_LOGIN_USER)
 
     _db.commit()
 

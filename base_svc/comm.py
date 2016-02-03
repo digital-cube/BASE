@@ -33,10 +33,18 @@ class BaseAPIRequestHandler:
 def call(svc_url, port, location, data, method, request_timeout=10, force_json=False, call_headers=None):
 
     import http.client
-    conn = http.client.HTTPConnection(svc_url, 8600)
+    conn = http.client.HTTPConnection(svc_url, port)
 
-    body = urllib.parse.urlencode(data)
-    _headers = {'content-type': 'application/x-www-form-urlencoded'}
+    if force_json:
+        body = json.dumps(data)
+        _headers = {'content-type': 'application/json'}
+    else:
+        body = urllib.parse.urlencode(data)
+        _headers = {'content-type': 'application/x-www-form-urlencoded'}
+
+    if call_headers:
+        _headers.update(call_headers)
+
     conn.request(method, "/"+location, body, headers=_headers)
 
     response = conn.getresponse()
@@ -133,7 +141,13 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.finish('Not Allowed')
 
     def options(self, *args, **kwargs):
-        self.not_allowed()
+
+        self.set_status(200)
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.set_header('Access-Control-Max-Age', 1000)
+        self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization')
+        self.finish('OK')
 
     def get(self):
 
@@ -146,7 +160,6 @@ class GeneralPostHandler(tornado.web.RequestHandler):
     def patch(self):
 
         self.not_allowed()
-        # self.call_api_fun(method_map[PATCH])
 
     def post(self):
 

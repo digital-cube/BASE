@@ -12,7 +12,10 @@ import base_svc.comm
 from base_common.dbacommon import close_stdout
 from base_common.importer import import_from_settings
 from base_common.importer import get_installed_apps
+from base_common.importer import check_test_port_is_used
 from base_config.service import logs, log
+from base_tests.tests_common import prepare_test_env
+from base_tests.basetest import run_tests
 
 from socket import gaierror
 
@@ -42,6 +45,7 @@ def check_args(installed_apps):
                        default=list(installed_apps.keys())[0], nargs='?')
 
     a.add_argument("-p", "--port", help="Application port")
+    a.add_argument("-t", "--test", help="TEST Application", action='store_true')
 
     return a.parse_args()
 
@@ -62,6 +66,14 @@ def entry_point(api_module, allowed=None, denied=None):
            dict(allowed=allowed, denied=denied, apimodule=api_module, log=llog)
 
 
+def start_tests():
+
+        import subprocess
+        import base_tests.basetest
+
+        s = subprocess.Popen(["python3", base_tests.basetest.__file__], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+
+
 def start_base_service():
 
     close_stdout(csettings.DEBUG)
@@ -73,6 +85,8 @@ def start_base_service():
     b_args = check_args(installed_apps)
 
     svc_port = b_args.port if b_args.port else installed_apps[b_args.app]['svc_port']
+    check_test_port_is_used(svc_port, b_args.app)
+
     if not svc_port:
         log.critical('No svc port provided, lok in app config or add in commandline')
         print('Please provide svc_port in app init or trough commandline')
@@ -82,8 +96,14 @@ def start_base_service():
 
     entry_points = [entry_point(m) for m in imported_modules]
 
+    if b_args.test:
+        prepare_test_env()
+        svc_port = csettings.TEST_PORT
+        start_tests()
+
     baseapi_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     tpl_dir = os.path.join(baseapi_dir, 'templates')
+    st_dir = os.path.join(baseapi_dir, 'static')
 
     application = tornado.web.Application([
         (r'^/$', base_svc.comm.MainHandler),
@@ -91,7 +111,7 @@ def start_base_service():
         *entry_points
         ],
         template_path=tpl_dir,
-        static_path=tpl_dir,
+        static_path=st_dir,
         cookie_secret="d1g1t4l", debug=csettings.DEBUG)
 
     try:

@@ -56,8 +56,7 @@ def do_post(request, *args, **kwargs):
         if 'http_status' not in res or res['http_status'] != 200:
             return base_common.msg.error(msgs.PASSWORD_TOKEN_EXPIRED)
 
-        user_data = res['params']
-        username = user_data['username']
+        username = res['username']
 
     else:
         # TRY TO CHANGE PASSWORD FROM USER CHANGE REQUEST

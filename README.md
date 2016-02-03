@@ -7,6 +7,7 @@
 
 * Python3.5+
 * [PIP](https://www.google.rs/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0ahUKEwjFx9KQwKHKAhUECCwKHVYBDDIQFggbMAA&url=https%3A%2F%2Fbootstrap.pypa.io%2Fget-pip.py&usg=AFQjCNE8Fo9j_sgo1hBzEoUT39H85hFDrg)
+* build-essential
 * mysql
 * python3.5-dev
 * libmysqlclient-dev

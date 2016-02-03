@@ -64,7 +64,7 @@ def do_put(request, *args, **kwargs):
     if 'http_status' not in res or res['http_status'] != 200:
         return base_common.msg.error('Cannot handle forgot password')
 
-    tk = res['params']['h']
+    tk = res['h']
 
     message = get_email_message(request, username, tk)
 
@@ -77,5 +77,5 @@ def do_put(request, *args, **kwargs):
     if 'http_status' not in res or res['http_status'] != 204:
         return base_common.msg.error('Error finishing change password request')
 
-    return base_common.msg.post_ok("OK")
+    return base_common.msg.post_ok(msgs.OK)
 

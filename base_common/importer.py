@@ -1,10 +1,15 @@
 import sys
 import importlib
-from base_config.settings import APPS, BASE_APPS
+from base_config.settings import APPS, BASE_APPS, TEST_PORT
 import base_config.settings
 
 __INSTALLED_APPS = {}
 __STARTED_APP = None
+
+port_warning = '''
+Application {} cannot be started on test port {},
+please change port in application settings
+'''
 
 
 def insert_path_to_sys(pth):
@@ -17,12 +22,22 @@ def insert_path_to_sys(pth):
     return pl[-1]   # package name
 
 
+def check_test_port_is_used(port_to_test, app_name):
+
+    port_to_test = int(port_to_test)
+    if port_to_test == TEST_PORT:
+        print(port_warning.format(app_name, TEST_PORT))
+        sys.exit(3)
+
+
 def get_installed_apps(installed_apps):
 
     for app in APPS:
 
         pkg = insert_path_to_sys(app)
         pm = importlib.import_module(pkg)
+
+        check_test_port_is_used(pm.SVC_PORT, pm.APP_NAME)
 
         installed_apps[pm.APP_NAME] = {}
         installed_apps[pm.APP_NAME]['svc_port'] = pm.SVC_PORT if hasattr(pm, 'SVC_PORT') else None

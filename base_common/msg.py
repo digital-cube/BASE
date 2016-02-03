@@ -10,12 +10,16 @@ def error(s, **kwargs):
         del kwargs['http_status']
 
     if isinstance(s, str):
-        return {'message': s, 'code': 0, 'http_status': http_status }
+        return {'message': s, 'code': 0, 'http_status': http_status}
 
     if s not in msgs:
-        return {'message': 'unknown error', 'code': 0, 's': s, 'http_status': http_status }
+        return {'message': 'unknown error', 'code': 0, 's': s, 'http_status': http_status}
 
-    return {'message': msgs[s], 'code': s, 'params': kwargs, 'http_status': http_status}
+    response = {'message': msgs[s], 'code': s, 'http_status': http_status}
+    if kwargs:
+        response.update(kwargs)
+
+    return response
 
 
 def res_ok(s=None, **kwargs):
@@ -42,9 +46,13 @@ def res_ok(s=None, **kwargs):
             response.update({'message': msgs[s], 'code': s})
 
     if response:
-        return {'http_status': http_status, 'params': response}
+        if isinstance(response, dict):
+            response.update({'http_status': http_status})
+            return response
 
-    return {'http_status':http_status}
+        return {'http_status': http_status, 'response': response}
+
+    return {'http_status': http_status}
 
 
 def put_ok(s=None, **kwargs):

@@ -14,5 +14,5 @@ DEBUG = True
 
 APP_DB = None  # leave None - dinamicaly filled
 
-TEST_USER = 'user1'
-TEST_USER_PWD = '123'
+TEST_PORT = 8778
+
