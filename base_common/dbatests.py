@@ -4,7 +4,7 @@ import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from base_svc.comm import call
-from base_api.users.user_register import location as register_location
+from base_api.users.user_login import location as login_location
 from base_config.settings import TEST_USER, TEST_USER_PWD
 
 
@@ -24,14 +24,14 @@ def test_authorize(svc_url, svc_port, username=None, password=None, force_json=F
         'password': password if password else TEST_USER_PWD
     }
 
-    res, status = call(svc_url, svc_port, register_location, data, 'POST')
+    res, status = call(svc_url, svc_port, login_location, data, 'POST')
 
     if force_json:
         return res, status
 
     res = json.loads(res)
     if status < 300:
-        return res['params']['token'], status
+        return res['token'], status
 
     return res['message'], status
 

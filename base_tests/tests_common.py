@@ -1,11 +1,27 @@
 import os
 import sys
 import json
+import logging
+from logging.handlers import RotatingFileHandler
 
 pth = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(pth)
 
+
 from base_svc.comm import call
+from base_config.settings import LOG_DIR
+
+
+log_filename = "{}/tests.log".format(LOG_DIR)
+log_handler = RotatingFileHandler(log_filename, maxBytes=1048576, backupCount=2)
+log_formatter = logging.Formatter(
+        '%(asctime)-6s  - %(message)s')
+log_handler.setFormatter(log_formatter)
+
+log = logging.getLogger('DGTT')
+log.propagate = False
+log.addHandler(log_handler)
+log.setLevel(logging.DEBUG)
 
 
 class Color:
@@ -26,16 +42,26 @@ class WarningLevel:
     STRICT_ON_KEY = 2  # ONLY KEY HAS TO BE CHECKED
 
 
+def test_log(loc, method, result, color, message):
+    st = '{}{} {} {}{}{}'.format(color, message, loc, method, '-> {}'.format(result) if result else '', Color.DEFAULT)
+    log.info(st)
+    print(st)
+
+
+def test_info(loc, method, result):
+    test_log(loc, method, result, Color.BLUE, 'INFO')
+
+
 def test_warning(loc, method, result):
-    print(Color.BOLD_YELLOW, 'WARNING', loc, method, '-> {}'.format(result) if result else '', Color.DEFAULT)
+    test_log(loc, method, result, Color.BOLD_YELLOW, 'WARNING')
 
 
 def test_failed(loc, method, result):
-    print(Color.BOLD_RED, 'FAILED', loc, method, '->', result, Color.DEFAULT)
+    test_log(loc, method, result, Color.BOLD_RED, 'FAILED')
 
 
 def test_passed(loc, method, result):
-    print(Color.BOLD_GREEN, 'PASSED', loc, method, '-> {}'.format(result) if result else '', Color.DEFAULT)
+    test_log(loc, method, result, Color.BOLD_GREEN, 'PASSED')
 
 
 def test_db_is_active():
@@ -100,20 +126,26 @@ def prepare_test_env():
     base_config.settings.APP_DB = db_test
 
     _db = base_common.dbacommon.get_md2db()
-    print('TEST PROSHO')
 
     # test if test.sql exists
     # test db connection
 
 
 def finish_test_with_error():
-    print(Color.BOLD_RED, 'ERROR TESTING', Color.DEFAULT)
+    st = '{}{}{}'.format(Color.BOLD_RED, 'ERROR TESTING', Color.DEFAULT)
+    log.info(st)
+    print(st)
     sys.exit(4)
+
+    st = '{}{}{}{}{}{}{}'.format(Color.BOLD_GREEN, 'PASSED', loc, method, '-> {}'.format(result) if result else '', Color.DEFAULT)
+    log.info(st)
 
 
 def finish_tests():
 
+    st = '{}{}{}'.format(Color.BOLD_GREEN, 'FINISH TESTING', Color.DEFAULT)
+    log.info(st)
+    print(st)
     import tornado.ioloop
-    print(Color.BOLD_GREEN, 'FINISH TESTING', Color.DEFAULT)
     tornado.ioloop.IOLoop.instance().stop()
-    #sys.exit()
+    sys.exit()

@@ -16,3 +16,5 @@ APP_DB = None  # leave None - dinamicaly filled
 
 TEST_PORT = 8778
 
+TEST_USER = None
+TEST_USER_PWD = None
