@@ -16,6 +16,7 @@ PASSWORD_TO_SHORT = 22
 ERROR_SERIALIZE_USER = 23
 ERROR_REGISTER_USER = 24
 ERROR_LOGIN_USER = 25
+INVALID_REQUEST_ARGUMENT = 26
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -36,3 +37,4 @@ msgs[PASSWORD_TO_SHORT] = "Password to short"
 msgs[ERROR_SERIALIZE_USER] = "Error serializing user"
 msgs[ERROR_REGISTER_USER] = "Error register user"
 msgs[ERROR_LOGIN_USER] = "Error login user"
+msgs[INVALID_REQUEST_ARGUMENT] = "Invalid request argument"
