@@ -18,6 +18,7 @@ def user_register_test(svc_port):
 
     test(svc_port, base_api.users.user_register.location, 'POST', None,
          {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, WarningLevel.STRICT_ON_KEY)
+         # {'username': 'user1@test.loc', 'password': '123', 'first_name':'pera','last_name':'zika'}, 200, {'token': ''}, WarningLevel.STRICT_ON_KEY)
 
     test(svc_port, base_api.users.user_register.location, 'POST', None,
          {'username': 'user1@test.loc', 'password': '123'}, 400, {'message': amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]})

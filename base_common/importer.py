@@ -58,11 +58,12 @@ def import_from_settings(imported_modules, app_to_start):
     pkg_dict = __INSTALLED_APPS[app_to_start]
     pm = pkg_dict['pkg']
 
-    # base_config.settings.APP_PORT = pm.SVC_PORT
-
     if hasattr(pm, 'DB_CONF'):
         app_db = importlib.import_module(pm.DB_CONF)
         base_config.settings.APP_DB = app_db.db_config
+
+    if hasattr(pm, 'TESTS'):
+        base_config.settings.APP_TESTS = pm.TESTS
 
     if hasattr(pm, 'MSG_LOOKUP'):
         _app_msgs = pm.MSG_LOOKUP

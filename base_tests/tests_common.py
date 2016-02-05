@@ -149,3 +149,34 @@ def finish_tests():
     import tornado.ioloop
     tornado.ioloop.IOLoop.instance().stop()
     sys.exit()
+
+
+def load_app_test(app_started, app_tests_list):
+
+    from base_common.importer import import_from_settings
+    from base_common.importer import get_installed_apps
+    from base_common.importer import get_app
+    import base_tests.test_list
+    imported_modules = []
+    installed_apps = {}
+    get_installed_apps(installed_apps)
+    import_from_settings(imported_modules, app_started)
+
+    _installed_app = get_app()
+    _pm = _installed_app['pkg']
+    import importlib
+    app_tests = importlib.import_module(_pm.TESTS)
+
+    for itest in app_tests.tests_included:
+
+        app_test = getattr(app_tests, itest)
+
+        if hasattr(base_tests.test_list, itest):
+            test_info('OVERLOADING {}'.format(itest), '', None)
+            setattr(base_tests.test_list, itest, app_test)
+
+        else:
+            test_info('LOADING {}'.format(itest), '', None)
+            app_tests_list.append(app_test)
+
+

@@ -1,62 +1,71 @@
 import os
 import sys
+import time
 
 pth = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(pth)
 
 from base_config.settings import TEST_PORT
 
-from base_tests.test_list import user_register_test
-from base_tests.test_list import user_login_test
-from base_tests.test_list import user_logout_test
-from base_tests.test_list import user_forgot_password_test
-from base_tests.test_list import hash_save_test
-from base_tests.test_list import hash_retrieve_test
-from base_tests.test_list import user_change_password_test
-from base_tests.test_list import user_check_test
+import base_tests.test_list
 from base_tests.tests_common import finish_tests
+from base_tests.tests_common import load_app_test
+import base_tests.tests_common
 
 
 def test_base(svc_port):
 
     # USER REGISTER TEST
-    user_register_test(svc_port)
+    base_tests.test_list.user_register_test(svc_port)
 
     # LOGIN TESTS
-    user_login_test(svc_port)
+    base_tests.test_list.user_login_test(svc_port)
 
     # LOGOUT TESTS
-    user_logout_test(svc_port)
+    base_tests.test_list.user_logout_test(svc_port)
 
     # FORGOT PASSWORD TESTS
-    user_forgot_password_test(svc_port)
+    base_tests.test_list.user_forgot_password_test(svc_port)
 
     # HASHI SAVE TESTS
-    hash_save_test(svc_port)
+    base_tests.test_list.hash_save_test(svc_port)
 
-    # HASHI RETRIEVE TESTS
-    hash_retrieve_test(svc_port)
+    # HASH RETRIEVE TESTS
+    base_tests.test_list.hash_retrieve_test(svc_port)
 
     # CHANGE PASSWORD TESTS
-    user_change_password_test(svc_port)
+    base_tests.test_list.user_change_password_test(svc_port)
 
     # CHECK USER TESTS
-    user_check_test(svc_port)
+    base_tests.test_list.user_check_test(svc_port)
 
 
-def run_tests():
+def test_app(app_tests_list, svc_port):
 
-    import time
+    if app_tests_list:
+
+        for itest in app_tests_list:
+
+            itest(svc_port)
+
+
+def run_tests(app_started):
+
     time.sleep(3)
 
     svc_port = TEST_PORT
 
+    app_tests_list = []
+    load_app_test(app_started, app_tests_list)
+
     test_base(svc_port)
+    test_app(app_tests_list, svc_port)
 
     finish_tests()
 
 if __name__ == '__main__':
 
-    run_tests()
+    app_started = sys.argv[1]
+    run_tests(app_started)
 
 

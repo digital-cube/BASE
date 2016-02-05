@@ -66,12 +66,13 @@ def entry_point(api_module, allowed=None, denied=None):
            dict(allowed=allowed, denied=denied, apimodule=api_module, log=llog)
 
 
-def start_tests():
+def start_tests(app_started):
 
         import subprocess
         import base_tests.basetest
 
-        s = subprocess.Popen(["python3", base_tests.basetest.__file__], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        s = subprocess.Popen(["python3", base_tests.basetest.__file__, app_started], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        log.info('Tests started on PID: {}'.format(s.pid))
 
 
 def start_base_service():
@@ -99,7 +100,7 @@ def start_base_service():
     if b_args.test:
         prepare_test_env()
         svc_port = csettings.TEST_PORT
-        start_tests()
+        start_tests(b_args.app)
 
     baseapi_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     tpl_dir = os.path.join(baseapi_dir, 'templates')
