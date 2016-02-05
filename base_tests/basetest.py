@@ -51,7 +51,7 @@ def test_app(app_tests_list, svc_port):
 
 def run_tests(app_started):
 
-    time.sleep(3)
+    time.sleep(1)
 
     svc_port = TEST_PORT
 
@@ -62,6 +62,7 @@ def run_tests(app_started):
     test_app(app_tests_list, svc_port)
 
     finish_tests()
+
 
 if __name__ == '__main__':
 

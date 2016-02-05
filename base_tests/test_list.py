@@ -14,11 +14,10 @@ def user_register_test(svc_port):
     import base_api.users.user_register
 
     test(svc_port, base_api.users.user_register.location, 'GET', None,
-         {'username': 'user1@test.loc', 'password': '123'}, 404, {'message': 'GET not implemented'})
+         {'username': 'user1@test.loc', 'password': '123'}, 404, {'message': amsgs.msgs[amsgs.NOT_IMPLEMENTED_GET]})
 
     test(svc_port, base_api.users.user_register.location, 'POST', None,
          {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, WarningLevel.STRICT_ON_KEY)
-         # {'username': 'user1@test.loc', 'password': '123', 'first_name':'pera','last_name':'zika'}, 200, {'token': ''}, WarningLevel.STRICT_ON_KEY)
 
     test(svc_port, base_api.users.user_register.location, 'POST', None,
          {'username': 'user1@test.loc', 'password': '123'}, 400, {'message': amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]})
@@ -57,7 +56,7 @@ def user_forgot_password_test(svc_port):
     import base_api.users.forgot_password
 
     test(svc_port, base_api.users.forgot_password.location, 'POST', None, {'ername': 'user2@test.loc'}, 404,
-         {'message': 'POST not implemented'})
+         {'message': amsgs.msgs[amsgs.NOT_IMPLEMENTED_POST]})
     test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'ername': 'user2@test.loc'}, 400,
          {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user2@test.loc'}, 400,
@@ -109,7 +108,7 @@ def hash_save_test(svc_port):
     import base_api.hash2params.save_hash
 
     test(svc_port, base_api.hash2params.save_hash.location, 'POST', None,
-         {'username': 'user2@test.loc', 'password': '123'}, 404, {'message': 'POST not implemented'})
+         {'username': 'user2@test.loc', 'password': '123'}, 404, {'message': amsgs.msgs[amsgs.NOT_IMPLEMENTED_POST]})
     test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'dat': 'user2@test.loc'}, 400,
          {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None,
@@ -125,7 +124,7 @@ def hash_retrieve_test(svc_port):
                {'data': json.dumps({"username": "user2@test.loc"})}, 200, {})['h']
 
     test(svc_port, base_api.hash2params.retrieve_hash.location, 'PUT', None, {'hash': htk}, 404,
-         {'message': 'PUT not implemented'})
+         {'message': amsgs.msgs[amsgs.NOT_IMPLEMENTED_PUT]})
     test(svc_port, base_api.hash2params.retrieve_hash.location, 'GET', None,
          {'hash': htk[:20]}, 400, {'message': ''}, warning_level=WarningLevel.STRICT_ON_KEY)
     test(svc_port, base_api.hash2params.retrieve_hash.location, 'GET', None,

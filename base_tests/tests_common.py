@@ -48,19 +48,19 @@ def test_log(loc, method, result, color, message):
     print(st)
 
 
-def test_info(loc, method, result):
+def log_info(loc, method, result):
     test_log(loc, method, result, Color.BLUE, 'INFO')
 
 
-def test_warning(loc, method, result):
+def log_warning(loc, method, result):
     test_log(loc, method, result, Color.BOLD_YELLOW, 'WARNING')
 
 
-def test_failed(loc, method, result):
+def log_failed(loc, method, result):
     test_log(loc, method, result, Color.BOLD_RED, 'FAILED')
 
 
-def test_passed(loc, method, result):
+def log_passed(loc, method, result):
     test_log(loc, method, result, Color.BOLD_GREEN, 'PASSED')
 
 
@@ -88,7 +88,7 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
                 return False
 
             if expected_data[k] != res[k] and warning_level == WarningLevel.STRICT:
-                test_warning(location, method, '{}: {} | expected | {}'.format(k, expected_data[k], res[k]))
+                log_warning(location, method, '{}: {} | expected | {}'.format(k, expected_data[k], res[k]))
 
     return True
 
@@ -98,14 +98,14 @@ def test(svc_port, location, method, token, data, expected_status, expected_data
     __result = {}
 
     if not test_db_is_active():
-        test_failed('TEST DATABASE NOT ACTIVE', '', '')
+        log_failed('TEST DATABASE NOT ACTIVE', '', '')
         sys.exit(1)
 
     if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result, warning_level):
-        test_failed(location, method, __result)
+        log_failed(location, method, __result)
         sys.exit(1)
 
-    test_passed(location, method, __result)
+    log_passed(location, method, __result)
     return __result
 
 
@@ -135,10 +135,9 @@ def finish_test_with_error():
     st = '{}{}{}'.format(Color.BOLD_RED, 'ERROR TESTING', Color.DEFAULT)
     log.info(st)
     print(st)
+    import tornado.ioloop
+    tornado.ioloop.IOLoop.instance().stop()
     sys.exit(4)
-
-    st = '{}{}{}{}{}{}{}'.format(Color.BOLD_GREEN, 'PASSED', loc, method, '-> {}'.format(result) if result else '', Color.DEFAULT)
-    log.info(st)
 
 
 def finish_tests():
@@ -172,11 +171,11 @@ def load_app_test(app_started, app_tests_list):
         app_test = getattr(app_tests, itest)
 
         if hasattr(base_tests.test_list, itest):
-            test_info('OVERLOADING {}'.format(itest), '', None)
+            log_info('OVERLOADING {}'.format(itest), '', None)
             setattr(base_tests.test_list, itest, app_test)
 
         else:
-            test_info('LOADING {}'.format(itest), '', None)
+            log_info('LOADING {}'.format(itest), '', None)
             app_tests_list.append(app_test)
 
 
