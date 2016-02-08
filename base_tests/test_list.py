@@ -17,7 +17,8 @@ def user_register_test(svc_port):
          {'username': 'user1@test.loc', 'password': '123'}, 404, {'message': amsgs.msgs[amsgs.NOT_IMPLEMENTED_GET]})
 
     test(svc_port, base_api.users.user_register.location, 'POST', None,
-         {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, WarningLevel.STRICT_ON_KEY)
+         {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+         warning_level=WarningLevel.STRICT_ON_KEY)
 
     test(svc_port, base_api.users.user_register.location, 'POST', None,
          {'username': 'user1@test.loc', 'password': '123'}, 400, {'message': amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]})
@@ -28,7 +29,7 @@ def user_login_test(svc_port):
     import base_api.users.user_login
 
     test(svc_port, base_api.users.user_login.location, 'POST', None, {'username': 'user1@test.loc', 'password': '123'},
-         200, {'token': ''}, warning_level=WarningLevel.STRICT_ON_KEY)
+         200, {'token': ''}, result_types={'token': str}, warning_level=WarningLevel.STRICT_ON_KEY)
     test(svc_port, base_api.users.user_login.location, 'POST', None,
          {'username': 'no_user@test.loc', 'password': '123'}, 400, {'message': amsgs.msgs[amsgs.USER_NOT_FOUND]})
     test(svc_port, base_api.users.user_login.location, 'POST', None, {'userna': 'no_user@test.loc', 'password': '123'},
@@ -43,7 +44,7 @@ def user_logout_test(svc_port):
     import base_api.users.user_logout
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''},
+              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     test(svc_port, base_api.users.user_logout.location, 'POST', None, {}, 400,
@@ -71,7 +72,7 @@ def user_change_password_test(svc_port):
     import base_api.users.change_password
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''},
+              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
     htk = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None,
                {'data': json.dumps({"username": "user2@test.loc"})}, 200, {})['h']
@@ -81,10 +82,10 @@ def user_change_password_test(svc_port):
     test(svc_port, base_api.users.change_password.location, 'POST', tk, {'newpassword': '123'}, 400,
          {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, base_api.users.change_password.location, 'POST', tk, {'newpassword': '123', 'oldpassword': '123'},
-         200, {'message': amsgs.msgs[amsgs.USER_PASSWORD_CHANGED]})
+         200, {'message': amsgs.msgs[amsgs.USER_PASSWORD_CHANGED]}, result_types={'message': str})
 
     loc = base_api.users.change_password.location[:-2] + '/' + htk
-    test(svc_port, loc, 'POST', None, {'newpassword':'123'}, 200, {'message': ''},
+    test(svc_port, loc, 'POST', None, {'newpassword': '123'}, 200, {'message': ''}, result_types={'message': str},
          warning_level=WarningLevel.STRICT_ON_KEY)
 
 
@@ -94,13 +95,13 @@ def user_check_test(svc_port):
     import base_api.users.user_check
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''},
+              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     test(svc_port, base_api.users.user_check.location, 'POST', None, {'username': 'user2@test.loc', 'password': '123'},
          400, {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]})
     test(svc_port, base_api.users.user_check.location, 'POST', tk, {'username': 'user2@test.loc', 'password': '123'},
-         200, {'username': ''}, warning_level=WarningLevel.STRICT_ON_KEY)
+         200, {'username': ''}, result_types={'username': str}, warning_level=WarningLevel.STRICT_ON_KEY)
 
 
 def hash_save_test(svc_port):
