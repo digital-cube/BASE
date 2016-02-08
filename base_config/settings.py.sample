@@ -1,4 +1,4 @@
-__VERSION__ = 0.1.6
+__VERSION__ = '0.1.7'
 
 APPS = [
      '/project_home_dir/mockupecho',
