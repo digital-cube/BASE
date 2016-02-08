@@ -27,8 +27,8 @@ request_timeout = 10
 def do_post(request, *args, **kwargs):
     """
     Change password
-    :param username: users username, string, True
-    :param password: users password, string, True
+    :param newpassword: users newpassword, string, True
+    :param oldpassword: old password if user logged, string, True
     :return:  200, OK
     :return:  404
     """
