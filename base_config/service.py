@@ -2,11 +2,6 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from base_config.settings import APPS, LOG_DIR
 
-
-# port = 8600
-# svc_prefix = 'echo'
-# svc_url = 'http://localhost:{}/{}'.format(port, svc_prefix)
-
 support_mail = 'support@support.com'
 
 logs = {}

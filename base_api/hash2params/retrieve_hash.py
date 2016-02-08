@@ -21,7 +21,7 @@ def prepare_get_query(h2p):
     Make query for given hash
     """
 
-    q = "SELECT id, data FROM hash_2_params where hash = '{}'".format(h2p)
+    q = "SELECT id, last_access, data FROM hash_2_params where hash = '{}'".format(h2p)
 
     return q
 
@@ -87,6 +87,16 @@ def do_get(request, *args, **kwargs):
     dbd = dbc.fetchone()
     d = dbd['data']
     did = dbd['id']
+    d_last_accessed = dbd['last_access']
+
+    if d_last_accessed:
+        log.warning('New access to {}'.format(h))
+
+        if not log_hash_access(_db, did, request.r_ip, log):
+            log.warning("Error save hash access log")
+
+        return base_common.msg.error(msgs.WRONG_OR_EXPIRED_TOKEN)
+
     try:
         d = json.loads(d)
     except Exception as e:

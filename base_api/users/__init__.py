@@ -6,5 +6,7 @@ IMPORTS = [
     'base_api.users.user_register',
     'base_api.users.forgot_password',
     'base_api.users.change_password',
+    'base_api.users.change_username',
+    'base_api.users.changing_username',
 ]
 
