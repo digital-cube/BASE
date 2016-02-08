@@ -3,6 +3,7 @@ import importlib
 from base_config.settings import APPS, BASE_APPS, TEST_PORT
 import base_config.settings
 import base_lookup.api_messages
+from base_common.dbaexc import ApplicationNameUsed
 
 __INSTALLED_APPS = {}
 __STARTED_APP = None
@@ -39,6 +40,9 @@ def get_installed_apps(installed_apps):
         pm = importlib.import_module(pkg)
 
         check_test_port_is_used(pm.SVC_PORT, pm.APP_NAME)
+
+        if pm.APP_NAME in installed_apps:
+            raise ApplicationNameUsed('{}'.format(pm.APP_NAME))
 
         installed_apps[pm.APP_NAME] = {}
         installed_apps[pm.APP_NAME]['svc_port'] = pm.SVC_PORT if hasattr(pm, 'SVC_PORT') else None
