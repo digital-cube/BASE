@@ -1,6 +1,6 @@
 import os
 import sys
-import hashlib
+import bcrypt
 import MySQLdb
 import MySQLdb.cursors
 from functools import wraps
@@ -46,9 +46,14 @@ def qu_esc(query):
 
 def format_password(username, password):
 
-    h = hashlib.md5()
-    h.update('{}.{}'.format(username, password).encode('utf-8'))
-    return h.hexdigest()
+    return bcrypt.hashpw('{}{}'.format(username, password).encode('utf-8'), bcrypt.gensalt())
+
+
+def check_password(db_pwd, username, password):
+
+    pwd = '{}{}'.format(username, password).encode('utf-8')
+    dpwd = db_pwd.encode('utf-8')
+    return dpwd == bcrypt.hashpw(pwd, dpwd)
 
 
 def app_api_method(origin_f):

@@ -21,6 +21,7 @@ NOT_IMPLEMENTED_GET = 27
 NOT_IMPLEMENTED_PUT = 28
 NOT_IMPLEMENTED_POST = 29
 NOT_IMPLEMENTED_DELETE = 30
+WRONG_USERNAME_OR_PASSWORD = 31
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -46,3 +47,4 @@ msgs[NOT_IMPLEMENTED_DELETE] = "DELETE not implemented"
 msgs[NOT_IMPLEMENTED_GET] = "GET not implemented"
 msgs[NOT_IMPLEMENTED_PUT] = "PUT not implemented"
 msgs[NOT_IMPLEMENTED_POST] = "POST not implemented"
+msgs[WRONG_USERNAME_OR_PASSWORD] = "Wrong username or password"
