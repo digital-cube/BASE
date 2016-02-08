@@ -40,7 +40,7 @@ def _get_email_message():
 
 
 @app_api_method
-def do_post(request, *args, **kwargs):
+def do_get(request, *args, **kwargs):
     """
     Change password
     :param username: users new username, string, True

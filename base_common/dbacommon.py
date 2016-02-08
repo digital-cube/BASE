@@ -15,7 +15,7 @@ from base_lookup import api_messages as amsgs
 __db = None
 
 
-def get_md2db():
+def get_md2db(prefix=None):
     global __db
 
     if __db and __db.open:
@@ -25,7 +25,7 @@ def get_md2db():
             host=base_config.settings.APP_DB.host,
             user=base_config.settings.APP_DB.user,
             passwd=base_config.settings.APP_DB.passwd,
-            db=base_config.settings.APP_DB.db,
+            db='{}{}'.format(prefix, base_config.settings.APP_DB.db) if prefix else base_config.settings.APP_DB.db,
             charset=base_config.settings.APP_DB.charset,
             cursorclass=MySQLdb.cursors.DictCursor)
 

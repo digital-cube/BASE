@@ -74,7 +74,15 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
         _headers = {'Authorization': token}
 
     res, status = call('localhost', svc_port, location, data, method, call_headers=_headers)
-    res = json.loads(res) if res else {}
+
+    try:
+        res = json.loads(res) if res else {}
+    except Exception as e:
+        log_warning('Error load json data: {}'.format(res), '', None)
+        log_warning('Error: {}'.format(e), '', None)
+        result.update({'message': res})
+        res = {'message': res}
+
     res.update({'status': status})
     result.update(res)
 

@@ -42,6 +42,15 @@ def test_base(svc_port):
     # CHECK USER TESTS
     base_tests.test_list.user_check_test(svc_port)
 
+    # CHANGE USERNAME TEST
+    base_tests.test_list.user_change_username_test(svc_port)
+
+    # CHANGING USERNAME TEST
+    base_tests.test_list.user_changing_username_test(svc_port)
+
+    # SAVE MAIL TEST
+    base_tests.test_list.save_message_test(svc_port)
+
 
 def test_app(app_tests_list, svc_port):
 

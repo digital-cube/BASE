@@ -7,6 +7,7 @@ sys.path.append(pth)
 
 import base_lookup.api_messages as amsgs
 from base_tests.tests_common import WarningLevel, test
+from base_tests.tests_common import log
 
 
 def user_register_test(svc_port):
@@ -130,3 +131,57 @@ def hash_retrieve_test(svc_port):
          {'hash': htk[:20]}, 400, {'message': ''}, warning_level=WarningLevel.STRICT_ON_KEY)
     test(svc_port, base_api.hash2params.retrieve_hash.location, 'GET', None,
          {'hash': htk}, 200, {})
+
+
+def user_change_username_test(svc_port):
+
+    import base_api.users.user_login
+    import base_api.users.change_username
+
+    tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
+              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              warning_level=WarningLevel.STRICT_ON_KEY)['token']
+
+    test(svc_port, base_api.users.change_username.location, 'POST', None, {'username': '', 'password': ''},
+         400, {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]})
+    test(svc_port, base_api.users.change_username.location, 'POST', tk, {'username': 'user21@test.loc'}, 400,
+         {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
+    test(svc_port, base_api.users.change_username.location, 'POST', tk,
+         {'username': 'user21@test.loc', 'password': '12'}, 400, {'message': amsgs.msgs[amsgs.WRONG_PASSWORD]})
+    test(svc_port, base_api.users.change_username.location, 'POST', tk,
+         {'username': 'user21@test.loc', 'password': '123'}, 200,
+         {'message': amsgs.msgs[amsgs.CHANGE_USERNAME_REQUEST]}, result_types={'message': str})
+
+
+def user_changing_username_test(svc_port):
+
+    import base_api.users.user_login
+    import base_api.hash2params.save_hash
+    import base_api.users.changing_username
+
+    tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
+              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              warning_level=WarningLevel.STRICT_ON_KEY)['token']
+
+    import base_common.dbacommon
+    _db = base_common.dbacommon.get_md2db('test_')
+    n, p, u_id = base_common.dbatokens.get_user_by_token(_db.cursor(), tk, log)
+
+    hdata = {'cmd': 'change_username', 'newusername': 'user21@test.loc', 'user_id': u_id, 'password': '123'}
+    htk = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'data': json.dumps(hdata)}, 200, {})['h']
+
+    loc = base_api.users.changing_username.location[:-2] + htk
+    test(svc_port, loc, 'GET', None, {}, 200, {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]},
+         result_types={'message': str})
+    test(svc_port, loc, 'GET', None, {}, 400, {'message': amsgs.msgs[amsgs.PASSWORD_TOKEN_EXPIRED]},
+         result_types={'message': str})
+
+
+def save_message_test(svc_port):
+
+    # SEND MAIL IS NOT REGISTERED FOR API
+    import base_api.mail_api.save_mail
+
+    test(svc_port, base_api.mail_api.save_mail.location, 'POST', None,
+         {'username': 'user21@test.loc', 'password': '123'}, 404, {'message': ''},
+         warning_level=WarningLevel.STRICT_ON_KEY)
