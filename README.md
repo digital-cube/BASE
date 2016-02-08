@@ -13,3 +13,5 @@
 
 Easy create REST api for custom application
 
+### [Wiki](https://github.com/digital-cube/BASE/wiki)
+
