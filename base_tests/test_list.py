@@ -176,6 +176,13 @@ def user_changing_username_test(svc_port):
     test(svc_port, loc, 'GET', None, {}, 400, {'message': amsgs.msgs[amsgs.PASSWORD_TOKEN_EXPIRED]},
          result_types={'message': str})
 
+    hdata1 = {'cmd': 'change_username', 'newusername': 'user1@test.loc', 'user_id': u_id, 'password': '123'}
+    htk1 = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'data': json.dumps(hdata1)}, 200, {})['h']
+
+    loc1 = base_api.users.changing_username.location[:-2] + htk1
+    test(svc_port, loc1, 'GET', None, {}, 200, {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]},
+         result_types={'message': str})
+
 
 def save_message_test(svc_port):
 
