@@ -37,7 +37,7 @@ class Color:
 
 
 class WarningLevel:
-    NO_WARNING = 0
+    NO_WARNING = 0  # WITHOUT WARNINGS
     STRICT = 1  # DEFAULT
     STRICT_ON_KEY = 2  # ONLY KEY HAS TO BE CHECKED
 
@@ -68,32 +68,61 @@ def test_db_is_active():
     return True
 
 
-def do_test(svc_port, location, method, token, data, expected_status, expected_data, result, warning_level):
+def do_test(svc_port, location, method, token, data, expected_status, expected_data, result, result_types, warning_level):
     _headers = None
     if token:
         _headers = {'Authorization': token}
 
     res, status = call('localhost', svc_port, location, data, method, call_headers=_headers)
-    res = json.loads(res) if res else {}
+
+    try:
+        res = json.loads(res) if res else {}
+    except Exception as e:
+        log_warning('Error load json data: {}'.format(res), '', None)
+        log_warning('Error: {}'.format(e), '', None)
+        result.update({'message': res})
+        res = {'message': res}
+
     res.update({'status': status})
     result.update(res)
 
     if status != expected_status:
         return False
 
+    if result_types and not expected_data:
+        log_warning('Missing expected data for given result_types: {}'.format(result_types), '', None)
+        return False
+
     if expected_data:
+        # inspect expected results
         for k in expected_data:
 
             if k not in res and warning_level != WarningLevel.NO_WARNING:
                 return False
 
             if expected_data[k] != res[k] and warning_level == WarningLevel.STRICT:
-                log_warning(location, method, '{}: {} | expected | {}'.format(k, expected_data[k], res[k]))
+                log_warning(location, method, '{}: {} | expected | {}'.format(k, res[k], expected_data[k]))
+
+        # inspect result types
+        if result_types:
+            if expected_data.keys() != result_types.keys():
+                log_warning('Expected results and results types differ', '', None)
+                return False
+
+            for k in expected_data:
+
+                if k not in res:
+                    log_warning('Missing result {}'.format(k), '', None)
+                    return False
+
+                if type(res[k]) != result_types[k]:
+                    log_warning('Result types for {} differ: got {} expected {}'.format(k, type(res[k]), result_types[k]), '', None)
+                    return False
 
     return True
 
 
-def test(svc_port, location, method, token, data, expected_status, expected_data, warning_level=WarningLevel.STRICT):
+def test(svc_port, location, method, token, data, expected_status, expected_data, result_types={}, warning_level=WarningLevel.STRICT):
 
     __result = {}
 
@@ -101,7 +130,7 @@ def test(svc_port, location, method, token, data, expected_status, expected_data
         log_failed('TEST DATABASE NOT ACTIVE', '', '')
         sys.exit(1)
 
-    if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result, warning_level):
+    if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result, result_types, warning_level):
         log_failed(location, method, __result)
         sys.exit(1)
 

@@ -3,6 +3,7 @@ import importlib
 from base_config.settings import APPS, BASE_APPS, TEST_PORT
 import base_config.settings
 import base_lookup.api_messages
+from base_common.dbaexc import ApplicationNameUsed
 
 __INSTALLED_APPS = {}
 __STARTED_APP = None
@@ -40,6 +41,9 @@ def get_installed_apps(installed_apps):
 
         check_test_port_is_used(pm.SVC_PORT, pm.APP_NAME)
 
+        if pm.APP_NAME in installed_apps:
+            raise ApplicationNameUsed('{}'.format(pm.APP_NAME))
+
         installed_apps[pm.APP_NAME] = {}
         installed_apps[pm.APP_NAME]['svc_port'] = pm.SVC_PORT if hasattr(pm, 'SVC_PORT') else None
 
@@ -61,6 +65,9 @@ def import_from_settings(imported_modules, app_to_start):
     if hasattr(pm, 'DB_CONF'):
         app_db = importlib.import_module(pm.DB_CONF)
         base_config.settings.APP_DB = app_db.db_config
+
+    if hasattr(pm, 'BASE_TEST'):
+        base_config.settings.BASE_TEST = pm.BASE_TEST
 
     if hasattr(pm, 'TESTS'):
         base_config.settings.APP_TESTS = pm.TESTS

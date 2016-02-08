@@ -5,7 +5,7 @@ import time
 pth = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(pth)
 
-from base_config.settings import TEST_PORT
+import base_config.settings
 
 import base_tests.test_list
 from base_tests.tests_common import finish_tests
@@ -14,6 +14,9 @@ import base_tests.tests_common
 
 
 def test_base(svc_port):
+
+    if not base_config.settings.BASE_TEST:
+        return
 
     # USER REGISTER TEST
     base_tests.test_list.user_register_test(svc_port)
@@ -39,6 +42,15 @@ def test_base(svc_port):
     # CHECK USER TESTS
     base_tests.test_list.user_check_test(svc_port)
 
+    # CHANGE USERNAME TEST
+    base_tests.test_list.user_change_username_test(svc_port)
+
+    # CHANGING USERNAME TEST
+    base_tests.test_list.user_changing_username_test(svc_port)
+
+    # SAVE MAIL TEST
+    base_tests.test_list.save_message_test(svc_port)
+
 
 def test_app(app_tests_list, svc_port):
 
@@ -53,7 +65,7 @@ def run_tests(app_started):
 
     time.sleep(1)
 
-    svc_port = TEST_PORT
+    svc_port = base_config.settings.TEST_PORT
 
     app_tests_list = []
     load_app_test(app_started, app_tests_list)

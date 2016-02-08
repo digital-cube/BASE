@@ -15,7 +15,8 @@ from base_common.importer import get_installed_apps
 from base_common.importer import check_test_port_is_used
 from base_config.service import logs, log
 from base_tests.tests_common import prepare_test_env
-from base_tests.basetest import run_tests
+from base_common.dbaexc import ApplicationNameUsed
+
 
 from socket import gaierror
 
@@ -82,7 +83,13 @@ def start_base_service():
     imported_modules = []
     installed_apps = {}
 
-    get_installed_apps(installed_apps)
+    try:
+        get_installed_apps(installed_apps)
+    except ApplicationNameUsed as e:
+        log.critical('Application name collision, check installed applications: {}'.format(e))
+        print('Application name collision, check installed applications: {}'.format(e))
+        sys.exit(4)
+
     b_args = check_args(installed_apps)
 
     svc_port = b_args.port if b_args.port else installed_apps[b_args.app]['svc_port']

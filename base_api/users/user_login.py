@@ -4,11 +4,12 @@ User login
 import tornado.web
 
 import base_common.msg
-from base_common.dbacommon import app_api_method
-from base_common.dbacommon import format_password
-from base_common.dbacommon import get_md2db
 from base_common.dbacommon import qu_esc
 from base_common.dbatokens import get_token
+from base_common.dbacommon import get_md2db
+from base_common.dbacommon import app_api_method
+from base_common.dbacommon import check_password
+from base_common.dbacommon import format_password
 from base_lookup import api_messages as msgs
 
 
@@ -38,11 +39,10 @@ def do_post(request, *args, **kwargs):
         log.critical('Missing argument')
         return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
 
-    password = format_password(username, password)
+    # password = format_password(username, password)
 
-    q = "select id from users where username = '{}' and password = '{}'".format(
-        qu_esc(username),
-        qu_esc(password)
+    q = "select id, password from users where username = '{}'".format(
+        qu_esc(username)
     )
 
     dbc.execute(q)
@@ -50,7 +50,13 @@ def do_post(request, *args, **kwargs):
         log.critical('{} users found: {}'.format(username, dbc.rowcount))
         return base_common.msg.error(msgs.USER_NOT_FOUND)
 
-    u_id = dbc.fetchone()['id']
+    us = dbc.fetchone()
+    u_id = us['id']
+    u_pwd = us['password']
+
+    if not check_password(u_pwd, username, password):
+        log.critical('Username {} wrong password: {}'.format(username, password))
+        return base_common.msg.error(msgs.USER_NOT_FOUND)
 
     # ASSIGN TOKEN
     tk = get_token(u_id, dbc, log)

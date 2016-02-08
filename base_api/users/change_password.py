@@ -14,6 +14,7 @@ from base_common.dbacommon import app_api_method
 from base_common.dbatokens import authorized_by_token
 from base_common.dbatokens import get_user_by_token
 from base_common.dbacommon import get_url_token
+from base_common.dbacommon import check_password
 from base_svc.comm import BaseAPIRequestHandler
 import base_api.hash2params.retrieve_hash
 
@@ -75,8 +76,7 @@ def do_post(request, *args, **kwargs):
             log.critical('Missing argument oldpassword')
             return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
 
-        oldpassword = format_password(username, oldpassword)
-        if oldpassword != oldpwdhashed:
+        if not check_password(oldpwdhashed, username, oldpassword):
             log.critical("Passwords don't match, entered : {}".format(oldpassword))
             return base_common.msg.error(msgs.WRONG_PASSWORD)
 
