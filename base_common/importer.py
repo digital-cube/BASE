@@ -62,6 +62,9 @@ def import_from_settings(imported_modules, app_to_start):
         app_db = importlib.import_module(pm.DB_CONF)
         base_config.settings.APP_DB = app_db.db_config
 
+    if hasattr(pm, 'BASE_TEST'):
+        base_config.settings.BASE_TEST = pm.BASE_TEST
+
     if hasattr(pm, 'TESTS'):
         base_config.settings.APP_TESTS = pm.TESTS
 

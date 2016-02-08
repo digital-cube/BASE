@@ -46,7 +46,7 @@ def qu_esc(query):
 
 def format_password(username, password):
 
-    return bcrypt.hashpw('{}{}'.format(username, password).encode('utf-8'), bcrypt.gensalt())
+    return bcrypt.hashpw('{}{}'.format(username, password).encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 
 def check_password(db_pwd, username, password):
