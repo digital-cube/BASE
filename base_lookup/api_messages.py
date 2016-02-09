@@ -28,6 +28,7 @@ TOKEN_MISSING_ARGUMENT = 34
 USER_UPDATE_ERROR = 35
 USER_NAME_CHANGED = 36
 REQUEST_NOT_ALLOWED = 37
+NOT_FOUND_IN_DB = 38
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -60,3 +61,4 @@ msgs[TOKEN_MISSING_ARGUMENT] = "Missing argument in token"
 msgs[USER_UPDATE_ERROR] = "Error updating user"
 msgs[USER_NAME_CHANGED] = "Username changed"
 msgs[REQUEST_NOT_ALLOWED] = "Request not allowed"
+msgs[NOT_FOUND_IN_DB] = "Not found"

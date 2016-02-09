@@ -62,11 +62,11 @@ def user_forgot_password_test(svc_port):
 
     import base_api.users.forgot_password
 
-    test(svc_port, base_api.users.forgot_password.location, 'POST', None, {'ername': 'user2@test.loc'}, 404,
+    test(svc_port, base_api.users.forgot_password.location, 'POST', None, {'ername': 'user3@test.loc'}, 404,
          {'message': amsgs.msgs[amsgs.NOT_IMPLEMENTED_POST]})
-    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'ername': 'user2@test.loc'}, 400,
+    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'ername': 'user3@test.loc'}, 400,
          {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
-    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user2@test.loc'}, 400,
+    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user3@test.loc'}, 400,
          {'message': amsgs.msgs[amsgs.USER_NOT_FOUND]})
     test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user1@test.loc'}, 200, {})
 
