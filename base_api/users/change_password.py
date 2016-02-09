@@ -65,8 +65,9 @@ def do_post(request, *args, **kwargs):
         if not authorized_by_token(dbc, tk, log):
             return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)
 
-        username, oldpwdhashed, user_id = get_user_by_token(dbc, tk, log)
-        if not username:
+        # username, oldpwdhashed, user_id = get_user_by_token(dbc, tk, log)
+        dbuser = get_user_by_token(dbc, tk, log)
+        if not dbuser.username:
             log.critical('User not found by token')
             return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)
 
@@ -76,9 +77,11 @@ def do_post(request, *args, **kwargs):
             log.critical('Missing argument oldpassword')
             return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
 
-        if not check_password(oldpwdhashed, username, oldpassword):
+        if not check_password(dbuser.password, dbuser.username, oldpassword):
             log.critical("Passwords don't match, entered : {}".format(oldpassword))
             return base_common.msg.error(msgs.WRONG_PASSWORD)
+
+        username = dbuser.username
 
     # UPDATE USERS PASSWORD
     password = format_password(username, newpassword)

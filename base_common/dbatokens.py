@@ -105,7 +105,7 @@ def get_user_by_token(dbc, tk, log):
     db_tk = dbc.fetchone()
     u_id = db_tk['id_user']
 
-    q = "select id, username, password from users where id = '{}'".format(u_id)
+    q = "select id, username, password, role_flags from users where id = '{}'".format(u_id)
 
     try:
         dbc.execute(q)
@@ -115,9 +115,16 @@ def get_user_by_token(dbc, tk, log):
 
     if dbc.rowcount != 1:
         log.warning('Fount {} users with id {}'.format(dbc.rowcount, u_id))
-    user = dbc.fetchone()
-    user_id = user['id']
-    username = user['username']
-    password = user['password']
 
-    return username, password, user_id
+    class DB_User:
+        pass
+    db_user = DB_User
+
+    user = dbc.fetchone()
+    db_user.user_id = user['id']
+    db_user.username = user['username']
+    db_user.password = user['password']
+    db_user.role = int(user['role_flags'])
+
+    return db_user
+

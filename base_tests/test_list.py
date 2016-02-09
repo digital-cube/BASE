@@ -8,9 +8,11 @@ sys.path.append(pth)
 import base_lookup.api_messages as amsgs
 from base_tests.tests_common import WarningLevel, test
 from base_tests.tests_common import log
+from base_tests.tests_common import log_info
 
 
 def user_register_test(svc_port):
+    log_info("User Register test", '', None)
 
     import base_api.users.user_register
 
@@ -26,6 +28,7 @@ def user_register_test(svc_port):
 
 
 def user_login_test(svc_port):
+    log_info("User Login test", '', None)
 
     import base_api.users.user_login
 
@@ -40,6 +43,7 @@ def user_login_test(svc_port):
 
 
 def user_logout_test(svc_port):
+    log_info("User Logout test", '', None)
 
     import base_api.users.user_login
     import base_api.users.user_logout
@@ -54,6 +58,7 @@ def user_logout_test(svc_port):
 
 
 def user_forgot_password_test(svc_port):
+    log_info("User Forgot Password test", '', None)
 
     import base_api.users.forgot_password
 
@@ -67,6 +72,7 @@ def user_forgot_password_test(svc_port):
 
 
 def user_change_password_test(svc_port):
+    log_info("User Change Password test", '', None)
 
     import base_api.users.user_login
     import base_api.hash2params.save_hash
@@ -91,6 +97,7 @@ def user_change_password_test(svc_port):
 
 
 def user_check_test(svc_port):
+    log_info("User Check test", '', None)
 
     import base_api.users.user_login
     import base_api.users.user_check
@@ -106,6 +113,7 @@ def user_check_test(svc_port):
 
 
 def hash_save_test(svc_port):
+    log_info("Hash save test", '', None)
 
     import base_api.hash2params.save_hash
 
@@ -118,6 +126,7 @@ def hash_save_test(svc_port):
 
 
 def hash_retrieve_test(svc_port):
+    log_info("Hash Retrieve test", '', None)
 
     import base_api.hash2params.save_hash
     import base_api.hash2params.retrieve_hash
@@ -134,6 +143,7 @@ def hash_retrieve_test(svc_port):
 
 
 def user_change_username_test(svc_port):
+    log_info("User Change Username test", '', None)
 
     import base_api.users.user_login
     import base_api.users.change_username
@@ -154,6 +164,7 @@ def user_change_username_test(svc_port):
 
 
 def user_changing_username_test(svc_port):
+    log_info("Changing Username test", '', None)
 
     import base_api.users.user_login
     import base_api.hash2params.save_hash
@@ -165,9 +176,10 @@ def user_changing_username_test(svc_port):
 
     import base_common.dbacommon
     _db = base_common.dbacommon.get_md2db('test_')
-    n, p, u_id = base_common.dbatokens.get_user_by_token(_db.cursor(), tk, log)
+    # n, p, u_id = base_common.dbatokens.get_user_by_token(_db.cursor(), tk, log)
+    dbuser = base_common.dbatokens.get_user_by_token(_db.cursor(), tk, log)
 
-    hdata = {'cmd': 'change_username', 'newusername': 'user21@test.loc', 'user_id': u_id, 'password': '123'}
+    hdata = {'cmd': 'change_username', 'newusername': 'user21@test.loc', 'user_id': dbuser.user_id, 'password': '123'}
     htk = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'data': json.dumps(hdata)}, 200, {})['h']
 
     loc = base_api.users.changing_username.location[:-2] + htk
@@ -176,7 +188,7 @@ def user_changing_username_test(svc_port):
     test(svc_port, loc, 'GET', None, {}, 400, {'message': amsgs.msgs[amsgs.PASSWORD_TOKEN_EXPIRED]},
          result_types={'message': str})
 
-    hdata1 = {'cmd': 'change_username', 'newusername': 'user1@test.loc', 'user_id': u_id, 'password': '123'}
+    hdata1 = {'cmd': 'change_username', 'newusername': 'user1@test.loc', 'user_id': dbuser.user_id, 'password': '123'}
     htk1 = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'data': json.dumps(hdata1)}, 200, {})['h']
 
     loc1 = base_api.users.changing_username.location[:-2] + htk1
@@ -185,6 +197,7 @@ def user_changing_username_test(svc_port):
 
 
 def save_message_test(svc_port):
+    log_info("Email Message Save test", '', None)
 
     # SEND MAIL IS NOT REGISTERED FOR API
     import base_api.mail_api.save_mail

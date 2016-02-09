@@ -43,11 +43,9 @@ dump_cmd = '{} -u{} -p{} -d {} > {}/test_{}.dmp'.format(
 os.system(dump_cmd)
 
 if required_tables:
-    print('FUCK REQ')
     dump_required_tables_cmd = '{} -u{} -p{} {} -t {} >> {}/test_{}.dmp'.format(
         dump_app, db_user, db_pwd, db_name, required_tables, dbm_file_path, db_name
     )
-    print(dump_required_tables_cmd)
     # add required tables to dump
     os.system(dump_required_tables_cmd)
 

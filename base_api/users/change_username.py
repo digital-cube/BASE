@@ -81,17 +81,18 @@ def do_post(request, *args, **kwargs):
         return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
 
     tk = request.auth_token
-    u_n, u_p, u_i = get_user_by_token(dbc, tk, log)
+    # u_n, u_p, u_i = get_user_by_token(dbc, tk, log)
+    dbuser = get_user_by_token(dbc, tk, log)
     newusername = qu_esc(newusername)
     password = qu_esc(password)
 
-    if not check_password(u_p, u_n, password):
+    if not check_password(dbuser.password, dbuser.username, password):
         log.critical('Wrong users password: {}'.format(password))
         return base_common.msg.error(msgs.WRONG_PASSWORD)
 
     # SAVE HASH FOR USERNAME CHANGE
     rh = BaseAPIRequestHandler(log)
-    data = {'cmd': 'change_username', 'newusername': newusername, 'user_id': u_i, 'password': password}
+    data = {'cmd': 'change_username', 'newusername': newusername, 'user_id': dbuser.user_id, 'password': password}
     rh.set_argument('data', json.dumps(data))
     res = base_api.hash2params.save_hash.do_put(rh)
     if 'http_status' not in res or res['http_status'] != 200:
@@ -110,11 +111,11 @@ def do_post(request, *args, **kwargs):
     if 'http_status' not in res or res['http_status'] != 204:
         return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
 
-    message2 = _get_email_warning(u_n, newusername)
+    message2 = _get_email_warning(dbuser.username, newusername)
 
     rh2 = BaseAPIRequestHandler(log)
     rh2.set_argument('sender', support_mail)
-    rh2.set_argument('receiver', u_n)
+    rh2.set_argument('receiver', dbuser.username)
     rh2.set_argument('message', message2)
     res = base_api.mail_api.save_mail.do_put(rh2)
     if 'http_status' not in res or res['http_status'] != 204:
