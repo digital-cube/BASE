@@ -21,7 +21,7 @@ CREATE TABLE hash_2_params_historylog (
 	ip varchar(16) NOT NULL,
 	log_time DATETIME NOT NULL,
 	CONSTRAINT hash_2_params_historylog_fk0 FOREIGN KEY (id_hash_2_params) REFERENCES hash_2_params(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=ARCHIVE DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS sequencers (
 	id char(2) NOT NULL,
@@ -44,6 +44,8 @@ CREATE TABLE session_token (
   id_user char(10) NOT NULL,
   created DATETIME NOT NULL,
   closed boolean DEFAULT FALSE,
+	INDEX (id_user),
+	INDEX (closed),
 	CONSTRAINT session_token_fk0 FOREIGN KEY (id_user) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
