@@ -4,22 +4,30 @@ import os
 import sys
 
 usage = '''
-{} source_db_name db_user db_password [dmp_path]
+{} source_db_name db_user db_password [dmp_path] [-r required tables list]
 '''.format(sys.argv[0])
 
 if len(sys.argv) < 4:
     print(usage)
     sys.exit(1)
 
-
 dbm_file_path = os.getcwd()
-if len(sys.argv) == 5:
-    tmp_path = sys.argv[4]
-    if not os.path.exists(tmp_path):
-        print(tmp_path, "don't exists, please create desired directory")
-        sys.exit(1)
+required_tables = None
+if len(sys.argv) > 5:
 
-    dbm_file_path = tmp_path
+    if '-r' in sys.argv:
+        i = sys.argv.index('-r')
+        tmp_required_list = sys.argv[i+1:]
+        if tmp_required_list:
+            required_tables = ' '.join(tmp_required_list)
+
+    if sys.argv[4] != '-r':
+        tmp_path = sys.argv[4]
+        if not os.path.exists(tmp_path):
+            print(tmp_path, "don't exists, please create desired directory")
+            sys.exit(1)
+
+        dbm_file_path = tmp_path
 
 db_name = sys.argv[1]
 db_user = sys.argv[2]
@@ -27,7 +35,6 @@ db_pwd = sys.argv[3]
 
 db_app = 'mysql'
 dump_app = 'mysqldump'
-required_tables = 'sequencers'
 
 dump_cmd = '{} -u{} -p{} -d {} > {}/test_{}.dmp'.format(
     dump_app, db_user, db_pwd, db_name, dbm_file_path, db_name
@@ -35,12 +42,14 @@ dump_cmd = '{} -u{} -p{} -d {} > {}/test_{}.dmp'.format(
 # crate sql schema dump for test
 os.system(dump_cmd)
 
-dump_required_tables_cmd = '{} -u{} -p{} {} -t {} >> {}/test_{}.dmp'.format(
-    dump_app, db_user, db_pwd, db_name, required_tables, dbm_file_path, db_name
-)
-# add required tables to dump
-os.system(dump_required_tables_cmd)
-
+if required_tables:
+    print('FUCK REQ')
+    dump_required_tables_cmd = '{} -u{} -p{} {} -t {} >> {}/test_{}.dmp'.format(
+        dump_app, db_user, db_pwd, db_name, required_tables, dbm_file_path, db_name
+    )
+    print(dump_required_tables_cmd)
+    # add required tables to dump
+    os.system(dump_required_tables_cmd)
 
 destroy_test_db_cmd = "{} -u{} -p{} -e 'drop database if exists test_{}'".format(db_app, db_user, db_pwd, db_name)
 create_test_db_cmd = "{} -u{} -p{} -e 'create database test_{}'".format(db_app, db_user, db_pwd, db_name)
