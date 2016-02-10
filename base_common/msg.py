@@ -71,4 +71,5 @@ def post_ok(s=None, **kwargs):
     return res_ok(s, **kwargs)
 
 
-
+def patch_ok(s=None, **kwargs):
+    return res_ok(s, **kwargs)
