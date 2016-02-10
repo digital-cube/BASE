@@ -8,7 +8,7 @@ import tornado.web
 
 import base_common.msg
 import base_config.settings as csettings
-from base_lookup.http_methods import GET, POST, PUT, DELETE
+from base_lookup.http_methods import GET, POST, PUT, DELETE, PATCH
 from base_lookup.http_methods import rev as http_rev_map
 from base_lookup.methods_mapping import method_map
 from base_lookup.methods_mapping import method_map_rev
@@ -159,7 +159,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
     def patch(self):
 
-        self.not_allowed()
+        self.call_api_fun(method_map[PATCH])
 
     def post(self):
 
