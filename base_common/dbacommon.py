@@ -100,9 +100,12 @@ def authenticated_call(original_f):
     return f_wrapper
 
 
-def check_user_exists(username, db, log):
+def check_user_exists(username, db, log, userid=None):
     dbc = db.cursor()
-    q = "select id from users where username = '{}'".format(qu_esc(username))
+    if userid:
+        q = "select id from users where id = '{}'".format(qu_esc(userid))
+    else:
+        q = "select id from users where username = '{}'".format(qu_esc(username))
 
     try:
         dbc.execute(q)
