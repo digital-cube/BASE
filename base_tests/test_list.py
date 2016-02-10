@@ -175,7 +175,7 @@ def user_changing_username_test(svc_port):
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     import base_common.dbacommon
-    _db = base_common.dbacommon.get_md2db('test_')
+    _db = base_common.dbacommon.get_db('test_')
     # n, p, u_id = base_common.dbatokens.get_user_by_token(_db.cursor(), tk, log)
     dbuser = base_common.dbatokens.get_user_by_token(_db.cursor(), tk, log)
 

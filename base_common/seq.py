@@ -1,6 +1,6 @@
 import string
 import random
-from base_common import  dbacommon
+from base_common import dbacommon
 from base_common.dbaexc import ToManyAttemptsException
 from MySQLdb import IntegrityError
 
@@ -124,7 +124,7 @@ def sequencer():
 
     global _sequencer
     if not _sequencer:
-        _sequencer = SequencerFactory(dbacommon.get_md2db())
+        _sequencer = SequencerFactory(dbacommon.get_db())
 
     return _sequencer
 

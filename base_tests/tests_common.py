@@ -154,7 +154,7 @@ def prepare_test_env():
         'utf8')
     base_config.settings.APP_DB = db_test
 
-    _db = base_common.dbacommon.get_md2db()
+    _db = base_common.dbacommon.get_db()
 
     # test if test.sql exists
     # test db connection

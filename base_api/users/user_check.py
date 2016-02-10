@@ -4,7 +4,7 @@ Check is user logged
 from base_common.dbacommon import authenticated_call
 import base_common.msg
 from base_lookup import api_messages as msgs
-from base_common.dbacommon import get_md2db
+from base_common.dbacommon import get_db
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import qu_esc
 
@@ -26,7 +26,7 @@ def do_post(request, *args, **kwargs):
 
     log = request.log
 
-    _db = get_md2db()
+    _db = get_db()
     dbc = _db.cursor()
 
     tk = request.auth_token

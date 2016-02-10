@@ -5,7 +5,7 @@ from base_common.dbatokens import authorized_by_token
 from base_common.dbatokens import close_session_by_token
 import base_common.msg
 from base_lookup import api_messages as msgs
-from base_common.dbacommon import get_md2db
+from base_common.dbacommon import get_db
 from base_common.dbacommon import app_api_method
 
 
@@ -25,7 +25,7 @@ def do_post(request, *args, **kwargs):
 
     log = request.log
 
-    _db = get_md2db()
+    _db = get_db()
     dbc = _db.cursor()
 
     tk = request.auth_token

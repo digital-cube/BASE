@@ -9,7 +9,7 @@ import base_common.msg
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import app_api_method
 from base_svc.comm import BaseAPIRequestHandler
-from base_common.dbacommon import get_md2db
+from base_common.dbacommon import get_db
 from base_common.dbacommon import qu_esc
 
 name = "E-mail Save"
@@ -43,7 +43,7 @@ def do_put(request, *args, **kwargs):
     """
 
     log = request.log
-    _db = get_md2db()
+    _db = get_db()
     dbc = _db.cursor()
 
     try:

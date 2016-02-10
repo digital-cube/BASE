@@ -15,7 +15,7 @@ from base_lookup import api_messages as amsgs
 __db = None
 
 
-def get_md2db(prefix=None):
+def get_db(prefix=None):
     global __db
 
     if __db and __db.open:
@@ -87,7 +87,7 @@ def authenticated_call(original_f):
             return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
 
         tk = request_handler.auth_token
-        _db = get_md2db()
+        _db = get_db()
         dbc = _db.cursor()
         log = request_handler.log
 

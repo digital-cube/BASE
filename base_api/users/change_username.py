@@ -11,7 +11,7 @@ import base_api.hash2params.save_hash
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import check_password
 from base_common.dbacommon import qu_esc
-from base_common.dbacommon import get_md2db
+from base_common.dbacommon import get_db
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import authenticated_call
 from base_common.dbatokens import get_user_by_token
@@ -70,7 +70,7 @@ def do_post(request, *args, **kwargs):
     """
 
     log = request.log
-    _db = get_md2db()
+    _db = get_db()
     dbc = _db.cursor()
 
     try:
