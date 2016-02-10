@@ -50,7 +50,7 @@ def __set_session_token(dbc, uid, tk):
 
 def __get_user_by_token(dbc, tk, log):
 
-    q = "select id, id_user, created, closed from session_token where id = '{}'".format(qu_esc(tk))
+    q = '''select id, id_user, created, closed from session_token where id = '{}' '''.format(tk)
 
     try:
         dbc.execute(q)
@@ -116,9 +116,9 @@ def get_user_by_token(dbc, tk, log):
     if dbc.rowcount != 1:
         log.warning('Fount {} users with id {}'.format(dbc.rowcount, u_id))
 
-    class DB_User:
+    class DBUser:
         pass
-    db_user = DB_User
+    db_user = DBUser
 
     user = dbc.fetchone()
     db_user.user_id = user['id']
