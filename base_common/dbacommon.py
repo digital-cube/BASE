@@ -8,7 +8,7 @@ from MySQLdb import IntegrityError
 
 import base_config.settings
 import base_common.msg
-from base_common.dbaexc import ApiMethodError
+from base_common.dbaexc import ApiMethodError, ApplicationDbConfig
 from base_lookup import api_messages as amsgs
 
 
@@ -18,16 +18,37 @@ __db = None
 def get_db(prefix=None):
     global __db
 
+    host = base_config.settings.APP_DB.host
+    user = base_config.settings.APP_DB.user
+    passwd = base_config.settings.APP_DB.passwd
+    db = '{}{}'.format(prefix, base_config.settings.APP_DB.db) if prefix else base_config.settings.APP_DB.db
+    charset = base_config.settings.APP_DB.charset
+
+    def conn_to_db():
+
+        return MySQLdb.connect(
+                host=host,
+                user=user,
+                passwd=passwd,
+                db=db,
+                charset=charset,
+                cursorclass=MySQLdb.cursors.DictCursor)
+
+    def test_db_conn(db):
+        try:
+            db.cursor().execute('select 1')
+        except MySQLdb.OperationalError as e:
+            if len(e.args) == 2 and e.args[0] == 2006 and e.args[1] == 'MySQL server has gone away':
+                return False
+            raise ApplicationDbConfig('Operational error occur: {}'.format(e))
+        return True
+
     if __db and __db.open:
+        if not test_db_conn(__db):
+            __db = conn_to_db()
         return __db
 
-    __db = MySQLdb.connect(
-            host=base_config.settings.APP_DB.host,
-            user=base_config.settings.APP_DB.user,
-            passwd=base_config.settings.APP_DB.passwd,
-            db='{}{}'.format(prefix, base_config.settings.APP_DB.db) if prefix else base_config.settings.APP_DB.db,
-            charset=base_config.settings.APP_DB.charset,
-            cursorclass=MySQLdb.cursors.DictCursor)
+    __db = conn_to_db()
 
     return __db
 
