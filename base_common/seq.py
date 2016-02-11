@@ -77,6 +77,17 @@ class SequencerFactory:
 
         return '2'*size
 
+    def check_db(self):
+
+        dbc = self.db.cursor()
+        import MySQLdb
+        try:
+            dbc.execute('select 1')
+        except MySQLdb.OperationalError as e:
+            return False
+
+        return True
+
     def new(self, table_id):
 
         if table_id not in self.s_table:
@@ -123,7 +134,7 @@ _sequencer = None
 def sequencer():
 
     global _sequencer
-    if not _sequencer:
+    if not _sequencer or not _sequencer.check_db():
         _sequencer = SequencerFactory(dbacommon.get_db())
 
     return _sequencer
