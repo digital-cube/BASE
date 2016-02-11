@@ -105,11 +105,11 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
 
         # inspect result types
         if result_types:
-            if expected_data.keys() != result_types.keys():
+            if not set(result_types.keys()).issubset(set(expected_data.keys())):
                 log_warning('Expected results and results types differ', '', None)
                 return False
 
-            for k in expected_data:
+            for k in result_types:
 
                 if k not in res:
                     log_warning('Missing result {}'.format(k), '', None)
