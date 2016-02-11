@@ -10,7 +10,7 @@ from base_config.settings import  __VERSION__
 def fdoc_parser(doc):
 
     try:
-        docl=doc.split('\n')
+        docl = doc.split('\n')
     except AttributeError:
         return 'Missing docstring'
 
@@ -59,19 +59,24 @@ def parse_module_desc(docstr):
 
     dd = '(?P<desc>[^:]+)\s*:description:\s*(?P<long_desc>[\w,\s]*)'
     dd1 = '(?P<desc>[^:]+)\s*'
-    pp = re.match(dd,docstr)
-    if not pp:
-
-        pp = re.match(dd1, docstr)
+    try:
+        pp = re.match(dd, docstr)
         if not pp:
-            return 'Missing description', False
+
+            pp = re.match(dd1, docstr)
+            if not pp:
+                return 'Missing description', False
+
+            short_d = pp.group('desc')
+
+            return short_d, False
 
         short_d = pp.group('desc')
+        long_d = pp.group('long_desc')
 
-        return short_d, False
-
-    short_d = pp.group('desc')
-    long_d = pp.group('long_desc')
+    except:
+        short_d = 'Missing description'
+        long_d = 'Missing description'
 
     return short_d, long_d
 
@@ -115,7 +120,7 @@ def get_api_specification(request, *args, **kwargs):
 
                 mmod = installed_apps[app][m]
 
-                base_pkg = hasattr(mmod,'BASE') and mmod.BASE
+                base_pkg = hasattr(mmod, 'BASE') and mmod.BASE
                 mm = {}
                 mm['name'] = mmod.name
                 mm['url'] = '/{}'.format(mmod.location) if base_pkg else '/{}/{}'.format(url_prefix, mmod.location)
