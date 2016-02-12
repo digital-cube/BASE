@@ -1,6 +1,7 @@
 import os
 import sys
 import bcrypt
+import datetime
 import MySQLdb
 import MySQLdb.cursors
 from functools import wraps
@@ -161,3 +162,78 @@ def get_url_token(request_handler, log):
         tk = url_parts[-1]
 
     return tk
+
+
+
+def _convert_args(el, tp, esc):
+
+    if tp == int:
+        try:
+            el = int(el)
+        except ValueError as e:
+            return False
+
+        return el
+
+    if tp == str:
+
+        return qu_esc(el) if esc else el
+
+    if tp == datetime.datetime:
+
+        try:
+            el = datetime.datetime.strptime(el, "%Y-%m-%d %H:%M:%S")
+        except ValueError as e:
+            return False
+
+        return str(el)[:19]
+
+    if tp == datetime.date:
+
+        try:
+            el = datetime.datetime.strptime(el, "%Y-%m-%d")
+        except ValueError as e:
+            return False
+
+        return str(el)[:10]
+
+
+def params(*arguments):
+
+    def real_dec(original):
+
+        @wraps(original)
+        def wrapper(request, *args, **kwargs):
+
+            log = request.log
+            ags = []
+            for a in arguments:
+
+                atr = request.get_argument(a['arg'], default=None)
+
+                requ = a['required'] if 'required' in a else True
+
+                if not atr:
+                    if not requ:
+                        convertovan = None
+                    else:
+                        log.critical('Missing request argument: {}'.format(a['arg']))
+                        return base_common.msg.error(amsgs.MISSING_REQUEST_ARGUMENT)
+                else:
+                    tip = a['type'] if 'type' in a else str
+                    esc = a['escaped'] if 'escaped' in a else (tip == str)
+
+                    convertovan = _convert_args(atr, tip, esc)
+                    if not convertovan:
+                        log.critical('Invalid request argument {} type, expected {}'.format(atr, tip))
+                        return base_common.msg.error(amsgs.INVALID_REQUEST_ARGUMENT)
+
+                ags.append(convertovan)
+
+            return original(request, *ags)
+
+        return wrapper
+
+    return real_dec
+
+
