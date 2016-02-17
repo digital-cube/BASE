@@ -4,20 +4,13 @@ Change user's username
 user confirm username change
 """
 
-import json
-import tornado.web
 import base_common.msg
 import base_api.hash2params.save_hash
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import format_password
-from base_common.dbacommon import check_password
-from base_common.dbacommon import qu_esc
 from base_common.dbacommon import get_db
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
-# from base_common.dbatokens import authorized_by_token
-from base_common.dbatokens import get_user_by_token
-# from base_common.dbacommon import get_url_token
-# from base_common.dbacommon import check_password
 from base_svc.comm import BaseAPIRequestHandler
 from base_config.service import support_mail
 from base_common.dbacommon import get_url_token
@@ -43,8 +36,6 @@ def _get_email_message():
 def do_get(request, *args, **kwargs):
     """
     Change password
-    :param username: users new username, string, True
-    :param password: users password, string, True
     :return:  200, OK
     :return:  404
     """

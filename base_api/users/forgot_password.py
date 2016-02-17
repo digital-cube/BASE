@@ -3,9 +3,9 @@ User forgot password
 """
 
 import json
-import tornado.web
 import base_common.msg
 from base_lookup import api_messages as msgs
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_svc.comm import BaseAPIRequestHandler
 from base_common.dbacommon import get_db
@@ -35,6 +35,9 @@ def get_email_message(request, username, tk):
 
 
 @app_api_method
+@params(
+    {'arg': 'username', 'type': str, 'required': True},
+)
 def do_put(request, *args, **kwargs):
     """
     Forgot password
@@ -46,11 +49,7 @@ def do_put(request, *args, **kwargs):
     log = request.log
     _db = get_db()
 
-    try:
-        username = request.get_argument('username')
-    except tornado.web.MissingArgumentError:
-        log.critical('Missing argument username')
-        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
+    username, = args
 
     if not check_user_exists(username, _db, log):
         log.critical('User check fail')

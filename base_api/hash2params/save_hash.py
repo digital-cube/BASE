@@ -6,11 +6,11 @@ import datetime
 from MySQLdb import IntegrityError
 
 import base_common.msg
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import get_db
 from base_common.dbacommon import qu_esc
 from base_common.seq import sequencer
-from base_lookup import api_messages as msgs
 
 name = "SaveHash"
 location = "h2p/save"
@@ -27,13 +27,18 @@ def prepare_hash2params_query(h_id, data):
         "VALUES (null, '{}', '{}', '{}')".format(
             h_id,
             str(n),
-            qu_esc(data)
+            data
+        # qu_esc(data),
         )
 
     return q
 
 
+import json
 @app_api_method
+@params(
+    {'arg': 'data', 'type': json, 'required': True},
+)
 def do_put(request, *args, **kwargs):
     """
     Save hash for give parameters
@@ -47,12 +52,7 @@ def do_put(request, *args, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    import tornado.web
-    try:
-        hdata = request.get_argument('data')
-    except tornado.web.MissingArgumentError:
-        log.critical('Missing data argument for hash2param')
-        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
+    hdata, = args
 
     h_id = sequencer().new('h')
 

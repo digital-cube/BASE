@@ -16,7 +16,6 @@ from base_api.apisvc.apisvc import get_api_specification
 
 
 class BaseAPIRequestHandler:
-
     r_ip = "127.0.0.1"
 
     def __init__(self, logfile):
@@ -26,12 +25,14 @@ class BaseAPIRequestHandler:
     def set_argument(self, key, value):
         self._map[key] = value
 
-    def get_argument(self, key):
+    def get_argument(self, key, default='__DEFAULT_VALUE__'):
+        if key not in self._map and default != '__DEFAULT_VALUE__':
+            return default
+
         return self._map[key]
 
 
 def call(svc_url, port, location, data, method, request_timeout=10, force_json=False, call_headers=None):
-
     import http.client
     conn = http.client.HTTPConnection(svc_url, port)
 
@@ -45,7 +46,7 @@ def call(svc_url, port, location, data, method, request_timeout=10, force_json=F
     if call_headers:
         _headers.update(call_headers)
 
-    conn.request(method, "/"+location, body, headers=_headers)
+    conn.request(method, "/" + location, body, headers=_headers)
 
     response = conn.getresponse()
     return response.read().decode('utf-8'), response.status
@@ -79,7 +80,6 @@ class MainHandler(tornado.web.RequestHandler):
 
 
 class GeneralPostHandler(tornado.web.RequestHandler):
-
     def __init__(self, application, request, **kwargs):
         self.auth_token = None
         self.apimodule = None
@@ -187,11 +187,12 @@ class GeneralPostHandler(tornado.web.RequestHandler):
             else:
                 self.log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method_map_rev[method]]))
                 self.set_status(404)
-                self.write(json.dumps(base_common.msg.error('{} not implemented'.format(http_rev_map[method_map_rev[method]]))))
+                self.write(json.dumps(
+                    base_common.msg.error('{} not implemented'.format(http_rev_map[method_map_rev[method]]))))
 
         except Exception as e:
 
-            self.log.error("ip: {}, module: {}, function: {}, exception: e:{}".format(ip, self.apimodule.__name__, method, e))
+            self.log.error(
+                "ip: {}, module: {}, function: {}, exception: e:{}".format(ip, self.apimodule.__name__, method, e))
             self.set_status(500)
             self.write(json.dumps(base_common.msg.error(e)))
-

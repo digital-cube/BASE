@@ -7,6 +7,7 @@ import datetime
 import tornado.web
 import base_common.msg
 from base_lookup import api_messages as msgs
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_svc.comm import BaseAPIRequestHandler
 from base_common.dbacommon import get_db
@@ -32,6 +33,11 @@ def get_mail_query(sender, receiver, message):
 
 
 @app_api_method
+@params(
+    {'arg': 'sender', 'type': str, 'required': True},
+    {'arg': 'receiver', 'type': str, 'required': True},
+    {'arg': 'message', 'type': str, 'required': True},
+)
 def do_put(request, *args, **kwargs):
     """
     Save e-mail message
@@ -46,13 +52,7 @@ def do_put(request, *args, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    try:
-        sender = request.get_argument('sender')
-        receiver = request.get_argument('receiver')
-        emessage = request.get_argument('message')
-    except tornado.web.MissingArgumentError:
-        log.critical('Missing argument')
-        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
+    sender, receiver, emessage = args
 
     q = get_mail_query(sender, receiver, emessage)
     from MySQLdb import IntegrityError

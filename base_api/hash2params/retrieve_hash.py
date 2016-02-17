@@ -9,6 +9,7 @@ from MySQLdb import IntegrityError
 import base_common.msg
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import get_db
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 
 name = "GetHashData"
@@ -53,6 +54,9 @@ def log_hash_access(db, did, ip, log):
 
 
 @app_api_method
+@params(
+    {'arg': 'hash', 'type': str, 'required': True},
+)
 def do_get(request, *args, **kwargs):
     """
     Get data for given hash
@@ -66,11 +70,7 @@ def do_get(request, *args, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    try:
-        h = request.get_argument('hash')
-    except tornado.web.MissingArgumentError as e:
-        log.critical('Missing hash argument')
-        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
+    h, = args
 
     get_data_q = prepare_get_query(h)
 

@@ -12,6 +12,7 @@ from base_lookup import api_messages as msgs
 from base_common.dbacommon import check_password
 from base_common.dbacommon import qu_esc
 from base_common.dbacommon import get_db
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import authenticated_call
 from base_common.dbatokens import get_user_by_token
@@ -60,6 +61,10 @@ def _get_email_message(request, h):
 
 @authenticated_call
 @app_api_method
+@params(
+    {'arg': 'username', 'type': str, 'required': True},
+    {'arg': 'password', 'type': str, 'required': True},
+)
 def do_post(request, *args, **kwargs):
     """
     Change password
@@ -73,15 +78,10 @@ def do_post(request, *args, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    try:
-        newusername = request.get_argument('username')
-        password = request.get_argument('password')
-    except tornado.web.MissingArgumentError:
-        log.critical('Missing argument password')
-        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
+    newusername, password = args
 
     tk = request.auth_token
-    # u_n, u_p, u_i = get_user_by_token(dbc, tk, log)
+
     dbuser = get_user_by_token(dbc, tk, log)
     newusername = qu_esc(newusername)
     password = qu_esc(password)

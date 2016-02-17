@@ -7,9 +7,9 @@ import base_common.msg
 from base_common.dbacommon import qu_esc
 from base_common.dbatokens import get_token
 from base_common.dbacommon import get_db
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import check_password
-from base_common.dbacommon import format_password
 from base_lookup import api_messages as msgs
 
 
@@ -19,6 +19,10 @@ request_timeout = 10
 
 
 @app_api_method
+@params(
+    {'arg': 'username', 'type': str, 'required': True},
+    {'arg': 'password', 'type': str, 'required': True},
+)
 def do_post(request, *args, **kwargs):
     """
     User login
@@ -38,8 +42,6 @@ def do_post(request, *args, **kwargs):
     except tornado.web.MissingArgumentError:
         log.critical('Missing argument')
         return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
-
-    # password = format_password(username, password)
 
     q = "select id, password from users where username = '{}'".format(
         qu_esc(username)

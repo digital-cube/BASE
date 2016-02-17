@@ -1,7 +1,6 @@
 """
 User logout
 """
-from base_common.dbatokens import authorized_by_token
 from base_common.dbatokens import close_session_by_token
 import base_common.msg
 from base_lookup import api_messages as msgs
@@ -31,8 +30,6 @@ def do_post(request, *args, **kwargs):
     dbc = _db.cursor()
 
     tk = request.auth_token
-    # if not authorized_by_token(dbc, tk, log):
-    #     return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)
 
     if not close_session_by_token(dbc, tk, log):
         log.warning("Clossing session with token {}".format(tk))

@@ -5,6 +5,7 @@ import tornado.web
 from MySQLdb import IntegrityError
 
 import base_common.msg
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import format_password
 from base_common.dbacommon import get_db
@@ -37,6 +38,10 @@ def _prepare_user_query(u_id, username, password):
 
 
 @app_api_method
+@params(
+    {'arg': 'username', 'type': str, 'required': True},
+    {'arg': 'password', 'type': str, 'required': True},
+)
 def do_post(request, *args, **kwargs):
     """
     Register user account
@@ -48,11 +53,7 @@ def do_post(request, *args, **kwargs):
 
     log = request.log
 
-    try:
-        username = request.get_argument('username')
-        password = request.get_argument('password')
-    except tornado.web.MissingArgumentError:
-        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
+    username, password = args
 
     if len(password) < 3:
         return base_common.msg.error(msgs.PASSWORD_TO_SHORT)
