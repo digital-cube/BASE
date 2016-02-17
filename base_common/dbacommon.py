@@ -1,5 +1,7 @@
 import os
 import sys
+import json
+import json.decoder
 import bcrypt
 import datetime
 import MySQLdb
@@ -164,13 +166,13 @@ def get_url_token(request_handler, log):
     return tk
 
 
-
-def _convert_args(el, tp, esc):
+def _convert_args(el, tp, esc, log):
 
     if tp == int:
         try:
             el = int(el)
         except ValueError as e:
+            log.critical('Invalid argument: expected int got {} ({}): {}'.format(el, type(el)), e)
             return False
 
         return el
@@ -184,6 +186,7 @@ def _convert_args(el, tp, esc):
         try:
             el = datetime.datetime.strptime(el, "%Y-%m-%d %H:%M:%S")
         except ValueError as e:
+            log.critical('Invalid argument: expected datetime got {} ({}): {}'.format(el, type(el)), e)
             return False
 
         return str(el)[:19]
@@ -193,9 +196,20 @@ def _convert_args(el, tp, esc):
         try:
             el = datetime.datetime.strptime(el, "%Y-%m-%d")
         except ValueError as e:
+            log.critical('Invalid argument: expected date got {} ({}): {}'.format(el, type(el)), e)
             return False
 
         return str(el)[:10]
+
+    if tp == json:
+
+        try:
+            el = json.dumps(json.loads(el))
+        except json.decoder.JSONDecodeError as e:
+            log.critical('Invalid argument: expected date got {} ({}): {}'.format(el, type(el)), e)
+            return False
+
+        return qu_esc(el) if esc else el
 
 
 def params(*arguments):
@@ -209,13 +223,15 @@ def params(*arguments):
             ags = []
             for a in arguments:
 
-                atr = request.get_argument(a['arg'], default=None)
+                default_arg_value = a['default'] if 'default' in a else None
 
-                requ = a['required'] if 'required' in a else True
+                atr = request.get_argument(a['arg'], default=default_arg_value)
+
+                required = a['required'] if 'required' in a else True
 
                 if not atr:
-                    if not requ:
-                        convertovan = None
+                    if not required:
+                        converted = None
                     else:
                         log.critical('Missing request argument: {}'.format(a['arg']))
                         return base_common.msg.error(amsgs.MISSING_REQUEST_ARGUMENT)
@@ -223,12 +239,12 @@ def params(*arguments):
                     tip = a['type'] if 'type' in a else str
                     esc = a['escaped'] if 'escaped' in a else (tip == str)
 
-                    convertovan = _convert_args(atr, tip, esc)
-                    if not convertovan:
+                    converted = _convert_args(atr, tip, esc, log)
+                    if not converted:
                         log.critical('Invalid request argument {} type, expected {}'.format(atr, tip))
                         return base_common.msg.error(amsgs.INVALID_REQUEST_ARGUMENT)
 
-                ags.append(convertovan)
+                ags.append(converted)
 
             return original(request, *ags)
 

@@ -106,6 +106,10 @@ def get_pkgs(pkg_map):
         pkg_map[pkg.APP_NAME] = {}
         pkg_map[pkg.APP_NAME]['PREFIX'] = pkg.PREFIX
 
+        # pkg_map[pkg.APP_NAME]['APP_VERSION'] = pkg.APP_VERSION if hasattr(pkg, 'APP_VERSION') else None
+        if hasattr(pkg, 'APP_VERSION'):
+            pkg_map[pkg.APP_NAME]['APP_VERSION'] = pkg.APP_VERSION
+
         for _m in pkg.IMPORTS:
             mm = importlib.import_module('{}.{}'.format(pkg_name, _m))   # import pkg.module
             if mm.name in pkg.BASE_EXCEPTIONS:
