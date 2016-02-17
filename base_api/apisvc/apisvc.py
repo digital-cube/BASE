@@ -116,6 +116,10 @@ def get_api_specification(request, *args, **kwargs):
             url_prefix = installed_apps[app]['PREFIX']
             del installed_apps[app]['PREFIX']
 
+            if 'APP_VERSION' in installed_apps[app]:
+                applications[app]['APP_VERSION'] = installed_apps[app]['APP_VERSION']
+                del installed_apps[app]['APP_VERSION']
+
             for m in installed_apps[app]:
 
                 mmod = installed_apps[app][m]

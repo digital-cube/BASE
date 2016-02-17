@@ -50,34 +50,6 @@ def call(svc_url, port, location, data, method, request_timeout=10, force_json=F
     response = conn.getresponse()
     return response.read().decode('utf-8'), response.status
 
-    # http_client = httpclient.HTTPClient()
-    #
-    # if force_json:
-    #     body = json.dumps(data)
-    #     _headers = {'content-type': 'application/json'}
-    # else:
-    #     body = urllib.parse.urlencode(data)
-    #     _headers = {'content-type': 'application/x-www-form-urlencoded'}
-    #
-    # if call_headers and isinstance(call_headers,dict):
-    #     _headers.update(call_headers)
-    # headers = tornado.httputil.HTTPHeaders(_headers)
-    # url = svc_url + '/' + location
-    #
-    # http_request = httpclient.HTTPRequest(
-    #         url,
-    #         method=method,
-    #         body=body,
-    #         request_timeout=request_timeout,
-    #         headers=headers)
-    #
-    # response = http_client.fetch(http_request)
-    #
-    # try:
-    #     return response.body.decode("utf-8")
-    # except:
-    #     return response
-
 
 class MainHandler(tornado.web.RequestHandler):
     def data_received(self, chunk):
