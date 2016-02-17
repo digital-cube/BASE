@@ -172,7 +172,7 @@ def _convert_args(el, tp, esc, log):
         try:
             el = int(el)
         except ValueError as e:
-            log.critical('Invalid argument: expected int got {} ({}): {}'.format(el, type(el)), e)
+            log.critical('Invalid argument: expected int got {} ({}): {}'.format(el, type(el), e))
             return False
 
         return el
@@ -186,7 +186,7 @@ def _convert_args(el, tp, esc, log):
         try:
             el = datetime.datetime.strptime(el, "%Y-%m-%d %H:%M:%S")
         except ValueError as e:
-            log.critical('Invalid argument: expected datetime got {} ({}): {}'.format(el, type(el)), e)
+            log.critical('Invalid argument: expected datetime got {} ({}): {}'.format(el, type(el), e))
             return False
 
         return str(el)[:19]
@@ -196,7 +196,7 @@ def _convert_args(el, tp, esc, log):
         try:
             el = datetime.datetime.strptime(el, "%Y-%m-%d")
         except ValueError as e:
-            log.critical('Invalid argument: expected date got {} ({}): {}'.format(el, type(el)), e)
+            log.critical('Invalid argument: expected date got {} ({}): {}'.format(el, type(el), e))
             return False
 
         return str(el)[:10]
@@ -206,7 +206,7 @@ def _convert_args(el, tp, esc, log):
         try:
             el = json.dumps(json.loads(el))
         except json.decoder.JSONDecodeError as e:
-            log.critical('Invalid argument: expected date got {} ({}): {}'.format(el, type(el)), e)
+            log.critical('Invalid argument: expected date got {} ({}): {}'.format(el, type(el), e))
             return False
 
         return qu_esc(el) if esc else el
@@ -224,8 +224,9 @@ def params(*arguments):
             for a in arguments:
 
                 default_arg_value = a['default'] if 'default' in a else None
+                argmnt = a['arg'].strip()
 
-                atr = request.get_argument(a['arg'], default=default_arg_value)
+                atr = request.get_argument(argmnt, default=default_arg_value)
 
                 required = a['required'] if 'required' in a else True
 
@@ -233,7 +234,7 @@ def params(*arguments):
                     if not required:
                         converted = None
                     else:
-                        log.critical('Missing request argument: {}'.format(a['arg']))
+                        log.critical('Missing request argument: {}'.format(argmnt))
                         return base_common.msg.error(amsgs.MISSING_REQUEST_ARGUMENT)
                 else:
                     tip = a['type'] if 'type' in a else str
