@@ -36,12 +36,7 @@ def do_post(request, *args, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    try:
-        username = request.get_argument('username')
-        password = request.get_argument('password')
-    except tornado.web.MissingArgumentError:
-        log.critical('Missing argument')
-        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
+    username, password = args
 
     q = "select id, password from users where username = '{}'".format(
         qu_esc(username)

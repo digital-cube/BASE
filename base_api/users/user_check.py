@@ -19,7 +19,7 @@ request_timeout = 10
 def do_post(request, *args, **kwargs):
     """
     User logout
-    :param Auth: authorization token in header, string, True
+    :Authorization: token required
     :return:  200, OK
     :return:  400
     """

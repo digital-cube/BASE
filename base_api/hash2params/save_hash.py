@@ -1,15 +1,15 @@
 """
 Save id for params
 """
-import datetime
 
+import datetime
+import json
 from MySQLdb import IntegrityError
 
 import base_common.msg
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import get_db
-from base_common.dbacommon import qu_esc
 from base_common.seq import sequencer
 
 name = "SaveHash"
@@ -28,13 +28,11 @@ def prepare_hash2params_query(h_id, data):
             h_id,
             str(n),
             data
-        # qu_esc(data),
         )
 
     return q
 
 
-import json
 @app_api_method
 @params(
     {'arg': 'data', 'type': json, 'required': True},
@@ -66,3 +64,4 @@ def do_put(request, *args, **kwargs):
     _db.commit()
 
     return base_common.msg.post_ok({'h': h_id})
+
