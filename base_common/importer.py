@@ -78,10 +78,16 @@ def import_from_settings(imported_modules, app_to_start):
         if hasattr(app_msgs, 'msgs') and isinstance(app_msgs.msgs, dict):
             base_lookup.api_messages.msgs.update(app_msgs.msgs)
 
+    if hasattr(pm, 'APP_HOOKS'):
+        hm = importlib.import_module('{}.{}'.format(pkg_dict['pkg_name'], pm.APP_HOOKS))   # import pkg.module
+        import base_common.app_hooks
+        for h_name in hm.hooks:
+
+            h_attr = getattr(hm, h_name)
+            setattr(base_common.app_hooks, h_name, h_attr)
+
     for _m in pm.IMPORTS:
         mm = importlib.import_module('{}.{}'.format(pkg_dict['pkg_name'], _m))   # import pkg.module
-        if mm.name in pm.BASE_EXCEPTIONS:
-            continue
         mm.PREFIX = pm.PREFIX       # import pkg settings into module
         mm.APP_NAME = pm.APP_NAME   # import pkg settings into module
         imported_modules.append(mm)
@@ -112,8 +118,6 @@ def get_pkgs(pkg_map):
 
         for _m in pkg.IMPORTS:
             mm = importlib.import_module('{}.{}'.format(pkg_name, _m))   # import pkg.module
-            if mm.name in pkg.BASE_EXCEPTIONS:
-                continue
             pkg_map[pkg.APP_NAME][mm.name] = mm
 
         pkg_map['BASE'] = {}

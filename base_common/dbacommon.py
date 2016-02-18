@@ -179,7 +179,7 @@ def _convert_args(el, tp, esc, log):
 
     if tp == str:
 
-        if type(tp) != str:
+        if type(el) != str:
             return False
 
         return qu_esc(el) if esc else el
