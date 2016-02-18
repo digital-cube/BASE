@@ -20,7 +20,7 @@ request_timeout = 10
 
 @app_api_method
 @params(
-    {'arg': 'username', 'type': str, 'required': True},
+    {'arg': 'username', 'type': 'e-mail', 'required': True},
     {'arg': 'password', 'type': str, 'required': True},
 )
 def do_post(request, *args, **kwargs):

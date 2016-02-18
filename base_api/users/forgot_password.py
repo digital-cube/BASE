@@ -36,7 +36,7 @@ def get_email_message(request, username, tk):
 
 @app_api_method
 @params(
-    {'arg': 'username', 'type': str, 'required': True},
+    {'arg': 'username', 'type': 'e-mail', 'required': True},
 )
 def do_put(request, *args, **kwargs):
     """
