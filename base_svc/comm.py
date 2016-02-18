@@ -66,12 +66,41 @@ class MainHandler(tornado.web.RequestHandler):
             applist = get_api_specification(self)
 
             if html:
-                self.render('apisvctemplate.html', items=json.loads(applist))
+                j = json.loads(applist);
+
+                base = None
+                app = None
+
+                for key in j['applications'].keys():
+                    if key == 'BASE':
+                        base = j['applications']['BASE']
+                        version = j['api_version']
+                        base_ordered = list(base.keys())
+                        base_ordered .sort()
+
+                    else:
+                        app = j['applications'][key]
+
+                        app_ordered = list(app.keys())
+                        app_ordered.sort()
+
+                        name = key
+                        version = j['api_version']
+
+                self.render('x.html', items=[{'name': 'BASE',
+                                              'data': base,
+                                              'order': base_ordered,
+                                              'version': version},
+                                             {'name': name,
+                                              'data': app,
+                                              'order': app_ordered,
+                                              'version': version}])
                 return
 
             self.write(applist)
         else:
             self.write("<h1>Hello! You're doing well</h1>")
+
 
     def write_error(self, status_code, **kwargs):
         if not csettings.DEBUG:
