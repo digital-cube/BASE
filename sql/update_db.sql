@@ -2,6 +2,8 @@ CREATE TABLE IF NOT EXISTS users (
 	id char(10) PRIMARY KEY,
 	username varchar(128) NOT NULL UNIQUE,
 	password char(255) NOT NULL,
+	password_expire DATETIME,
+	active BOOLEAN NOT NULL DEFAULT FALSE,
 	INDEX (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -43,6 +45,8 @@ CREATE TABLE session_token (
   id char(64) PRIMARY KEY,
   id_user char(10) NOT NULL,
   created DATETIME NOT NULL,
+	expiration DATETIME,
+	inactive_expiration int,
   closed boolean DEFAULT FALSE,
 	INDEX (id_user),
 	INDEX (closed),
