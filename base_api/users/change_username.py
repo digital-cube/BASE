@@ -5,7 +5,6 @@ user change the username (email)
 """
 
 import json
-import tornado.web
 import base_common.msg
 import base_api.hash2params.save_hash
 from base_lookup import api_messages as msgs
@@ -68,6 +67,7 @@ def _get_email_message(request, h):
 def do_post(request, *args, **kwargs):
     """
     Change password
+    :Authorization: token required
     :param username: users new username, string, True
     :param password: users password, string, True
     :return:  200, OK

@@ -17,9 +17,11 @@ def fdoc_parser(doc):
     desc = ''
     params = {}
     _return = {}
+    auth = {}
 
     ps = ':(?P<grp>\w+)\s*(?P<prm>\w+)\s*:\s*(?P<desc>[^,]+)\s*,\s*(?P<tp>[^,]+)\s*,\s*(?P<req>\w+)$'
     rs = ':(?P<grp>\w+)\s*:\s*(?P<tp>\d+)\s*,?\s*(?P<desc>.*)?$'
+    sa = ':(?P<grp>\w+)\s*:\s*(?P<desc>.*)?$'
 
     for l in docl:
 
@@ -42,17 +44,23 @@ def fdoc_parser(doc):
                 params[param]['req'] = m.group('req')
 
             elif grp == 'return':
-                m = re.match(rs,l)
+                m = re.match(rs, l)
                 ret = m.group('tp')
                 if ret not in _return:
                     _return[ret] = {}
                 mdesc = m.group('desc')
                 _return[ret]['description'] = mdesc if mdesc else 'No content'
+
+            elif grp == 'Authorization':
+                a = re.match(sa, l)
+                a_desc = a.group('desc')
+                auth['description'] = a_desc
+
         else:
             if l:
                 desc = l
 
-    return {'description':desc, 'parameters': params, 'return': _return}
+    return {'description':desc, 'authorization': auth, 'parameters': params, 'return': _return}
 
 
 def parse_module_desc(docstr):
@@ -91,8 +99,8 @@ def doc_parser(doc):
         'methods': {}}
 
     for v in method_map.values():
-        if hasattr(doc,v):
-            f = getattr(doc,v)
+        if hasattr(doc, v):
+            f = getattr(doc, v)
             http_method = http_methods.rev[method_map_rev[v]]
             api['methods'][http_method] = fdoc_parser(f.__doc__)
 

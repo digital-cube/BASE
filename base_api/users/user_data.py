@@ -19,7 +19,7 @@ request_timeout = 10
 def do_get(request, *args, **kwargs):
     """
     Get user data
-    :param Auth: authorization token in header, string, True
+    :Authorization: token required
     :param username: requested user username, string, True
     :return:  200, OK
     :return:  400
