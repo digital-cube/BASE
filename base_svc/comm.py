@@ -87,7 +87,7 @@ class MainHandler(tornado.web.RequestHandler):
                         name = key
                         version = j['api_version']
 
-                self.render('x.html', items=[{'name': 'BASE',
+                self.render('apisvctemplate.html', items=[{'name': 'BASE',
                                               'data': base,
                                               'order': base_ordered,
                                               'version': version},
@@ -100,7 +100,6 @@ class MainHandler(tornado.web.RequestHandler):
             self.write(applist)
         else:
             self.write("<h1>Hello! You're doing well</h1>")
-
 
     def write_error(self, status_code, **kwargs):
         if not csettings.DEBUG:

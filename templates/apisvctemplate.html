@@ -1,64 +1,75 @@
 {% import json %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="API specification">
-    <meta name="author" content="DigitalCube">
-    <link rel="icon" href="favicon.ico">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="API specification">
+<meta name="author" content="DigitalCube">
+<link rel="icon" href="favicon.ico">
 
-    <title>API specification</title>
+<title>API specification</title>
 
-    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="http://getbootstrap.com/dist/css/bootstrap-theme.min.css" rel="stylesheet">
-    <link href="http://getbootstrap.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-    <!--<link href="{{static_url('css/style.css')}}" rel="stylesheet">-->
-    <link href="/static/css/style.css" rel="stylesheet">
-    
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="http://getbootstrap.com/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="http://getbootstrap.com/assets/js/ie-emulation-modes-warning.js"></script>
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://getbootstrap.com/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+<link href="http://getbootstrap.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+<!--<link href="{{static_url('css/style.css')}}" rel="stylesheet">-->
+<link href="/static/css/style.css" rel="stylesheet">
+
+<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+<!--[if lt IE 9]><script src="http://getbootstrap.com/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+<script src="http://getbootstrap.com/assets/js/ie-emulation-modes-warning.js"></script>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
 
 
-  </head>
+</head>
 
-  <body role="document">
-    <div class="container theme-showcase" role="main">
-      <div class="page-header">
-        <h1>Projects</h1>
-      </div>
-      <div class="row">
-          <div class="col-md-12">
-              {% set g = 0 %}
-                     <h4>Version: {{items['api_version']}} :</h4>
-                  {% for i in items %}
+<body role="document">
+<div class="container theme-showcase" role="main">
+  <div class="page-header">
+    <h1>Projects</h1>
+  </div>
 
-                        {% if i == 'applications' %}
-                          {% for app in items[i] %}
-                            {% set appl = items[i][app] %}
-                                {% if app!=items['api_version'] %}
-                                <h3> -{{app}}</h3>
-                                {% end %}
-                              {% for appc in appl %}
-                                {% set appcall = appl[appc] %}
-                                {% set method = appcall['methods'] %}
-                                {% set g = g+1  %}
+<div class="row">
+      <div class="col-md-12">
+                {% set g = 0 %}
+          {% for num in [1,0] %}
+
+              {% set name = items[num]['name']%}
+              {% set applications = items[num]['order'] %}
+
+                    {% if items[num]['name']!='BASE'  %}
+                        {% set app_version  = items[num]['data']['APP_VERSION'] %}
+                    {% else %}
+                        <hr>
+                        {% set app_version  = items[num]['version'] %}
+                    {% end %}
+
+            <h3>{{ name }} - {{app_version}}</h3>
+
+            {% for application in applications %}
+
+            {% set data = items[num]['data'][application] %}
+
+            {% if type(data) != str %}
+
+                                {% set method = data['methods'] %}
+                                {% set g =g + 1 %}
+
 
                             <table>
                                 <tbody style="margin-top:10px;">
                                 <tr>
 
-                                 <td class=" siz bold ">{{appcall['name']}}</td>
-                                 <td class=" siz">{{appcall['url']}}</td>
+                                 <td class=" siz bold ">{{data['name']}}</td>
+                                 <td class=" siz">{{data['url']}}</td>
                                  <td class=" siz"> </td>
-                                 <td class=" sizr">{{appcall['description']}} </td>
+                                 <td class=" sizr">{{data['description']}} </td>
 
                                </tr>
                               </tbody>
@@ -81,26 +92,26 @@
                                         {% if type(method[s])!=str %}
 
                                        {% if s == 'GET' %}
-                                         <span class=" label label-primary">{{s}}</span>  - {{appcall['url']}}
+                                         <span class=" label label-primary">{{s}}</span>  - {{data['url']}}
                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                          {% set clasa = 'get_th ' %}
                                        {% end %}
 
                                        {% if s == 'PUT' %}
-                                        <span class="label label-success">{{s}}</span>  - {{appcall['url']}}
+                                        <span class="label label-success">{{s}}</span>  - {{data['url']}}
                                         <span class="indicator right">  {{method[s]['description']}}</span>
                                          {% set clasa = 'put_th' %}
                                        {% end %}
 
                                        {% if s == 'DELETE' %}
-                                          <span class="label label-warning">{{s}}</span>  - {{appcall['url']}}
+                                          <span class="label label-warning">{{s}}</span>  - {{data['url']}}
                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                          {% set clasa = 'delete_th' %}
                                         {% else %}
                                        {% end %}
 
                                        {% if s == 'POST' %}
-                                       <span class="label label-danger">{{s}}</span>  - {{appcall['url']}}
+                                       <span class="label label-danger">{{s}}</span>  - {{data['url']}}
                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                          {% set clasa = 'post_th' %}
                                        {% end %}
@@ -185,41 +196,35 @@
                 </table>
 
 
-
-
-                              {% end %}
-                          {% end %}
-                        {% else %}
-                      <h4> {{ items[i] }}</h4>
-
-
-
-                  {% end %}
-                {% end %}
+            {% end # if  %}
 
 
 
 
-        </div>
+          {% end # for in app %}
 
-      </div>
+
+
+         {% end # for num in range(1,-1,-1) %}
 
 
 
 
 
 
-    </div> <!-- /container -->
 
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="http://getbootstrap.com/assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-    <script src="http://getbootstrap.com/assets/js/docs.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
-  </body>
+
+  </div>
+</div></body>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://getbootstrap.com/assets/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+<script src="http://getbootstrap.com/assets/js/docs.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
 </html>
