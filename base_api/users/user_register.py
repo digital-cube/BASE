@@ -1,10 +1,12 @@
 """
 User registration
 """
-import tornado.web
+
+import json
 from MySQLdb import IntegrityError
 
 import base_common.msg
+import base_common.app_hooks as apphooks
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import format_password
@@ -19,46 +21,33 @@ location = "user/register"
 request_timeout = 10
 
 
-def _check_user_registered(dbc,uname):
+def _check_user_registered(dbc, uname):
 
-    q="select id from users where username = '{}'".format(qu_esc(uname))
+    q = "select id from users where username = '{}'".format(qu_esc(uname))
     dbc.execute(q)
-    return dbc.rowcount !=0
-
-
-def _prepare_user_query(u_id, username, password):
-
-    q = "INSERT into users (id, username, password) VALUES " \
-            "('{}', '{}', '{}')".format(
-                qu_esc(u_id),
-                qu_esc(username),
-                qu_esc(password) )
-
-    return q
+    return dbc.rowcount != 0
 
 
 @app_api_method
 @params(
-    {'arg': 'username', 'type': str, 'required': True},
+    {'arg': 'username', 'type': 'e-mail', 'required': True},
     {'arg': 'password', 'type': str, 'required': True},
+    {'arg': 'data', 'type': json, 'required': False},
 )
-def do_post(request, *args, **kwargs):
+def do_post(_, *args, **kwargs):
     """
     Register user account
     :param username: users username, string, True
     :param password: users password, string, True
+    :param user_data: application specific users data, string, False
     :return:  201, Created
     :return:  404
     """
 
-    log = request.log
+    log = _.log
 
-    username, password = args
-
-    if len(password) < 3:
-        return base_common.msg.error(msgs.PASSWORD_TO_SHORT)
-
-    password = format_password(username, password)
+    username, password, users_data = args
+    username = qu_esc(username)
 
     _db = get_db()
     dbc = _db.cursor()
@@ -66,12 +55,20 @@ def do_post(request, *args, **kwargs):
     if _check_user_registered(dbc, username):
         return base_common.msg.error(msgs.USERNAME_ALREADY_TAKEN)
 
+    if hasattr(apphooks, 'check_password_is_valid') and not apphooks.check_password_is_valid(password):
+        return base_common.msg.error(msgs.INVALID_PASSWORD)
+
+    password = format_password(username, password)
+
     u_id = sequencer().new('u')
 
     if not u_id:
         return base_common.msg.error(msgs.ERROR_SERIALIZE_USER)
 
-    quser = _prepare_user_query(u_id, username, password)
+    quser = apphooks.prepare_user_query(u_id, username, password, users_data, log)
+    if not quser:
+        log.critical('Error checking users data and create query')
+        return base_common.msg.error(msgs.ERROR_REGISTER_USER)
 
     try:
         dbc.execute(quser)
@@ -85,6 +82,11 @@ def do_post(request, *args, **kwargs):
 
     _db.commit()
 
-    return base_common.msg.put_ok({'token': tk}, http_status=200)
+    response = {'token': tk}
+
+    if users_data and hasattr(apphooks, 'post_register_digest'):
+        response.update(apphooks.post_register_digest(u_id, username, password, users_data))
+
+    return base_common.msg.put_ok(response)
 
 

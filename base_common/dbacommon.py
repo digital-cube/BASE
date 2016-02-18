@@ -179,6 +179,9 @@ def _convert_args(el, tp, esc, log):
 
     if tp == str:
 
+        if type(el) != str:
+            return False
+
         return qu_esc(el) if esc else el
 
     if tp == datetime.datetime:
@@ -210,6 +213,28 @@ def _convert_args(el, tp, esc, log):
             return False
 
         return qu_esc(el) if esc else el
+
+    if tp == 'e-mail':
+
+        if '@' not in el:
+            log.critical('Invalid argument: expected e-mail address, got {}'.format(el))
+            return False
+
+        return qu_esc(el) if esc else el
+
+    if tp == list:
+
+        if type(el) != list:
+            return False
+
+        return el
+
+    if tp == dict:
+
+        if type(el) != dict:
+            return False
+
+        return el
 
 
 def params(*arguments):

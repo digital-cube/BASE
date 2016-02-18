@@ -61,7 +61,7 @@ def _get_email_message(request, h):
 @authenticated_call
 @app_api_method
 @params(
-    {'arg': 'username', 'type': str, 'required': True},
+    {'arg': 'username', 'type': 'e-mail', 'required': True},
     {'arg': 'password', 'type': str, 'required': True},
 )
 def do_post(request, *args, **kwargs):
