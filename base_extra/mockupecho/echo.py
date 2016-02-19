@@ -6,6 +6,7 @@ import json
 import datetime
 import base_common.msg
 import base_common.msg
+from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 
 
@@ -36,7 +37,8 @@ def do_get(request, *args, **kwargs):
 @app_api_method
 @params(
     {'arg': 'message', 'type': datetime.date, 'required': True}
-def do_put(request, *args, **kwargs):
+)
+def do_put(_, *args, **kwargs):
     """
     Put method of echo API call - test
     :param echo_string:  insert test string, string, True
@@ -60,7 +62,7 @@ def do_put(request, *args, **kwargs):
 @params(
     {'arg': 'message', 'type': datetime.datetime, 'required': True}
 )
-def do_delete(request, *args, **kwargs):
+def do_delete(_ , *args, **kwargs):
     """
     Delete method of echo API call - test
     :param echo_string: delete test string, string, True
