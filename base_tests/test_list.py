@@ -176,8 +176,7 @@ def user_changing_username_test(svc_port):
 
     import base_common.dbacommon
     _db = base_common.dbacommon.get_db('test_')
-    # n, p, u_id = base_common.dbatokens.get_user_by_token(_db.cursor(), tk, log)
-    dbuser = base_common.dbatokens.get_user_by_token(_db.cursor(), tk, log)
+    dbuser = base_common.dbatokens.get_user_by_token(_db, tk, log)
 
     hdata = {'cmd': 'change_username', 'newusername': 'user21@test.loc', 'user_id': dbuser.user_id, 'password': '123'}
     htk = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'data': json.dumps(hdata)}, 200, {})['h']

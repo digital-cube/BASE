@@ -278,4 +278,3 @@ def params(*arguments):
 
     return real_dec
 
-

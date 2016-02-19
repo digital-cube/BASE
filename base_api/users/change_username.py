@@ -76,13 +76,12 @@ def do_post(request, *args, **kwargs):
 
     log = request.log
     _db = get_db()
-    dbc = _db.cursor()
 
     newusername, password = args
 
     tk = request.auth_token
 
-    dbuser = get_user_by_token(dbc, tk, log)
+    dbuser = get_user_by_token(_db, tk, log)
     newusername = qu_esc(newusername)
     password = qu_esc(password)
 

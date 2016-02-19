@@ -1,3 +1,4 @@
+import base_common.app_hooks
 from base_common.dbaexc import ErrorSetSessionToken
 from base_common.dbacommon import qu_esc
 from base_common.seq import sequencer
@@ -96,8 +97,9 @@ def authorized_by_token(dbc, tk, log):
     return True
 
 
-def get_user_by_token(dbc, tk, log):
+def get_user_by_token(db, tk, log):
 
+    dbc = db.cursor()
     if not __get_user_by_token(dbc, tk, log):
         log.critical('Cannot find users token')
         return False
@@ -105,27 +107,6 @@ def get_user_by_token(dbc, tk, log):
     db_tk = dbc.fetchone()
     u_id = db_tk['id_user']
 
-    # q = "select id, username, password, role_flags from users where id = '{}'".format(u_id)
-    q = "select id, username, password from users where id = '{}'".format(u_id)
+    return base_common.app_hooks.pack_user_by_id(db, u_id, log)
 
-    try:
-        dbc.execute(q)
-    except Exception as e:
-        log.critical('Error find user by token')
-        return False
-
-    if dbc.rowcount != 1:
-        log.warning('Fount {} users with id {}'.format(dbc.rowcount, u_id))
-
-    class DBUser:
-        pass
-    db_user = DBUser
-
-    user = dbc.fetchone()
-    db_user.user_id = user['id']
-    db_user.username = user['username']
-    db_user.password = user['password']
-    # db_user.role = int(user['role_flags'])
-
-    return db_user
 

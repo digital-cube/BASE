@@ -65,8 +65,7 @@ def do_post(request, *args, **kwargs):
         if not authorized_by_token(dbc, tk, log):
             return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)
 
-        # username, oldpwdhashed, user_id = get_user_by_token(dbc, tk, log)
-        dbuser = get_user_by_token(dbc, tk, log)
+        dbuser = get_user_by_token(_db, tk, log)
         if not dbuser.username:
             log.critical('User not found by token')
             return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)
