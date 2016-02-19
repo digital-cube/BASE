@@ -1,5 +1,6 @@
 import os
 import sys
+import ast
 import json
 import json.decoder
 import bcrypt
@@ -223,12 +224,24 @@ def _convert_args(el, tp, esc, log):
 
     if tp == list:
 
+        try:
+            el = ast.literal_eval(el)
+        except SyntaxError as e:
+            log.critical('Invalid argument: expected list, got {}: {}'.format(el, e))
+            return False
+
         if type(el) != list:
             return False
 
         return el
 
     if tp == dict:
+
+        try:
+            el = ast.literal_eval(el)
+        except SyntaxError as e:
+            log.critical('Invalid argument: expected dict, got {}: {}'.format(el, e))
+            return False
 
         if type(el) != dict:
             return False
@@ -266,7 +279,13 @@ def params(*arguments):
 
                     converted = _convert_args(atr, tip, esc, log)
                     if not converted:
-                        log.critical('Invalid request argument {} type, expected {}'.format(atr, tip))
+                        c_type = "|type get error|"
+                        try:
+                            c_type = type(atr)
+                        except Exception as e:
+                            log.warning('Get argument type error: {}'.format(e))
+
+                        log.critical('Invalid request argument {} type {}, expected {}'.format(atr, c_type, tip))
                         return base_common.msg.error(amsgs.INVALID_REQUEST_ARGUMENT)
 
                 ags.append(converted)
