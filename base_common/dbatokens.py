@@ -79,8 +79,9 @@ def close_session_by_token(dbc, tk, log):
     return True
 
 
-def authorized_by_token(dbc, tk, log):
+def authorized_by_token(db, tk, log):
 
+    dbc = db.cursor()
     if not tk:
         log.warning("Access token not provided")
         return False

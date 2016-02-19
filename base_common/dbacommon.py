@@ -112,11 +112,10 @@ def authenticated_call(original_f):
 
         tk = request_handler.auth_token
         _db = get_db()
-        dbc = _db.cursor()
         log = request_handler.log
 
         from base_common.dbatokens import authorized_by_token
-        if not authorized_by_token(dbc, tk, log):
+        if not authorized_by_token(_db, tk, log):
             return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
 
         return original_f(request_handler, *args, **kwargs)

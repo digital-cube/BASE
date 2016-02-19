@@ -62,7 +62,7 @@ def do_post(request, *args, **kwargs):
     else:
         # TRY TO CHANGE PASSWORD FROM USER CHANGE REQUEST
         tk = request.auth_token
-        if not authorized_by_token(dbc, tk, log):
+        if not authorized_by_token(_db, tk, log):
             return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)
 
         dbuser = get_user_by_token(_db, tk, log)
