@@ -11,6 +11,7 @@ from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import get_db
 from base_common.seq import sequencer
+import base_lookup.api_messages as msgs
 
 name = "SaveHash"
 location = "h2p/save"
@@ -59,7 +60,7 @@ def do_put(request, *args, **kwargs):
         dbc.execute(h2p)
     except IntegrityError as e:
         log.critical('Insert hash for data: {}'.format(e))
-        return base_common.msg.error('Save data hash')
+        return base_common.msg.error(msgs.ERROR_SAVE_HASH)
 
     _db.commit()
 
