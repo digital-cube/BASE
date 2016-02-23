@@ -209,7 +209,7 @@ def _convert_args(el, tp, esc, log):
         try:
             el = json.dumps(json.loads(el))
         except json.decoder.JSONDecodeError as e:
-            log.critical('Invalid argument: expected date got {} ({}): {}'.format(el, type(el), e))
+            log.critical('Invalid argument: expected json got {} ({}): {}'.format(el, type(el), e))
             return False
 
         return qu_esc(el) if esc else el
