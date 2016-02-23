@@ -51,7 +51,12 @@ def __set_session_token(dbc, uid, tk):
 
 def __get_user_by_token(dbc, tk, log):
 
-    q = '''select id, id_user, created, closed from session_token where id = '{}' '''.format(tk)
+    q = '''SELECT
+              s.id id, s.id_user id_user, s.created created, s.closed closed
+            FROM
+              session_token s JOIN users u ON s.id_user = u.id
+            WHERE
+              s.id = '{}' AND u.active AND NOT s.closed'''.format(tk)
 
     try:
         dbc.execute(q)
@@ -109,5 +114,10 @@ def get_user_by_token(db, tk, log):
     u_id = db_tk['id_user']
 
     return base_common.app_hooks.pack_user_by_id(db, u_id, log)
+
+
+def get_user_by_id(db, user_id, log):
+
+    return base_common.app_hooks.pack_user_by_id(db, user_id, log)
 
 

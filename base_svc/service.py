@@ -72,7 +72,7 @@ def start_tests(app_started):
         import subprocess
         import base_tests.basetest
 
-        s = subprocess.Popen(["python3", base_tests.basetest.__file__, app_started], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        s = subprocess.Popen(["python3", base_tests.basetest.__file__, app_started, csettings.APP_DB.db, csettings.APP_DB.user, csettings.APP_DB.passwd], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
         log.info('Tests started on PID: {}'.format(s.pid))
 
 

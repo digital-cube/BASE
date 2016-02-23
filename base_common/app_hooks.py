@@ -51,7 +51,7 @@ def pack_user_by_id(db, user_id, log, get_dict=False):
         return False
 
     if dbc.rowcount != 1:
-        log.critical('Fount {} users with id {}'.format(dbc.rowcount, u_id))
+        log.critical('Fount {} users with id {}'.format(dbc.rowcount, user_id))
         return False
 
     class DBUser:
