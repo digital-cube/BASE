@@ -41,7 +41,7 @@ def prepare_hash2params_query(h_id, data):
 def do_put(request, *args, **kwargs):
     """
     Save hash for give parameters
-    :param hash_data: data for storing, string, True
+    :param hash_data: data for storing, json, True
     :return:  202, Data hash
     :return:  404, Missing argument
     """

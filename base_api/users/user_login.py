@@ -26,7 +26,7 @@ request_timeout = 10
 def do_post(request, *args, **kwargs):
     """
     User login
-    :param username: users username, string, True
+    :param username: users username, email, True
     :param password: users password, string, True
     :return:  200, OK
     :return:  404

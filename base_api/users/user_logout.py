@@ -18,7 +18,7 @@ request_timeout = 10
 @app_api_method
 def do_post(request, *args, **kwargs):
     """
-    User logout
+    Logout user
     :Authorization: token required
     :return:  200, OK
     :return:  400

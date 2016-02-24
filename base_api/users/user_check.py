@@ -1,5 +1,5 @@
 """
-Check is user logged
+Check if user is logged
 """
 from base_common.dbacommon import authenticated_call
 import base_common.msg
@@ -18,7 +18,7 @@ request_timeout = 10
 @app_api_method
 def do_post(request, *args, **kwargs):
     """
-    User logout
+    Check if user is logged
     :Authorization: token required
     :return:  200, OK
     :return:  400
