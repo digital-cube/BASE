@@ -4,7 +4,7 @@ User login
 import tornado.web
 
 import base_common.msg
-from base_common.dbacommon import qu_esc
+import base_common.app_hooks as apphooks
 from base_common.dbatokens import get_token
 from base_common.dbacommon import get_db
 from base_common.dbacommon import params
@@ -38,9 +38,7 @@ def do_post(request, *args, **kwargs):
 
     username, password = args
 
-    q = "select id, password from users where username = '{}'".format(
-        qu_esc(username)
-    )
+    q = apphooks.prepare_login_query(username)
 
     dbc.execute(q)
     if dbc.rowcount != 1:
@@ -54,6 +52,9 @@ def do_post(request, *args, **kwargs):
     if not check_password(u_pwd, username, password):
         log.critical('Username {} wrong password: {}'.format(username, password))
         return base_common.msg.error(msgs.USER_NOT_FOUND)
+
+    if hasattr(apphooks, 'login_expansion') and not apphooks.login_expansion(us):
+        return base_common.msg.error(msgs.ERROR_LOGIN_USER)
 
     # ASSIGN TOKEN
     tk = get_token(u_id, dbc, log)

@@ -7,6 +7,7 @@ post_register_digest -- post register users data processing
 prepare_user_query -- prepare query for insert user in db
                         (parameters: users id, username, password, json users data) (user_register)
 pack_user_by_id -- get user from db by it's id (db connection, user id, application log) (dbtokens)
+prepare_login_query -- prepare query for user login (parameters: username)
 """
 
 
@@ -73,4 +74,10 @@ def pack_user_by_id(db, user_id, log, get_dict=False):
 
     return db_user.dump_user() if get_dict else db_user
 
+
+def prepare_login_query(username):
+
+    q = "select id, password from users where username = '{}'".format( username )
+
+    return q
 

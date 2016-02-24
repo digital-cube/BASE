@@ -30,6 +30,9 @@ USER_NAME_CHANGED = 36
 REQUEST_NOT_ALLOWED = 37
 NOT_FOUND_IN_DB = 38
 ERROR_SAVE_HASH = 39
+ERROR_RETRIEVE_HASH = 40
+MISSING_URL_HASH = 41
+USER_NOT_ACTIVE = 42
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -64,3 +67,6 @@ msgs[USER_NAME_CHANGED] = "Username changed"
 msgs[REQUEST_NOT_ALLOWED] = "Request not allowed"
 msgs[NOT_FOUND_IN_DB] = "Not found"
 msgs[ERROR_SAVE_HASH] = "Error save hash"
+msgs[ERROR_RETRIEVE_HASH] = "Wrong url used"
+msgs[MISSING_URL_HASH] = "Missing url parameter"
+msgs[USER_NOT_ACTIVE] = "User is not active"

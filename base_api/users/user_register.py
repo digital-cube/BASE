@@ -85,7 +85,7 @@ def do_post(_, *args, **kwargs):
     response = {'token': tk}
 
     if users_data and hasattr(apphooks, 'post_register_digest'):
-        response.update(apphooks.post_register_digest(u_id, username, password, users_data))
+        response.update(apphooks.post_register_digest(u_id, username, password, users_data, log))
 
     return base_common.msg.put_ok(response)
 

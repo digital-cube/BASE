@@ -49,14 +49,17 @@ def __set_session_token(dbc, uid, tk):
         raise ErrorSetSessionToken
 
 
-def __get_user_by_token(dbc, tk, log):
+def __get_user_by_token(dbc, tk, log, is_active=True):
 
     q = '''SELECT
               s.id id, s.id_user id_user, s.created created, s.closed closed
             FROM
               session_token s JOIN users u ON s.id_user = u.id
             WHERE
-              s.id = '{}' AND u.active AND NOT s.closed'''.format(tk)
+              s.id = '{}' {} AND NOT s.closed'''.format(
+        tk,
+        ' AND u.active ' if is_active else ''
+        )
 
     try:
         dbc.execute(q)
@@ -103,10 +106,10 @@ def authorized_by_token(db, tk, log):
     return True
 
 
-def get_user_by_token(db, tk, log):
+def get_user_by_token(db, tk, log, is_active=True):
 
     dbc = db.cursor()
-    if not __get_user_by_token(dbc, tk, log):
+    if not __get_user_by_token(dbc, tk, log, is_active):
         log.critical('Cannot find users token')
         return False
 
