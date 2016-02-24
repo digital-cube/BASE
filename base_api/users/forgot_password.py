@@ -41,7 +41,7 @@ def get_email_message(request, username, tk):
 def do_put(request, *args, **kwargs):
     """
     Forgot password
-    :param username: users username, string, True
+    :param username: users username, email, True
     :return:  200, OK
     :return:  404, notice
     """

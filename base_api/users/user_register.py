@@ -37,7 +37,7 @@ def _check_user_registered(dbc, uname):
 def do_post(_, *args, **kwargs):
     """
     Register user account
-    :param username: users username, string, True
+    :param username: users username, email, True
     :param password: users password, string, True
     :param user_data: application specific users data, string, False
     :return:  201, Created

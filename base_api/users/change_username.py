@@ -68,7 +68,7 @@ def do_post(request, *args, **kwargs):
     """
     Change password
     :Authorization: token required
-    :param username: users new username, string, True
+    :param username: users new username, email, True
     :param password: users password, string, True
     :return:  200, OK
     :return:  404
