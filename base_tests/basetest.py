@@ -52,31 +52,57 @@ def test_base(svc_port):
     base_tests.test_list.save_message_test(svc_port)
 
 
-def test_app(app_tests_list, svc_port):
+def _prepare_stage_dump(_test_db, db_user, db_passwd, stage):
 
+    import os
+
+    dbm_file_dir_path = os.path.abspath(os.path.join(os.path.abspath(__file__), '../../..'))
+    dbm_file_path = os.path.abspath(os.path.join(dbm_file_dir_path, '{}_stage_{}_.dmp'.format(_test_db, stage)))
+
+    dump_app = 'mysqldump'
+
+    #todo make dump __proj__.stage[last_stage].dump
+    dump_cmd = '{} -u{} -p{} {} > {}'.format(
+        dump_app, db_user, db_passwd, _test_db, dbm_file_path
+    )
+
+    os.system(dump_cmd)
+
+
+def test_app(app_tests_list, svc_port, t_stage, t_db, db_u, db_p):
+
+    last_stage = t_stage
     if app_tests_list:
 
         for itest in app_tests_list:
 
-            itest(svc_port)
+            current_stage = itest[1]
+
+            if last_stage<current_stage:
+                _prepare_stage_dump(t_db, db_u, db_p, last_stage)
+                #todo make dump __proj__.stage[last_stage].dump
+
+            itest[0](svc_port)
+
+            last_stage = current_stage
 
 
-def run_tests(app_started):
+def run_tests(app_started, t_stage, test_db, db_user, db_passwd):
 
-    time.sleep(1)
+    time.sleep(1) # TODO: pingovati service da li je ok da nastavish
 
     svc_port = base_config.settings.TEST_PORT
 
     app_tests_list = []
-    load_app_test(app_started, app_tests_list)
+    load_app_test(app_started, app_tests_list, t_stage)
 
     test_base(svc_port)
-    test_app(app_tests_list, svc_port)
+    test_app(app_tests_list, svc_port, t_stage, test_db, db_user, db_passwd)
 
     finish_tests()
 
 
-def prepare_test_db(_test_db, user, passwd):
+def prepare_test_db(_test_db, user, passwd, t_stage):
     t = len('test_')
     db_name = _test_db[t:]
 
@@ -105,13 +131,18 @@ def prepare_test_db(_test_db, user, passwd):
     # create test databse
     os.system(create_test_db_cmd)
 
+    if t_stage != 0:
+        dbm_file_path = os.path.abspath(os.path.join(dbm_file_dir_path, '{}_stage_{}_.dmp'.format(_test_db, t_stage-1)))
+
     fill_test_db_cmd = "{} -u{} -p{} {} < {}".format(
         db_app, db_user, passwd, _test_db, dbm_file_path
     )
 
     # create test db tables
     os.system(fill_test_db_cmd)
-    os.unlink(dbm_file_path)
+
+    if t_stage == 0:
+        os.unlink(dbm_file_path)
 
 
 if __name__ == '__main__':
@@ -120,8 +151,9 @@ if __name__ == '__main__':
     test_db = sys.argv[2]
     db_user = sys.argv[3]
     db_passwd = sys.argv[4]
+    t_stage = int(sys.argv[5]) if len(sys.argv) == 6 else 0
 
-    prepare_test_db(test_db, db_user, db_passwd)
-    run_tests(app_started)
+    prepare_test_db(test_db, db_user, db_passwd, t_stage)
+    run_tests(app_started, t_stage, test_db, db_user, db_passwd)
 
 

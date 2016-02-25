@@ -46,7 +46,7 @@ def check_args(installed_apps):
                        default=list(installed_apps.keys())[0], nargs='?')
 
     a.add_argument("-p", "--port", help="Application port")
-    a.add_argument("-t", "--test", help="TEST Application", action='store_true')
+    a.add_argument("-t", "--test", help="TEST Application")
 
     return a.parse_args()
 
@@ -67,12 +67,13 @@ def entry_point(api_module, allowed=None, denied=None):
            dict(allowed=allowed, denied=denied, apimodule=api_module, log=llog)
 
 
-def start_tests(app_started):
+def start_tests(app_started, t_stage):
 
         import subprocess
         import base_tests.basetest
 
-        s = subprocess.Popen(["python3", base_tests.basetest.__file__, app_started, csettings.APP_DB.db, csettings.APP_DB.user, csettings.APP_DB.passwd], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        s = subprocess.Popen(["python3", base_tests.basetest.__file__, app_started, csettings.APP_DB.db,
+                              csettings.APP_DB.user, csettings.APP_DB.passwd, t_stage], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
         log.info('Tests started on PID: {}'.format(s.pid))
 
 
@@ -107,7 +108,7 @@ def start_base_service():
     if b_args.test:
         prepare_test_env()
         svc_port = csettings.TEST_PORT
-        start_tests(b_args.app)
+        start_tests(b_args.app, b_args.test)
 
     baseapi_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     tpl_dir = os.path.join(baseapi_dir, 'templates')

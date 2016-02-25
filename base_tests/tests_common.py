@@ -179,7 +179,7 @@ def finish_tests():
     sys.exit()
 
 
-def load_app_test(app_started, app_tests_list):
+def load_app_test(app_started, app_tests_list, stage):
 
     from base_common.importer import import_from_settings
     from base_common.importer import get_installed_apps
@@ -197,14 +197,19 @@ def load_app_test(app_started, app_tests_list):
 
     for itest in app_tests.tests_included:
 
-        app_test = getattr(app_tests, itest)
+        t_s = itest[1]
+        if t_s < stage:
+            continue
 
-        if hasattr(base_tests.test_list, itest):
-            log_info('OVERLOADING {}'.format(itest), '', None)
-            setattr(base_tests.test_list, itest, app_test)
+        t_n = itest[0]
+        app_test = getattr(app_tests, t_n)
+
+        if hasattr(base_tests.test_list, t_n):
+            log_info('OVERLOADING {}'.format(t_n), '', None)
+            setattr(base_tests.test_list, t_n, app_test)
 
         else:
-            log_info('LOADING {}'.format(itest), '', None)
-            app_tests_list.append(app_test)
+            log_info('LOADING {}'.format(t_n), '', None)
+            app_tests_list.append((app_test, t_s))
 
 
