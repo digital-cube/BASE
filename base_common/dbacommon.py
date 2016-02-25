@@ -248,6 +248,10 @@ def _convert_args(el, tp, esc, log):
 
         return el
 
+    if tp == bool:
+
+        return isinstance(el, bool) and el
+
 
 def params(*arguments):
 

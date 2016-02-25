@@ -33,6 +33,7 @@ ERROR_SAVE_HASH = 39
 ERROR_RETRIEVE_HASH = 40
 MISSING_URL_HASH = 41
 USER_NOT_ACTIVE = 42
+ERROR_POST_REGISTRATION = 43
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -70,3 +71,4 @@ msgs[ERROR_SAVE_HASH] = "Error save hash"
 msgs[ERROR_RETRIEVE_HASH] = "Wrong url used"
 msgs[MISSING_URL_HASH] = "Missing url parameter"
 msgs[USER_NOT_ACTIVE] = "User is not active"
+msgs[ERROR_POST_REGISTRATION] = "Postregistration error"

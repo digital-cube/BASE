@@ -56,6 +56,7 @@ def log_hash_access(db, did, ip, log):
 @app_api_method
 @params(
     {'arg': 'hash', 'type': str, 'required': True},
+    {'arg': 'access', 'type': bool, 'required': False, 'default': False},
 )
 def do_get(request, *args, **kwargs):
     """
@@ -70,7 +71,7 @@ def do_get(request, *args, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    h, = args
+    h, grant_access = args
 
     get_data_q = prepare_get_query(h)
 
@@ -95,7 +96,8 @@ def do_get(request, *args, **kwargs):
         if not log_hash_access(_db, did, request.r_ip, log):
             log.warning("Error save hash access log")
 
-        return base_common.msg.error(msgs.WRONG_OR_EXPIRED_TOKEN)
+        if not grant_access:
+            return base_common.msg.error(msgs.WRONG_OR_EXPIRED_TOKEN)
 
     try:
         d = json.loads(d)

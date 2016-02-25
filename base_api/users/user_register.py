@@ -85,7 +85,13 @@ def do_post(_, *args, **kwargs):
     response = {'token': tk}
 
     if users_data and hasattr(apphooks, 'post_register_digest'):
-        response.update(apphooks.post_register_digest(u_id, username, password, users_data, log))
+        post_d = apphooks.post_register_digest(u_id, username, password, users_data, log)
+        if post_d == False:
+            log.critical('Error user post registration digest')
+            return base_common.msg.error(msgs.ERROR_POST_REGISTRATION)
+
+        if isinstance(post_d, dict):
+            response.update(post_d)
 
     return base_common.msg.put_ok(response)
 
