@@ -65,7 +65,7 @@ def do_post(_, *args, **kwargs):
     if not u_id:
         return base_common.msg.error(msgs.ERROR_SERIALIZE_USER)
 
-    quser = apphooks.prepare_user_query(u_id, username, password, users_data, log)
+    quser = apphooks.prepare_user_query(_, u_id, username, password, users_data, log)
     if not quser:
         log.critical('Error checking users data and create query')
         return base_common.msg.error(msgs.ERROR_REGISTER_USER)

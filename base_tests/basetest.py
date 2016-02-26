@@ -10,6 +10,7 @@ import base_config.settings
 import base_tests.test_list
 from base_tests.tests_common import finish_tests
 from base_tests.tests_common import load_app_test
+from base_tests.tests_common import log_failed
 import base_tests.tests_common
 
 
@@ -18,38 +19,42 @@ def test_base(svc_port):
     if not base_config.settings.BASE_TEST:
         return
 
-    # USER REGISTER TEST
-    base_tests.test_list.base_user_register_test(svc_port)
+    try:
+        # USER REGISTER TEST
+        base_tests.test_list.base_user_register_test(svc_port)
 
-    # LOGIN TESTS
-    base_tests.test_list.base_user_login_test(svc_port)
+        # LOGIN TESTS
+        base_tests.test_list.base_user_login_test(svc_port)
 
-    # LOGOUT TESTS
-    base_tests.test_list.base_user_logout_test(svc_port)
+        # LOGOUT TESTS
+        base_tests.test_list.base_user_logout_test(svc_port)
 
-    # FORGOT PASSWORD TESTS
-    base_tests.test_list.base_user_forgot_password_test(svc_port)
+        # FORGOT PASSWORD TESTS
+        base_tests.test_list.base_user_forgot_password_test(svc_port)
 
-    # HASHI SAVE TESTS
-    base_tests.test_list.base_hash_save_test(svc_port)
+        # HASHI SAVE TESTS
+        base_tests.test_list.base_hash_save_test(svc_port)
 
-    # HASH RETRIEVE TESTS
-    base_tests.test_list.base_hash_retrieve_test(svc_port)
+        # HASH RETRIEVE TESTS
+        base_tests.test_list.base_hash_retrieve_test(svc_port)
 
-    # CHANGE PASSWORD TESTS
-    base_tests.test_list.base_user_change_password_test(svc_port)
+        # CHANGE PASSWORD TESTS
+        base_tests.test_list.base_user_change_password_test(svc_port)
 
-    # CHECK USER TESTS
-    base_tests.test_list.base_user_check_test(svc_port)
+        # CHECK USER TESTS
+        base_tests.test_list.base_user_check_test(svc_port)
 
-    # CHANGE USERNAME TEST
-    base_tests.test_list.base_user_change_username_test(svc_port)
+        # CHANGE USERNAME TEST
+        base_tests.test_list.base_user_change_username_test(svc_port)
 
-    # CHANGING USERNAME TEST
-    base_tests.test_list.base_user_changing_username_test(svc_port)
+        # CHANGING USERNAME TEST
+        base_tests.test_list.base_user_changing_username_test(svc_port)
 
-    # SAVE MAIL TEST
-    base_tests.test_list.base_save_message_test(svc_port)
+        # SAVE MAIL TEST
+        base_tests.test_list.base_save_message_test(svc_port)
+    except Exception as e:
+        log_failed('Error in test: {}'.format(e), '', None)
+        sys.exit(1)
 
 
 def _prepare_stage_dump(_test_db, db_user, db_passwd, stage):
@@ -82,7 +87,11 @@ def test_app(app_tests_list, svc_port, t_stage, t_db, db_u, db_p):
                 _prepare_stage_dump(t_db, db_u, db_p, last_stage)
                 #todo make dump __proj__.stage[last_stage].dump
 
-            itest[0](svc_port)
+            try:
+                itest[0](svc_port)
+            except Exception as e:
+                log_failed('Error in test: {}'.format(e), '', None)
+                sys.exit(1)
 
             last_stage = current_stage
 
