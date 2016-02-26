@@ -130,9 +130,13 @@ def authenticated_call(*arguments):
             from base_common.dbatokens import get_user_by_token
             dbuser = get_user_by_token(_db, tk, log)
 
+            _access = False
             for a in arguments:
 
-                if not bool(dbuser.role&a):
+                if bool(dbuser.role&a):
+                    _access = True
+
+                if not _access:
                     log.critical("Unauthorized user access attempt")
                     return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
 
