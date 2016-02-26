@@ -42,7 +42,7 @@ def pack_user_by_id(db, user_id, log, get_dict=False):
     """
 
     dbc = db.cursor()
-    q = "select id, username, password from users where id = '{}'".format(user_id)
+    q = "select id, username, password, role_flags, active from users where id = '{}'".format(user_id)
 
     import MySQLdb
     try:
@@ -71,6 +71,8 @@ def pack_user_by_id(db, user_id, log, get_dict=False):
     db_user.user_id = user['id']
     db_user.username = user['username']
     db_user.password = user['password']
+    db_user.role = user['role_flags']
+    db_user.active = user['active']
 
     return db_user.dump_user() if get_dict else db_user
 

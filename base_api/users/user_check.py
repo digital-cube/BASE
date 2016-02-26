@@ -14,7 +14,7 @@ location = "user/check"
 request_timeout = 10
 
 
-@authenticated_call
+@authenticated_call()
 @app_api_method
 def do_post(request, *args, **kwargs):
     """

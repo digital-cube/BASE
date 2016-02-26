@@ -58,7 +58,7 @@ def _get_email_message(request, h):
     return m
 
 
-@authenticated_call
+@authenticated_call()
 @app_api_method
 @params(
     {'arg': 'username', 'type': 'e-mail', 'required': True},

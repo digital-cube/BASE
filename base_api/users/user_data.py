@@ -14,7 +14,7 @@ location = "user/data"
 request_timeout = 10
 
 
-@authenticated_call
+@authenticated_call()
 @app_api_method
 def do_get(request, *args, **kwargs):
     """

@@ -99,29 +99,48 @@ def app_api_method(origin_f):
     return f_wrapper
 
 
-def authenticated_call(original_f):
+def authenticated_call(*arguments):
     """
     Checking if user who calls authenticated
     :param original_f:  function to be called
     :return:  function or error
     """
-    @wraps(original_f)
-    def f_wrapper(request_handler, *args,**kwargs):
 
-        if not hasattr(request_handler, 'auth_token'):
-            return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
+    def outer_wrapper(original_f):
 
-        tk = request_handler.auth_token
-        _db = get_db()
-        log = request_handler.log
+        @wraps(original_f)
+        def f_wrapper(request_handler, *args,**kwargs):
 
-        from base_common.dbatokens import authorized_by_token
-        if not authorized_by_token(_db, tk, log):
-            return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
+            if not hasattr(request_handler, 'auth_token'):
+                return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
 
-        return original_f(request_handler, *args, **kwargs)
+            from base_config import settings as base_settings
+            if not base_settings.APP_DB:
+                return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
 
-    return f_wrapper
+            tk = request_handler.auth_token
+            _db = get_db()
+            log = request_handler.log
+
+            from base_common.dbatokens import authorized_by_token
+            if not authorized_by_token(_db, tk, log):
+                log.critical("Unauthorized access attempt")
+                return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
+
+            from base_common.dbatokens import get_user_by_token
+            dbuser = get_user_by_token(_db, tk, log)
+
+            for a in arguments:
+
+                if not bool(dbuser.role&a):
+                    log.critical("Unauthorized user access attempt")
+                    return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
+
+            return original_f(request_handler, *args, **kwargs)
+
+        return f_wrapper
+
+    return outer_wrapper
 
 
 def check_user_exists(username, db, log, userid=None):

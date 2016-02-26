@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS users (
 	password char(255) NOT NULL,
 	password_expire DATETIME,
 	active BOOLEAN NOT NULL DEFAULT FALSE,
-	INDEX (username)
+	role_flags int NOT NULL,
+	INDEX (username),
+	INDEX (active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE hash_2_params (
