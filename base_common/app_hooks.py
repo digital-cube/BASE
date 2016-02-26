@@ -22,8 +22,10 @@ def prepare_user_query(u_id, username, password, *args, **kwargs):
     :return:
     """
 
-    q = "INSERT into users (id, username, password, active) VALUES " \
-        "('{}', '{}', '{}', true)".format(
+    # role_flags - HARDCODED to 1
+
+    q = "INSERT into users (id, username, password, role_flags, active) VALUES " \
+        "('{}', '{}', '{}', 1, true)".format(
                 u_id,
                 username,
                 password)
