@@ -11,7 +11,7 @@ from base_tests.tests_common import log
 from base_tests.tests_common import log_info
 
 
-def user_register_test(svc_port):
+def base_user_register_test(svc_port):
     log_info("User Register test", '', None)
 
     import base_api.users.user_register
@@ -27,7 +27,7 @@ def user_register_test(svc_port):
          {'username': 'user1@test.loc', 'password': '123'}, 400, {'message': amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]})
 
 
-def user_login_test(svc_port):
+def base_user_login_test(svc_port):
     log_info("User Login test", '', None)
 
     import base_api.users.user_login
@@ -42,7 +42,7 @@ def user_login_test(svc_port):
          400, {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
 
 
-def user_logout_test(svc_port):
+def base_user_logout_test(svc_port):
     log_info("User Logout test", '', None)
 
     import base_api.users.user_login
@@ -57,7 +57,7 @@ def user_logout_test(svc_port):
     test(svc_port, base_api.users.user_logout.location, 'POST', tk, {}, 204, {})
 
 
-def user_forgot_password_test(svc_port):
+def base_user_forgot_password_test(svc_port):
     log_info("User Forgot Password test", '', None)
 
     import base_api.users.forgot_password
@@ -71,7 +71,7 @@ def user_forgot_password_test(svc_port):
     test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user1@test.loc'}, 200, {})
 
 
-def user_change_password_test(svc_port):
+def base_user_change_password_test(svc_port):
     log_info("User Change Password test", '', None)
 
     import base_api.users.user_login
@@ -96,7 +96,7 @@ def user_change_password_test(svc_port):
          warning_level=WarningLevel.STRICT_ON_KEY)
 
 
-def user_check_test(svc_port):
+def base_user_check_test(svc_port):
     log_info("User Check test", '', None)
 
     import base_api.users.user_login
@@ -112,7 +112,7 @@ def user_check_test(svc_port):
          200, {'username': ''}, result_types={'username': str}, warning_level=WarningLevel.STRICT_ON_KEY)
 
 
-def hash_save_test(svc_port):
+def base_hash_save_test(svc_port):
     log_info("Hash save test", '', None)
 
     import base_api.hash2params.save_hash
@@ -125,7 +125,7 @@ def hash_save_test(svc_port):
          {'data': json.dumps({"username": "user2@test.loc"})}, 200, {})
 
 
-def hash_retrieve_test(svc_port):
+def base_hash_retrieve_test(svc_port):
     log_info("Hash Retrieve test", '', None)
 
     import base_api.hash2params.save_hash
@@ -142,7 +142,7 @@ def hash_retrieve_test(svc_port):
          {'hash': htk}, 200, {})
 
 
-def user_change_username_test(svc_port):
+def base_user_change_username_test(svc_port):
     log_info("User Change Username test", '', None)
 
     import base_api.users.user_login
@@ -163,7 +163,7 @@ def user_change_username_test(svc_port):
          {'message': amsgs.msgs[amsgs.CHANGE_USERNAME_REQUEST]}, result_types={'message': str})
 
 
-def user_changing_username_test(svc_port):
+def base_user_changing_username_test(svc_port):
     log_info("Changing Username test", '', None)
 
     import base_api.users.user_login
@@ -195,7 +195,7 @@ def user_changing_username_test(svc_port):
          result_types={'message': str})
 
 
-def save_message_test(svc_port):
+def base_save_message_test(svc_port):
     log_info("Email Message Save test", '', None)
 
     # SEND MAIL IS NOT REGISTERED FOR API

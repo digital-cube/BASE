@@ -19,37 +19,37 @@ def test_base(svc_port):
         return
 
     # USER REGISTER TEST
-    base_tests.test_list.user_register_test(svc_port)
+    base_tests.test_list.base_user_register_test(svc_port)
 
     # LOGIN TESTS
-    base_tests.test_list.user_login_test(svc_port)
+    base_tests.test_list.base_user_login_test(svc_port)
 
     # LOGOUT TESTS
-    base_tests.test_list.user_logout_test(svc_port)
+    base_tests.test_list.base_user_logout_test(svc_port)
 
     # FORGOT PASSWORD TESTS
-    base_tests.test_list.user_forgot_password_test(svc_port)
+    base_tests.test_list.base_user_forgot_password_test(svc_port)
 
     # HASHI SAVE TESTS
-    base_tests.test_list.hash_save_test(svc_port)
+    base_tests.test_list.base_hash_save_test(svc_port)
 
     # HASH RETRIEVE TESTS
-    base_tests.test_list.hash_retrieve_test(svc_port)
+    base_tests.test_list.base_hash_retrieve_test(svc_port)
 
     # CHANGE PASSWORD TESTS
-    base_tests.test_list.user_change_password_test(svc_port)
+    base_tests.test_list.base_user_change_password_test(svc_port)
 
     # CHECK USER TESTS
-    base_tests.test_list.user_check_test(svc_port)
+    base_tests.test_list.base_user_check_test(svc_port)
 
     # CHANGE USERNAME TEST
-    base_tests.test_list.user_change_username_test(svc_port)
+    base_tests.test_list.base_user_change_username_test(svc_port)
 
     # CHANGING USERNAME TEST
-    base_tests.test_list.user_changing_username_test(svc_port)
+    base_tests.test_list.base_user_changing_username_test(svc_port)
 
     # SAVE MAIL TEST
-    base_tests.test_list.save_message_test(svc_port)
+    base_tests.test_list.base_save_message_test(svc_port)
 
 
 def _prepare_stage_dump(_test_db, db_user, db_passwd, stage):
