@@ -26,6 +26,14 @@ def base_user_register_test(svc_port):
     test(svc_port, base_api.users.user_register.location, 'POST', None,
          {'username': 'user1@test.loc', 'password': '123'}, 400, {'message': amsgs.msgs[amsgs.USERNAME_ALREADY_TAKEN]})
 
+    test(svc_port, base_api.users.user_register.location, 'POST', None,
+         {'username': 'user2@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+         warning_level=WarningLevel.STRICT_ON_KEY)
+
+    test(svc_port, base_api.users.user_register.location, 'POST', None,
+         {'username': 'user3@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+         warning_level=WarningLevel.STRICT_ON_KEY)
+
 
 def base_user_login_test(svc_port):
     log_info("User Login test", '', None)
@@ -49,7 +57,7 @@ def base_user_logout_test(svc_port):
     import base_api.users.user_logout
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              {'username': 'user3@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     test(svc_port, base_api.users.user_logout.location, 'POST', None, {}, 400,
@@ -66,9 +74,10 @@ def base_user_forgot_password_test(svc_port):
          {'message': amsgs.msgs[amsgs.NOT_IMPLEMENTED_POST]})
     test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'ername': 'user3@test.loc'}, 400,
          {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
-    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user3@test.loc'}, 400,
+    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user4@test.loc'}, 400,
          {'message': amsgs.msgs[amsgs.USER_NOT_FOUND]})
     test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user1@test.loc'}, 200, {})
+    test(svc_port, base_api.users.forgot_password.location, 'PUT', None, {'username': 'user3@test.loc'}, 200, {})
 
 
 def base_user_change_password_test(svc_port):
@@ -79,12 +88,12 @@ def base_user_change_password_test(svc_port):
     import base_api.users.change_password
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              {'username': 'user3@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
     htk = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None,
-               {'data': json.dumps({"username": "user2@test.loc"})}, 200, {})['h']
+               {'data': json.dumps({"username": "user3@test.loc"})}, 200, {})['h']
 
-    test(svc_port, base_api.users.change_password.location, 'POST', None, {'ername': 'user2@test.loc'}, 400,
+    test(svc_port, base_api.users.change_password.location, 'POST', None, {'ername': 'user3@test.loc'}, 400,
          {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, base_api.users.change_password.location, 'POST', tk, {'newpassword': '123'}, 400,
          {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
@@ -103,7 +112,7 @@ def base_user_check_test(svc_port):
     import base_api.users.user_check
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user1@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              {'username': 'user3@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     test(svc_port, base_api.users.user_check.location, 'POST', None, {'username': 'user2@test.loc', 'password': '123'},
