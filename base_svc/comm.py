@@ -13,6 +13,9 @@ from base_lookup.http_methods import rev as http_rev_map
 from base_lookup.methods_mapping import method_map
 from base_lookup.methods_mapping import method_map_rev
 from base_api.apisvc.apisvc import get_api_specification
+import tornado.web
+
+_c = 0
 
 
 class BaseAPIRequestHandler:
@@ -111,6 +114,7 @@ class MainHandler(tornado.web.RequestHandler):
 
 
 class GeneralPostHandler(tornado.web.RequestHandler):
+
     def __init__(self, application, request, **kwargs):
         self.auth_token = None
         self.apimodule = None
@@ -119,7 +123,21 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.denied = None
         self.log = None
         self.r_ip = None
+        self._a_p = None
         super().__init__(application, request, **kwargs)
+
+        if csettings.LB:
+            setattr(GeneralPostHandler, 'get', self.a_get)
+            setattr(GeneralPostHandler, 'put', self.a_put)
+            setattr(GeneralPostHandler, 'post', self.a_post)
+            setattr(GeneralPostHandler, 'patch', self.a_patch)
+            setattr(GeneralPostHandler, 'delete', self.a_delete)
+        else:
+            setattr(GeneralPostHandler, 'get', self._get)
+            setattr(GeneralPostHandler, 'put', self._put)
+            setattr(GeneralPostHandler, 'post', self._post)
+            setattr(GeneralPostHandler, 'patch', self._patch)
+            setattr(GeneralPostHandler, 'delete', self._delete)
 
     def data_received(self, chunk):
         print('RECEIVED CHUNK', chunk)
@@ -152,23 +170,48 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization')
         self.finish('OK')
 
-    def get(self):
+    @tornado.web.asynchronous
+    def a_get(self):
 
         self.call_api_fun(method_map[GET])
 
-    def put(self):
+    def _get(self):
+
+        self.call_api_fun(method_map[GET])
+
+    @tornado.web.asynchronous
+    def a_put(self):
 
         self.call_api_fun(method_map[PUT])
 
-    def patch(self):
+    def _put(self):
+
+        self.call_api_fun(method_map[PUT])
+
+    @tornado.web.asynchronous
+    def a_patch(self):
 
         self.call_api_fun(method_map[PATCH])
 
-    def post(self):
+    def _patch(self):
+
+        self.call_api_fun(method_map[PATCH])
+
+    @tornado.web.asynchronous
+    def a_post(self):
 
         self.call_api_fun(method_map[POST])
 
-    def delete(self):
+    def _post(self):
+
+        self.call_api_fun(method_map[POST])
+
+    @tornado.web.asynchronous
+    def a_delete(self):
+
+        self.call_api_fun(method_map[DELETE])
+
+    def _delete(self):
 
         self.call_api_fun(method_map[DELETE])
 
@@ -196,6 +239,13 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
         return j, ip
 
+    # TODO: write coroutine for this call
+    # http://www.tornadoweb.org/en/stable/guide/coroutines.html#coroutines
+    def _a_cb(self, res):
+        self.log.info('EXITING SERVER: {}'.format(self._a_p))
+        self.write('{} -> {}'.format(self._a_p,res.body))
+        self.finish()
+
     def call_api_fun(self, method):
 
         self.set_header('Access-Control-Allow-Origin', '*')
@@ -204,8 +254,33 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
         try:
             if hasattr(self.apimodule, method):
+
                 fun = getattr(self.apimodule, method)
-                result = fun(self, logged_user_dict=j)
+
+                if csettings.LB:
+
+                    def a_call(r_handler, _server_ip):
+                        from tornado import httpclient
+                        _aclient = httpclient.AsyncHTTPClient(force_instance=True)
+                        _uri = 'http://{}{}'.format(_server,r_handler.request.uri)
+
+                        _res = _aclient.fetch(_uri, self._a_cb) #, connect_timeout=200)
+                        print('RES',_res)
+
+                    global _c
+                    _server = csettings.BALANCE[ _c % len(csettings.BALANCE) ]
+                    _c += 1
+                    print('IZABRAO SAM', _server)
+
+                    self._a_p = _server[-4:]
+                    self.log.info('CALLING SERVER: {}'.format(self._a_p))
+                    a_call(self, _server)
+                    return
+
+                else:
+
+                    result = fun(self, logged_user_dict=j)
+                # result = fun(self, logged_user_dict=j)
 
                 self.set_status(200)
                 if 'http_status' in result:
