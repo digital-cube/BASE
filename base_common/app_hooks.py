@@ -67,7 +67,7 @@ def pack_user_by_id(db, user_id, log, get_dict=False):
 
             return ret
 
-    db_user = DBUser
+    db_user = DBUser()
 
     user = dbc.fetchone()
     db_user.user_id = user['id']

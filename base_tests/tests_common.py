@@ -44,8 +44,10 @@ class WarningLevel:
 
 def test_log(loc, method, result, color, message):
     st = '{}{} {} {}{}{}'.format(color, message, loc, method, '-> {}'.format(result) if result else '', Color.DEFAULT)
-    log.info(st)
-    print(st)
+    try:
+        log.info(st)
+    except Exception as e:
+        log.critical(e)
 
 
 def log_info(loc, method, result):

@@ -14,9 +14,9 @@ from base_tests.tests_common import log_failed
 import base_tests.tests_common
 
 
-def test_base(svc_port):
+def test_base(svc_port, t_stage):
 
-    if not base_config.settings.BASE_TEST:
+    if not base_config.settings.BASE_TEST or t_stage != 0:
         return
 
     try:
@@ -105,7 +105,7 @@ def run_tests(app_started, t_stage, test_db, db_user, db_passwd):
     app_tests_list = []
     load_app_test(app_started, app_tests_list, t_stage)
 
-    test_base(svc_port)
+    test_base(svc_port, t_stage)
     test_app(app_tests_list, svc_port, t_stage, test_db, db_user, db_passwd)
 
     finish_tests()

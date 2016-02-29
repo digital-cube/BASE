@@ -273,7 +273,10 @@ def _convert_args(el, tp, esc, log):
 
     if tp == bool:
 
-        return isinstance(el, bool) and el
+        try:
+            return el.lower() == 'true'
+        except AttributeError:
+            return isinstance(el, bool) and el
 
 
 def params(*arguments):
