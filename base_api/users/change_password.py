@@ -39,8 +39,6 @@ def do_post(request, *args, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    # TODO: check users token
-
     try:
         newpassword = request.get_argument('newpassword')
     except tornado.web.MissingArgumentError:

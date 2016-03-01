@@ -66,7 +66,6 @@ def _prepare_stage_dump(_test_db, db_user, db_passwd, stage):
 
     dump_app = 'mysqldump'
 
-    #todo make dump __proj__.stage[last_stage].dump
     dump_cmd = '{} -u{} -p{} {} > {}'.format(
         dump_app, db_user, db_passwd, _test_db, dbm_file_path
     )
@@ -83,9 +82,8 @@ def test_app(app_tests_list, svc_port, t_stage, t_db, db_u, db_p):
 
             current_stage = itest[1]
 
-            if last_stage<current_stage:
+            if last_stage < current_stage:
                 _prepare_stage_dump(t_db, db_u, db_p, last_stage)
-                #todo make dump __proj__.stage[last_stage].dump
 
             try:
                 itest[0](svc_port)
