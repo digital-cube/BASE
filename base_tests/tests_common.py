@@ -197,13 +197,19 @@ def load_app_test(app_started, app_tests_list, stage):
     import importlib
     app_tests = importlib.import_module(_pm.TESTS)
 
+    _last_stage = 0
     for itest in app_tests.tests_included:
 
         t_s = itest[1]
+        t_n = itest[0]
+
+        if t_s < _last_stage:
+            log_warning('Exiting after: {}'.format(t_n), '', None)
+            break
+
         if t_s < stage:
             continue
 
-        t_n = itest[0]
         app_test = getattr(app_tests, t_n)
 
         if hasattr(base_tests.test_list, t_n):
@@ -214,4 +220,5 @@ def load_app_test(app_started, app_tests_list, stage):
             log_info('LOADING {}'.format(t_n), '', None)
             app_tests_list.append((app_test, t_s))
 
+        _last_stage = t_s
 
