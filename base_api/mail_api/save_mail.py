@@ -37,6 +37,7 @@ def get_mail_query(sender, receiver, message):
     {'arg': 'sender', 'type': str, 'required': True},
     {'arg': 'receiver', 'type': str, 'required': True},
     {'arg': 'message', 'type': str, 'required': True},
+    {'arg': '_get_id', 'type': bool, 'required': False, 'default': False},
 )
 def do_put(request, *args, **kwargs):
     """
@@ -52,7 +53,7 @@ def do_put(request, *args, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    sender, receiver, emessage = args
+    sender, receiver, emessage, _get_id = args
 
     q = get_mail_query(sender, receiver, emessage)
     from MySQLdb import IntegrityError
@@ -63,5 +64,10 @@ def do_put(request, *args, **kwargs):
         return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
 
     _db.commit()
+
+    if _get_id:
+
+        m_id = dbc.lastrowid
+        return base_common.msg.post_ok({'message_id': m_id})
 
     return base_common.msg.post_ok()

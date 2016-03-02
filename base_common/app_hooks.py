@@ -57,6 +57,7 @@ def pack_user_by_id(db, user_id, log, get_dict=False):
         log.critical('Fount {} users with id {}'.format(dbc.rowcount, user_id))
         return False
 
+    #DUMMY CLASS INSTANCE USER JUST FOR EASIER MANIPULATION OF DATA
     class DBUser:
 
         def dump_user(self):

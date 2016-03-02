@@ -222,3 +222,22 @@ def load_app_test(app_started, app_tests_list, stage):
 
         _last_stage = t_s
 
+
+def make_mail_sent(db, mail_id, log):
+
+    q = '''update mail_queue set sent = TRUE where id = {}'''.format(mail_id)
+    dbc = db.cursor()
+
+    import MySQLdb
+    try:
+        dbc.execute(q)
+    except MySQLdb.IntegrityError as e:
+        log.critical('Error updating mail table: {}'.format(e))
+        return False
+
+    if dbc.rowcount != 1:
+        log.critical('Error in mail sent mockup')
+        return False
+
+    db.commit()
+    return True
