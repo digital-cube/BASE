@@ -53,7 +53,7 @@ def log_hash_access(db, did, ip, log):
     return True
 
 
-@app_api_method
+@app_api_method(method='GET')
 @params(
     {'arg': 'hash', 'type': str, 'required': True},
     {'arg': 'access', 'type': bool, 'required': False, 'default': False},

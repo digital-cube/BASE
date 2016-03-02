@@ -32,7 +32,7 @@ def get_mail_query(sender, receiver, message):
     return q
 
 
-@app_api_method
+@app_api_method(method='PUT', expose=False)
 @params(
     {'arg': 'sender', 'type': str, 'required': True},
     {'arg': 'receiver', 'type': str, 'required': True},

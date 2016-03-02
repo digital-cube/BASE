@@ -34,7 +34,7 @@ def prepare_hash2params_query(h_id, data):
     return q
 
 
-@app_api_method
+@app_api_method(method='PUT')
 @params(
     {'arg': 'data', 'type': json, 'required': True},
 )

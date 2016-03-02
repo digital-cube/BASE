@@ -18,7 +18,7 @@ location = "user/login"
 request_timeout = 10
 
 
-@app_api_method
+@app_api_method(method='POST')
 @params(
     {'arg': 'username', 'type': 'e-mail', 'required': True},
     {'arg': 'password', 'type': str, 'required': True},
