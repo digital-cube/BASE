@@ -69,6 +69,15 @@ def import_from_settings(imported_modules, app_to_start):
     if hasattr(pm, 'BASE_TEST'):
         base_config.settings.BASE_TEST = pm.BASE_TEST
 
+    if hasattr(pm, 'LB'):
+        base_config.settings.LB = pm.LB
+        if base_config.settings.LB:
+            if hasattr(pm, 'BALANCE'):
+                base_config.settings.BALANCE = pm.BALANCE
+            else:
+                from base_common.dbaexc import BalancingAppException
+                raise BalancingAppException("Missing balancing server ips")
+
     if hasattr(pm, 'TESTS'):
         base_config.settings.APP_TESTS = pm.TESTS
 

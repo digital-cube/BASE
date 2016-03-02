@@ -101,7 +101,12 @@ def start_base_service():
         print('Please provide svc_port in app init or trough commandline')
         sys.exit(3)
 
-    import_from_settings(imported_modules, b_args.app)
+    from base_common.dbaexc import BalancingAppException
+    try:
+        import_from_settings(imported_modules, b_args.app)
+    except BalancingAppException as e:
+        log.critical('Error loading balance servers: {}'.format(e))
+        sys.exit(5)
 
     entry_points = [entry_point(m) for m in imported_modules]
 
