@@ -99,6 +99,7 @@ def import_from_settings(imported_modules, app_to_start):
 
     def _add_to_imports(_mm, _f, _m):
 
+        # _expose = False
         try:
             _expose = getattr(_f, '__api_method_call__')
         except AttributeError:
@@ -141,7 +142,7 @@ def import_from_settings(imported_modules, app_to_start):
             mm_ = importlib.import_module(_m)   # import base modules
             mm_.BASE = True
 
-            for f in [o for o in getmembers(mm) if isfunction(o)]:
+            for f in [o for o in getmembers(mm) if isfunction(o[1])]:
                 _add_to_imports(mm_, f[1], imported_modules)
 
 

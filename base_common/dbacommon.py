@@ -98,9 +98,7 @@ def app_api_method(**arguments):
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                # raise ApiMethodError('{}, {}, {}, {}'.format(exc_type, fname, exc_tb.tb_lineno, str(e)))
                 log.critical('{}, {}, {}, {}'.format(exc_type, fname, exc_tb.tb_lineno, str(e)))
-                import base_common.msg
                 return base_common.msg.error(amsgs.API_CALL_EXCEPTION)
 
         # set api method meta data
@@ -302,6 +300,7 @@ def params(*arguments):
 
             log = request.log
             ags = []
+            # k = original.__name__
             for a in arguments:
 
                 default_arg_value = a['default'] if 'default' in a else None

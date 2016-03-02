@@ -270,6 +270,8 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                     self.write(json.dumps(base_common.msg.error(amsgs.NOT_API_CALL)))
                     return
 
+                # k = fun.__name__
+                # p = fun.__parent__
                 _fun_method = getattr(fun, '__api_method_type__')
                 _fun_method = http_map[_fun_method]
                 if method != _fun_method:
