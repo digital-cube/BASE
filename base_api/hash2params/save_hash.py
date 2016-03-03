@@ -34,16 +34,16 @@ def prepare_hash2params_query(h_id, data):
     return q
 
 
-@app_api_method(method='PUT')
+@app_api_method(
+    method='PUT',
+    api_return=[(202, 'Data hash'), (404, 'Missing argument')]
+)
 @params(
-    {'arg': 'data', 'type': json, 'required': True},
+    {'arg': 'data', 'type': json, 'required': True, 'description': 'data for storing'},
 )
 def do_put(request, *args, **kwargs):
     """
     Save hash for give parameters
-    :param hash_data: data for storing, json, True
-    :return:  202, Data hash
-    :return:  404, Missing argument
     """
 
     log = request.log

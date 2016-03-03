@@ -32,20 +32,19 @@ def get_mail_query(sender, receiver, message):
     return q
 
 
-@app_api_method(method='PUT', expose=False)
+@app_api_method(
+    method='PUT',
+    expose=False,
+    api_return=[(200, 'OK'), (404, 'notice')]
+)
 @params(
-    {'arg': 'sender', 'type': str, 'required': True},
-    {'arg': 'receiver', 'type': str, 'required': True},
-    {'arg': 'message', 'type': str, 'required': True},
+    {'arg': 'sender', 'type': str, 'required': True, 'description': 'user who sends a mail'},
+    {'arg': 'receiver', 'type': str, 'required': True, 'description': 'user who receive a mail'},
+    {'arg': 'message', 'type': str, 'required': True, 'description': 'message to send'},
 )
 def do_put(request, *args, **kwargs):
     """
     Save e-mail message
-    :param sender: user who sends a mail, string, True
-    :param receiver: user who receive a mail, string, True
-    :param message: message to send, string, True
-    :return:  200, OK
-    :return:  404, notice
     """
 
     log = request.log

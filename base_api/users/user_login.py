@@ -18,18 +18,17 @@ location = "user/login"
 request_timeout = 10
 
 
-@app_api_method(method='POST')
+@app_api_method(
+    method='POST',
+    api_return=[(200, 'OK'), (404, '')]
+)
 @params(
-    {'arg': 'username', 'type': 'e-mail', 'required': True},
-    {'arg': 'password', 'type': str, 'required': True},
+    {'arg': 'username', 'type': 'e-mail', 'required': True, 'description': 'users username'},
+    {'arg': 'password', 'type': str, 'required': True, 'description': 'users password'},
 )
 def do_post(request, *args, **kwargs):
     """
     User login
-    :param username: users username, email, True
-    :param password: users password, string, True
-    :return:  200, OK
-    :return:  404
     """
 
     log = request.log

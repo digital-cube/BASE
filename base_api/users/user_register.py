@@ -28,20 +28,18 @@ def _check_user_registered(dbc, uname):
     return dbc.rowcount != 0
 
 
-@app_api_method(method='POST')
+@app_api_method(
+    method='POST',
+    api_return=[(201, 'Created'), (404, '')]
+)
 @params(
-    {'arg': 'username', 'type': 'e-mail', 'required': True},
-    {'arg': 'password', 'type': str, 'required': True},
-    {'arg': 'data', 'type': json, 'required': False},
+    {'arg': 'username', 'type': 'e-mail', 'required': True, 'description': 'users username'},
+    {'arg': 'password', 'type': str, 'required': True, 'description': 'users password'},
+    {'arg': 'data', 'type': json, 'required': False, 'description': 'application specific users data'},
 )
 def do_post(_, *args, **kwargs):
     """
     Register user account
-    :param username: users username, email, True
-    :param password: users password, string, True
-    :param user_data: application specific users data, string, False
-    :return:  201, Created
-    :return:  404
     """
 
     log = _.log

@@ -160,12 +160,24 @@ def get_pkgs(pkg_map):
         pkg_map[pkg.APP_NAME] = {}
         pkg_map[pkg.APP_NAME]['PREFIX'] = pkg.PREFIX
 
-        # pkg_map[pkg.APP_NAME]['APP_VERSION'] = pkg.APP_VERSION if hasattr(pkg, 'APP_VERSION') else None
         if hasattr(pkg, 'APP_VERSION'):
             pkg_map[pkg.APP_NAME]['APP_VERSION'] = pkg.APP_VERSION
 
         for _m in pkg.IMPORTS:
             mm = importlib.import_module('{}.{}'.format(pkg_name, _m))   # import pkg.module
+
+            mm.__api_methods__ = []
+
+            for f in [o for o in getmembers(mm) if isfunction(o[1])]:
+                k = dir(f[1])
+                try:
+                    _c = f[1].__app_api_arguments__
+                except:
+                    pass
+
+                l = 1
+                mm.__api_methods__.append(f[1])
+
             pkg_map[pkg.APP_NAME][mm.name] = mm
 
         pkg_map['BASE'] = {}
@@ -175,8 +187,14 @@ def get_pkgs(pkg_map):
 
             base_pkg = importlib.import_module(bapp)
             for _m in base_pkg.IMPORTS:
-                pk = importlib.import_module(_m)
-                pkg_map['BASE'][pk.name] = pk
+                _pk = importlib.import_module(_m)
+
+                _pk.__api_methods__ = []
+
+                for f in [o for o in getmembers(_pk) if isfunction(o[1])]:
+                    _pk.__api_methods__.append(f[1])
+
+                pkg_map['BASE'][_pk.name] = _pk
 
 
 def get_app():

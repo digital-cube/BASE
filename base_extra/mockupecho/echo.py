@@ -17,6 +17,7 @@ request_timeout = 10
 
 @app_api_method(
     method='GET',
+    api_return=[(200, 'echoed message'), (404, '')]
 )
 @params(
     {'arg': 'message', 'type': str, 'required': True}
@@ -24,20 +25,17 @@ request_timeout = 10
 def do_get(request, *args, **kwargs):
     """
     Get method of echo API call - test
-    :param echo_string: token given in request uri, string, True
-    :return: 200, OK
-    :return: 404, not found
     """
 
     message, = args
 
-    #request.log.info('echo.get')
     return base_common.msg.get_ok({'echo': message})
     return {'echo': 'get echo'}
 
 
 @app_api_method(
     method='PUT',
+    api_return=[(200, 'echo date'), (400, ''), (401, 'Unauthorized')]
 )
 @params(
     {'arg': 'message', 'type': datetime.date, 'required': True}
@@ -45,12 +43,6 @@ def do_get(request, *args, **kwargs):
 def do_put(_, *args, **kwargs):
     """
     Put method of echo API call - test
-    :param echo_string:  insert test string, string, True
-    :return:  200, echo
-    :return:  202, echo to be accepted
-    :return:  204
-    :return:  400, bad request
-    :return:  401, Unauthorized
     """
 
     dt, = args
@@ -64,6 +56,7 @@ def do_put(_, *args, **kwargs):
 
 @app_api_method(
     method='DELETE',
+    api_return=[(200, 'echo date'), (400, ''), (401, 'Unauthorized')]
 )
 @params(
     {'arg': 'message', 'type': datetime.datetime, 'required': True}
@@ -71,12 +64,6 @@ def do_put(_, *args, **kwargs):
 def do_delete(_ , *args, **kwargs):
     """
     Delete method of echo API call - test
-    :param echo_string: delete test string, string, True
-    :return:  200, OK
-    :return:  202, echo to be deleted
-    :return:  204
-    :return:  400, bad request
-    :return:  401, Unauthorized
     """
 
     dt, = args
@@ -90,6 +77,7 @@ def do_delete(_ , *args, **kwargs):
 
 @app_api_method(
     method='POST',
+    api_return=[(200, 'echo date'), (400, ''), (401, 'Unauthorized')]
 )
 @params(
     {'arg': 'message', 'type': json, 'required': True}
@@ -97,10 +85,6 @@ def do_delete(_ , *args, **kwargs):
 def do_post(request, *args, **kwargs):
     """
     Post method of echo API call - test
-    :param echo_string: insert test string, string, True
-    :return:  200, OK
-    :return:  201, echo created
-    :return:  204
     """
 
     j, = args
@@ -112,6 +96,7 @@ def do_post(request, *args, **kwargs):
 
 @app_api_method(
     method='PATCH',
+    api_return=[(200, 'echo date'), (400, '')]
 )
 @params(
     {'arg': 'message', 'type': int, 'required': True}
@@ -119,10 +104,6 @@ def do_post(request, *args, **kwargs):
 def do_patch(request, *args, **kwargs):
     """
     Patch method of echo API call - test
-    :param echo_string: echo int, int, True
-    :return:  200, OK
-    :return:  201, echo created
-    :return:  204
     """
 
     i, = args
@@ -133,22 +114,3 @@ def do_patch(request, *args, **kwargs):
     return base_common.msg.patch_ok({'echo': i}, http_status=201)
 
 
-def test():
-
-    import base_common.test
-
-    request = base_common.test.Request()
-    request.set_argument('message', 'test')
-
-    result = do_post(request)
-    print(result)
-
-
-def svc_test():
-
-    print(call({'message': 'test'}))
-
-
-if __name__ == "__main__":
-
-    test()

@@ -59,19 +59,17 @@ def _get_email_message(request, h):
 
 
 @authenticated_call()
-@app_api_method(method='POST')
+@app_api_method(
+    method='POST',
+    api_return=[(200, 'OK'), (404, '')]
+)
 @params(
-    {'arg': 'username', 'type': 'e-mail', 'required': True},
-    {'arg': 'password', 'type': str, 'required': True},
+    {'arg': 'username', 'type': 'e-mail', 'required': True, 'description': 'users new username'},
+    {'arg': 'password', 'type': str, 'required': True, 'description': 'users password'},
 )
 def do_post(request, *args, **kwargs):
     """
     Change password
-    :Authorization: token required
-    :param username: users new username, email, True
-    :param password: users password, string, True
-    :return:  200, OK
-    :return:  404
     """
 
     log = request.log

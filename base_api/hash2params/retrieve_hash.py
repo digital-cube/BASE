@@ -53,17 +53,17 @@ def log_hash_access(db, did, ip, log):
     return True
 
 
-@app_api_method(method='GET')
+@app_api_method(
+    method='GET',
+    api_return=[(200, 'OK'), (404, 'Missing argument')]
+)
 @params(
-    {'arg': 'hash', 'type': str, 'required': True},
-    {'arg': 'access', 'type': bool, 'required': False, 'default': False},
+    {'arg': 'hash', 'type': str, 'required': True, 'description': 'data hash'},
+    {'arg': 'access', 'type': bool, 'required': False, 'default': False, 'description': 'access to viewed hash'},
 )
 def do_get(request, *args, **kwargs):
     """
     Get data for given hash
-    :param hash: data hash, string, True
-    :return:  202, Data
-    :return:  404, Missing argument
     """
 
     log = request.log

@@ -15,14 +15,13 @@ request_timeout = 10
 
 
 @authenticated_call()
-@app_api_method(method='GET')
+@app_api_method(
+    method='GET',
+    api_return=[(200, 'OK'), (400, '')]
+)
 def do_get(request, *args, **kwargs):
     """
     Get user data
-    :Authorization: token required
-    :param username: requested user username, string, True
-    :return:  200, OK
-    :return:  400
     """
 
     log = request.log

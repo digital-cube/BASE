@@ -2,12 +2,10 @@ import re
 import json
 import base_config.settings as csettings
 from base_common.importer import get_pkgs
-from base_lookup.methods_mapping import method_map, method_map_rev
-from base_lookup import http_methods
 from base_config.settings import  __VERSION__
 
 
-def fdoc_parser(doc):
+def fdoc_parser_old(doc):
 
     try:
         docl = doc.split('\n')
@@ -89,20 +87,54 @@ def parse_module_desc(docstr):
     return short_d, long_d
 
 
-def doc_parser(doc):
+def fdoc_parser(url_methods, func):
+
+    _m = func.__api_method_type__
+    if _m not in url_methods:
+        url_methods[_m] = {}
+
+    url_methods[_m]['name'] = func.__name__
+    url_methods[_m]['description'] = func.__doc__.strip() if func.__doc__ else None
+    url_methods[_m]['parameters'] = {}
+    url_methods[_m]['return'] = {"204": {"description": "No content"}}
+    try:
+        for p in func.__app_api_arguments__:
+
+            url_methods[_m]['parameters'][p[0]] = {
+                'description': p[1],
+                'type': p[2],
+                'req': p[3]
+            }
+    except AttributeError as e:
+        print('READ DOCUMENT EXCEPTION: {}'.format(e))
+
+    if func.__api_return__:
+        for r in func.__api_return__:
+            url_methods[_m]['return'][r[0]] = {
+                'description': r[1]
+            }
+
+
+def doc_parser(doc, url_prefix, base_pkg):
 
     short_desc, long_desc = parse_module_desc(doc.__doc__)
     api = {
-        'name': doc.name,
-        'description': short_desc,
-        'description_long': long_desc,
-        'methods': {}}
+        'description': short_desc.strip() if short_desc else short_desc,
+        'description_long': long_desc.strip() if long_desc else long_desc,
+        'urls': {}}
 
-    for v in method_map.values():
-        if hasattr(doc, v):
-            f = getattr(doc, v)
-            http_method = http_methods.rev[method_map_rev[v]]
-            api['methods'][http_method] = fdoc_parser(f.__doc__)
+    for f in doc.__api_methods__:
+
+        if hasattr(f,'__api_method_call__') and f.__api_method_call__:
+
+            _url = '/{}'.format(doc.location) if base_pkg else '/{}/{}'.format(url_prefix, doc.location)
+            if f.__api_path__:
+                _url += '/{}'.format(f.__api_path__)
+
+            if _url not in api['urls']:
+                api['urls'][_url] = {}
+
+            fdoc_parser(api['urls'][_url], f)
 
     return api
 
@@ -135,8 +167,8 @@ def get_api_specification(request, *args, **kwargs):
                 base_pkg = hasattr(mmod, 'BASE') and mmod.BASE
                 mm = {}
                 mm['name'] = mmod.name
-                mm['url'] = '/{}'.format(mmod.location) if base_pkg else '/{}/{}'.format(url_prefix, mmod.location)
-                a = doc_parser(mmod)
+
+                a = doc_parser(mmod, url_prefix, base_pkg)
                 mm.update(a)
 
                 applications[app][mmod.name] = mm
