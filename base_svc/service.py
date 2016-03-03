@@ -17,7 +17,6 @@ from base_config.service import logs, log
 from base_tests.tests_common import prepare_test_env
 from base_common.dbaexc import ApplicationNameUsed
 
-
 from socket import gaierror
 
 w_arning = '''
@@ -30,7 +29,6 @@ w_arning = '''
 
 
 def check_args(installed_apps):
-
     a = argparse.ArgumentParser()
 
     if not installed_apps:
@@ -51,37 +49,39 @@ def check_args(installed_apps):
     return a.parse_args()
 
 
-def entry_point(api_module, allowed=None, denied=None):
+def entry_point(api_path, api_module_map, allowed=None, denied=None):
+
+    api_module = api_module_map['module']
 
     try:
-        llog = logs[api_module.__name__ .split('.')[0]]
+        _log = logs[api_module.__name__.split('.')[0]]
     except KeyError:
-        llog = log
+        _log = log
 
-    llog.info("Registering {}".format(api_module.name))
+    _log.info("Registering {}".format(api_module.name))
 
-    base_pkg = hasattr(api_module,'BASE') and api_module.BASE
+    base_pkg = hasattr(api_module, 'BASE') and api_module.BASE
 
-    return "^/{}{}".format("" if base_pkg else "{}/".format(api_module.PREFIX), api_module.location), \
-           base_svc.comm.GeneralPostHandler, \
-           dict(allowed=allowed, denied=denied, apimodule=api_module, log=llog)
+    _uri = "^/{}{}".format("" if base_pkg else "{}/".format(api_module.PREFIX), api_path)
+
+    return _uri, base_svc.comm.GeneralPostHandler, dict(allowed=allowed, denied=denied, apimodule_map=api_module_map,
+                                                        log=_log)
 
 
 def start_tests(app_started, t_stage):
+    import subprocess
+    import base_tests.basetest
 
-        import subprocess
-        import base_tests.basetest
-
-        s = subprocess.Popen(["python3", base_tests.basetest.__file__, app_started, csettings.APP_DB.db,
-                              csettings.APP_DB.user, csettings.APP_DB.passwd, t_stage], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-        log.info('Tests started on PID: {}'.format(s.pid))
+    s = subprocess.Popen(["python3", base_tests.basetest.__file__, app_started, csettings.APP_DB.db,
+                          csettings.APP_DB.user, csettings.APP_DB.passwd, t_stage], stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    log.info('Tests started on PID: {}'.format(s.pid))
 
 
 def start_base_service():
-
     close_stdout(csettings.DEBUG)
 
-    imported_modules = []
+    imported_modules = {}
     installed_apps = {}
 
     try:
@@ -108,7 +108,7 @@ def start_base_service():
         log.critical('Error loading balance servers: {}'.format(e))
         sys.exit(5)
 
-    entry_points = [entry_point(m) for m in imported_modules]
+    entry_points = [entry_point(p, m) for p, m in imported_modules.items()]
 
     if b_args.test:
         prepare_test_env()
@@ -123,7 +123,7 @@ def start_base_service():
         (r'^/$', base_svc.comm.MainHandler),
         (r'^/spec.*$', base_svc.comm.MainHandler),
         *entry_points
-        ],
+    ],
         template_path=tpl_dir,
         static_path=st_dir,
         cookie_secret="d1g1t4l", debug=csettings.DEBUG)

@@ -15,7 +15,9 @@ location = "echo"
 request_timeout = 10
 
 
-@app_api_method
+@app_api_method(
+    method='GET',
+)
 @params(
     {'arg': 'message', 'type': str, 'required': True}
 )
@@ -34,7 +36,9 @@ def do_get(request, *args, **kwargs):
     return {'echo': 'get echo'}
 
 
-@app_api_method
+@app_api_method(
+    method='PUT',
+)
 @params(
     {'arg': 'message', 'type': datetime.date, 'required': True}
 )
@@ -58,7 +62,9 @@ def do_put(_, *args, **kwargs):
     return base_common.msg.put_ok({'echo': str(dt)}, http_status=202)
 
 
-@app_api_method
+@app_api_method(
+    method='DELETE',
+)
 @params(
     {'arg': 'message', 'type': datetime.datetime, 'required': True}
 )
@@ -82,7 +88,9 @@ def do_delete(_ , *args, **kwargs):
     return base_common.msg.delete_ok({'echo': 'delete echo'}, http_status=202)
 
 
-@app_api_method
+@app_api_method(
+    method='POST',
+)
 @params(
     {'arg': 'message', 'type': json, 'required': True}
 )
@@ -102,7 +110,9 @@ def do_post(request, *args, **kwargs):
     return base_common.msg.post_ok({'echo': j}, http_status=201)
 
 
-@app_api_method
+@app_api_method(
+    method='PATCH',
+)
 @params(
     {'arg': 'message', 'type': int, 'required': True}
 )

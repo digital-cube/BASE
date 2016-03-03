@@ -12,7 +12,8 @@ from MySQLdb import IntegrityError
 
 import base_config.settings
 import base_common.msg
-from base_common.dbaexc import ApiMethodError, ApplicationDbConfig
+import base_lookup.http_methods as _hm
+from base_common.dbaexc import ApplicationDbConfig
 from base_lookup import api_messages as amsgs
 
 
@@ -81,22 +82,33 @@ def check_password(db_pwd, username, password):
     return dpwd == bcrypt.hashpw(pwd, dpwd)
 
 
-def app_api_method(origin_f):
-    """
-    Decorator for every get/post/put/delete method
-    """
+def app_api_method(**arguments):
 
-    @wraps(origin_f)
-    def f_wrapper(*args, **kwargs):
+    def o_wrapper(origin_f):
+        """
+        Decorator for every get/post/put/delete method
+        """
 
-        try:
-            return origin_f(*args, **kwargs)
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            raise ApiMethodError('{}, {}, {}, {}'.format(exc_type, fname, exc_tb.tb_lineno, str(e)))
+        @wraps(origin_f)
+        def f_wrapper(request_handler, *args, **kwargs):
 
-    return f_wrapper
+            log = request_handler.log
+            try:
+                return origin_f(request_handler, *args, **kwargs)
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                log.critical('{}, {}, {}, {}'.format(exc_type, fname, exc_tb.tb_lineno, str(e)))
+                return base_common.msg.error(amsgs.API_CALL_EXCEPTION)
+
+        # set api method meta data
+        f_wrapper.__api_method_call__ = arguments['expose'] if 'expose' in arguments else True
+        f_wrapper.__api_method_type__ = arguments['method'] if 'method' in arguments else _hm.rev[_hm.GET]
+        f_wrapper.__api_path__ = arguments['uri'] if 'uri' in arguments else ''
+
+        return f_wrapper
+
+    return o_wrapper
 
 
 def authenticated_call(*arguments):
@@ -288,6 +300,7 @@ def params(*arguments):
 
             log = request.log
             ags = []
+            # k = original.__name__
             for a in arguments:
 
                 default_arg_value = a['default'] if 'default' in a else None

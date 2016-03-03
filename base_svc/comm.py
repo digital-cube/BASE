@@ -1,19 +1,17 @@
-import urllib
 
 import json
+import urllib
+import tornado.web
 import tornado.ioloop
 import tornado.template
-import tornado.web
-# from tornado import httpclient
 
 import base_common.msg
 import base_config.settings as csettings
+import base_lookup.api_messages as amsgs
 from base_lookup.http_methods import GET, POST, PUT, DELETE, PATCH
 from base_lookup.http_methods import rev as http_rev_map
-from base_lookup.methods_mapping import method_map
-from base_lookup.methods_mapping import method_map_rev
+from base_lookup.http_methods import map as http_map
 from base_api.apisvc.apisvc import get_api_specification
-import tornado.web
 
 _c = 0
 
@@ -87,7 +85,7 @@ class MainHandler(tornado.web.RequestHandler):
                         app_ordered = list(app.keys())
                         app_ordered.sort()
 
-                        name = key
+                        _name = key
                         if app['APP_VERSION'] in app:
                             version = app['APP_VERSION']
                         else:
@@ -97,7 +95,7 @@ class MainHandler(tornado.web.RequestHandler):
                                               'data': base,
                                               'order': base_ordered,
                                               'version': version},
-                                             {'name': name,
+                                             {'name': _name,
                                               'data': app,
                                               'order': app_ordered,
                                               'version': version}])
@@ -117,8 +115,9 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
     def __init__(self, application, request, **kwargs):
         self.auth_token = None
+        self.apimodule_map = None
         self.apimodule = None
-        self.name = None
+        self.api_module_name = None
         self.allowed = None
         self.denied = None
         self.log = None
@@ -139,18 +138,27 @@ class GeneralPostHandler(tornado.web.RequestHandler):
             setattr(GeneralPostHandler, 'patch', self._patch)
             setattr(GeneralPostHandler, 'delete', self._delete)
 
+        self.e_msgs = {
+            GET: amsgs.NOT_IMPLEMENTED_GET,
+            PUT: amsgs.NOT_IMPLEMENTED_PUT,
+            POST: amsgs.NOT_IMPLEMENTED_POST,
+            PATCH: amsgs.NOT_IMPLEMENTED_PATCH,
+            DELETE: amsgs.NOT_IMPLEMENTED_DELETE,
+        }
+
     def data_received(self, chunk):
         print('RECEIVED CHUNK', chunk)
         print('RECEIVED CHUNK', type(chunk))
 
-    def initialize(self, apimodule, log, allowed=None, denied=None):
+    def initialize(self, apimodule_map, log, allowed=None, denied=None):
 
-        self.apimodule = apimodule
-        self.name = apimodule.name
+        self.apimodule_map = apimodule_map
+        self.apimodule = self.apimodule_map['module']
+        self.api_module_name = self.apimodule.name
         self.allowed = allowed
         self.denied = denied
         self.log = log
-        self.log.info(self.name)
+        self.log.info(self.api_module_name)
 
     def write_error(self, status_code, **kwargs):
         if not csettings.DEBUG:
@@ -173,47 +181,47 @@ class GeneralPostHandler(tornado.web.RequestHandler):
     @tornado.web.asynchronous
     def a_get(self):
 
-        self.call_api_fun(method_map[GET])
+        self.call_api_fun(GET)
 
     def _get(self):
 
-        self.call_api_fun(method_map[GET])
+        self.call_api_fun(GET)
 
     @tornado.web.asynchronous
     def a_put(self):
 
-        self.call_api_fun(method_map[PUT])
+        self.call_api_fun(PUT)
 
     def _put(self):
 
-        self.call_api_fun(method_map[PUT])
+        self.call_api_fun(PUT)
 
     @tornado.web.asynchronous
     def a_patch(self):
 
-        self.call_api_fun(method_map[PATCH])
+        self.call_api_fun(PATCH)
 
     def _patch(self):
 
-        self.call_api_fun(method_map[PATCH])
+        self.call_api_fun(PATCH)
 
     @tornado.web.asynchronous
     def a_post(self):
 
-        self.call_api_fun(method_map[POST])
+        self.call_api_fun(POST)
 
     def _post(self):
 
-        self.call_api_fun(method_map[POST])
+        self.call_api_fun(POST)
 
     @tornado.web.asynchronous
     def a_delete(self):
 
-        self.call_api_fun(method_map[DELETE])
+        self.call_api_fun(DELETE)
 
     def _delete(self):
 
-        self.call_api_fun(method_map[DELETE])
+        self.call_api_fun(DELETE)
 
     def check(self):
 
@@ -253,24 +261,39 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         j, ip = self.check()
 
         try:
-            if hasattr(self.apimodule, method):
+            if method in self.apimodule_map:
 
-                fun = getattr(self.apimodule, method)
+                fun = self.apimodule_map[method]
+
+                if not hasattr(fun, '__api_method_call__') or not fun.__api_method_call__:
+                    self.set_status(500)
+                    self.write(json.dumps(base_common.msg.error(amsgs.NOT_API_CALL)))
+                    return
+
+                # k = fun.__name__
+                # p = fun.__parent__
+                _fun_method = getattr(fun, '__api_method_type__')
+                _fun_method = http_map[_fun_method]
+                if method != _fun_method:
+                    self.log.critical('Trying to call {} method on {} function from {}'.format(
+                        method, fun.__name__, self.apimodule.__name__))
+
+                    self.set_status(500)
+                    self.write(json.dumps(base_common.msg.error(self.e_msgs[method])))
+                    return
 
                 if csettings.LB:
 
                     def a_call(r_handler, _server_ip):
                         from tornado import httpclient
                         _aclient = httpclient.AsyncHTTPClient(force_instance=True)
-                        _uri = 'http://{}{}'.format(_server,r_handler.request.uri)
+                        _uri = 'http://{}{}'.format(_server_ip, r_handler.request.uri)
 
-                        _res = _aclient.fetch(_uri, self._a_cb) #, connect_timeout=200)
-                        print('RES',_res)
+                        _res = _aclient.fetch(_uri, self._a_cb)
 
                     global _c
                     _server = csettings.BALANCE[ _c % len(csettings.BALANCE) ]
                     _c += 1
-                    print('IZABRAO SAM', _server)
 
                     self._a_p = _server[-4:]
                     self.log.info('CALLING SERVER: {}'.format(self._a_p))
@@ -280,7 +303,6 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                 else:
 
                     result = fun(self, logged_user_dict=j)
-                # result = fun(self, logged_user_dict=j)
 
                 self.set_status(200)
                 if 'http_status' in result:
@@ -291,10 +313,9 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                     self.write(json.dumps(result))
 
             else:
-                self.log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method_map_rev[method]]))
+                self.log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method]))
                 self.set_status(404)
-                self.write(json.dumps(
-                    base_common.msg.error('{} not implemented'.format(http_rev_map[method_map_rev[method]]))))
+                self.write(json.dumps(base_common.msg.error(self.e_msgs[method])))
 
         except Exception as e:
 

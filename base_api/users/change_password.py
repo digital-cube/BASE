@@ -24,7 +24,7 @@ location = "user/password/change.*"
 request_timeout = 10
 
 
-@app_api_method
+@app_api_method(method='POST')
 def do_post(request, *args, **kwargs):
     """
     Change password
