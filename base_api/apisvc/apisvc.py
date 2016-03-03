@@ -98,6 +98,12 @@ def fdoc_parser(url_methods, func):
     url_methods[_m]['parameters'] = {}
     url_methods[_m]['return'] = {"204": {"description": "No content"}}
     try:
+        url_methods[_m]['authorization'] = func.__api_authenticated__
+    except:
+        print(func.__name__, 'nema auth')
+        url_methods[_m]['authorization'] = False
+
+    try:
         for p in func.__app_api_arguments__:
 
             url_methods[_m]['parameters'][p[0]] = {

@@ -157,6 +157,8 @@ def authenticated_call(*arguments):
 
             return original_f(request_handler, *args, **kwargs)
 
+        f_wrapper.__api_authenticated__ = True
+
         return f_wrapper
 
     return outer_wrapper
