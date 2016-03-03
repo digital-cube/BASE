@@ -63,6 +63,7 @@ def import_from_settings(imported_modules, app_to_start):
     __STARTED_APP = __INSTALLED_APPS[app_to_start]
     pkg_dict = __INSTALLED_APPS[app_to_start]
     pm = pkg_dict['pkg']
+    base_config.settings.APP_PREFIX = pm.PREFIX
 
     if hasattr(pm, 'DB_CONF'):
         app_db = importlib.import_module(pm.DB_CONF)
@@ -81,6 +82,9 @@ def import_from_settings(imported_modules, app_to_start):
                 raise BalancingAppException("Missing balancing server ips")
 
     if hasattr(pm, 'TESTS'):
+        base_config.settings.APP_TESTS = pm.TESTS
+
+    if hasattr(pm, 'PREFIX'):
         base_config.settings.APP_TESTS = pm.TESTS
 
     if hasattr(pm, 'MSG_LOOKUP'):
@@ -142,7 +146,7 @@ def import_from_settings(imported_modules, app_to_start):
             mm_ = importlib.import_module(_m)   # import base modules
             mm_.BASE = True
 
-            for f in [o for o in getmembers(mm) if isfunction(o[1])]:
+            for f in [o for o in getmembers(mm_) if isfunction(o[1])]:
                 _add_to_imports(mm_, f[1], imported_modules)
 
 

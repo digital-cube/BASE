@@ -7,9 +7,8 @@ tests_included = [
     'echo_patch_test',
 ]
 
-prefix = 'api'
-
 import base_lookup.api_messages as amsgs
+from base_config.settings import APP_PREFIX
 from base_tests.tests_common import test, WarningLevel, log_info
 
 
@@ -17,7 +16,7 @@ def echo_get_test(svc_port):
     log_info("Echo Get test", '', None)
 
     import echo
-    loc = '{}/{}'.format(prefix, echo.location)
+    loc = '{}/{}'.format(APP_PREFIX, echo.location)
 
     test(svc_port, loc, 'GET', None, {}, 400, {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, loc, 'GET', None, {'message': 'Test message'}, 200, {'echo': 'Test message'})
@@ -32,7 +31,7 @@ def echo_put_test(svc_port):
     log_info("Echo Put test", '', None)
 
     import echo
-    loc = '{}/{}'.format(prefix, echo.location)
+    loc = '{}/{}'.format(APP_PREFIX, echo.location)
 
     test(svc_port, loc, 'PUT', None, {}, 400, {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, loc, 'PUT', None, {'message': 'Test message'}, 400,
@@ -49,7 +48,7 @@ def echo_delete_test(svc_port):
     log_info("Echo Delete test", '', None)
 
     import echo
-    loc = '{}/{}'.format(prefix, echo.location)
+    loc = '{}/{}'.format(APP_PREFIX, echo.location)
 
     test(svc_port, loc, 'DELETE', None, {}, 400, {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, loc, 'DELETE', None, {'message': 'Test message'}, 400,
@@ -68,7 +67,7 @@ def echo_post_test(svc_port):
     log_info("Echo Post test", '', None)
 
     import echo
-    loc = '{}/{}'.format(prefix, echo.location)
+    loc = '{}/{}'.format(APP_PREFIX, echo.location)
 
     test(svc_port, loc, 'POST', None, {}, 400, {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, loc, 'POST', None, {'message': 'Test message'}, 400,
@@ -85,7 +84,7 @@ def echo_patch_test(svc_port):
     log_info("Echo Post test", '', None)
 
     import echo
-    loc = '{}/{}'.format(prefix, echo.location)
+    loc = '{}/{}'.format(APP_PREFIX, echo.location)
 
     test(svc_port, loc, 'PATCH', None, {}, 400, {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, loc, 'PATCH', None, {'message': 'Test message'}, 400,
