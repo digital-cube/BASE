@@ -7,6 +7,7 @@ user change the username (email)
 import json
 import base_common.msg
 import base_api.hash2params.save_hash
+import base_api.mail_api.save_mail
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import check_password
 from base_common.dbacommon import qu_esc
