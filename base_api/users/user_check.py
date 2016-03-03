@@ -13,13 +13,13 @@ request_timeout = 10
 
 
 @authenticated_call()
-@app_api_method(method='POST')
+@app_api_method(
+    method='POST',
+    api_return=[(200, 'OK'), (400, '')]
+)
 def do_post(request, *args, **kwargs):
     """
     Check if user is logged
-    :Authorization: token required
-    :return:  200, OK
-    :return:  400
     """
 
     log = request.log

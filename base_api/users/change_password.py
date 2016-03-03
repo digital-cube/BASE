@@ -24,15 +24,13 @@ location = "user/password/change.*"
 request_timeout = 10
 
 
-@app_api_method(method='POST')
+@app_api_method(
+    method='POST',
+    api_return=[(200, 'OK'), (404, '')]
+)
 def do_post(request, *args, **kwargs):
     """
     Change password
-    :Authorization: token required
-    :param newpassword: users newpassword, string, True
-    :param oldpassword: old password if user logged, string, True
-    :return:  200, OK
-    :return:  404
     """
 
     log = request.log

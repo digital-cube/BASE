@@ -32,12 +32,13 @@ def _get_email_message():
     return m
 
 
-@app_api_method(method='GET')
+@app_api_method(
+    method='GET',
+    api_return=[(200, 'OK'), (404, '')]
+)
 def do_get(request, *args, **kwargs):
     """
     Change password
-    :return:  200, OK
-    :return:  404
     """
 
     log = request.log

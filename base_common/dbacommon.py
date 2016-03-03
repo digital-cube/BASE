@@ -96,15 +96,18 @@ def app_api_method(**arguments):
             try:
                 return origin_f(request_handler, *args, **kwargs)
             except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                log.critical('{}, {}, {}, {}'.format(exc_type, fname, exc_tb.tb_lineno, str(e)))
+
+                import inspect
+                parent_module = inspect.getmodule(origin_f)
+                log.critical('{} -> {} -> {}'.format(parent_module.__name__, origin_f.__name__, str(e)))
+
                 return base_common.msg.error(amsgs.API_CALL_EXCEPTION)
 
         # set api method meta data
         f_wrapper.__api_method_call__ = arguments['expose'] if 'expose' in arguments else True
         f_wrapper.__api_method_type__ = arguments['method'] if 'method' in arguments else _hm.rev[_hm.GET]
         f_wrapper.__api_path__ = arguments['uri'] if 'uri' in arguments else ''
+        f_wrapper.__api_return__ = arguments['api_return'] if 'api_return' in arguments else []
 
         return f_wrapper
 
@@ -291,16 +294,41 @@ def _convert_args(el, tp, esc, log):
             return isinstance(el, bool) and el
 
 
+def _tr_type(t):
+    if t == str:
+        return 'string'
+    if t == int:
+        return 'integer'
+    if t == json:
+        return 'json'
+    if t == datetime.date:
+        return 'date'
+    if t == datetime.datetime:
+        return 'datetime'
+    if t == bool:
+        return 'boolean'
+    return 'Unkonwn type'
+
+
 def params(*arguments):
 
     def real_dec(original):
+
+        desc_args = []
+        for _a in arguments:
+            desc_args.append([
+                _a['arg'],
+                _a['description'] if 'description' in _a else 'Missing description',
+                _tr_type(_a['type']),
+                _a['required'] if 'required' in _a else None
+            ])
 
         @wraps(original)
         def wrapper(request, *args, **kwargs):
 
             log = request.log
             ags = []
-            # k = original.__name__
+
             for a in arguments:
 
                 default_arg_value = a['default'] if 'default' in a else None
@@ -334,6 +362,8 @@ def params(*arguments):
                 ags.append(converted)
 
             return original(request, *ags)
+
+        wrapper.__app_api_arguments__ = desc_args
 
         return wrapper
 
