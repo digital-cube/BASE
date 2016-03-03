@@ -1,9 +1,11 @@
 import sys
 import importlib
+from inspect import getmembers, isfunction
 from base_config.settings import APPS, BASE_APPS, TEST_PORT
 import base_config.settings
 import base_lookup.api_messages
-from base_common.dbaexc import ApplicationNameUsed
+import base_lookup.http_methods as _hm
+from base_common.dbaexc import ApplicationNameUsed, ApiMethodError
 
 __INSTALLED_APPS = {}
 __STARTED_APP = None
@@ -61,6 +63,7 @@ def import_from_settings(imported_modules, app_to_start):
     __STARTED_APP = __INSTALLED_APPS[app_to_start]
     pkg_dict = __INSTALLED_APPS[app_to_start]
     pm = pkg_dict['pkg']
+    base_config.settings.APP_PREFIX = pm.PREFIX
 
     if hasattr(pm, 'DB_CONF'):
         app_db = importlib.import_module(pm.DB_CONF)
@@ -81,6 +84,9 @@ def import_from_settings(imported_modules, app_to_start):
     if hasattr(pm, 'TESTS'):
         base_config.settings.APP_TESTS = pm.TESTS
 
+    if hasattr(pm, 'PREFIX'):
+        base_config.settings.APP_TESTS = pm.TESTS
+
     if hasattr(pm, 'MSG_LOOKUP'):
         _app_msgs = pm.MSG_LOOKUP
         app_msgs = importlib.import_module('{}.{}'.format(pkg_dict['pkg_name'], _app_msgs))
@@ -95,11 +101,42 @@ def import_from_settings(imported_modules, app_to_start):
             h_attr = getattr(hm, h_name)
             setattr(base_common.app_hooks, h_name, h_attr)
 
+    def _add_to_imports(_mm, _f, _m):
+
+        # _expose = False
+        try:
+            _expose = getattr(_f, '__api_method_call__')
+        except AttributeError:
+            return
+
+        if _expose:
+            _f_path = _f.__api_path__
+            try:
+                _f_method = _hm.map[_f.__api_method_type__]
+            except KeyError:
+                raise ApiMethodError('{} http method is not implemented'.format(_f.__api_method_type__))
+
+            _m_path = '{}/{}'.format(_mm.location, _f_path) if _f_path else _mm.location
+
+            if _m_path not in _m:
+                _m[_m_path] = {}
+
+            if _f_method in _m[_m_path]:
+                raise ApiMethodError('{} api call already exists in path: {}'.format(_hm.rev[_f_method], _m_path))
+
+            _m[_m_path][_f_method] = _f
+
+            if 'module' not in _m[_m_path]:
+                _m[_m_path]['module'] = _mm
+
     for _m in pm.IMPORTS:
         mm = importlib.import_module('{}.{}'.format(pkg_dict['pkg_name'], _m))   # import pkg.module
         mm.PREFIX = pm.PREFIX       # import pkg settings into module
         mm.APP_NAME = pm.APP_NAME   # import pkg settings into module
-        imported_modules.append(mm)
+
+        _fs = [o for o in getmembers(mm) if isfunction(o[1])]
+        for f in _fs:
+            _add_to_imports(mm, f[1], imported_modules)
 
     for bapp in BASE_APPS:
 
@@ -108,7 +145,9 @@ def import_from_settings(imported_modules, app_to_start):
 
             mm_ = importlib.import_module(_m)   # import base modules
             mm_.BASE = True
-            imported_modules.append(mm_)
+
+            for f in [o for o in getmembers(mm_) if isfunction(o[1])]:
+                _add_to_imports(mm_, f[1], imported_modules)
 
 
 def get_pkgs(pkg_map):

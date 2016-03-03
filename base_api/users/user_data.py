@@ -15,7 +15,7 @@ request_timeout = 10
 
 
 @authenticated_call()
-@app_api_method
+@app_api_method(method='GET')
 def do_get(request, *args, **kwargs):
     """
     Get user data

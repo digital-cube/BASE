@@ -187,7 +187,7 @@ def load_app_test(app_started, app_tests_list, stage):
     from base_common.importer import get_installed_apps
     from base_common.importer import get_app
     import base_tests.test_list
-    imported_modules = []
+    imported_modules = {}
     installed_apps = {}
     get_installed_apps(installed_apps)
     import_from_settings(imported_modules, app_started)

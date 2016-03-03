@@ -22,3 +22,4 @@ APP_TESTS = None
 BASE_TEST = False
 LB = False  # True for balancing instance in application
 BALANCE = False     # list of balance servers in application
+APP_PREFIX = None

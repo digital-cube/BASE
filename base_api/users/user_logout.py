@@ -15,7 +15,7 @@ request_timeout = 10
 
 
 @authenticated_call()
-@app_api_method
+@app_api_method(method='POST')
 def do_post(request, *args, **kwargs):
     """
     Logout user

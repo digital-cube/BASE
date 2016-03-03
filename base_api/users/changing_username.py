@@ -32,7 +32,7 @@ def _get_email_message():
     return m
 
 
-@app_api_method
+@app_api_method(method='GET')
 def do_get(request, *args, **kwargs):
     """
     Change password
