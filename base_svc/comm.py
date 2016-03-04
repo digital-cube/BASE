@@ -251,7 +251,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
     # http://www.tornadoweb.org/en/stable/guide/coroutines.html#coroutines
     def _a_cb(self, res):
         self.log.info('EXITING SERVER: {}'.format(self._a_p))
-        self.write('{} -> {}'.format(self._a_p,res.body))
+        self.write('{} -> {}'.format(self._a_p, res.body))
         self.finish()
 
     def call_api_fun(self, method):

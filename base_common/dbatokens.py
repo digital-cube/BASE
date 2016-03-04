@@ -1,12 +1,11 @@
 import base_common.app_hooks
 from base_common.dbaexc import ErrorSetSessionToken
-from base_common.dbacommon import qu_esc
 from base_common.seq import sequencer
 
 
 def __get_assigned_token(dbc,log,uid):
 
-    q = "select id from session_token where id_user = '{}' and not closed".format(qu_esc(uid))
+    q = "select id from session_token where id_user = '{}' and not closed".format(uid)
     dbc.execute(q)
     if dbc.rowcount != 1:
         return False
@@ -39,9 +38,9 @@ def __set_session_token(dbc, uid, tk):
     n = str(n)[:19]
 
     q = "INSERT INTO session_token (id, id_user, created) VALUES ('{}', '{}', '{}')".format(
-            qu_esc(tk),
-            qu_esc(uid),
-            qu_esc(n))
+            tk,
+            uid,
+            n)
 
     try:
         dbc.execute(q)
@@ -76,7 +75,7 @@ def __get_user_by_token(dbc, tk, log, is_active=True):
 
 def close_session_by_token(dbc, tk, log):
 
-    q = "update session_token set closed = true where id = '{}'".format(qu_esc(tk))
+    q = "update session_token set closed = true where id = '{}'".format(tk)
 
     try:
         dbc.execute(q)

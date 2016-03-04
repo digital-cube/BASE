@@ -81,8 +81,6 @@ def do_post(request, *args, **kwargs):
     tk = request.auth_token
 
     dbuser = get_user_by_token(_db, tk, log)
-    newusername = qu_esc(newusername)
-    password = qu_esc(password)
 
     if not check_password(dbuser.password, dbuser.username, password):
         log.critical('Wrong users password: {}'.format(password))

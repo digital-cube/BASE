@@ -2,16 +2,12 @@
 Save mail for sending
 """
 
-import json
 import datetime
-import tornado.web
 import base_common.msg
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
-from base_svc.comm import BaseAPIRequestHandler
 from base_common.dbacommon import get_db
-from base_common.dbacommon import qu_esc
 
 name = "E-mail Save"
 location = "email/message/save"
@@ -23,10 +19,10 @@ def get_mail_query(sender, receiver, message):
     q = "insert into mail_queue (id, sender, receiver, time_created, message) " \
         "VALUES " \
         "(null, '{}', '{}', '{}', '{}')".format(
-            qu_esc(sender),
-            qu_esc(receiver),
+            sender,
+            receiver,
             str(n),
-            qu_esc(message)
+            message
         )
 
     return q

@@ -11,7 +11,6 @@ from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import format_password
 from base_common.dbacommon import get_db
-from base_common.dbacommon import qu_esc
 from base_common.dbatokens import get_token
 from base_common.seq import sequencer
 from base_lookup import api_messages as msgs
@@ -23,7 +22,7 @@ request_timeout = 10
 
 def _check_user_registered(dbc, uname):
 
-    q = "select id from users where username = '{}'".format(qu_esc(uname))
+    q = "select id from users where username = '{}'".format(uname)
     dbc.execute(q)
     return dbc.rowcount != 0
 
@@ -45,7 +44,6 @@ def do_post(_, *args, **kwargs):
     log = _.log
 
     username, password, users_data = args
-    username = qu_esc(username)
 
     _db = get_db()
     dbc = _db.cursor()

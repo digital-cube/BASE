@@ -167,9 +167,9 @@ def authenticated_call(*arguments):
 def check_user_exists(username, db, log, userid=None):
     dbc = db.cursor()
     if userid:
-        q = "select id from users where id = '{}'".format(qu_esc(userid))
+        q = "select id from users where id = '{}'".format(userid)
     else:
-        q = "select id from users where username = '{}'".format(qu_esc(username))
+        q = "select id from users where username = '{}'".format(username)
 
     try:
         dbc.execute(q)
@@ -348,7 +348,7 @@ def params(*arguments):
                         return base_common.msg.error(amsgs.MISSING_REQUEST_ARGUMENT)
                 else:
                     tip = a['type'] if 'type' in a else str
-                    esc = a['escaped'] if 'escaped' in a else (tip == str)
+                    esc = a['escaped'] if 'escaped' in a else (tip in [str, 'e-mail'])
 
                     converted = _convert_args(atr, tip, esc, log)
                     if not converted:
