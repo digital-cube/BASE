@@ -101,15 +101,17 @@ def app_api_method(**arguments):
 
                 _list = '{}({})'.format(fname, exc_tb.tb_lineno)
                 _n = exc_tb.tb_next
+                _c = None
                 while _n:
                     _fname = os.path.split(_n.tb_frame.f_code.co_filename)[1]
                     _list += ' -> {}({})'.format(_fname, _n.tb_lineno)
+                    _c = '{}({})'.format(_n.tb_frame.f_code.co_name, _n.tb_lineno)
                     _n = _n.tb_next
 
                 import inspect
                 parent_module = inspect.getmodule(origin_f)
-
-                log.critical('{} -> {} -> {} -> {}'.format(parent_module.__name__, str(e), _list, origin_f.__name__))
+                log.critical('{} -> {} -> {} -> {} -> {}'.format(
+                    parent_module.__name__, str(e), _list, origin_f.__name__, _c))
 
                 return base_common.msg.error(amsgs.API_CALL_EXCEPTION)
 
