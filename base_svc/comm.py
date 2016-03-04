@@ -72,24 +72,22 @@ class MainHandler(tornado.web.RequestHandler):
                 base = None
                 app = None
 
-                for key in j['applications'].keys():
-                    if key == 'BASE':
+                for base_key in j['applications'].keys():
+                    if base_key == 'BASE':
                         base = j['applications']['BASE']
                         version = j['api_version']
                         base_ordered = list(base.keys())
                         base_ordered .sort()
 
                     else:
-                        app = j['applications'][key]
+                        app = j['applications'][base_key]
 
                         app_ordered = list(app.keys())
                         app_ordered.sort()
 
-                        _name = key
-                        if app['APP_VERSION'] in app:
-                            version = app['APP_VERSION']
-                        else:
-                            version = ""
+                        _name = base_key
+                        version = app['APP_VERSION'] if 'APP_VERSION' in app else ''
+
 
                 self.render('apisvctemplate.html', items=[{'name': 'BASE',
                                               'data': base,
