@@ -37,188 +37,190 @@
 <div class="row">
       <div class="col-md-12">
           {% import json %}
-                {% set g = 0 %}
+          {% set g = 0 %}
           {% for num in [1,0] %}
-              {% set name = items[num]['name']%}
-              {% set applications = items[num]['order'] %}
+                {% set name = items[num]['name']%}
+                {% set applications = items[num]['order'] %}
 
-                    {% if items[num]['name']!='BASE'  %}
+                {% if items[num]['name']!='BASE'  %}
 
-                        {% set app_version  = items[num]['data']['APP_VERSION'] %}
+                    {% set app_version  = items[num]['data']['APP_VERSION'] %}
 
-                    {% else %}
-                        <hr>
-                        {% set app_version  = items[num]['version'] %}
+                {% else %}
+                    <hr>
+                    {% set app_version  = items[num]['version'] %}
 
-                    {% end %}
+                {% end %}
 
-            <h3>{{ name }} - {{app_version}}</h3>
-
-            {% for application in applications %}
-
-            {% set data = items[num]['data'][application] %}
-
-            {% if type(data) != str %}
-
-                                {% set method = data['methods'] %}
-                                {% set g =g + 1 %}
+                <h3>{{ name }} - {{app_version}}</h3>
 
 
-                            <table>
-                                <tbody style="margin-top:10px;">
-                                <tr>
 
-                                 <td class=" siz bold ">{{data['name']}}</td>
-                                 <td class=" siz">{{data['url']}}</td>
-                                 <td class=" siz"> </td>
-                                 <td class=" sizr">{{data['description']}} </td>
+          {% for application in applications %}
 
-                               </tr>
-                              </tbody>
-                            </table>
+              {% set data = items[num]['data'][application] %}
 
-                <table id="tableSearchResults" class="table table-hover  table-striped table-condensed">
+              {% if type(data) != str %}
+                    {% set methods = data['urls'] %}
+
+                    {% for m in methods %}
+                    {% set link = m %}
+
+                        {% set g =g + 1 %}
 
 
-                                {% for s in  method %}
-                     {% if method[s] != 'Missing docstring' %}
+                        <table id="tableSearchResults" class="table table-hover  table-striped table-condensed">
+                                {% set method = methods[m] %}
+                                {% for s in method %}
+                                {% if method[s] != 'Missing docstring' %}
 
-                                {% set bg_stil = s.lower()+'_bg' %}
-                              <tbody style="border-top:8px solid white;">
-                                {% if s == 'DELETE' or s == 'POST' or s == 'PUT'  or s == 'GET' %}
-                                 <tr id="package{{s}}-{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle"
-                                     data-toggle="collapse" data-parent="#OrderPackages"
-                                     data-target=".packageDetails{{s}}-{{g}}">
-                                    <td style="margin-top:10px;padding:7px;  border-top-left-radius:5px;border-top-right-radius:5px;">
+                                    {% set bg_stil = s.lower()+'_bg' %}
+                                    <tr style="border-top:8px solid white;">
+                                    {% if s == 'DELETE' or s == 'PATCH' or s == 'POST' or s == 'PUT'  or s == 'GET' %}
 
                                         {% if type(method[s])!=str %}
+                                            <tr id="package{{s}}-{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle"
+                                                data-toggle="collapse" data-parent="#OrderPackages"
+                                                data-target=".packageDetails{{s}}-{{g}}">
+                                                <td style="margin-top:10px;padding:7px;  border-top-left-radius:5px;border-top-right-radius:5px;">
 
-                                       {% if s == 'GET' %}
-                                         <span class=" label label-primary">{{s}}</span>  - {{data['url']}}
-                                        <span class="indicator right"> {{method[s]['description']}}</span>
-                                         {% set clasa = 'get_th ' %}
-                                       {% end %}
+                                                   {% if s == 'GET' %}
+                                                        <span class=" label label-primary">{{s}}</span> - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp - {{data['description_long']}}</span>
+                                                        <span class="indicator right"> {{method[s]['description']}}</span>
+                                                        {% set clasa = 'get_th ' %}
+                                                   {% end %}
 
-                                       {% if s == 'PUT' %}
-                                        <span class="label label-success">{{s}}</span>  - {{data['url']}}
-                                        <span class="indicator right">  {{method[s]['description']}}</span>
-                                         {% set clasa = 'put_th' %}
-                                       {% end %}
+                                                   {% if s == 'PUT' %}
+                                                        <span class="label label-success">{{s}}</span>  -  {{link}}  <span class="lab"> &nbsp&nbsp&nbsp  - {{data['description_long']}}</span>
 
-                                       {% if s == 'DELETE' %}
-                                          <span class="label label-warning">{{s}}</span>  - {{data['url']}}
-                                        <span class="indicator right"> {{method[s]['description']}}</span>
-                                         {% set clasa = 'delete_th' %}
-                                        {% else %}
-                                       {% end %}
+                                                        <span class="indicator right">  {{method[s]['description']}}</span>
+                                                        {% set clasa = 'put_th' %}
+                                                   {% end %}
 
-                                       {% if s == 'POST' %}
-                                       <span class="label label-danger">{{s}}</span>  - {{data['url']}}
-                                        <span class="indicator right"> {{method[s]['description']}}</span>
-                                         {% set clasa = 'post_th' %}
-                                       {% end %}
+                                                   {% if s == 'DELETE' %}
+                                                        <span class="label label-warning">{{s}}</span>  -  {{link}} <span class="lab"> &nbsp&nbsp&nbsp   - {{data['description_long']}}
+                                                        <span class="indicator right"> {{method[s]['description']}}</span>
+                                                        {% set clasa = 'delete_th' %}{% else %}
+                                                   {% end %}
 
+                                                    {% if s == 'PATCH' %}
+                                                        <span class="label label-patch">{{s}}</span>  - <span class="lab"> {{link}}   &nbsp&nbsp&nbsp  - {{data['description_long']}}
+                                                        <span class="indicator right"> {{method[s]['description']}}</span>
+                                                        {% set clasa = 'patch_th' %}
+                                                   {% end %}
 
+                                                   {% if s == 'POST' %}
+                                                        <span class="label label-danger">{{s}}</span>  - <span class="lab"> {{link}} &nbsp&nbsp&nbsp   - {{data['description_long']}}
+                                                        <span class="indicator right"> {{method[s]['description']}}</span>
+                                                        {% set clasa = 'post_th' %}
+                                                   {% end %}
 
-                                    </td>
-                                 </tr>
+                                                </td>
+                                            </tr>
 
-                                {% if s == 'DELETE' or s == 'POST' or s == 'PUT' or s == 'GET' %}
-                                    <td colspan="{{s}}-{{g}}" class="hiddenRow {{bg_stil}}" >
-                                    <div class="accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
+                                            {% if s == 'DELETE' or s == 'POST' or s == 'PATCH' or s == 'PUT' or s == 'GET' %}
 
-
-                                        {% set ms = method[s]  %}
-
-                                        {% set t = type(ms) %}
-
-                                        {% if t!=str %}
-
-                                          <table>
-                                              <tbody class="margina">
-                                                 <tr class="{{clasa}}" >
-                                                            <th class="bg">Parameters :</th >
-                                                            <th class="bg" >Description</th>
-                                                            <th class="bg">Type</th>
-                                                            <th></th>
-                                                            <th class="bg">Requests</th>
-                                                            <th></th>
-                                                            <th></th>
-                                                        </tr>
+                                                    <td colspan="{{s}}-{{g}}" class="hiddenRow {{bg_stil}}" >
+                                                        <div class="padd accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
 
 
-                                                        {% for keys in ms['parameters'] %}
-                                                               <tr class="siz">
-                                                                  <td class="bg">{{keys}}</td>
+                                                            {% set ms = method[s]  %}
 
-                                                                  <td class="bg">{{ms['parameters'][keys]['description']}}</td>
-                                                                  <td class="bg">{{ms['parameters'][keys]['type']}}<td>
-                                                                  <td class="bg">{{ms['parameters'][keys]['req']}}<td>
+                                                            {% set t = type(ms) %}
 
-                                                                </tr>
-                                                        {% end %}
+                                                            {% if t!=str %}
+                                                                <table class="bgd">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                         <td class=" siz bold ">{{data['name']}}</td>
+                                                                         <td class=" siz"></td>
+                                                                         <td class=" siz"> </td>
+                                                                         <td class=" sizr">{{data['description']}} </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
 
-                                                  </tr>
-                                              </tbody>
-                                              <tbody style="padding-top:50px;">
-                                                   <tr class="{{clasa}} ">
-                                                         <th class="bg">Returns :</th>
-                                                         <th class="bg" colspan="6"></th>
+                                                                <table class="backgroundtable">
 
-                                                        {% for keys in ms['return'] %}
-                                                            <tr class="siz">
-                                                                <td class="bg">{{keys}}</td>
-                                                                <td class="bg">{{json.dumps(ms['return'][keys])}}</td>
-                                                                <td class="bg" colspan="5"></td>
-                                                            </tr>
-                                                        {% end %}
+                                                                      <tbody class="margina">
 
-                                                    </tr>
-                                              </tbody>
-                                          </table>
-
-                                        {% end %}
+                                                                         <tr class="{{clasa}}" >
+                                                                                <th class="bg">Parameters :</th >
+                                                                                <th class="bg" >Description</th>
+                                                                                <th class="bg">Type</th>
+                                                                                <th></th>
+                                                                                <th class="bg">Requests</th>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                         </tr>
 
 
+                                                                        {% for keys in ms['parameters'] %}
+                                                                               <tr class="siz">
+                                                                                  <td class="bg">{{keys}}</td>
 
-                                    </div>
-                                </td>
+                                                                                  <td class="bg">{{ms['parameters'][keys]['description']}}</td>
+                                                                                  <td class="bg">{{ms['parameters'][keys]['type']}}<td>
+                                                                                  <td class="bg">{{ms['parameters'][keys]['req']}}<td>
+
+                                                                                </tr>
+                                                                        {% end %}
+
+                                                                          </tr>
+                                                                      </tbody>
+
+
+                                                              </table>
+                                                         </div>
+                                                        <div class="padd accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
+
+                                                            <table>
+                                                                 <tbody style="padding-top:0px;">
+                                                                           <tr class="{{clasa}} ">
+                                                                                 <th class="bg">HTTP Status Code</th>
+                                                                                 <th class="bg"></th>
+                                                                                 <th class="bg">Description</th>
+
+                                                                                {% for keys in ms['return'] %}
+                                                                                    <tr class="siz">
+                                                                                        <td class="bg">{{keys}}</td>
+                                                                                        <td class="bg"></td>
+                                                                                        <td class="bg">{{json.dumps(ms['return'][keys])}}</td>
+                                                                                    </tr>
+                                                                                {% end %}
+
+                                                                            </tr>
+                                                                 </tbody>
+
+                                                            </table>
+                                                            {% end #str if%}
+
+
+
+                                                        </div>
+                                                    </td>
+                                            {% end %}
+                                        {% end # if %}
+
+                                    {% end # if %}
+                                    </tbody>
                                 {% end %}
+                    {% end #for mode  %}
+
+                        </table>
+
+                    {% end #for mode  %}
+              {% end #if  %}
+
+          {% end # first for%}
 
 
-                                {% end %}
-
-                                {% end %}
-                                                              </tbody>
-                              {% end %}
-
-                                {% end %}
-
-
-                </table>
-
-
-            {% end # if  %}
-
-
-
-
-          {% end # for in app %}
-
-
-
-         {% end # for num in range(1,-1,-1) %}
-
-
-
-
-
-
+          {% end # for num in range([1,0]) %}
 
 
 
   </div>
-</div>
+</div></div>
 </body>
 
 <!-- Bootstrap core JavaScript

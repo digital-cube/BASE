@@ -28,15 +28,19 @@ th, td {
     border-radius: 0.25em;
     font-size: 12px;
 }
+.lab{font-size: 100%;
+    font-weight: 400;
+}
 .right{float:right;}
 
 .table {
     width: 100%;
     max-width: 100%;
-    margin-bottom: 60px;
+    margin-bottom: 50px;
 }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
     border:0px;
+    margin-top: 10px;
 }
 .table-condensed>tbody>tr>td, .table-condensed>tbody>tr>th, .table-condensed>tfoot>tr>td, .table-condensed>tfoot>tr>th, .table-condensed>thead>tr>td, .table-condensed>thead>tr>th {
     padding:0px;
@@ -51,6 +55,7 @@ th, td {
 .get_bg {
     background-color: #bce8f1 !important;
     border-color: #bce8f1 !important;
+    //color:black;
     color: #337ab7;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
@@ -58,19 +63,35 @@ th, td {
 .delete_bg {
     background-color: #faebcc !important;
     border-color: #faebcc !important;
-    color: #8a6216;
+    //color:black;
+    color: #f0bc4e;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
+
 }
 .put_bg {
     background-color: #d6e9c6 !important;
     border-color: #d6e9c6 !important;
+    //color:black;
     color: #3c763d;
 
+}  .patch_bg {
+    background-color: #a9d3f0 !important;
+   color: #6095ff;
 }
-.bg{
-
-    padding: 5px 10px;
+   .backgroundtable{background: white;}
+  .padd{  padding: 10px 10px 10px 10px;  }
+ .bg{
+    border-bottom: 0.01px solid rgb(232, 232, 232);
+    background: white;
+    padding: 10px 10px;
+    color:black;
+     font-weight: 200;
+}
+  .bgd{
+    border-bottom: 0.01px solid rgb(232, 232, 232);
+    padding: 25px 10px;
+    color:black;
 }
 .post_bg {
     background-color: #ebccd1 !important;
@@ -81,13 +102,15 @@ th, td {
 }
 
 
-
+.tbodyfeed{background: #78bcff; border:0;}
 .put_th {
     background-color: #5cb85c;
     color: white;
 
 }
-
+.label-patch{
+    background: #558bb7;
+}
 
 
 .get_th {
@@ -98,10 +121,17 @@ th, td {
     background-color: indianred;
     color: white;
 }
+.patch_th {
+    background-color: #6095ff;
+    color: white;
+}
 .delete_th {
     background-color: #f0ad4e;
     color: white;
 }
+  .h3{
+    font-weight: 500;
+}
 .bold{font-weight: bold;}
-.siz{font-size: 14px; padding-left:0px; width:25%; text-align:left; border:0; }
+.siz{font-size: 14px; font-weight: 300; padding-bottom:5px;padding-left:0px; width:25%; text-align:left; border:0; }
 .sizr{font-size: 14px; padding-left:10px; text-align:right; border:0; }
