@@ -62,6 +62,7 @@
 
               {% if type(data) != str %}
           {% set long_desc = data['description_long'] %}
+          {% set short_desc = data['description'] %}
                     {% set methods = data['urls'] %}
 
                     {% for m in methods %}
@@ -86,32 +87,32 @@
                                                 <td style="margin-top:10px;padding:7px;  border-top-left-radius:5px;border-top-right-radius:5px;">
 
                                                    {% if s == 'GET' %}
-                                                        <span class=" label label-primary">{{s}}</span> - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp - {{data['description_long']}}</span>
+                                                        <span class=" label label-primary">{{s}}</span> - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp </span>
                                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                                         {% set clasa = 'get_th ' %}
                                                    {% end %}
 
                                                    {% if s == 'PUT' %}
-                                                        <span class="label label-success">{{s}}</span>  -  {{link}}  <span class="lab"> &nbsp&nbsp&nbsp  - {{data['description_long']}}</span>
+                                                        <span class="label label-success">{{s}}</span>  -  {{link}}  <span class="lab"> &nbsp&nbsp&nbsp  </span>
 
                                                         <span class="indicator right">  {{method[s]['description']}}</span>
                                                         {% set clasa = 'put_th' %}
                                                    {% end %}
 
                                                    {% if s == 'DELETE' %}
-                                                        <span class="label label-warning">{{s}}</span>  -  {{link}} <span class="lab"> &nbsp&nbsp&nbsp   - {{data['description_long']}}
-                                                        <span class="indicator right"> {{method[s]['description']}}</span>
+                                                        <span class="label label-warning">{{s}}</span>  -  {{link}} <span class="lab"> &nbsp&nbsp&nbsp</span>
+                                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                                         {% set clasa = 'delete_th' %}{% else %}
                                                    {% end %}
 
                                                     {% if s == 'PATCH' %}
-                                                        <span class="label label-patch">{{s}}</span>  - <span class="lab"> {{link}}   &nbsp&nbsp&nbsp  - {{data['description_long']}}
+                                                        <span class="label label-patch">{{s}}</span>  - <span class="lab"> {{link}}   &nbsp&nbsp&nbsp
                                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                                         {% set clasa = 'patch_th' %}
                                                    {% end %}
 
                                                    {% if s == 'POST' %}
-                                                        <span class="label label-danger">{{s}}</span>  - <span class="lab"> {{link}} &nbsp&nbsp&nbsp   - {{data['description_long']}}
+                                                        <span class="label label-danger">{{s}}</span>  - <span class="lab"> {{link}} &nbsp&nbsp&nbsp
                                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                                         {% set clasa = 'post_th' %}
                                                    {% end %}
@@ -148,20 +149,16 @@
                                                                         <tr>
                                                                          <tr class="{{clasa}}" >
                                                                                 <th class="bg">Description :</th >
-                                                                                 <td class="bg"></td>
-                                                                                  <td class="bg"><td>
-                                                                                  <td class="bg"><td>
+                                                                          
 
                                                                          </tr>
 
 
 
-                                                                               <tr class="siz">
-                                                                                  <td class="bg">{{long_desc}}</td>
+                                                                        <tr class="siz">
 
-                                                                                  <td class="bg"></td>
-                                                                                  <td class="bg"><td>
-                                                                                  <td class="bg"><td>
+                                                                                  <td class="bg">{{long_desc}}<td>
+
 
                                                                                 </tr>
 
