@@ -61,6 +61,7 @@
               {% set data = items[num]['data'][application] %}
 
               {% if type(data) != str %}
+          {% set long_desc = data['description_long'] %}
                     {% set methods = data['urls'] %}
 
                     {% for m in methods %}
@@ -129,6 +130,9 @@
                                                             {% set t = type(ms) %}
 
                                                             {% if t!=str %}
+
+
+
                                                                 <table class="bgd">
                                                                     <tbody>
                                                                         <tr>
@@ -139,6 +143,34 @@
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
+                                                            <table class="backgroundtable">
+                                                                      <tbody class="margina">
+                                                                        <tr>
+                                                                         <tr class="{{clasa}}" >
+                                                                                <th class="bg">Description :</th >
+                                                                                 <td class="bg"></td>
+                                                                                  <td class="bg"><td>
+                                                                                  <td class="bg"><td>
+
+                                                                         </tr>
+
+
+
+                                                                               <tr class="siz">
+                                                                                  <td class="bg">{{long_desc}}</td>
+
+                                                                                  <td class="bg"></td>
+                                                                                  <td class="bg"><td>
+                                                                                  <td class="bg"><td>
+
+                                                                                </tr>
+
+                                                                      </tbody>
+
+
+                                                              </table>
+                                                                </div>
+                                                        <div class="padd accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
 
                                                                 <table class="backgroundtable">
 
@@ -166,7 +198,6 @@
                                                                                 </tr>
                                                                         {% end %}
 
-                                                                          </tr>
                                                                       </tbody>
 
 
@@ -185,7 +216,7 @@
                                                                                     <tr class="siz">
                                                                                         <td class="bg">{{keys}}</td>
                                                                                         <td class="bg"></td>
-                                                                                        <td class="bg">{{json.dumps(ms['return'][keys])}}</td>
+                                                                                        <td class="bg">{{ms['return'][keys]['description']}}</td>
                                                                                     </tr>
                                                                                 {% end %}
 
@@ -193,11 +224,16 @@
                                                                  </tbody>
 
                                                             </table>
+
+                                                        </div>
+
+
+
+
                                                             {% end #str if%}
 
 
 
-                                                        </div>
                                                     </td>
                                             {% end %}
                                         {% end # if %}
