@@ -9,7 +9,6 @@ import base_common.msg
 import base_common.app_hooks as apphooks
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
-from base_common.dbacommon import format_password
 from base_common.dbacommon import get_db
 from base_common.dbatokens import get_token
 from base_common.seq import sequencer
@@ -53,8 +52,6 @@ def do_post(_, *args, **kwargs):
 
     if hasattr(apphooks, 'check_password_is_valid') and not apphooks.check_password_is_valid(password):
         return base_common.msg.error(msgs.INVALID_PASSWORD)
-
-    password = format_password(username, password)
 
     u_id = sequencer().new('u')
 

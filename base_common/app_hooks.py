@@ -10,6 +10,8 @@ pack_user_by_id -- get user from db by it's id (db connection, user id, applicat
 prepare_login_query -- prepare query for user login (parameters: username)
 """
 
+from base_common.dbacommon import format_password
+
 
 def prepare_user_query(_, u_id, username, password, *args, **kwargs):
     """
@@ -21,6 +23,8 @@ def prepare_user_query(_, u_id, username, password, *args, **kwargs):
     :param kwargs:  additional named arguments (application specific)
     :return:
     """
+
+    password = format_password(username, password)
 
     # role_flags - HARDCODED to 1
 
