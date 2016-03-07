@@ -15,6 +15,7 @@ import base_common.msg
 import base_lookup.http_methods as _hm
 from base_common.dbaexc import ApplicationDbConfig
 from base_lookup import api_messages as amsgs
+from base_config.service import log
 
 
 __db = None
@@ -90,11 +91,10 @@ def app_api_method(**arguments):
         """
 
         @wraps(origin_f)
-        def f_wrapper(request_handler, *args, **kwargs):
+        def f_wrapper(*args, **kwargs):
 
-            log = request_handler.log
             try:
-                return origin_f(request_handler, *args, **kwargs)
+                return origin_f(*args, **kwargs)
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -136,7 +136,9 @@ def authenticated_call(*arguments):
     def outer_wrapper(original_f):
 
         @wraps(original_f)
-        def f_wrapper(request_handler, *args,**kwargs):
+        def f_wrapper(*args, **kwargs):
+
+            request_handler = kwargs['request_handler']
 
             if not hasattr(request_handler, 'auth_token'):
                 return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
@@ -147,15 +149,14 @@ def authenticated_call(*arguments):
 
             tk = request_handler.auth_token
             _db = get_db()
-            log = request_handler.log
 
             from base_common.dbatokens import authorized_by_token
-            if not authorized_by_token(_db, tk, log):
+            if not authorized_by_token(_db, tk):
                 log.critical("Unauthorized access attempt")
                 return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
 
             from base_common.dbatokens import get_user_by_token
-            dbuser = get_user_by_token(_db, tk, log)
+            dbuser = get_user_by_token(_db, tk)
 
             _access = (len(arguments) == 0)
             for a in arguments:
@@ -167,7 +168,7 @@ def authenticated_call(*arguments):
                 log.critical("Unauthorized user access attempt")
                 return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
 
-            return original_f(request_handler, *args, **kwargs)
+            return original_f(*args, **kwargs)
 
         f_wrapper.__api_authenticated__ = True
 
@@ -176,7 +177,7 @@ def authenticated_call(*arguments):
     return outer_wrapper
 
 
-def check_user_exists(username, db, log, userid=None):
+def check_user_exists(username, db, userid=None):
     dbc = db.cursor()
     if userid:
         q = "select id from users where id = '{}'".format(userid)
@@ -196,19 +197,7 @@ def check_user_exists(username, db, log, userid=None):
     return True
 
 
-def get_auth_token(request_handler, log):
-
-    tk = None
-    if 'Authorization' in request_handler.request.headers:
-        tka = request_handler.request.headers.get('Authorization')
-        tka = tka.split(' ')
-        if len(tka) == 1:
-            tk = tka[0].strip()
-
-    return tk
-
-
-def get_url_token(request_handler, log):
+def get_url_token(request_handler):
 
     tk = None
     url_parts = request_handler.request.uri.split('/')
@@ -218,7 +207,7 @@ def get_url_token(request_handler, log):
     return tk
 
 
-def _convert_args(el, tp, esc, log):
+def _convert_args(el, tp, esc):
 
     if tp == int:
         try:
@@ -338,10 +327,10 @@ def params(*arguments):
             ])
 
         @wraps(original)
-        def wrapper(request, *args, **kwargs):
+        def wrapper(*args, **kwargs):
 
-            log = request.log
             ags = []
+            request = kwargs['request_handler']
 
             for a in arguments:
 
@@ -362,7 +351,7 @@ def params(*arguments):
                     tip = a['type'] if 'type' in a else str
                     esc = a['escaped'] if 'escaped' in a else (tip in [str, 'e-mail'])
 
-                    converted = _convert_args(atr, tip, esc, log)
+                    converted = _convert_args(atr, tip, esc)
                     if not converted:
                         c_type = "|type get error|"
                         try:
@@ -375,7 +364,7 @@ def params(*arguments):
 
                 ags.append(converted)
 
-            return original(request, *ags)
+            return original(*ags, **kwargs)
 
         wrapper.__app_api_arguments__ = desc_args
 

@@ -4,10 +4,10 @@ Get params for id
 
 import json
 import datetime
-import tornado.web
 from MySQLdb import IntegrityError
 import base_common.msg
 from base_lookup import api_messages as msgs
+from base_config.service import log
 from base_common.dbacommon import get_db
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
@@ -27,7 +27,7 @@ def prepare_get_query(h2p):
     return q
 
 
-def log_hash_access(db, did, ip, log):
+def log_hash_access(db, did, ip):
     dbc = db.cursor()
     n = datetime.datetime.now()
     q = "insert into hash_2_params_historylog (id, id_hash_2_params, ip, log_time ) VALUES (null, {}, '{}', '{}')". \
@@ -61,17 +61,13 @@ def log_hash_access(db, did, ip, log):
     {'arg': 'hash', 'type': str, 'required': True, 'description': 'data hash'},
     {'arg': 'access', 'type': bool, 'required': False, 'default': False, 'description': 'access to viewed hash'},
 )
-def do_get(request, *args, **kwargs):
+def do_get(h, grant_access, **kwargs):
     """
     Get data for given hash
     """
 
-    log = request.log
-
     _db = get_db()
     dbc = _db.cursor()
-
-    h, grant_access = args
 
     get_data_q = prepare_get_query(h)
 
@@ -93,7 +89,7 @@ def do_get(request, *args, **kwargs):
     if d_last_accessed:
         log.warning('New access to {}'.format(h))
 
-        if not log_hash_access(_db, did, request.r_ip, log):
+        if not log_hash_access(_db, did, kwargs['r_ip']):
             log.warning("Error save hash access log")
 
         if not grant_access:
@@ -104,7 +100,7 @@ def do_get(request, *args, **kwargs):
     except Exception as e:
         log.warning('Load hash data: {}'.format(e))
 
-    if not log_hash_access(_db, did, request.r_ip, log):
+    if not log_hash_access(_db, did, kwargs['r_ip']):
         log.warning("Error save hash access log")
 
     return base_common.msg.get_ok(d)

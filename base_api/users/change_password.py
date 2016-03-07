@@ -7,6 +7,7 @@ or from user change password request
 
 import tornado.web
 import base_common.msg
+from base_config.service import log
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import format_password
 from base_common.dbacommon import get_db
@@ -28,14 +29,14 @@ request_timeout = 10
     method='POST',
     api_return=[(200, 'OK'), (404, '')]
 )
-def do_post(request, *args, **kwargs):
+def do_post(**kwargs):
     """
     Change password
     """
 
-    log = request.log
     _db = get_db()
     dbc = _db.cursor()
+    request = kwargs['request_handler']
 
     try:
         newpassword = request.get_argument('newpassword')
@@ -44,13 +45,14 @@ def do_post(request, *args, **kwargs):
         return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
 
     # CHANGE PASSWORD FROM FORGOT PASSWORD FLOW
-    h2p = get_url_token(request, log)
+    h2p = get_url_token(request)
     if h2p and len(h2p) > 60:
 
-        rh = BaseAPIRequestHandler(log)
+        rh = BaseAPIRequestHandler()
         rh.set_argument('hash', h2p)
-        rh.r_ip= request.r_ip
-        res = base_api.hash2params.retrieve_hash.do_get(rh)
+        rh.r_ip = request.r_ip
+        kwargs['request_handler'] = rh
+        res = base_api.hash2params.retrieve_hash.do_get(h2p, False, **kwargs)
         if 'http_status' not in res or res['http_status'] != 200:
             return base_common.msg.error(msgs.PASSWORD_TOKEN_EXPIRED)
 
@@ -59,10 +61,10 @@ def do_post(request, *args, **kwargs):
     else:
         # TRY TO CHANGE PASSWORD FROM USER CHANGE REQUEST
         tk = request.auth_token
-        if not authorized_by_token(_db, tk, log):
+        if not authorized_by_token(_db, tk):
             return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)
 
-        dbuser = get_user_by_token(_db, tk, log)
+        dbuser = get_user_by_token(_db, tk)
         if not dbuser.username:
             log.critical('User not found by token')
             return base_common.msg.error(msgs.UNAUTHORIZED_REQUEST)

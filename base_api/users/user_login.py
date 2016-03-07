@@ -1,7 +1,6 @@
 """
 User login
 """
-import tornado.web
 
 import base_common.msg
 import base_common.app_hooks as apphooks
@@ -11,6 +10,7 @@ from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import check_password
 from base_lookup import api_messages as msgs
+from base_config.service import log
 
 
 name = "Login"
@@ -26,16 +26,13 @@ request_timeout = 10
     {'arg': 'username', 'type': 'e-mail', 'required': True, 'description': 'users username'},
     {'arg': 'password', 'type': str, 'required': True, 'description': 'users password'},
 )
-def do_post(request, *args, **kwargs):
+def do_post(username, password, **kwargs):
     """
     User login
     """
 
-    log = request.log
     _db = get_db()
     dbc = _db.cursor()
-
-    username, password = args
 
     q = apphooks.prepare_login_query(username)
 
@@ -56,7 +53,7 @@ def do_post(request, *args, **kwargs):
         return base_common.msg.error(msgs.ERROR_LOGIN_USER)
 
     # ASSIGN TOKEN
-    tk = get_token(u_id, dbc, log)
+    tk = get_token(u_id, dbc)
     if not tk:
         return base_common.msg.error(msgs.ERROR_LOGIN_USER)
 

@@ -7,6 +7,7 @@ from base_lookup import api_messages as msgs
 from base_common.dbacommon import get_db
 from base_common.dbacommon import authenticated_call
 from base_common.dbacommon import app_api_method
+from base_config.service import log
 
 
 name = "Logout"
@@ -19,15 +20,15 @@ request_timeout = 10
     method='POST',
     api_return=[(200, 'OK'), (404, '')]
 )
-def do_post(request, *args, **kwargs):
+def do_post(**kwargs):
     """
     Logout user
     """
 
-    log = request.log
-
     _db = get_db()
     dbc = _db.cursor()
+
+    request = kwargs['request_handler']
 
     tk = request.auth_token
 

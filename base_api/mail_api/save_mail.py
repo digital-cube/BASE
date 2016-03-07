@@ -5,6 +5,7 @@ Save mail for sending
 import datetime
 import base_common.msg
 from base_lookup import api_messages as msgs
+from base_config.service import log
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import get_db
@@ -39,16 +40,13 @@ def get_mail_query(sender, receiver, message):
     {'arg': 'message', 'type': str, 'required': True, 'description': 'message to send'},
     {'arg': '_get_id', 'type': bool, 'required': False, 'default': False, 'description': 'test flag'},
 )
-def do_put(request, *args, **kwargs):
+def do_put(sender, receiver, emessage, _get_id, **kwargs):
     """
     Save e-mail message
     """
 
-    log = request.log
     _db = get_db()
     dbc = _db.cursor()
-
-    sender, receiver, emessage, _get_id = args
 
     q = get_mail_query(sender, receiver, emessage)
     from MySQLdb import IntegrityError
