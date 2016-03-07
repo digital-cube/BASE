@@ -1,9 +1,10 @@
 import base_common.app_hooks
 from base_common.dbaexc import ErrorSetSessionToken
 from base_common.seq import sequencer
+from base_config.service import log
 
 
-def __get_assigned_token(dbc,log,uid):
+def __get_assigned_token(dbc, uid):
 
     q = "select id from session_token where id_user = '{}' and not closed".format(uid)
     dbc.execute(q)
@@ -13,11 +14,11 @@ def __get_assigned_token(dbc,log,uid):
     return dbc.fetchone()['id']
 
 
-def get_token(uid, dbc, log):
+def get_token(uid, dbc):
 
     # RETRIEVE ASSIGNED TOKEN
 
-    __tk = __get_assigned_token(dbc, log, uid)
+    __tk = __get_assigned_token(dbc, uid)
     if __tk:
         return __tk
 
@@ -48,7 +49,7 @@ def __set_session_token(dbc, uid, tk):
         raise ErrorSetSessionToken
 
 
-def __get_user_by_token(dbc, tk, log, is_active=True):
+def __get_user_by_token(dbc, tk, is_active=True):
 
     q = '''SELECT
               s.id id, s.id_user id_user, s.created created, s.closed closed
@@ -86,14 +87,14 @@ def close_session_by_token(dbc, tk, log):
     return True
 
 
-def authorized_by_token(db, tk, log):
+def authorized_by_token(db, tk):
 
     dbc = db.cursor()
     if not tk:
         log.warning("Access token not provided")
         return False
 
-    if not __get_user_by_token(dbc, tk, log):
+    if not __get_user_by_token(dbc, tk):
         log.warning("Access token {} not found".format(tk))
         return False
 
@@ -105,21 +106,21 @@ def authorized_by_token(db, tk, log):
     return True
 
 
-def get_user_by_token(db, tk, log, is_active=True):
+def get_user_by_token(db, tk, is_active=True):
 
     dbc = db.cursor()
-    if not __get_user_by_token(dbc, tk, log, is_active):
+    if not __get_user_by_token(dbc, tk, is_active):
         log.critical('Cannot find users token')
         return False
 
     db_tk = dbc.fetchone()
     u_id = db_tk['id_user']
 
-    return base_common.app_hooks.pack_user_by_id(db, u_id, log)
+    return base_common.app_hooks.pack_user_by_id(db, u_id)
 
 
-def get_user_by_id(db, user_id, log):
+def get_user_by_id(db, user_id):
 
-    return base_common.app_hooks.pack_user_by_id(db, user_id, log)
+    return base_common.app_hooks.pack_user_by_id(db, user_id)
 
 

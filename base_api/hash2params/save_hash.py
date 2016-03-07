@@ -7,6 +7,7 @@ import json
 from MySQLdb import IntegrityError
 
 import base_common.msg
+from base_config.service import log
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import get_db
@@ -41,17 +42,13 @@ def prepare_hash2params_query(h_id, data):
 @params(
     {'arg': 'data', 'type': json, 'required': True, 'description': 'data for storing'},
 )
-def do_put(request, *args, **kwargs):
+def do_put(hdata, **kwargs):
     """
     Save hash for give parameters
     """
 
-    log = request.log
-
     _db = get_db()
     dbc = _db.cursor()
-
-    hdata, = args
 
     h_id = sequencer().new('h')
 

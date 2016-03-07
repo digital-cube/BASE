@@ -6,15 +6,16 @@ user confirm username change
 
 import base_common.msg
 import base_api.hash2params.save_hash
+from base_config.service import log
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import format_password
 from base_common.dbacommon import get_db
-from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_svc.comm import BaseAPIRequestHandler
 from base_config.service import support_mail
 from base_common.dbacommon import get_url_token
 from MySQLdb import IntegrityError
+import base_api.hash2params.retrieve_hash
 
 
 name = "Changing username"
@@ -36,24 +37,25 @@ def _get_email_message():
     method='GET',
     api_return=[(200, 'OK'), (404, '')]
 )
-def do_get(request, *args, **kwargs):
+def do_get(*args, **kwargs):
     """
     Change password
     """
 
-    log = request.log
     _db = get_db()
     dbc = _db.cursor()
+    request = kwargs['request_handler']
 
-    h2p = get_url_token(request, log)
+    h2p = get_url_token(request)
     if not h2p or len(h2p) < 64:
         log.critical('Wrong or expired token {}'.format(h2p))
         return base_common.msg.error(msgs.WRONG_OR_EXPIRED_TOKEN)
 
-    rh = BaseAPIRequestHandler(log)
+    rh = BaseAPIRequestHandler()
     rh.set_argument('hash', h2p)
-    rh.r_ip = request.r_ip
-    res = base_api.hash2params.retrieve_hash.do_get(rh)
+    kwargs['request_handler'] = rh
+
+    res = base_api.hash2params.retrieve_hash.do_get(h2p, False, *args, **kwargs)
     if 'http_status' not in res or res['http_status'] != 200:
         return base_common.msg.error(msgs.PASSWORD_TOKEN_EXPIRED)
 
@@ -94,11 +96,12 @@ def do_get(request, *args, **kwargs):
     message = _get_email_message()
 
     # SAVE EMAILS FOR SENDING
-    rh1 = BaseAPIRequestHandler(log)
+    rh1 = BaseAPIRequestHandler()
     rh1.set_argument('sender', support_mail)
     rh1.set_argument('receiver', newusername)
     rh1.set_argument('message', message)
-    res = base_api.mail_api.save_mail.do_put(rh1)
+    kwargs['request_handler'] = rh1
+    res = base_api.mail_api.save_mail.do_put(support_mail, newusername, message, **kwargs)
     if 'http_status' not in res or res['http_status'] != 204:
         return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
 

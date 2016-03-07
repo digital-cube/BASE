@@ -4,6 +4,7 @@ User forgot password
 
 import json
 import base_common.msg
+from base_config.service import log
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
@@ -41,25 +42,25 @@ def get_email_message(request, username, tk):
 @params(
     {'arg': 'username', 'type': 'e-mail', 'required': True, 'description': 'users username'},
 )
-def do_put(request, *args, **kwargs):
+def do_put(username, *args, **kwargs):
     """
     Forgot password
     """
 
-    log = request.log
     _db = get_db()
 
-    username, = args
+    request = kwargs['request_handler']
 
-    if not check_user_exists(username, _db, log):
+    if not check_user_exists(username, _db):
         log.critical('User check fail')
         return base_common.msg.error(msgs.USER_NOT_FOUND)
 
     # GET HASH FOR FORGOTTEN PASSWORD
-    rh = BaseAPIRequestHandler(log)
+    rh = BaseAPIRequestHandler()
     data = {'cmd': 'forgot_password', 'username': username}
     rh.set_argument('data', json.dumps(data))
-    res = base_api.hash2params.save_hash.do_put(rh)
+    kwargs['request_handler'] = rh
+    res = base_api.hash2params.save_hash.do_put(json.dumps(data), *args, **kwargs)
     if 'http_status' not in res or res['http_status'] != 200:
         return base_common.msg.error('Cannot handle forgot password')
 
@@ -68,11 +69,12 @@ def do_put(request, *args, **kwargs):
     message = get_email_message(request, username, tk)
 
     # SAVE EMAIL FOR SENDING
-    rh1 = BaseAPIRequestHandler(log)
+    rh1 = BaseAPIRequestHandler()
     rh1.set_argument('sender', support_mail)
     rh1.set_argument('receiver', username)
     rh1.set_argument('message', message)
-    res = base_api.mail_api.save_mail.do_put(rh1)
+    kwargs['request_handler'] = rh1
+    res = base_api.mail_api.save_mail.do_put(support_mail, username, message, *args, **kwargs)
     if 'http_status' not in res or res['http_status'] != 204:
         return base_common.msg.error('Error finishing change password request')
 

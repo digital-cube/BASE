@@ -17,18 +17,16 @@ request_timeout = 10
     method='POST',
     api_return=[(200, 'OK'), (400, '')]
 )
-def do_post(request, *args, **kwargs):
+def do_post(**kwargs):
     """
     Check if user is logged
     """
 
-    log = request.log
-
     _db = get_db()
 
-    tk = request.auth_token
+    tk = kwargs['auth_token']
     from base_common.dbatokens import get_user_by_token
-    dbuser = get_user_by_token(_db, tk, log)
+    dbuser = get_user_by_token(_db, tk)
 
     d = dbuser.dump_user()
 
