@@ -4,6 +4,8 @@ import urllib
 import tornado.web
 import tornado.ioloop
 import tornado.template
+from tornado import gen
+from tornado import httpclient
 
 import base_common.msg
 import base_config.settings as csettings
@@ -243,11 +245,14 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
         return j, ip
 
-    # TODO: write coroutine for this call
-    # http://www.tornadoweb.org/en/stable/guide/coroutines.html#coroutines
-    def _a_cb(self, res):
+    @gen.coroutine
+    def a_call(self, r_handler, _server_ip):
+
+        _aclient = httpclient.AsyncHTTPClient(force_instance=True)
+        _uri = 'http://{}{}'.format(_server_ip, r_handler.request.uri)
+        _res = yield _aclient.fetch(_uri)
         log.info('EXITING SERVER: {}'.format(self._a_p))
-        self.write('{} -> {}'.format(self._a_p, res.body))
+        self.write('{} -> {}'.format(self._a_p, _res.body))
         self.finish()
 
     def call_api_fun(self, method):
@@ -280,20 +285,13 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
                 if csettings.LB:
 
-                    def a_call(r_handler, _server_ip):
-                        from tornado import httpclient
-                        _aclient = httpclient.AsyncHTTPClient(force_instance=True)
-                        _uri = 'http://{}{}'.format(_server_ip, r_handler.request.uri)
-
-                        _res = _aclient.fetch(_uri, self._a_cb)
-
                     global _c
                     _server = csettings.BALANCE[ _c % len(csettings.BALANCE) ]
                     _c += 1
 
                     self._a_p = _server[-4:]
                     log.info('CALLING SERVER: {}'.format(self._a_p))
-                    a_call(self, _server)
+                    self.a_call(self, _server)
                     return
 
                 else:
