@@ -24,3 +24,5 @@ LB = False  # True for balancing instance in application
 BALANCE = False     # list of balance servers in application
 APP_PREFIX = None
 SESSION_STORAGE = DB # DB | REDIS
+REDIS_SERVER = 'localhost'
+REDIS_PORT = 6379
