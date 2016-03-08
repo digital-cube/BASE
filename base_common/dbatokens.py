@@ -129,6 +129,8 @@ def __close_session_by_token_in_redis(tk):
     r = get_redis_db()
     r.delete(tk)
 
+    return True
+
 
 def __close_session_by_token_in_sql(dbc, tk):
 

@@ -33,7 +33,7 @@ def do_post(**kwargs):
     tk = request.auth_token
 
     if not close_session_by_token(dbc, tk):
-        log.warning("Clossing session with token {}".format(tk))
+        log.warning("Closing session with token {}".format(tk))
         return base_common.msg.error(msgs.CLOSE_USER_SESSION)
 
     _db.commit()
