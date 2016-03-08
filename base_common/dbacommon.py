@@ -3,6 +3,7 @@ import sys
 import ast
 import json
 import json.decoder
+import redis
 import bcrypt
 import datetime
 import MySQLdb
@@ -16,9 +17,11 @@ import base_lookup.http_methods as _hm
 from base_common.dbaexc import ApplicationDbConfig
 from base_lookup import api_messages as amsgs
 from base_config.service import log
+from base_config.settings import REDIS_SERVER, REDIS_PORT
 
 
 __db = None
+__redis = None
 
 
 def get_db(prefix=None):
@@ -57,6 +60,18 @@ def get_db(prefix=None):
     __db = conn_to_db()
 
     return __db
+
+
+def get_redis_db():
+
+    global __redis
+
+    if __redis:
+        return __redis
+
+    __redis = redis.Redis(host=REDIS_SERVER, port=REDIS_PORT)
+
+    return __redis
 
 
 def close_stdout(debug):
