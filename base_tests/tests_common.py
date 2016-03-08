@@ -241,3 +241,27 @@ def make_mail_sent(db, mail_id, log):
 
     db.commit()
     return True
+
+
+def parse_hash_from_change_username_mail(db, receiver):
+
+    import re
+
+    dbc = db.cursor()
+    q = '''SELECT message FROM mail_queue WHERE receiver = '{}' ORDER BY id desc LIMIT 1'''.format(receiver)
+    dbc.execute(q)
+    if dbc.rowcount != 1:
+        return False
+
+    message = dbc.fetchone()
+    msg = message['message']
+
+    from base_config.settings import TEST_PORT
+    tpl ='''Dear,<br\/>You have requested username change. Please confirm change by following the link below:<br\/>
+    http:\/\/localhost:{}\/user\/username\/changing\/(.*)<br\/><br\/>If You didn't requested the change, please ignore this message.<br\/>Thank You!'''.format(TEST_PORT)
+
+    p = re.compile(tpl)
+    r = p.match(msg)
+    hsh = r.group(1)
+
+    return hsh
