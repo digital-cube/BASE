@@ -8,6 +8,7 @@ version_map= {
     '0.1.5': 'disable console output',
     '0.1.6': 'user manipulation, tokenization, configuration',
     '0.1.7': 'bcrypt password, tests',
-    '0.2.0': 'asynchronous api method calls'
+    '0.2.0': 'asynchronous api method calls',
+    '0.2.1': 'session storage',
 }
 
