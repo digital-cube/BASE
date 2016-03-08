@@ -13,7 +13,7 @@ from base_common.dbacommon import close_stdout
 from base_common.importer import import_from_settings
 from base_common.importer import get_installed_apps
 from base_common.importer import check_test_port_is_used
-from base_config.service import logs, log
+from base_config.service import log
 from base_tests.tests_common import prepare_test_env
 from base_common.dbaexc import ApplicationNameUsed
 
@@ -53,19 +53,13 @@ def entry_point(api_path, api_module_map, allowed=None, denied=None):
 
     api_module = api_module_map['module']
 
-    try:
-        _log = logs[api_module.__name__.split('.')[0]]
-    except KeyError:
-        _log = log
-
-    _log.info("Registering {}".format(api_module.name))
+    log.info("Registering {}".format(api_module.name))
 
     base_pkg = hasattr(api_module, 'BASE') and api_module.BASE
 
     _uri = "^/{}{}".format("" if base_pkg else "{}/".format(api_module.PREFIX), api_path)
 
-    return _uri, base_svc.comm.GeneralPostHandler, dict(allowed=allowed, denied=denied, apimodule_map=api_module_map,
-                                                        log=_log)
+    return _uri, base_svc.comm.GeneralPostHandler, dict(allowed=allowed, denied=denied, apimodule_map=api_module_map)
 
 
 def start_tests(app_started, t_stage):

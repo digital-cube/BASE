@@ -4,6 +4,8 @@ import urllib
 import tornado.web
 import tornado.ioloop
 import tornado.template
+from tornado import gen
+from tornado import httpclient
 
 import base_common.msg
 import base_config.settings as csettings
@@ -12,6 +14,7 @@ from base_lookup.http_methods import GET, POST, PUT, DELETE, PATCH
 from base_lookup.http_methods import rev as http_rev_map
 from base_lookup.http_methods import map as http_map
 from base_api.apisvc.apisvc import get_api_specification
+from base_config.service import log
 
 _c = 0
 
@@ -19,9 +22,8 @@ _c = 0
 class BaseAPIRequestHandler:
     r_ip = "127.0.0.1"
 
-    def __init__(self, logfile):
+    def __init__(self):
         self._map = {}
-        self.log = logfile
 
     def set_argument(self, key, value):
         self._map[key] = value
@@ -118,7 +120,6 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.api_module_name = None
         self.allowed = None
         self.denied = None
-        self.log = None
         self.r_ip = None
         self._a_p = None
         super().__init__(application, request, **kwargs)
@@ -148,15 +149,14 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         print('RECEIVED CHUNK', chunk)
         print('RECEIVED CHUNK', type(chunk))
 
-    def initialize(self, apimodule_map, log, allowed=None, denied=None):
+    def initialize(self, apimodule_map, allowed=None, denied=None):
 
         self.apimodule_map = apimodule_map
         self.apimodule = self.apimodule_map['module']
         self.api_module_name = self.apimodule.name
         self.allowed = allowed
         self.denied = denied
-        self.log = log
-        self.log.info(self.api_module_name)
+        log.info(self.api_module_name)
 
     def write_error(self, status_code, **kwargs):
         if not csettings.DEBUG:
@@ -245,11 +245,14 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
         return j, ip
 
-    # TODO: write coroutine for this call
-    # http://www.tornadoweb.org/en/stable/guide/coroutines.html#coroutines
-    def _a_cb(self, res):
-        self.log.info('EXITING SERVER: {}'.format(self._a_p))
-        self.write('{} -> {}'.format(self._a_p, res.body))
+    @gen.coroutine
+    def a_call(self, r_handler, _server_ip):
+
+        _aclient = httpclient.AsyncHTTPClient(force_instance=True)
+        _uri = 'http://{}{}'.format(_server_ip, r_handler.request.uri)
+        _res = yield _aclient.fetch(_uri)
+        log.info('EXITING SERVER: {}'.format(self._a_p))
+        self.write('{} -> {}'.format(self._a_p, _res.body))
         self.finish()
 
     def call_api_fun(self, method):
@@ -273,7 +276,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                 _fun_method = getattr(fun, '__api_method_type__')
                 _fun_method = http_map[_fun_method]
                 if method != _fun_method:
-                    self.log.critical('Trying to call {} method on {} function from {}'.format(
+                    log.critical('Trying to call {} method on {} function from {}'.format(
                         method, fun.__name__, self.apimodule.__name__))
 
                     self.set_status(500)
@@ -282,25 +285,18 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
                 if csettings.LB:
 
-                    def a_call(r_handler, _server_ip):
-                        from tornado import httpclient
-                        _aclient = httpclient.AsyncHTTPClient(force_instance=True)
-                        _uri = 'http://{}{}'.format(_server_ip, r_handler.request.uri)
-
-                        _res = _aclient.fetch(_uri, self._a_cb)
-
                     global _c
                     _server = csettings.BALANCE[ _c % len(csettings.BALANCE) ]
                     _c += 1
 
                     self._a_p = _server[-4:]
-                    self.log.info('CALLING SERVER: {}'.format(self._a_p))
-                    a_call(self, _server)
+                    log.info('CALLING SERVER: {}'.format(self._a_p))
+                    self.a_call(self, _server)
                     return
 
                 else:
 
-                    result = fun(self, logged_user_dict=j)
+                    result = fun(request_handler=self, logged_user_dict=j, r_ip=ip, auth_token=self.auth_token)
 
                 self.set_status(200)
                 if 'http_status' in result:
@@ -311,13 +307,13 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                     self.write(json.dumps(result))
 
             else:
-                self.log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method]))
+                log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method]))
                 self.set_status(404)
                 self.write(json.dumps(base_common.msg.error(self.e_msgs[method])))
 
         except Exception as e:
 
-            self.log.error(
+            log.error(
                 "ip: {}, module: {}, function: {}, exception: e:{}".format(ip, self.apimodule.__name__, method, e))
             self.set_status(500)
             self.write(json.dumps(base_common.msg.error(e)))

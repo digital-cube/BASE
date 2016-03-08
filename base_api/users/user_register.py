@@ -13,6 +13,7 @@ from base_common.dbacommon import get_db
 from base_common.dbatokens import get_token
 from base_common.seq import sequencer
 from base_lookup import api_messages as msgs
+from base_config.service import log
 
 name = "Registration"
 location = "user/register"
@@ -35,14 +36,10 @@ def _check_user_registered(dbc, uname):
     {'arg': 'password', 'type': str, 'required': True, 'description': 'users password'},
     {'arg': 'data', 'type': json, 'required': False, 'description': 'application specific users data'},
 )
-def do_post(_, *args, **kwargs):
+def do_post(username, password, users_data, **kwargs):
     """
     Register user account
     """
-
-    log = _.log
-
-    username, password, users_data = args
 
     _db = get_db()
     dbc = _db.cursor()
@@ -58,7 +55,7 @@ def do_post(_, *args, **kwargs):
     if not u_id:
         return base_common.msg.error(msgs.ERROR_SERIALIZE_USER)
 
-    quser = apphooks.prepare_user_query(_, u_id, username, password, users_data, log)
+    quser = apphooks.prepare_user_query(u_id, username, password, users_data, **kwargs)
     if not quser:
         log.critical('Error checking users data and create query')
         return base_common.msg.error(msgs.ERROR_REGISTER_USER)
@@ -69,7 +66,7 @@ def do_post(_, *args, **kwargs):
         log.critical('User registration: {}'.format(e))
         return base_common.msg.error(msgs.ERROR_REGISTER_USER)
 
-    tk = get_token(u_id, dbc, log)
+    tk = get_token(u_id, dbc)
     if not tk:
         return base_common.msg.error('Cannot login user')
 
@@ -78,7 +75,7 @@ def do_post(_, *args, **kwargs):
     response = {'token': tk}
 
     if users_data and hasattr(apphooks, 'post_register_digest'):
-        post_d = apphooks.post_register_digest(_, u_id, username, password, users_data, log)
+        post_d = apphooks.post_register_digest(u_id, username, password, users_data, **kwargs)
         if post_d == False:
             log.critical('Error user post registration digest')
             return base_common.msg.error(msgs.ERROR_POST_REGISTRATION)

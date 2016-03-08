@@ -8,9 +8,9 @@ import json
 import base_common.msg
 import base_api.hash2params.save_hash
 import base_api.mail_api.save_mail
+from base_config.service import log
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import check_password
-from base_common.dbacommon import qu_esc
 from base_common.dbacommon import get_db
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
@@ -68,29 +68,28 @@ def _get_email_message(request, h):
     {'arg': 'username', 'type': 'e-mail', 'required': True, 'description': 'users new username'},
     {'arg': 'password', 'type': str, 'required': True, 'description': 'users password'},
 )
-def do_post(request, *args, **kwargs):
+def do_post(newusername, password, **kwargs):
     """
     Change password
     """
 
-    log = request.log
     _db = get_db()
 
-    newusername, password = args
+    request = kwargs['request_handler']
+    tk = kwargs['auth_token']
 
-    tk = request.auth_token
-
-    dbuser = get_user_by_token(_db, tk, log)
+    dbuser = get_user_by_token(_db, tk)
 
     if not check_password(dbuser.password, dbuser.username, password):
         log.critical('Wrong users password: {}'.format(password))
         return base_common.msg.error(msgs.WRONG_PASSWORD)
 
     # SAVE HASH FOR USERNAME CHANGE
-    rh = BaseAPIRequestHandler(log)
+    rh = BaseAPIRequestHandler()
     data = {'cmd': 'change_username', 'newusername': newusername, 'user_id': dbuser.user_id, 'password': password}
     rh.set_argument('data', json.dumps(data))
-    res = base_api.hash2params.save_hash.do_put(rh)
+    kwargs['request_handler'] = rh
+    res = base_api.hash2params.save_hash.do_put(json.dumps(data), **kwargs)
     if 'http_status' not in res or res['http_status'] != 200:
         return base_common.msg.error('Cannot handle forgot password')
 
@@ -99,21 +98,23 @@ def do_post(request, *args, **kwargs):
     message = _get_email_message(request, h)
 
     # SAVE EMAILS FOR SENDING
-    rh1 = BaseAPIRequestHandler(log)
+    rh1 = BaseAPIRequestHandler()
     rh1.set_argument('sender', support_mail)
     rh1.set_argument('receiver', newusername)
     rh1.set_argument('message', message)
-    res = base_api.mail_api.save_mail.do_put(rh1)
+    kwargs['request_handler'] = rh1
+    res = base_api.mail_api.save_mail.do_put(support_mail, newusername, message, **kwargs)
     if 'http_status' not in res or res['http_status'] != 204:
         return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
 
     message2 = _get_email_warning(dbuser.username, newusername)
 
-    rh2 = BaseAPIRequestHandler(log)
+    rh2 = BaseAPIRequestHandler()
     rh2.set_argument('sender', support_mail)
     rh2.set_argument('receiver', dbuser.username)
     rh2.set_argument('message', message2)
-    res = base_api.mail_api.save_mail.do_put(rh2)
+    kwargs['request_handler'] = rh2
+    res = base_api.mail_api.save_mail.do_put(support_mail, dbuser.username, message2, **kwargs)
     if 'http_status' not in res or res['http_status'] != 204:
         return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
 

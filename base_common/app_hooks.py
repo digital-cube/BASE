@@ -6,14 +6,15 @@ post_register_digest -- post register users data processing
                         (parameters: users id, username, password, json users data) (user_register)
 prepare_user_query -- prepare query for insert user in db
                         (parameters: request handler, users id, username, password, json users data) (user_register)
-pack_user_by_id -- get user from db by it's id (db connection, user id, application log) (dbtokens)
+pack_user_by_id -- get user from db by it's id (db connection, user id) (dbtokens)
 prepare_login_query -- prepare query for user login (parameters: username)
 """
 
 from base_common.dbacommon import format_password
+from base_config.service import log
 
 
-def prepare_user_query(_, u_id, username, password, *args, **kwargs):
+def prepare_user_query(u_id, username, password, *args, **kwargs):
     """
     User registration query
     :param u_id:  user's id (unique)
@@ -37,12 +38,11 @@ def prepare_user_query(_, u_id, username, password, *args, **kwargs):
     return q
 
 
-def pack_user_by_id(db, user_id, log, get_dict=False):
+def pack_user_by_id(db, user_id, get_dict=False):
     """
     Pack users information in DBUser class instance
     :param db: database
     :param user_id: users id
-    :param log: application log
     :param get_dict: export user like DBUser or dict
     :return: DBUser instance or user dict
     """
