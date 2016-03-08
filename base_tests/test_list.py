@@ -5,6 +5,7 @@ import json
 pth = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(pth)
 
+import base_common.dbatokens
 import base_lookup.api_messages as amsgs
 from base_tests.tests_common import WarningLevel, test
 from base_tests.tests_common import log
@@ -177,6 +178,7 @@ def base_user_changing_username_test(svc_port):
 
     import base_api.users.user_login
     import base_api.hash2params.save_hash
+    import base_api.users.change_username
     import base_api.users.changing_username
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
@@ -184,11 +186,16 @@ def base_user_changing_username_test(svc_port):
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     import base_common.dbacommon
+    import base_tests.tests_common
+
     _db = base_common.dbacommon.get_db('test_')
     dbuser = base_common.dbatokens.get_user_by_token(_db, tk, log)
 
-    hdata = {'cmd': 'change_username', 'newusername': 'user21@test.loc', 'user_id': dbuser.user_id, 'password': '123'}
-    htk = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'data': json.dumps(hdata)}, 200, {})['h']
+    test(svc_port, base_api.users.change_username.location, 'POST', tk,
+         {'username': 'user21@test.loc', 'password': '123'}, 200,
+         {'message': amsgs.msgs[amsgs.CHANGE_USERNAME_REQUEST]}, result_types={'message': str})
+
+    htk = base_tests.tests_common.parse_hash_from_change_username_mail(_db, 'user21@test.loc')
 
     loc = base_api.users.changing_username.location[:-2] + htk
     test(svc_port, loc, 'GET', None, {}, 200, {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]},
@@ -196,8 +203,11 @@ def base_user_changing_username_test(svc_port):
     test(svc_port, loc, 'GET', None, {}, 400, {'message': amsgs.msgs[amsgs.PASSWORD_TOKEN_EXPIRED]},
          result_types={'message': str})
 
-    hdata1 = {'cmd': 'change_username', 'newusername': 'user1@test.loc', 'user_id': dbuser.user_id, 'password': '123'}
-    htk1 = test(svc_port, base_api.hash2params.save_hash.location, 'PUT', None, {'data': json.dumps(hdata1)}, 200, {})['h']
+    test(svc_port, base_api.users.change_username.location, 'POST', tk,
+         {'username': 'user1@test.loc', 'password': '123'}, 200,
+         {'message': amsgs.msgs[amsgs.CHANGE_USERNAME_REQUEST]}, result_types={'message': str})
+
+    htk1 = base_tests.tests_common.parse_hash_from_change_username_mail(_db,'user1@test.loc')
 
     loc1 = base_api.users.changing_username.location[:-2] + htk1
     test(svc_port, loc1, 'GET', None, {}, 200, {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]},
