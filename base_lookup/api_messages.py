@@ -37,6 +37,7 @@ ERROR_POST_REGISTRATION = 43
 API_CALL_EXCEPTION = 44
 NOT_API_CALL = 45
 NOT_IMPLEMENTED_PATCH = 46
+ERROR_POST_LOGIN = 47
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -78,3 +79,4 @@ msgs[USER_NOT_ACTIVE] = "User is not active"
 msgs[ERROR_POST_REGISTRATION] = "Post registration error"
 msgs[API_CALL_EXCEPTION] = "Call Error"
 msgs[NOT_API_CALL] = "Error execute method"
+msgs[ERROR_POST_LOGIN] = "Post login error"

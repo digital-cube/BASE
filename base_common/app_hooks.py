@@ -8,6 +8,7 @@ prepare_user_query -- prepare query for insert user in db
                         (parameters: request handler, users id, username, password, json users data) (user_register)
 pack_user_by_id -- get user from db by it's id (db connection, user id) (dbtokens)
 prepare_login_query -- prepare query for user login (parameters: username)
+post_login_digest -- post login processing (parameters: user_id, username, password(plain), login token)
 """
 
 from base_common.dbacommon import format_password

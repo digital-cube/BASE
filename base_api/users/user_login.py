@@ -59,6 +59,17 @@ def do_post(username, password, **kwargs):
 
     _db.commit()
 
-    return base_common.msg.post_ok({'token': tk})
+    res = {'token': tk}
+
+    if hasattr(apphooks, 'post_login_digest'):
+        post_d = apphooks.post_login_digest(_db, u_id, username, password, tk)
+        if post_d == False:
+            log.critical('Error user post login digest')
+            return base_common.msg.error(msgs.ERROR_POST_LOGIN)
+
+        if isinstance(post_d, dict):
+            res.update(post_d)
+
+    return base_common.msg.post_ok(res)
 
 

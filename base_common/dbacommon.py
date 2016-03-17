@@ -233,6 +233,15 @@ def _convert_args(el, tp, esc):
 
         return el
 
+    if tp == float:
+        try:
+            el = float(el)
+        except ValueError as e:
+            log.critical('Invalid argument: expected float got {} ({}): {}'.format(el, type(el), e))
+            return False
+
+        return el
+
     if tp == str:
 
         if type(el) != str:
@@ -317,6 +326,8 @@ def _tr_type(t):
         return 'string'
     if t == int:
         return 'integer'
+    if t == float:
+        return 'float'
     if t == json:
         return 'json'
     if t == datetime.date:
