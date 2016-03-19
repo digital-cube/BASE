@@ -398,3 +398,45 @@ def params(*arguments):
 
     return real_dec
 
+
+def update_users_data(db, id_user, data_key, data_value, to_commit=True):
+
+    dbc = db.cursor()
+    q = '''SELECT data FROM users where id = '{}' '''.format(id_user)
+    try:
+        dbc.execute(q)
+    except MySQLdb.IntegrityError as e:
+        log.critical('Error getting user data for {}: {}'.format(id_user, e))
+        return False
+
+    if dbc.rowcount != 1:
+        log.warning('Found {} users with id {}'.format(dbc.rowcount, id_user))
+        return False
+
+    _dd = dbc.fetchone()
+    _dd = _dd['data']
+    try:
+        _dd = json.loads(_dd)
+    except json.decoder.JSONDecodeError as e:
+        log.warning('Error loading users {} data as json: {}'.format(id_user, e))
+        _dd = {}
+    except TypeError as e:
+        log.warning('Error loading users {} data as json: {}'.format(id_user, e))
+        _dd = {}
+
+    _dd[data_key] = str(data_value)
+    _dd = json.dumps(_dd)
+
+    qu = '''UPDATE users SET data = '{}' WHERE id = '{}' '''.format(_dd, id_user)
+
+    try:
+        dbc.execute(qu)
+    except MySQLdb.IntegrityError as e:
+        log.critical('Error updating users {} data: {}'.format(id_user, e))
+        return False
+
+    if to_commit:
+        db.commit()
+
+    return True
+
