@@ -399,4 +399,25 @@ def params(*arguments):
     return real_dec
 
 
+def get_current_time():
 
+    _db = get_db()
+    dbc = _db.cursor()
+    _t = 'test_datetime'
+
+    if base_config.settings.TEST_MODE:
+        q = '''SELECT o_value FROM options where o_key = '{}' '''.format(_t)
+        try:
+            dbc.execute(q)
+        except IntegrityError as e:
+            log.critical('Error reading {} from database: {}'.format(_t, e))
+            return False
+
+        if dbc.rowcount != 1:
+            return str(datetime.datetime.now())[:19]
+
+        _td = dbc.fetchone()
+
+        return _td['o_value']
+    else:
+        return str(datetime.datetime.now())[:19]

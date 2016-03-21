@@ -279,6 +279,8 @@ def base_get_option_test(svc_port):
          {'option_name': 'test4_option', 'option_value': 1.090232}, 204, {})
     test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
          {'option_name': 'test5_option', 'option_value': json.dumps({'key': 'val'})}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test_datetime', 'option_value': '2016-02-22 12:05:11'}, 204, {})
 
     test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', None,
          {'option_name': 'test_option'}, 400, {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]},
@@ -295,6 +297,9 @@ def base_get_option_test(svc_port):
          {'option_name': 'test4_option'}, 200, {'test4_option': '1.090232'}, result_types={'test4_option': str})
     test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', tk,
          {'option_name': 'test5_option'}, 200, {'test5_option': '{"key": "val"}'}, result_types={'test5_option': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', tk,
+         {'option_name': 'test_datetime'}, 200, {'test_datetime': '2016-02-22 12:05:11'},
+         result_types={'test_datetime': str})
 
 
 def base_del_option_test(svc_port):

@@ -105,6 +105,7 @@ def start_base_service():
     entry_points = [entry_point(p, m) for p, m in imported_modules.items()]
 
     if b_args.test:
+        setattr(csettings, 'TEST_MODE', True)
         prepare_test_env()
         svc_port = csettings.TEST_PORT
         start_tests(b_args.app, b_args.test)

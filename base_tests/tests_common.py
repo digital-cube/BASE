@@ -89,6 +89,7 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
     result.update(res)
 
     if status != expected_status:
+        log_warning('Wrong status {} | expected | {}'.format(status, expected_status), '', None)
         return False
 
     if result_types and not expected_data:

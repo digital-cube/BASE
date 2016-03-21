@@ -15,6 +15,7 @@ DEBUG = True
 
 APP_DB = None  # leave None - dinamicaly filled
 
+TEST_MODE = False
 TEST_PORT = 8778
 
 TEST_USER = None
