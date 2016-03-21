@@ -223,3 +223,105 @@ def base_save_message_test(svc_port):
     test(svc_port, base_api.mail_api.save_mail.location, 'POST', None,
          {'username': 'user21@test.loc', 'password': '123'}, 404, {'message': ''},
          warning_level=WarningLevel.STRICT_ON_KEY)
+
+
+def base_set_option_test(svc_port):
+    log_info("Save Option test", '', None)
+
+    import base_api.users.user_login
+    import base_api.options.options
+    from base_api.options.options import set_option
+
+    tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
+              {'username': 'user2@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              warning_level=WarningLevel.STRICT_ON_KEY)['token']
+
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', None,
+         {'option_name': 'test_option', 'option_value': 'test_value'}, 400,
+         {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]}, result_types={'message': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test_option', 'option_value': 'test_value'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test_option', 'option_value': 'test_value'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test_option', 'option_value': True}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test_option', 'option_value': 1}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test_option', 'option_value': 1.090232}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test_option', 'option_value': json.dumps({'key': 'val'})}, 204, {})
+
+
+def base_get_option_test(svc_port):
+    log_info("Get Option test", '', None)
+
+    import base_api.users.user_login
+    import base_api.options.options
+    from base_api.options.options import set_option, get_option
+
+    tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
+              {'username': 'user2@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              warning_level=WarningLevel.STRICT_ON_KEY)['token']
+
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', None,
+         {'option_name': 'test_option', 'option_value': 'test_value'}, 400,
+         {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]}, result_types={'message': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test_option', 'option_value': 'test_value'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test1_option', 'option_value': 'test_value'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test2_option', 'option_value': True}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test3_option', 'option_value': 1}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test4_option', 'option_value': 1.090232}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', tk,
+         {'option_name': 'test5_option', 'option_value': json.dumps({'key': 'val'})}, 204, {})
+
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', None,
+         {'option_name': 'test_option'}, 400, {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]},
+         result_types={'message': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', tk,
+         {'option_name': 'test_option'}, 200, {'test_option': 'test_value'}, result_types={'test_option': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', tk,
+         {'option_name': 'test1_option'}, 200, {'test1_option': 'test_value'}, result_types={'test1_option': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', tk,
+         {'option_name': 'test2_option'}, 200, {'test2_option': 'True'}, result_types={'test2_option': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', tk,
+         {'option_name': 'test3_option'}, 200, {'test3_option': '1'}, result_types={'test3_option': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', tk,
+         {'option_name': 'test4_option'}, 200, {'test4_option': '1.090232'}, result_types={'test4_option': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, get_option.__api_path__), 'GET', tk,
+         {'option_name': 'test5_option'}, 200, {'test5_option': '{"key": "val"}'}, result_types={'test5_option': str})
+
+
+def base_del_option_test(svc_port):
+    log_info("Delete Option test", '', None)
+
+    import base_api.users.user_login
+    import base_api.options.options
+    from base_api.options.options import del_option
+
+    tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
+              {'username': 'user2@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              warning_level=WarningLevel.STRICT_ON_KEY)['token']
+
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, del_option.__api_path__), 'DELETE', None,
+         {'option_name': 'test_option'}, 400, {'message': amsgs.msgs[amsgs.UNAUTHORIZED_REQUEST]},
+         result_types={'message': str})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, del_option.__api_path__), 'DELETE', tk,
+         {'option_name': 'test_option'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, del_option.__api_path__), 'DELETE', tk,
+         {'option_name': 'test1_option'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, del_option.__api_path__), 'DELETE', tk,
+         {'option_name': 'test2_option'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, del_option.__api_path__), 'DELETE', tk,
+         {'option_name': 'test3_option'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, del_option.__api_path__), 'DELETE', tk,
+         {'option_name': 'test4_option'}, 204, {})
+    test(svc_port, '{}/{}'.format(base_api.options.options.location, del_option.__api_path__), 'DELETE', tk,
+         {'option_name': 'test5_option'}, 204, {})
+
+

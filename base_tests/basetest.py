@@ -52,6 +52,16 @@ def test_base(svc_port, t_stage):
 
         # SAVE MAIL TEST
         base_tests.test_list.base_save_message_test(svc_port)
+
+        # SET OPTIONS TEST
+        base_tests.test_list.base_set_option_test(svc_port)
+
+        # GET OPTIONS TEST
+        base_tests.test_list.base_get_option_test(svc_port)
+
+        # DELETE OPTIONS TEST
+        base_tests.test_list.base_del_option_test(svc_port)
+
     except Exception as e:
         log_failed('Error in test: {}'.format(e), '', None)
         sys.exit(1)
