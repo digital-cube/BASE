@@ -399,7 +399,7 @@ def params(*arguments):
     return real_dec
 
 
-def get_current_time():
+def get_current_datetime():
 
     _db = get_db()
     dbc = _db.cursor()
