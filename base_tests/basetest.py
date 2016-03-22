@@ -131,6 +131,7 @@ def prepare_test_db(_test_db, user, passwd, t_stage):
     db_app = 'mysql'
     dump_app = 'mysqldump'
     required_tables = 'sequencers'
+    #required_tables = 'sequencers currency'
 
     dump_cmd = '{} -u{} -p{} -d {} > {}'.format(
         dump_app, user, passwd, db_name, dbm_file_path
