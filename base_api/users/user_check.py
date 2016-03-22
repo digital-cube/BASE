@@ -29,6 +29,7 @@ def do_post(**kwargs):
     dbuser = get_user_by_token(_db, tk)
 
     d = dbuser.dump_user()
+    d['token'] = tk
 
     return base_common.msg.post_ok(d)
 

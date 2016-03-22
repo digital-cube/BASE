@@ -7,6 +7,7 @@ APPS = [
 BASE_APPS = [
      'base_api.users',
      'base_api.hash2params',
+     'base_api.options',
 ]
 
 LOG_DIR = '/var/log/base'
@@ -14,6 +15,7 @@ DEBUG = True
 
 APP_DB = None  # leave None - dinamicaly filled
 
+TEST_MODE = False
 TEST_PORT = 8778
 
 TEST_USER = None
@@ -23,6 +25,6 @@ BASE_TEST = False
 LB = False  # True for balancing instance in application
 BALANCE = False     # list of balance servers in application
 APP_PREFIX = None
-SESSION_STORAGE = DB # DB | REDIS
+SESSION_STORAGE = 'DB' # 'DB' | 'REDIS'
 REDIS_SERVER = 'localhost'
 REDIS_PORT = 6379

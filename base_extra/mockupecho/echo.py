@@ -8,6 +8,7 @@ import base_common.msg
 import base_common.msg
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
+from base_config.service import log
 
 
 name = "echo"
@@ -22,12 +23,10 @@ request_timeout = 10
 @params(
     {'arg': 'message', 'type': str, 'required': True}
 )
-def do_get(request, *args, **kwargs):
+def do_get(message, **kwargs):
     """
     Get method of echo API call - test
     """
-
-    message, = args
 
     return base_common.msg.get_ok({'echo': message})
     return {'echo': 'get echo'}
@@ -40,18 +39,16 @@ def do_get(request, *args, **kwargs):
 @params(
     {'arg': 'message', 'type': datetime.date, 'required': True}
 )
-def do_put(_, *args, **kwargs):
+def do_put(message, **kwargs):
     """
     Put method of echo API call - test
     """
 
-    dt, = args
-    log = _.log
     log.info('echo.put')
 
     #return base_common.msg.put_ok()
-    return base_common.msg.put_ok({'echo': str(dt)})
-    return base_common.msg.put_ok({'echo': str(dt)}, http_status=202)
+    return base_common.msg.put_ok({'echo': str(message)})
+    return base_common.msg.put_ok({'echo': str(message)}, http_status=202)
 
 
 @app_api_method(
@@ -61,17 +58,14 @@ def do_put(_, *args, **kwargs):
 @params(
     {'arg': 'message', 'type': datetime.datetime, 'required': True}
 )
-def do_delete(_ , *args, **kwargs):
+def do_delete(message, **kwargs):
     """
     Delete method of echo API call - test
     """
 
-    dt, = args
-
-    log = _.log
     log.info('echo.do_delete')
 
-    return base_common.msg.delete_ok({'echo': str(dt)})
+    return base_common.msg.delete_ok({'echo': str(message)})
     return base_common.msg.delete_ok({'echo': 'delete echo'}, http_status=202)
 
 
@@ -82,16 +76,15 @@ def do_delete(_ , *args, **kwargs):
 @params(
     {'arg': 'message', 'type': json, 'required': True}
 )
-def do_post(request, *args, **kwargs):
+def do_post(message, **kwargs):
     """
     Post method of echo API call - test
     """
 
-    j, = args
-    request.log.info('echo.do_post')
+    log.info('echo.do_post')
 
-    return base_common.msg.post_ok({'echo': j})
-    return base_common.msg.post_ok({'echo': j}, http_status=201)
+    return base_common.msg.post_ok({'echo': message})
+    return base_common.msg.post_ok({'echo': message}, http_status=201)
 
 
 @app_api_method(
@@ -101,16 +94,15 @@ def do_post(request, *args, **kwargs):
 @params(
     {'arg': 'message', 'type': int, 'required': True}
 )
-def do_patch(request, *args, **kwargs):
+def do_patch(message, **kwargs):
     """
     Patch method of echo API call - test
     """
 
-    i, = args
-    request.log.info('echo.do_patch')
+    log.info('echo.do_patch')
 
     # return base_common.msg.put_ok()
-    return base_common.msg.patch_ok({'echo': i})
-    return base_common.msg.patch_ok({'echo': i}, http_status=201)
+    return base_common.msg.patch_ok({'echo': message})
+    return base_common.msg.patch_ok({'echo': message}, http_status=201)
 
 

@@ -234,6 +234,15 @@ def _convert_args(el, tp, esc):
 
         return el
 
+    if tp == float:
+        try:
+            el = float(el)
+        except ValueError as e:
+            log.critical('Invalid argument: expected float got {} ({}): {}'.format(el, type(el), e))
+            return False
+
+        return el
+
     if tp == str:
 
         if type(el) != str:
@@ -328,6 +337,8 @@ def _tr_type(t):
         return 'string'
     if t == int:
         return 'integer'
+    if t == float:
+        return 'float'
     if t == json:
         return 'json'
     if t == datetime.date:
@@ -398,3 +409,26 @@ def params(*arguments):
 
     return real_dec
 
+
+def get_current_datetime():
+
+    _db = get_db()
+    dbc = _db.cursor()
+    _t = 'test_datetime'
+
+    if base_config.settings.TEST_MODE:
+        q = '''SELECT o_value FROM options where o_key = '{}' '''.format(_t)
+        try:
+            dbc.execute(q)
+        except IntegrityError as e:
+            log.critical('Error reading {} from database: {}'.format(_t, e))
+            return False
+
+        if dbc.rowcount != 1:
+            return str(datetime.datetime.now())[:19]
+
+        _td = dbc.fetchone()
+
+        return _td['o_value']
+    else:
+        return str(datetime.datetime.now())[:19]
