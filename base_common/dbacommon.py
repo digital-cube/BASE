@@ -4,6 +4,7 @@ import ast
 import json
 import json.decoder
 import redis
+import decimal
 import bcrypt
 import datetime
 import MySQLdb
@@ -310,6 +311,16 @@ def _convert_args(el, tp, esc):
             return el.lower() == 'true'
         except AttributeError:
             return isinstance(el, bool) and el
+
+    if tp == decimal.Decimal:
+
+        try:
+            el = decimal.Decimal(el)
+        except decimal.InvalidOperation as e:
+            log.critical('Invalid argument: expected Decimal, got {}: {}'.format(el, e))
+            return False
+
+        return el
 
 
 def _tr_type(t):
