@@ -347,8 +347,7 @@ def _tr_type(t):
         return 'datetime'
     if t == bool:
         return 'boolean'
-    return 'string'
-    # return 'Unkonwn type'
+    return 'Unkonwn type'
 
 
 def params(*arguments):
@@ -360,7 +359,7 @@ def params(*arguments):
             desc_args.append([
                 _a['arg'],
                 _a['description'] if 'description' in _a else 'Missing description',
-                _tr_type(_a['type']),
+                _tr_type(_a['type'] if 'type' in _a else str),
                 _a['required'] if 'required' in _a else None
             ])
 
