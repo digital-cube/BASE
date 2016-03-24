@@ -347,7 +347,8 @@ def _tr_type(t):
         return 'datetime'
     if t == bool:
         return 'boolean'
-    return 'Unkonwn type'
+    return 'string'
+    # return 'Unkonwn type'
 
 
 def params(*arguments):
