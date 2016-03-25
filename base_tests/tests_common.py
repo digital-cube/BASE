@@ -266,3 +266,12 @@ def parse_hash_from_change_username_mail(db, receiver):
     hsh = r.group(1)
 
     return hsh
+
+
+def make_url(*args):
+
+    url = ""
+    for a in args:
+        url += '{}/'.format(a)
+
+    return url.rstrip('/')
