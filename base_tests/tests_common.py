@@ -10,6 +10,7 @@ sys.path.append(pth)
 
 from base_svc.comm import call
 from base_config.settings import LOG_DIR
+import base_config.settings
 
 
 log_filename = "{}/tests.log".format(LOG_DIR)
@@ -268,9 +269,18 @@ def parse_hash_from_change_username_mail(db, receiver):
     return hsh
 
 
-def make_url(*args):
+def make_base_url(*args):
 
     url = ""
+    for a in args:
+        url += '{}/'.format(a)
+
+    return url.rstrip('/')
+
+
+def make_url(*args):
+
+    url = "{}/".format(base_config.settings.APP_PREFIX)
     for a in args:
         url += '{}/'.format(a)
 
