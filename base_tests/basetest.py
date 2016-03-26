@@ -119,7 +119,16 @@ def run_tests(app_started, t_stage, test_db, db_user, db_passwd):
     finish_tests()
 
 
-def prepare_test_db(_test_db, user, passwd, t_stage):
+def add_keep_tables(required_tables, tables_to_keep):
+
+    if t_keep:
+        required_tables += ' '
+        required_tables += ' '.join(tables_to_keep.split(','))
+
+    return required_tables
+
+
+def prepare_test_db(_test_db, user, passwd, t_stage, t_keep):
     t = len('test_')
     db_name = _test_db[t:]
 
@@ -131,7 +140,7 @@ def prepare_test_db(_test_db, user, passwd, t_stage):
     db_app = 'mysql'
     dump_app = 'mysqldump'
     required_tables = 'sequencers'
-    #required_tables = 'sequencers currency'
+    required_tables = add_keep_tables(required_tables, t_keep)
 
     dump_cmd = '{} -u{} -p{} -d {} > {}'.format(
         dump_app, user, passwd, db_name, dbm_file_path
@@ -169,9 +178,18 @@ if __name__ == '__main__':
     test_db = sys.argv[2]
     db_user = sys.argv[3]
     db_passwd = sys.argv[4]
-    t_stage = int(sys.argv[5]) if len(sys.argv) == 6 else 0
+    t_stage = 0
+    t_keep = ''
 
-    prepare_test_db(test_db, db_user, db_passwd, t_stage)
+    for _a in sys.argv:
+        _a_idx = sys.argv.index(_a)
+        if _a == '-s':
+            t_stage = int(sys.argv[_a_idx + 1])
+
+        if _a == '-k':
+            t_keep = sys.argv[_a_idx + 1]
+
+    prepare_test_db(test_db, db_user, db_passwd, t_stage, t_keep)
     run_tests(app_started, t_stage, test_db, db_user, db_passwd)
 
 

@@ -45,6 +45,7 @@ def check_args(installed_apps):
 
     a.add_argument("-p", "--port", help="Application port")
     a.add_argument("-t", "--test", help="TEST Application")
+    a.add_argument("-k", "--keep", help="TEST comma separated tables to keep in tests")
 
     return a.parse_args()
 
@@ -62,13 +63,22 @@ def entry_point(api_path, api_module_map, allowed=None, denied=None):
     return _uri, base_svc.comm.GeneralPostHandler, dict(allowed=allowed, denied=denied, apimodule_map=api_module_map)
 
 
-def start_tests(app_started, t_stage):
+def start_tests(app_started, t_stage, t_keep):
     import subprocess
     import base_tests.basetest
 
-    s = subprocess.Popen(["python3", base_tests.basetest.__file__, app_started, csettings.APP_DB.db,
-                          csettings.APP_DB.user, csettings.APP_DB.passwd, t_stage], stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    test_cmd = ["python3", base_tests.basetest.__file__, app_started, csettings.APP_DB.db,
+                          csettings.APP_DB.user, csettings.APP_DB.passwd]
+
+    if t_stage:
+        test_cmd.append('-s')
+        test_cmd.append(t_stage)
+
+    if t_keep:
+        test_cmd.append('-k')
+        test_cmd.append(t_keep)
+
+    s = subprocess.Popen(test_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     log.info('Tests started on PID: {}'.format(s.pid))
 
 
@@ -108,7 +118,7 @@ def start_base_service():
         setattr(csettings, 'TEST_MODE', True)
         prepare_test_env()
         svc_port = csettings.TEST_PORT
-        start_tests(b_args.app, b_args.test)
+        start_tests(b_args.app, b_args.test, b_args.keep)
 
     baseapi_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     tpl_dir = os.path.join(baseapi_dir, 'templates')
