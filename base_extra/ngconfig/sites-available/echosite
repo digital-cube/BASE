@@ -1,7 +1,7 @@
-#server
+#server # http -> https redirection
 #{
 #        listen 80;
-#        server_name static.premierbet.me;
+#        server_name domain.name;
 #       rewrite        ^ https://$server_name$request_uri? permanent;
 #}
 
@@ -15,7 +15,7 @@ server
                 expires -1;
                 index index.html$args;
                 try_files $uri$args $uri$args/ $uri/ /index.html$args =404;
-            	proxy_pass http://troot;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr;
+            	proxy_pass http://api;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr;
         }
 
         location /bundle/ {
@@ -24,12 +24,17 @@ server
         }
 
         location /api { proxy_pass http://api;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr; }
-        location /specs { proxy_pass http://troot;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr; }
+        location /spec { proxy_pass http://api;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr; }
+        location /user { proxy_pass http://api;   proxy_redirect off; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $remote_addr; }
 
         access_log  /var/log/nginx/echosite.access.log main;
         error_log  /var/log/nginx/echosite.error.log;
 
-        rewrite ^/api/(.*)$ /api/$1 break;
+        rewrite ^/api/(.*)$ /api/$1 break;      # this is from mockupecho application prefix
+        rewrite ^/user/(.*)$ /user/$1 break;
+        rewrite ^/spec/(.*)$ /spec/$1 break;
+        rewrite ^/(.*)$ /$1 break;
+
                 
         location ~ /\.ht {
             deny  all;
