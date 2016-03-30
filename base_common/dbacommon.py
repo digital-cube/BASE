@@ -226,6 +226,10 @@ def get_url_token(request_handler):
 def _convert_args(el, tp, esc):
 
     if tp == int:
+
+        if el == '0':
+            return 0
+
         try:
             el = int(el)
         except ValueError as e:
@@ -390,14 +394,17 @@ def params(*arguments):
 
                     converted = _convert_args(atr, tip, esc)
                     if not converted:
-                        c_type = "|type get error|"
-                        try:
-                            c_type = type(atr)
-                        except Exception as e:
-                            log.warning('Get argument type error: {}'.format(e))
 
-                        log.critical('Invalid request argument {} type {}, expected {}'.format(atr, c_type, tip))
-                        return base_common.msg.error(amsgs.INVALID_REQUEST_ARGUMENT)
+                        if tip == int and converted != 0:   # count 0 as int
+
+                            c_type = "|type get error|"
+                            try:
+                                c_type = type(atr)
+                            except Exception as e:
+                                log.warning('Get argument type error: {}'.format(e))
+
+                            log.critical('Invalid request argument {} type {}, expected {}'.format(atr, c_type, tip))
+                            return base_common.msg.error(amsgs.INVALID_REQUEST_ARGUMENT)
 
                 ags.append(converted)
 
