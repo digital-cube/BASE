@@ -171,7 +171,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
         self.set_status(200)
         self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS')
         self.set_header('Access-Control-Max-Age', 1000)
         self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization')
         self.finish('OK')
@@ -250,7 +250,10 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
         _aclient = httpclient.AsyncHTTPClient(force_instance=True)
         _uri = 'http://{}{}'.format(_server_ip, r_handler.request.uri)
-        _res = yield _aclient.fetch(_uri)
+        _headers = {'Authorization': self.auth_token}
+        _areq = httpclient.HTTPRequest(_uri, headers=_headers)
+        _res = yield _aclient.fetch(_areq)
+        # _res = yield _aclient.fetch(_uri)
         log.info('EXITING SERVER: {}'.format(self._a_p))
         self.set_header('Content-Type', 'application/json')
         self.write('{} -> {}'.format(self._a_p, _res.body))

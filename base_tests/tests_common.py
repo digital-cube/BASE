@@ -105,7 +105,8 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
                 return False
 
             if expected_data[k] != res[k] and warning_level == WarningLevel.STRICT:
-                log_warning(location, method, '{}: {} | expected | {}'.format(k, res[k], expected_data[k]))
+                return False
+                #log_warning(location, method, '{}: {} | expected | {}'.format(k, res[k], expected_data[k]))
 
         # inspect result types
         if result_types:

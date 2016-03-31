@@ -233,7 +233,7 @@ def base_set_option_test(svc_port):
     from base_api.options.options import set_option
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user2@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              {'username': 'user3@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', None,
@@ -261,7 +261,7 @@ def base_get_option_test(svc_port):
     from base_api.options.options import set_option, get_option
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user2@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              {'username': 'user3@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     test(svc_port, '{}/{}'.format(base_api.options.options.location, set_option.__api_path__), 'PUT', None,
@@ -310,7 +310,7 @@ def base_del_option_test(svc_port):
     from base_api.options.options import del_option
 
     tk = test(svc_port, base_api.users.user_login.location, 'POST', None,
-              {'username': 'user2@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
+              {'username': 'user3@test.loc', 'password': '123'}, 200, {'token': ''}, result_types={'token': str},
               warning_level=WarningLevel.STRICT_ON_KEY)['token']
 
     test(svc_port, '{}/{}'.format(base_api.options.options.location, del_option.__api_path__), 'DELETE', None,
