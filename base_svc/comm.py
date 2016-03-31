@@ -246,17 +246,20 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         return j, ip
 
     @gen.coroutine
-    def a_call(self, r_handler, _server_ip):
+    def a_call(self, _server_ip, method):
 
         _aclient = httpclient.AsyncHTTPClient(force_instance=True)
-        _uri = 'http://{}{}'.format(_server_ip, r_handler.request.uri)
-        _headers = {'Authorization': self.auth_token}
-        _areq = httpclient.HTTPRequest(_uri, headers=_headers)
-        _res = yield _aclient.fetch(_areq)
-        # _res = yield _aclient.fetch(_uri)
-        log.info('EXITING SERVER: {}'.format(self._a_p))
-        self.set_header('Content-Type', 'application/json')
-        self.write('{} -> {}'.format(self._a_p, _res.body))
+        _uri = 'http://{}{}'.format(_server_ip, self.request.uri)
+        _body = self.request.body if method not in [GET,] else None
+
+        _headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        if self.auth_token:
+            _headers['Authorization'] = self.auth_token
+
+        _res = yield _aclient.fetch(_uri, body=_body, method=http_rev_map[method], headers=_headers)
+
+        # log.info('EXITING SERVER: {}'.format(self._a_p))
+        self.write(_res.body.decode('utf-8'))
         self.finish()
 
     def call_api_fun(self, method):
@@ -297,7 +300,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
                     self._a_p = _server[-4:]
                     log.info('CALLING SERVER: {}'.format(self._a_p))
-                    self.a_call(self, _server)
+                    self.a_call(_server, method)
                     return
 
                 else:
