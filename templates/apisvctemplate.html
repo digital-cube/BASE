@@ -71,20 +71,21 @@
                         {% set g =g + 1 %}
 
 
-                        <table id="tableSearchResults" class="table table-hover  table-striped table-condensed">
+                        <table id="tableSearchResults" class=" table table-hover  table-striped table-condensed">
                                 {% set method = methods[m] %}
                                 {% for s in method %}
                                 {% if method[s] != 'Missing docstring' %}
 
                                     {% set bg_stil = s.lower()+'_bg' %}
-                                    <tr style="border-top:8px solid white;">
+                                     <tr style="border-top:8px solid white;">
                                     {% if s == 'DELETE' or s == 'PATCH' or s == 'POST' or s == 'PUT'  or s == 'GET' %}
 
                                         {% if type(method[s])!=str %}
+                                        <div style="margin-bottom:10px;">
                                             <tr id="package{{s}}-{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle"
                                                 data-toggle="collapse" data-parent="#OrderPackages"
                                                 data-target=".packageDetails{{s}}-{{g}}">
-                                                <td style="margin-top:10px;padding:7px;  border-top-left-radius:5px;border-top-right-radius:5px;">
+                                                <td style="margin-top:10px;padding:7px; top:10px;  border-top-left-radius:0px;border-top-right-radius:0px;">
 
                                                    {% if s == 'GET' %}
                                                         <span class=" label label-primary">{{s}}</span> - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp </span>
@@ -122,19 +123,16 @@
 
                                             {% if s == 'DELETE' or s == 'POST' or s == 'PATCH' or s == 'PUT' or s == 'GET' %}
 
-                                                    <td colspan="{{s}}-{{g}}" class="hiddenRow {{bg_stil}}" >
-                                                        <div class="padd accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
+                                                    <td colspan="{{s}}-{{g}}" class=" hiddenRow {{bg_stil}}" >
 
+                                                        <div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
 
                                                             {% set ms = method[s]  %}
 
                                                             {% set t = type(ms) %}
 
                                                             {% if t!=str %}
-
-
-
-                                                                <table class="bgd">
+                                                            <table class="bgd ">
                                                                     <tbody>
                                                                         <tr>
                                                                          <td class=" siz bold ">{{data['name']}}</td>
@@ -144,8 +142,8 @@
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
-                                                            <table class="backgroundtable">
-                                                                      <tbody class="margina">
+                                                            <table class="  backgroundtable">
+                                                                      <tbody class="padd-t margina">
                                                                         <tr>
                                                                          <tr class="{{clasa}}" >
                                                                                 <th class="bg">Description :</th >
@@ -166,43 +164,41 @@
 
 
                                                               </table>
-                                                                </div>
-                                                        <div class="padd accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
 
-                                                                <table class="backgroundtable">
+                                                        </div>
+                                                        <div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
+                                                                    <br/><table class=" backgroundtable">
 
-                                                                      <tbody class="margina">
+                                                                          <tbody class="  ">
 
-                                                                         <tr class="{{clasa}}" >
-                                                                                <th class="bg">Parameters :</th >
-                                                                                <th class="bg" >Description</th>
-                                                                                <th class="bg">Type</th>
-                                                                                <th></th>
-                                                                                <th class="bg">Requests</th>
-                                                                                <th></th>
-                                                                                <th></th>
-                                                                         </tr>
-
-
-                                                                        {% for keys in ms['parameters'] %}
-                                                                               <tr class="siz">
-                                                                                  <td class="bg">{{keys}}</td>
-
-                                                                                  <td class="bg">{{ms['parameters'][keys]['description']}}</td>
-                                                                                  <td class="bg">{{ms['parameters'][keys]['type']}}<td>
-                                                                                  <td class="bg">{{ms['parameters'][keys]['req']}}<td>
-
-                                                                                </tr>
-                                                                        {% end %}
-
-                                                                      </tbody>
+                                                                             <tr class="{{clasa}}" >
+                                                                                    <th class="bg">Parameters :</th >
+                                                                                    <th class="bg" >Description</th>
+                                                                                    <th class="bg">Type</th>
+                                                                                    <th></th>
+                                                                                    <th class="bg">Requests</th>
+                                                                                    <th></th>
+                                                                                    <th></th>
+                                                                             </tr>
 
 
-                                                              </table>
-                                                         </div>
-                                                        <div class="padd accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
+                                                                            {% for keys in ms['parameters'] %}
+                                                                                   <tr class="siz">
+                                                                                      <td class="bg">{{keys}}</td>
 
-                                                            <table>
+                                                                                      <td class="bg">{{ms['parameters'][keys]['description']}}</td>
+                                                                                      <td class="bg">{{ms['parameters'][keys]['type']}}<td>
+                                                                                      <td class="bg">{{ms['parameters'][keys]['req']}}<td>
+
+                                                                                    </tr>
+                                                                            {% end %}
+
+                                                                          </tbody>
+
+                                                                    </table>
+                                                             </div>
+                                                        <div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
+                                                            <br/><table class="">
                                                                  <tbody style="padding-top:0px;">
                                                                            <tr class="{{clasa}} ">
                                                                                  <th class="bg">HTTP Status Code</th>
@@ -219,26 +215,19 @@
 
                                                                             </tr>
                                                                  </tbody>
-
-                                                            </table>
-
+                                                            </table><br/>
                                                         </div>
 
-
-
-
-                                                            {% end #str if%}
-
-
-
                                                     </td>
+                                            {% end #str if%}
                                             {% end %}
+
                                         {% end # if %}
 
                                     {% end # if %}
                                     </tbody>
                                 {% end %}
-                    {% end #for mode  %}
+                             {% end #for mode  %}
 
                         </table>
 

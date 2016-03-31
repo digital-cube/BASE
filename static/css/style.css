@@ -9,9 +9,9 @@ th, td {
     text-align: left;
     border:0px;
 }
-.margina{
-    margin-top: 10px;
-}
+/*.margina{*/
+    /*margin-top: 10px;*/
+/*}*/
 .label {
         border: 1px solid transparent;
     border-radius: 4px;
@@ -79,8 +79,10 @@ th, td {
     background-color: #a9d3f0 !important;
    color: #6095ff;
 }
-   .backgroundtable{background: white;}
+   /*.backgroundtable{background: white;}*/
   .padd{  padding: 10px 10px 10px 10px;  }
+  .padd-l{  padding: 0px 10px;}
+  .padd-t{  margin: 10px 0px;}
  .bg{
     border-bottom: 0.01px solid rgb(232, 232, 232);
     background: white;
