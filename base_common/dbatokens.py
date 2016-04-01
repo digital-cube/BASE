@@ -221,8 +221,8 @@ def _get_user_by_token_from_sql(db, tk, is_active):
     return base_common.app_hooks.pack_user_by_id(db, u_id)
 
 
-def get_user_by_id(db, user_id):
+def get_user_by_id(db, id_user):
 
-    return base_common.app_hooks.pack_user_by_id(db, user_id)
+    return base_common.app_hooks.pack_user_by_id(db, id_user)
 
 

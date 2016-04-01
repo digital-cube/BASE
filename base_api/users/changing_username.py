@@ -60,14 +60,14 @@ def do_get(*args, **kwargs):
         return base_common.msg.error(msgs.PASSWORD_TOKEN_EXPIRED)
 
     try:
-        user_id = res['user_id']
+        id_user = res['id_user']
         newusername = res['newusername']
         password = res['password']
     except KeyError as e:
         log.critical('Missing hash parameter: {}'.format(e))
         return base_common.msg.error(msgs.TOKEN_MISSING_ARGUMENT)
 
-    q = '''select username from users where id = '{}' '''.format(user_id)
+    q = '''select username from users where id = '{}' '''.format(id_user)
 
     try:
         dbc.execute(q)
@@ -83,7 +83,7 @@ def do_get(*args, **kwargs):
 
     passwd = format_password(newusername, password);
 
-    q1 = '''update users set username = '{}', password = '{}' where id = '{}' '''.format(newusername, passwd, user_id)
+    q1 = '''update users set username = '{}', password = '{}' where id = '{}' '''.format(newusername, passwd, id_user)
 
     try:
         dbc.execute(q1)

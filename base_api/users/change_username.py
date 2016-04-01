@@ -86,7 +86,7 @@ def do_post(newusername, password, **kwargs):
 
     # SAVE HASH FOR USERNAME CHANGE
     rh = BaseAPIRequestHandler()
-    data = {'cmd': 'change_username', 'newusername': newusername, 'user_id': dbuser.user_id, 'password': password}
+    data = {'cmd': 'change_username', 'newusername': newusername, 'id_user': dbuser.id_user, 'password': password}
     rh.set_argument('data', json.dumps(data))
     kwargs['request_handler'] = rh
     res = base_api.hash2params.save_hash.do_put(json.dumps(data), **kwargs)
