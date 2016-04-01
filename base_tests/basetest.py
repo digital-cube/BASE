@@ -62,6 +62,9 @@ def test_base(svc_port, t_stage):
         # DELETE OPTIONS TEST
         base_tests.test_list.base_del_option_test(svc_port)
 
+        # SHOW API SPECIFICATION TEST
+        base_tests.test_list.show_api_spec_test(svc_port)
+
     except Exception as e:
         log_failed('Error in test: {}'.format(e), '', None)
         sys.exit(1)

@@ -330,3 +330,12 @@ def base_del_option_test(svc_port):
          {'option_name': 'test5_option'}, 204, {})
 
 
+def show_api_spec_test(svc_port):
+    log_info("Show API Specification test", '', None)
+
+    test(svc_port, 'spec', 'GET', None, {}, 200, {'api_version':'', 'status': '', 'applications': ''},
+         result_types={'api_version': str, 'status': int, 'applications': dict},
+         warning_level=WarningLevel.STRICT_ON_KEY)
+    test(svc_port, 'spec', 'DELETE', None, {}, 405, {})
+    test(svc_port, 'spec?html=true', 'GET', None, {}, 200, {'message': '', 'status': 200},
+         result_types={'message': str, 'status': int}, warning_level=WarningLevel.STRICT_ON_KEY)

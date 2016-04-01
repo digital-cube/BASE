@@ -103,11 +103,12 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
         for k in expected_data:
 
             if k not in res and warning_level != WarningLevel.NO_WARNING:
+                log_warning(location, method, ' missing {} in result'.format(k))
                 return False
 
             if expected_data[k] != res[k] and warning_level == WarningLevel.STRICT:
+                log_warning(location, method, '{}: {} | expected | {}'.format(k, res[k], expected_data[k]))
                 return False
-                #log_warning(location, method, '{}: {} | expected | {}'.format(k, res[k], expected_data[k]))
 
         # inspect result types
         if result_types:
