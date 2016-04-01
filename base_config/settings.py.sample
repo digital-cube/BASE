@@ -28,3 +28,4 @@ APP_PREFIX = None
 SESSION_STORAGE = 'DB' # 'DB' | 'REDIS'
 REDIS_SERVER = 'localhost'
 REDIS_PORT = 6379
+CHANGE_EMAIL_ADDRESS = 'http://localhost:8778/change'

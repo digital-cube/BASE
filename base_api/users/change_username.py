@@ -19,6 +19,7 @@ from base_common.dbatokens import get_user_by_token
 from base_svc.comm import BaseAPIRequestHandler
 from base_config.service import support_mail
 import base_api.users.changing_username
+import base_config.settings
 
 
 name = "Change username"
@@ -42,7 +43,7 @@ def _get_email_warning(oldusername, newusername):
     return m
 
 
-def _get_email_message(request, h):
+def _get_email_message(h):
     """
     Create email message
     :param request:  request handler
@@ -52,7 +53,7 @@ def _get_email_message(request, h):
     :return:  message text as string
     """
 
-    l = 'http://{}/{}{}'.format(request.request.host, base_api.users.changing_username.location[:-2], h)
+    l = '{}/{}'.format(base_config.settings.CHANGE_EMAIL_ADDRESS, h)
     m = '''Dear,<br/>You have requested username change. Please confirm change by following the link below:<br/>
     {}<br/><br/>If You didn't requested the change, please ignore this message.<br/>Thank You!'''.format(l)
 
@@ -75,7 +76,6 @@ def do_post(newusername, password, **kwargs):
 
     _db = get_db()
 
-    request = kwargs['request_handler']
     tk = kwargs['auth_token']
 
     dbuser = get_user_by_token(_db, tk)
@@ -95,7 +95,7 @@ def do_post(newusername, password, **kwargs):
 
     h = res['h']
 
-    message = _get_email_message(request, h)
+    message = _get_email_message(h)
 
     # SAVE EMAILS FOR SENDING
     rh1 = BaseAPIRequestHandler()

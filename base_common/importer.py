@@ -101,6 +101,9 @@ def import_from_settings(imported_modules, app_to_start):
             h_attr = getattr(hm, h_name)
             setattr(base_common.app_hooks, h_name, h_attr)
 
+    if hasattr(pm, 'CHANGE_EMAIL_ADDRESS'):
+        base_config.settings.CHANGE_EMAIL_ADDRESS = pm.CHANGE_EMAIL_ADDRESS
+
     def _add_to_imports(_mm, _f, _m):
 
         # _expose = False

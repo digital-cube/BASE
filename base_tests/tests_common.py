@@ -8,16 +8,14 @@ from logging.handlers import RotatingFileHandler
 pth = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(pth)
 
-
 from base_svc.comm import call
 from base_config.settings import LOG_DIR
 import base_config.settings
 
-
 log_filename = "{}/tests.log".format(LOG_DIR)
 log_handler = RotatingFileHandler(log_filename, maxBytes=1048576, backupCount=2)
 log_formatter = logging.Formatter(
-        '%(asctime)-6s  - %(message)s')
+    '%(asctime)-6s  - %(message)s')
 log_handler.setFormatter(log_formatter)
 
 log = logging.getLogger('DGTT')
@@ -72,7 +70,8 @@ def test_db_is_active():
     return True
 
 
-def do_test(svc_port, location, method, token, data, expected_status, expected_data, result, result_types, warning_level):
+def do_test(svc_port, location, method, token, data, expected_status, expected_data, result, result_types,
+            warning_level):
     _headers = None
     if token:
         _headers = {'Authorization': token}
@@ -123,21 +122,24 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
                     return False
 
                 if type(res[k]) != result_types[k]:
-                    log_warning('Result types for {} differ: got {} expected {}'.format(k, type(res[k]), result_types[k]), '', None)
+                    log_warning(
+                        'Result types for {} differ: got {} expected {}'.format(k, type(res[k]), result_types[k]), '',
+                        None)
                     return False
 
     return True
 
 
-def test(svc_port, location, method, token, data, expected_status, expected_data, result_types={}, warning_level=WarningLevel.STRICT):
-
+def test(svc_port, location, method, token, data, expected_status, expected_data, result_types={},
+         warning_level=WarningLevel.STRICT):
     __result = {}
 
     if not test_db_is_active():
         log_failed('TEST DATABASE NOT ACTIVE', '', '')
         finish_tests(base_config.settings.S_PID, success=False)
 
-    if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result, result_types, warning_level):
+    if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result, result_types,
+                   warning_level):
         log_failed(location, method, __result)
         finish_tests(base_config.settings.S_PID, success=False)
 
@@ -146,7 +148,6 @@ def test(svc_port, location, method, token, data, expected_status, expected_data
 
 
 def prepare_test_env():
-
     from collections import namedtuple
     import base_config.settings
     import base_common.dbacommon
@@ -177,9 +178,7 @@ def finish_test_with_error():
 
 
 def finish_tests(server_pid, success=True):
-
     if success:
-
         st = '{}{}{}'.format(Color.BOLD_GREEN, 'FINISH TESTING', Color.DEFAULT)
         log.info(st)
         print(st)
@@ -189,7 +188,6 @@ def finish_tests(server_pid, success=True):
 
 
 def load_app_test(app_started, app_tests_list, stage):
-
     from base_common.importer import import_from_settings
     from base_common.importer import get_installed_apps
     from base_common.importer import get_app
@@ -231,7 +229,6 @@ def load_app_test(app_started, app_tests_list, stage):
 
 
 def make_mail_sent(db, mail_id, log):
-
     q = '''update mail_queue set sent = TRUE where id = {}'''.format(mail_id)
     dbc = db.cursor()
 
@@ -251,7 +248,6 @@ def make_mail_sent(db, mail_id, log):
 
 
 def parse_hash_from_change_username_mail(db, receiver):
-
     import re
 
     dbc = db.cursor()
@@ -263,9 +259,10 @@ def parse_hash_from_change_username_mail(db, receiver):
     message = dbc.fetchone()
     msg = message['message']
 
-    from base_config.settings import TEST_PORT
-    tpl ='''Dear,<br\/>You have requested username change. Please confirm change by following the link below:<br\/>
-    http:\/\/localhost:{}\/user\/username\/changing\/(.*)<br\/><br\/>If You didn't requested the change, please ignore this message.<br\/>Thank You!'''.format(TEST_PORT)
+    import base_config.settings
+    tpl = '''Dear,<br\/>You have requested username change. Please confirm change by following the link below:<br\/>
+    {}(.*)<br\/><br\/>If You didn't requested the change, please ignore this message.<br\/>Thank You!'''.format(
+        base_config.settings.CHANGE_EMAIL_ADDRESS)
 
     p = re.compile(tpl)
     r = p.match(msg)
@@ -275,7 +272,6 @@ def parse_hash_from_change_username_mail(db, receiver):
 
 
 def make_base_url(*args):
-
     url = ""
     for a in args:
         url += '{}/'.format(a)
@@ -284,7 +280,6 @@ def make_base_url(*args):
 
 
 def make_url(*args):
-
     url = "{}/".format(base_config.settings.APP_PREFIX)
     for a in args:
         url += '{}/'.format(a)
