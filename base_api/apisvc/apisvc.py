@@ -111,6 +111,10 @@ def fdoc_parser(url_methods, func):
                 'type': p[2],
                 'req': p[3]
             }
+
+            if p[4]:
+                url_methods[_m]['parameters'][p[0]]['example'] = p[4]
+
     except AttributeError as e:
         print('READ DOCUMENT EXCEPTION: {}'.format(e))
 

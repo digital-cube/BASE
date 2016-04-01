@@ -364,7 +364,8 @@ def params(*arguments):
                 _a['arg'],
                 _a['description'] if 'description' in _a else 'Missing description',
                 _tr_type(_a['type'] if 'type' in _a else str),
-                _a['required'] if 'required' in _a else None
+                _a['required'] if 'required' in _a else None,
+                _a['example'] if 'example' in _a else None
             ])
 
         @wraps(original)
