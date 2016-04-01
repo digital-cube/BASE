@@ -136,6 +136,7 @@ def app_api_method(**arguments):
         f_wrapper.__api_method_type__ = arguments['method'] if 'method' in arguments else _hm.rev[_hm.GET]
         f_wrapper.__api_path__ = arguments['uri'] if 'uri' in arguments else ''
         f_wrapper.__api_return__ = arguments['api_return'] if 'api_return' in arguments else []
+        f_wrapper.__api_return_type__ = arguments['return_type'] if 'return_type' in arguments else []
 
         return f_wrapper
 

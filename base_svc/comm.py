@@ -262,6 +262,11 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.write(_res.body.decode('utf-8'))
         self.finish()
 
+    def set_api_header(self, return_type):
+
+        if return_type == 'html':
+            self.set_header('Content-Type', 'text/html')
+
     def call_api_fun(self, method):
 
         self.set_header('Access-Control-Allow-Origin', '*')
@@ -273,9 +278,13 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
                 fun = self.apimodule_map[method]
 
+                if hasattr(fun,'__api_return_type__'):
+                    self.set_api_header(getattr(fun,'__api_return_type__'))
+                else:
+                    self.set_header('Content-Type', 'application/json')
+
                 if not hasattr(fun, '__api_method_call__') or not fun.__api_method_call__:
                     self.set_status(500)
-                    self.set_header('Content-Type', 'application/json')
                     self.write(json.dumps(base_common.msg.error(amsgs.NOT_API_CALL)))
                     return
 
@@ -288,7 +297,6 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                         method, fun.__name__, self.apimodule.__name__))
 
                     self.set_status(500)
-                    self.set_header('Content-Type', 'application/json')
                     self.write(json.dumps(base_common.msg.error(self.e_msgs[method])))
                     return
 
@@ -313,7 +321,6 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                     del result['http_status']
 
                 if result != {}:
-                    self.set_header('Content-Type', 'application/json')
                     self.write(json.dumps(result))
 
             else:
@@ -327,4 +334,5 @@ class GeneralPostHandler(tornado.web.RequestHandler):
             log.error(
                 "ip: {}, module: {}, function: {}, exception: e:{}".format(ip, self.apimodule.__name__, method, e))
             self.set_status(500)
+            self.set_header('Content-Type', 'application/json')
             self.write(json.dumps(base_common.msg.error(e)))
