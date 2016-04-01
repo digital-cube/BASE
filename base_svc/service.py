@@ -78,6 +78,10 @@ def start_tests(app_started, t_stage, t_keep):
         test_cmd.append('-k')
         test_cmd.append(t_keep)
 
+    s_pid = os.getpid()
+    test_cmd.append('-p')
+    test_cmd.append('{}'.format(s_pid))
+
     s = subprocess.Popen(test_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     log.info('Tests started on PID: {}'.format(s.pid))
 

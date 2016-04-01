@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import signal
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -133,11 +134,11 @@ def test(svc_port, location, method, token, data, expected_status, expected_data
 
     if not test_db_is_active():
         log_failed('TEST DATABASE NOT ACTIVE', '', '')
-        sys.exit(1)
+        finish_tests(base_config.settings.S_PID, success=False)
 
     if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result, result_types, warning_level):
         log_failed(location, method, __result)
-        sys.exit(1)
+        finish_tests(base_config.settings.S_PID, success=False)
 
     log_passed(location, method, __result)
     return __result
@@ -174,13 +175,15 @@ def finish_test_with_error():
     sys.exit(4)
 
 
-def finish_tests():
+def finish_tests(server_pid, success=True):
 
-    st = '{}{}{}'.format(Color.BOLD_GREEN, 'FINISH TESTING', Color.DEFAULT)
-    log.info(st)
-    print(st)
-    import tornado.ioloop
-    tornado.ioloop.IOLoop.instance().stop()
+    if success:
+
+        st = '{}{}{}'.format(Color.BOLD_GREEN, 'FINISH TESTING', Color.DEFAULT)
+        log.info(st)
+        print(st)
+
+    os.kill(server_pid, signal.SIGTERM)
     sys.exit()
 
 

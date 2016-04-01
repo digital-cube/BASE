@@ -104,7 +104,7 @@ def test_app(app_tests_list, svc_port, t_stage, t_db, db_u, db_p):
             last_stage = current_stage
 
 
-def run_tests(app_started, t_stage, test_db, db_user, db_passwd):
+def run_tests(app_started, t_stage, test_db, db_user, db_passwd, server_pid):
 
     time.sleep(1) # TODO: pingovati service da li je ok da nastavish
 
@@ -116,7 +116,7 @@ def run_tests(app_started, t_stage, test_db, db_user, db_passwd):
     test_base(svc_port, t_stage)
     test_app(app_tests_list, svc_port, t_stage, test_db, db_user, db_passwd)
 
-    finish_tests()
+    finish_tests(server_pid)
 
 
 def add_keep_tables(required_tables, tables_to_keep):
@@ -180,6 +180,7 @@ if __name__ == '__main__':
     db_passwd = sys.argv[4]
     t_stage = 0
     t_keep = ''
+    s_pid = 0
 
     for _a in sys.argv:
         _a_idx = sys.argv.index(_a)
@@ -189,7 +190,11 @@ if __name__ == '__main__':
         if _a == '-k':
             t_keep = sys.argv[_a_idx + 1]
 
+        if _a == '-p':
+            s_pid = int(sys.argv[_a_idx + 1])
+            setattr(base_config.settings, 'S_PID', s_pid)
+
     prepare_test_db(test_db, db_user, db_passwd, t_stage, t_keep)
-    run_tests(app_started, t_stage, test_db, db_user, db_passwd)
+    run_tests(app_started, t_stage, test_db, db_user, db_passwd, s_pid)
 
 
