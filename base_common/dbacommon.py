@@ -434,10 +434,10 @@ def get_current_datetime():
             return False
 
         if dbc.rowcount != 1:
-            return str(datetime.datetime.now())[:19]
+            return datetime.datetime.now()
 
         _td = dbc.fetchone()
 
         return _td['o_value']
     else:
-        return str(datetime.datetime.now())[:19]
+        return datetime.datetime.now()
