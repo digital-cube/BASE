@@ -431,7 +431,7 @@ def get_current_datetime():
             dbc.execute(q)
         except IntegrityError as e:
             log.critical('Error reading {} from database: {}'.format(_t, e))
-            return False
+            return datetime.datetime.now()
 
         if dbc.rowcount != 1:
             log.warning('Found {} current date occurrences'.format(dbc.rowcount))
@@ -443,8 +443,7 @@ def get_current_datetime():
             _td_datetime = datetime.datetime.strptime(_td['o_value'], '%Y-%m-%d %H:%M:%S.%f')
         except ValueError as e:
             log.critical('Error creating datetime from {}: {}'.format(_td['o_value'], e))
-            return False
+            return datetime.datetime.now()
 
         return _td_datetime
-    else:
-        return datetime.datetime.now()
+
