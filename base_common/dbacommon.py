@@ -434,10 +434,17 @@ def get_current_datetime():
             return False
 
         if dbc.rowcount != 1:
+            log.warning('Found {} current date occurrences'.format(dbc.rowcount))
             return datetime.datetime.now()
 
         _td = dbc.fetchone()
 
-        return _td['o_value']
+        try:
+            _td_datetime = datetime.datetime.strptime(_td['o_value'], '%Y-%m-%d %H:%M:%S.%f')
+        except ValueError as e:
+            log.critical('Error creating datetime from {}: {}'.format(_td['o_value'], e))
+            return False
+
+        return _td_datetime
     else:
         return datetime.datetime.now()
