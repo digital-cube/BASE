@@ -41,6 +41,7 @@ ERROR_POST_LOGIN = 47
 ERROR_SET_OPTION = 48
 ERROR_GET_OPTION = 49
 OPTION_NOT_EXIST = 50
+ERROR_UPDATE_MESSAGE = 51
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -86,3 +87,4 @@ msgs[ERROR_POST_LOGIN] = "Post login error"
 msgs[ERROR_SET_OPTION] = "Error setting option"
 msgs[ERROR_GET_OPTION] = "Error getting option"
 msgs[OPTION_NOT_EXIST] = "Option does not exists"
+msgs[ERROR_UPDATE_MESSAGE] = "Error update mail queue"

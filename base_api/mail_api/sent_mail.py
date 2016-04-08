@@ -1,5 +1,5 @@
 """
-Mail
+Mail Sent
 """
 
 import json
@@ -18,65 +18,37 @@ location = "email/sent"
 request_timeout = 10
 
 
-def get_mail_query(sender, receiver, message):
-    n = datetime.datetime.now()
-    q = "insert into mail_queue (id, sender, receiver, time_created, message) " \
-        "VALUES " \
-        "(null, '{}', '{}', '{}', '{}')".format(
-            sender,
-            receiver,
-            str(n),
-            message
-        )
+def get_mail_query(id_msg, msg_datetime):
+
+    q = '''UPDATE mail_queue set sent = true, time_sent = '{}' WHERE id = {} '''.format(str(msg_datetime), id_msg)
 
     return q
 
 
 @app_api_method(
-    method='PUT',
-    expose=False,
+    method='PATCH',
     api_return=[(200, 'OK'), (404, 'notice')]
 )
 @params(
-    {'arg': 'sender', 'type': str, 'required': True, 'description': 'user who sends a mail'},
-    {'arg': 'receiver', 'type': str, 'required': True, 'description': 'user who receive a mail'},
-    {'arg': 'message', 'type': str, 'required': True, 'description': 'message to send'},
-    {'arg': '_get_id', 'type': bool, 'required': False, 'default': False, 'description': 'test flag'},
+    {'arg': 'id_message', 'type': int, 'required': True, 'description': 'message id'},
+    {'arg': 'sent_time', 'type': str, 'required': True, 'description': 'message sent time'},
 )
-def do_put(sender, receiver, emessage, _get_id, **kwargs):
+def set_mail_sent(id_message, message_sent_time, **kwargs):
     """
-    Save e-mail message
+    Set e-mail sent
     """
 
     _db = get_db()
     dbc = _db.cursor()
-    rdb = get_redis_db()
 
-    q = get_mail_query(sender, receiver, emessage)
+    q = get_mail_query(id_message, message_sent_time)
     from MySQLdb import IntegrityError
     try:
         dbc.execute(q)
     except IntegrityError as e:
-        log.critical('Inserting mail queue: {}'.format(e))
-        return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
+        log.critical('Update mail queue: {}'.format(e))
+        return base_common.msg.error(msgs.ERROR_UPDATE_MESSAGE)
 
     _db.commit()
-    m_id = dbc.lastrowid
-    subject = 'General mail subject'
 
-    r_data = {
-        'id': m_id,
-        'sender': sender,
-        'receiver': receiver,
-        'subject': subject,
-        'message': emessage
-    }
-
-    r_data = json.dumps(r_data)
-
-    rdb.lpush(MAIL_CHANNEL, r_data)
-
-    if _get_id:
-        return base_common.msg.post_ok({'message_id': m_id})
-
-    return base_common.msg.post_ok()
+    return base_common.msg.patch_ok()

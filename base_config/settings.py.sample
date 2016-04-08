@@ -8,6 +8,7 @@ BASE_APPS = [
      'base_api.users',
      'base_api.hash2params',
      'base_api.options',
+     'base_api.mail_api',
 ]
 
 LOG_DIR = '/var/log/base'
@@ -30,3 +31,5 @@ REDIS_SERVER = 'localhost'
 REDIS_PORT = 6379
 CHANGE_EMAIL_ADDRESS = 'http://localhost:8778/change'
 MASTER=False    # IP address of the master server
+MAIL_CHANNEL = 'BSM'
+MAIL_CHANNEL_TIMEOUT = 2

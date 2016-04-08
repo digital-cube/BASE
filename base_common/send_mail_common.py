@@ -36,12 +36,11 @@ def send_message(sender, _to, subject, message):
     #     msg['tags'] = tags
 
     m = get_mail_api()
-    res = {'status': 'sent'} # TODO: SKLONI OVO OBAVEZNO
-    # try:
-    #     res = m.messages.send(message=msg, async=False)
-    # except mandrill.Error as e:
-    #     log.critical('MANDRILL send message error: {}'.format(e))
-    #     return False
+    try:
+        res = m.messages.send(message=msg, async=False)
+    except mandrill.Error as e:
+        log.critical('MANDRILL send message error: {}'.format(e))
+        return False
 
     if 'status' not in res or res['status'] != 'sent':
         log.warning('MANDRILL send mail error status: {}'.format(res))
@@ -51,5 +50,38 @@ def send_message(sender, _to, subject, message):
     return True
 
 
-def set_message_sent(id_message):
+def set_message_sent(id_message, svc_port):
     log.info('Set {} sent'.format(id_message))
+
+    import json
+    import datetime
+    from base_svc.comm import BaseAPIRequestHandler
+
+    n = str(datetime.datetime.now())[:19]
+
+    rh = BaseAPIRequestHandler()
+    data = {'id_message': id_message, 'sent_time': n}
+    rh.set_argument('data', json.dumps(data))
+    kwargs = {}
+    kwargs['request_handler'] = rh
+
+    from base_svc.comm import call
+    import base_api.mail_api.sent_mail
+
+    try:
+        res, status = call(
+            'localhost',
+            # base_config.settings.APP_PORT,
+            svc_port,
+            base_api.mail_api.sent_mail.location,
+            data,
+            base_api.mail_api.sent_mail.set_mail_sent.__api_method_type__)
+    except ConnectionRefusedError as e:
+        log.critical('Servis not working: {}'.format(e))
+        return False
+
+    if status != 204:
+        log.error('Error set message {} sent: {}'.format(id_message, res))
+
+    return True
+
