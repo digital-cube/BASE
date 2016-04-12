@@ -397,7 +397,7 @@ def params(*arguments):
                     converted = _convert_args(atr, tip, esc)
                     if not converted:
 
-                        if not (tip == int and converted != 0):   # count 0 as int
+                        if not (tip == int and converted == 0):   # count 0 as int
 
                             c_type = "|type get error|"
                             try:
