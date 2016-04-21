@@ -72,6 +72,7 @@ CREATE TABLE mail_queue (
 	time_sent DATETIME,
 	sent BOOLEAN NOT NULL DEFAULT FALSE,
 	message TEXT NOT NULL,
+	data TEXT,
 	INDEX email_sender_idx (sender),
 	INDEX email_sent (sent)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
