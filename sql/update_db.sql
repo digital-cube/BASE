@@ -82,9 +82,6 @@ values
 ('u','00','000',4,0,'users','STR','s_users',false),
 ('s','00','000',58,0,'session_token','STR','s_session_token',false),
 ('h','00','000',58,0,'hash_2_params','STR','s_hash_2_params ',false)
--- ('c','00','000',3,0,'clubs','STR','s_clubs',false),
--- ('e','00','000',3,0,'events','STR','s_events',false),
--- ('u','00','000',3,0,'um_transactions','STR','s_um_transactions',false)
 ;
 
 drop table if exists s_users;
