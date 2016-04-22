@@ -1,10 +1,13 @@
 """
 Check if user is logged
 """
-from base_common.dbacommon import authenticated_call
 import base_common.msg
+import base_common.app_hooks as apphooks
+from base_config.service import log
+from base_lookup import api_messages as msgs
 from base_common.dbacommon import get_db
 from base_common.dbacommon import app_api_method
+from base_common.dbacommon import authenticated_call
 
 
 name = "Check"
@@ -30,6 +33,15 @@ def do_post(**kwargs):
 
     d = dbuser.dump_user()
     d['token'] = tk
+
+    if hasattr(apphooks, 'extend_user_check'):
+        _extend_res = apphooks.extend_user_check(dbuser)
+        if _extend_res == False:
+            log.critical('Error user check extending')
+            return base_common.msg.error(msgs.ERROR_POST_CHECK)
+
+        if isinstance(_extend_res, dict):
+            d.update(_extend_res)
 
     return base_common.msg.post_ok(d)
 
