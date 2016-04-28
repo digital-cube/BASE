@@ -17,7 +17,7 @@ location = "lookup"
 request_timeout = 10
 
 
-@authenticated_call()
+# @authenticated_call()
 @app_api_method(
     method='GET',
     api_return=[(200, ''), (404, '')]
