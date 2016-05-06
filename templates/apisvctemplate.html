@@ -44,8 +44,11 @@
 
                 {% if items[num]['name']!='BASE'  %}
 
-                    {% set app_version  = items[num]['data']['APP_VERSION'] %}
-
+                    {% if 'APP_VERSION' in items[num]['data'] %}
+                         {% set app_version  = items[num]['data']['APP_VERSION'] %}
+                    {% else %}
+                        {% set app_version = '' %}
+                    {% end  %}
                 {% else %}
                     <hr>
                     {% set app_version  = items[num]['version'] %}
@@ -88,32 +91,52 @@
                                                 <td style="margin-top:10px;padding:7px; top:10px;  border-top-left-radius:0px;border-top-right-radius:0px;">
 
                                                    {% if s == 'GET' %}
-                                                        <span class=" label label-primary">{{s}}</span> - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp </span>
+                                                        <span class=" label label-primary">{{s}}</span>
+                                                            {% if method[s]['authorization'] %}
+                                                                <img src="/static/img/key_base.png" width="20px" />
+                                                            {% end %}
+                                                    - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp </span>
                                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                                         {% set clasa = 'get_th ' %}
                                                    {% end %}
 
                                                    {% if s == 'PUT' %}
-                                                        <span class="label label-success">{{s}}</span>  -  {{link}}  <span class="lab"> &nbsp&nbsp&nbsp  </span>
+                                                        <span class="label label-success">{{s}}</span>
+                                                            {% if method[s]['authorization'] %}
+                                                                <img src="/static/img/key_base.png" width="20px" />
+                                                            {% end %}
+                                                    -  {{link}}  <span class="lab"> &nbsp&nbsp&nbsp  </span>
 
                                                         <span class="indicator right">  {{method[s]['description']}}</span>
                                                         {% set clasa = 'put_th' %}
                                                    {% end %}
 
                                                    {% if s == 'DELETE' %}
-                                                        <span class="label label-warning">{{s}}</span>  -  {{link}} <span class="lab"> &nbsp&nbsp&nbsp</span>
+                                                        <span class="label label-warning">{{s}}</span>
+                                                            {% if method[s]['authorization'] %}
+                                                                <img src="/static/img/key_base.png" width="20px" />
+                                                            {% end %}
+                                                    -  {{link}} <span class="lab"> &nbsp&nbsp&nbsp</span>
                                                          <span class="indicator right"> {{method[s]['description']}}</span>
                                                         {% set clasa = 'delete_th' %}{% else %}
                                                    {% end %}
 
                                                     {% if s == 'PATCH' %}
-                                                        <span class="label label-patch">{{s}}</span>  - <span class="lab"> {{link}}   &nbsp&nbsp&nbsp
+                                                        <span class="label label-patch">{{s}}</span>
+                                                            {% if method[s]['authorization'] %}
+                                                                <img src="/static/img/key_base.png" width="20px" />
+                                                            {% end %}
+                                                    - <span class="lab"> {{link}}   &nbsp&nbsp&nbsp
                                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                                         {% set clasa = 'patch_th' %}
                                                    {% end %}
 
                                                    {% if s == 'POST' %}
-                                                        <span class="label label-danger">{{s}}</span>  - <span class="lab"> {{link}} &nbsp&nbsp&nbsp
+                                                        <span class="label label-danger">{{s}}</span>
+                                                            {% if method[s]['authorization'] %}
+                                                                <img src="/static/img/key_base.png" width="20px" />
+                                                            {% end %}
+                                                    - <span class="lab"> {{link}} &nbsp&nbsp&nbsp
                                                         <span class="indicator right"> {{method[s]['description']}}</span>
                                                         {% set clasa = 'post_th' %}
                                                    {% end %}
@@ -132,13 +155,24 @@
                                                             {% set t = type(ms) %}
 
                                                             {% if t!=str %}
+
+                                                            {% if 'name' in data %}
+                                                                {% set name = data['name'] %}
+                                                            {% else %}
+                                                                {% set name = '' %}
+                                                            {% end %}
+                                                            {% if 'description' in data %}
+                                                                {% set description = data['description'] %}
+                                                            {% else %}
+                                                                {% set description = '' %}
+                                                            {% end %}
                                                             <table class="bgd ">
                                                                     <tbody>
                                                                         <tr>
-                                                                         <td class=" siz bold ">{{data['name']}}</td>
+                                                                         <td class=" siz bold ">{{ name }}</td>
                                                                          <td class=" siz"></td>
                                                                          <td class=" siz"> </td>
-                                                                         <td class=" sizr">{{data['description']}} </td>
+                                                                         <td class=" sizr">{{ description }} </td>
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
@@ -178,17 +212,44 @@
                                                                                     <th></th>
                                                                                     <th class="bg">Requests</th>
                                                                                     <th></th>
-                                                                                    <th></th>
+                                                                                    <th class="bg">Example</th>
                                                                              </tr>
 
 
                                                                             {% for keys in ms['parameters'] %}
-                                                                                   <tr class="siz">
+                                                                                   {% if 'description' in ms['parameters'][keys] %}
+                                                                                        {% set p_description = ms['parameters'][keys]['description'] %}
+                                                                                   {% else %}
+                                                                                        {% set p_description = '' %}
+                                                                                   {% end %}
+
+
+
+                                                                                   {% if 'type' in ms['parameters'][keys] %}
+                                                                                        {% set p_type = ms['parameters'][keys]['type'] %}
+                                                                                   {% else %}
+                                                                                        {% set p_type = '' %}
+                                                                                   {% end %}
+
+                                                                                    {% if 'req' in ms['parameters'][keys] %}
+                                                                                        {% set p_req = ms['parameters'][keys]['req'] %}
+                                                                                   {% else %}
+                                                                                        {% set p_req = '' %}
+                                                                                   {%end%}
+
+                                                                                   {% if 'example' in ms['parameters'][keys] %}
+                                                                                        {% set p_example = ms['parameters'][keys]['example'] %}
+                                                                                   {% else %}
+                                                                                        {% set p_example = '' %}
+                                                                                   {% end %}
+                                                                             <tr class="siz">
+
                                                                                       <td class="bg">{{keys}}</td>
 
-                                                                                      <td class="bg">{{ms['parameters'][keys]['description']}}</td>
-                                                                                      <td class="bg">{{ms['parameters'][keys]['type']}}<td>
-                                                                                      <td class="bg">{{ms['parameters'][keys]['req']}}<td>
+                                                                                      <td class="bg">{{ p_description }}</td>
+                                                                                      <td class="bg">{{ p_type }}<td>
+                                                                                      <td class="bg">{{ p_req }}<td>
+                                                                                      <td class="bg">{{ p_example }}<td>
 
                                                                                     </tr>
                                                                             {% end %}
@@ -206,10 +267,17 @@
                                                                                  <th class="bg">Description</th>
 
                                                                                 {% for keys in ms['return'] %}
+
+                                                                                    {% if 'description' in ms['return'][keys] %}
+                                                                                        {% set r_description = ms['return'][keys]['description'] %}
+                                                                                    {% else %}
+                                                                                        {% set r_description = '' %}
+                                                                                    {% end %}
+
                                                                                     <tr class="siz">
                                                                                         <td class="bg">{{keys}}</td>
                                                                                         <td class="bg"></td>
-                                                                                        <td class="bg">{{ms['return'][keys]['description']}}</td>
+                                                                                        <td class="bg">{{ r_description }}</td>
                                                                                     </tr>
                                                                                 {% end %}
 
