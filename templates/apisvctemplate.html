@@ -55,7 +55,7 @@
 
                 {% end %}
 
-                <h3>{{ name }} - {{app_version}}</h3>
+                <h3>{{ name }} - {{app_version}}</h3><hr>
 
 
 
@@ -64,9 +64,22 @@
               {% set data = items[num]['data'][application] %}
 
               {% if type(data) != str %}
-          {% set long_desc = data['description_long'] %}
-          {% set short_desc = data['description'] %}
-                    {% set methods = data['urls'] %}
+                  {% if 'description_long' in data %}
+                    {% set long_desc = data['description_long'] %}
+                  {% else %}
+                    {% set long_desc  = '' %}
+                  {% end %}
+
+                  {% if 'description' in data %}
+                    {% set short_desc = data['description'] %}
+                  {% else %}
+                     {% set short_desc  = '' %}
+                  {% end %}
+                  {% if 'urls' in data %}
+                  {% set methods = data['urls'] %}
+                  {% else %}
+                     {% set methods  = '' %}
+                  {% end %}
 
                     {% for m in methods %}
                     {% set link = m %}
@@ -76,6 +89,18 @@
 
                         <table id="tableSearchResults" class=" table table-hover  table-striped table-condensed">
                                 {% set method = methods[m] %}
+                                {% if 'name' in data %}
+                                    {% set name = data['name'] %}
+                                {% else %}
+                                    {% set name = '' %}
+                                {% end %}
+                                {% if 'description' in data %}
+                                    {% set description = data['description'] %}
+                                {% else %}
+                                    {% set description = '' %}
+                                {% end %}
+
+                                        <h4 style="color:gray;">{{ name }}</h4><h5 style="color:darkgray;"> {{ description }}</h5>
                                 {% for s in method %}
                                 {% if method[s] != 'Missing docstring' %}
 
@@ -156,23 +181,14 @@
 
                                                             {% if t!=str %}
 
-                                                            {% if 'name' in data %}
-                                                                {% set name = data['name'] %}
-                                                            {% else %}
-                                                                {% set name = '' %}
-                                                            {% end %}
-                                                            {% if 'description' in data %}
-                                                                {% set description = data['description'] %}
-                                                            {% else %}
-                                                                {% set description = '' %}
-                                                            {% end %}
+
                                                             <table class="bgd ">
                                                                     <tbody>
                                                                         <tr>
-                                                                         <td class=" siz bold ">{{ name }}</td>
+                                                                         <td class=" siz bold "></td>
                                                                          <td class=" siz"></td>
                                                                          <td class=" siz"> </td>
-                                                                         <td class=" sizr">{{ description }} </td>
+                                                                         <td class=" sizr"></td>
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
