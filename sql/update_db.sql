@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS sequencers (
 	size smallint NOT NULL,
 	active_stage char(3) NOT NULL,
 	check_sum_size smallint NOT NULL,
-	name varchar(16) NOT NULL UNIQUE,
+	name varchar(64) NOT NULL UNIQUE,
 	type varchar(16) NOT NULL,
-	s_table varchar(32) NOT NULL UNIQUE,
+	s_table varchar(64) NOT NULL UNIQUE,
 	ordered BOOLEAN NOT NULL DEFAULT FALSE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

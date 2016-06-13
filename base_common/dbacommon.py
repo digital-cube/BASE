@@ -410,7 +410,7 @@ def params(*arguments):
                         return base_common.msg.error(amsgs.MISSING_REQUEST_ARGUMENT)
                 else:
                     tip = a['type'] if 'type' in a else str
-                    esc = a['escaped'] if 'escaped' in a else (tip in [str, 'e-mail'])
+                    esc = a['escaped'] if 'escaped' in a else (tip in [str, 'e-mail', json])
 
                     converted = _convert_args(atr, tip, esc)
                     if not converted:

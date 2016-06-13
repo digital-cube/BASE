@@ -87,6 +87,25 @@ def parse_module_desc(docstr):
     return short_d, long_d
 
 
+def _get_fdoc_parsed(func):
+
+    if not func.__doc__:
+        return None, None
+
+    dd = '(?P<desc>[^:]+)\s*:description:\s*(?P<long_desc>[\w,\s]*)'
+    try:
+        pp = re.match(dd, func.__doc__)
+        if not pp:
+
+            return None, None
+
+        short_d = pp.group('desc')
+        long_d = pp.group('long_desc')
+        return short_d, long_d
+    except:
+        return None, None
+
+
 def fdoc_parser(url_methods, func):
 
     _m = func.__api_method_type__
@@ -94,7 +113,8 @@ def fdoc_parser(url_methods, func):
         url_methods[_m] = {}
 
     url_methods[_m]['name'] = func.__name__
-    url_methods[_m]['description'] = func.__doc__.strip() if func.__doc__ else None
+    url_methods[_m]['description'], url_methods[_m]['long_description'] = _get_fdoc_parsed(func)
+    # url_methods[_m]['description'] = func.__doc__.strip() if func.__doc__ else None
     url_methods[_m]['parameters'] = {}
     url_methods[_m]['return'] = {"204": {"description": "No content"}}
     try:
