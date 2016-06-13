@@ -223,6 +223,24 @@ def get_url_token(request_handler):
 
     return tk
 
+def get_param_from_uri(uri):
+
+    tk = None
+    url_parts = uri.split('/')
+    if url_parts:
+        tk = url_parts[-1]
+
+    return tk
+
+
+def get_first_param_uri(request):
+
+    try:
+        return qu_esc( get_param_from_uri(request.request.uri.split('?')[0]) )
+    except Exception as e:
+        log.error(e)
+        return None
+
 
 def _convert_args(el, tp, esc):
 
