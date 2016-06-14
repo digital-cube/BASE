@@ -113,7 +113,7 @@ def fdoc_parser(url_methods, func):
         url_methods[_m] = {}
 
     url_methods[_m]['name'] = func.__name__
-    url_methods[_m]['description'], url_methods[_m]['long_description'] = _get_fdoc_parsed(func)
+    url_methods[_m]['func_description'], url_methods[_m]['func_description_long'] = _get_fdoc_parsed(func)
     # url_methods[_m]['description'] = func.__doc__.strip() if func.__doc__ else None
     url_methods[_m]['parameters'] = {}
     url_methods[_m]['return'] = {"204": {"description": "No content"}}
@@ -149,8 +149,8 @@ def doc_parser(doc, url_prefix, base_pkg):
 
     short_desc, long_desc = parse_module_desc(doc.__doc__)
     api = {
-        'description': short_desc.strip() if short_desc else short_desc,
-        'description_long': long_desc.strip() if long_desc else long_desc,
+        'doc_description': short_desc.strip() if short_desc else short_desc,
+        'doc_description_long': long_desc.strip() if long_desc else long_desc,
         'urls': {}}
 
     for f in doc.__api_methods__:

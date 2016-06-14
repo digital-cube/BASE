@@ -65,13 +65,13 @@
 
               {% if type(data) != str %}
                   {% if 'description_long' in data %}
-                    {% set long_desc = data['description_long'] %}
+                    {% set long_desc = data['doc_description_long'] %}
                   {% else %}
                     {% set long_desc  = '' %}
                   {% end %}
 
                   {% if 'description' in data %}
-                    {% set short_desc = data['description'] %}
+                    {% set short_desc = data['doc_description'] %}
                   {% else %}
                      {% set short_desc  = '' %}
                   {% end %}
@@ -94,13 +94,15 @@
                                 {% else %}
                                     {% set name = '' %}
                                 {% end %}
-                                {% if 'description' in data %}
-                                    {% set description = data['description'] %}
+                                {% if 'doc_description_long' in data %}
+                                    {% set short_desc_doc = data['doc_description'] %}
+                                    {% set long_desc_doc = data['doc_description_long'] %}
                                 {% else %}
-                                    {% set description = '' %}
+                                    {% set short_desc_doc = '' %}
+                                    {% set long_desc_doc = '' %}
                                 {% end %}
 
-                                        <h4 style="color:gray;">{{ name }}</h4><h5 style="color:darkgray;"> {{ description }}</h5>
+                                        <h4 style="color:gray;">{{ name }}</h4><h5 style="color:darkgray;"> {{ short_desc_doc }} ({{long_desc_doc}})</h5>
                                 {% for s in method %}
                                 {% if method[s] != 'Missing docstring' %}
 
@@ -121,7 +123,7 @@
                                                                 <img src="/static/img/key_base.png" width="20px" />
                                                             {% end %}
                                                     - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp </span>
-                                                        <span class="indicator right"> {{method[s]['description']}}</span>
+                                                        <span class="indicator right"> {{method[s]['func_description']}}</span>
                                                         {% set clasa = 'get_th ' %}
                                                    {% end %}
 
@@ -132,7 +134,7 @@
                                                             {% end %}
                                                     -  {{link}}  <span class="lab"> &nbsp&nbsp&nbsp  </span>
 
-                                                        <span class="indicator right">  {{method[s]['description']}}</span>
+                                                        <span class="indicator right">  {{method[s]['func_description']}}</span>
                                                         {% set clasa = 'put_th' %}
                                                    {% end %}
 
@@ -142,7 +144,7 @@
                                                                 <img src="/static/img/key_base.png" width="20px" />
                                                             {% end %}
                                                     -  {{link}} <span class="lab"> &nbsp&nbsp&nbsp</span>
-                                                         <span class="indicator right"> {{method[s]['description']}}</span>
+                                                         <span class="indicator right"> {{method[s]['func_description']}}</span>
                                                         {% set clasa = 'delete_th' %}{% else %}
                                                    {% end %}
 
@@ -152,7 +154,7 @@
                                                                 <img src="/static/img/key_base.png" width="20px" />
                                                             {% end %}
                                                     - <span class="lab"> {{link}}   &nbsp&nbsp&nbsp
-                                                        <span class="indicator right"> {{method[s]['description']}}</span>
+                                                        <span class="indicator right"> {{method[s]['func_description']}}</span>
                                                         {% set clasa = 'patch_th' %}
                                                    {% end %}
 
@@ -162,7 +164,7 @@
                                                                 <img src="/static/img/key_base.png" width="20px" />
                                                             {% end %}
                                                     - <span class="lab"> {{link}} &nbsp&nbsp&nbsp
-                                                        <span class="indicator right"> {{method[s]['description']}}</span>
+                                                        <span class="indicator right"> {{method[s]['func_description']}}</span>
                                                         {% set clasa = 'post_th' %}
                                                    {% end %}
 
@@ -205,7 +207,7 @@
 
                                                                         <tr class="siz">
 
-                                                                                  <td class="bg">{{long_desc}}<td>
+                                                                                  <td class="bg">{{method[s]['func_description_long']}}<td>
 
 
                                                                                 </tr>
@@ -226,7 +228,8 @@
                                                                                     <th class="bg" >Description</th>
                                                                                     <th class="bg">Type</th>
                                                                                     <th></th>
-                                                                                    <th class="bg">Requests</th>
+                                                                                    <th
+                                                                                    class="bg">Required	</th>
                                                                                     <th></th>
                                                                                     <th class="bg">Example</th>
                                                                              </tr>
