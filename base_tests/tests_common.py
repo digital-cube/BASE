@@ -130,7 +130,7 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
     return True
 
 
-def test(svc_port, location, method, token, data, expected_status, expected_data, result_types={},
+def test(svc_port, location, method, token, data, expected_status={}, expected_data={}, result_types={},
          warning_level=WarningLevel.STRICT):
     __result = {}
 
