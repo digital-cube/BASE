@@ -10,7 +10,7 @@ import base_config.settings
 import base_tests.test_list
 from base_tests.tests_common import finish_tests
 from base_tests.tests_common import load_app_test
-from base_tests.tests_common import log_failed
+from base_tests.tests_common import log_failed, log_info
 import base_tests.tests_common
 
 
@@ -92,6 +92,9 @@ def test_app(app_tests_list, svc_port, t_stage, t_db, db_u, db_p):
     if app_tests_list:
 
         for itest in app_tests_list:
+
+            log_info('','Executing test {}'.format(itest),'')
+
 
             current_stage = itest[1]
 
