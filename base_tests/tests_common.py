@@ -208,6 +208,8 @@ def load_app_test(app_started, app_tests_list, stage):
         t_s = itest[1]
         t_n = itest[0]
 
+        log_info('','Executing test {}'.format(t_s),'')
+
         if t_s < _last_stage:
             log_warning('Exiting after: {}'.format(t_n), '', None)
             break
