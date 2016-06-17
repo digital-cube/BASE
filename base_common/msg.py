@@ -55,6 +55,10 @@ def res_ok(s=None, **kwargs):
     return {'http_status': http_status}
 
 
+def ok(s=None, **kwargs):
+    return res_ok(s, **kwargs)
+
+
 def put_ok(s=None, **kwargs):
     return res_ok(s, **kwargs)
 
