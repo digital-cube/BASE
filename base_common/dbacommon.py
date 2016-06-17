@@ -181,6 +181,8 @@ def authenticated_call(*arguments):
                 if bool(dbuser.role&a):
                     _access = True
 
+            _access = _access if dbuser.active else False
+
             if not _access:
                 log.critical("Unauthorized user access attempt")
                 return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
