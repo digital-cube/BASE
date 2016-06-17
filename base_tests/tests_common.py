@@ -205,8 +205,8 @@ def load_app_test(app_started, app_tests_list, stage):
     _last_stage = 0
     for itest in app_tests.tests_included:
 
-        t_s = itest[1]
-        t_n = itest[0]
+        t_s = itest[0]
+        t_n = itest[1]
 
 
         if t_s < _last_stage:
