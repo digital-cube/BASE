@@ -13,7 +13,7 @@ from base_config.settings import LOG_DIR
 import base_config.settings
 
 log_filename = "{}/tests.log".format(LOG_DIR)
-log_handler = RotatingFileHandler(log_filename, maxBytes=1048576, backupCount=2)
+log_handler = RotatingFileHandler(log_filename, maxBytes=1048576000, backupCount=2)
 log_formatter = logging.Formatter(
     '%(asctime)-6s  - %(message)s')
 log_handler.setFormatter(log_formatter)
