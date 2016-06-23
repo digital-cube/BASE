@@ -181,6 +181,8 @@ def authenticated_call(*arguments):
                 if bool(dbuser.role&a):
                     _access = True
 
+            _access = _access if dbuser.active else False
+
             if not _access:
                 log.critical("Unauthorized user access attempt")
                 return base_common.msg.error(amsgs.UNAUTHORIZED_REQUEST)
@@ -413,7 +415,7 @@ def params(*arguments):
                     esc = a['escaped'] if 'escaped' in a else (tip in [str, 'e-mail'])
 
                     converted = _convert_args(atr, tip, esc)
-                    if not converted:
+                    if tip != bool and not converted:
 
                         if not (tip == int and converted == 0):   # count 0 as int
 

@@ -87,7 +87,7 @@ def pack_user_by_id(db, id_user, get_dict=False):
 
 def prepare_login_query(username):
 
-    q = "select id, password from users where username = '{}'".format( username )
+    q = "select id, password from users where username = '{}' and active=1".format( username )
 
     return q
 
