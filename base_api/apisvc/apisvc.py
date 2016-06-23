@@ -120,7 +120,7 @@ def fdoc_parser(url_methods, func):
     try:
         url_methods[_m]['authorization'] = func.__api_authenticated__
     except:
-        print(func.__name__, 'nema auth')
+        # print(func.__name__, 'nema auth')
         url_methods[_m]['authorization'] = False
 
     try:

@@ -1,5 +1,7 @@
 """
-Echo mockup API module
+Echo API title
+:description:
+echo api description
 """
 
 import json
@@ -21,13 +23,15 @@ request_timeout = 10
     api_return=[(200, 'echoed message'), (404, '')]
 )
 @params(
-    {'arg': 'message', 'type': str, 'required': True}
+    {'arg': 'message', 'type': str, 'required': True, 'description': 'echo parametar description','example':'echo mockup example'}
 )
 def do_get(message, **kwargs):
     """
-    Get method of echo API call - test
-    """
+    Get method of echo API call - title
+    :description:
+    Get method of echo API call - description
 
+    """
     return base_common.msg.get_ok({'echo': message})
     return {'echo': 'get echo'}
 
@@ -37,11 +41,14 @@ def do_get(message, **kwargs):
     api_return=[(200, 'echo date'), (400, ''), (401, 'Unauthorized')]
 )
 @params(
-    {'arg': 'message', 'type': datetime.date, 'required': True}
+    {'arg': 'message', 'type': datetime.date, 'required': True, 'description': 'echo parametar description','example':'echo mockup example'}
 )
 def do_put(message, **kwargs):
     """
-    Put method of echo API call - test
+    Put method of echo API call - title
+    :description:
+    Put method of echo API call - description
+
     """
 
     log.info('echo.put')
@@ -56,11 +63,14 @@ def do_put(message, **kwargs):
     api_return=[(200, 'echo date'), (400, ''), (401, 'Unauthorized')]
 )
 @params(
-    {'arg': 'message', 'type': datetime.datetime, 'required': True}
+    {'arg': 'message', 'type': datetime.datetime, 'required': True, 'description': 'echo parametar description','example':'echo mockup example'}
 )
 def do_delete(message, **kwargs):
     """
-    Delete method of echo API call - test
+    Delete method of echo API call - title
+    :description:
+    Delete method of echo API call - description
+
     """
 
     log.info('echo.do_delete')
@@ -74,11 +84,14 @@ def do_delete(message, **kwargs):
     api_return=[(200, 'echo date'), (400, ''), (401, 'Unauthorized')]
 )
 @params(
-    {'arg': 'message', 'type': json, 'required': True}
+    {'arg': 'message', 'type': json, 'required': True, 'description': 'description za parametar'}
 )
 def do_post(message, **kwargs):
     """
-    Post method of echo API call - test
+    Post method of echo API call - title
+    :description:
+    Post method of echo API call - description
+
     """
 
     log.info('echo.do_post')
@@ -92,11 +105,14 @@ def do_post(message, **kwargs):
     api_return=[(200, 'echo date'), (400, '')]
 )
 @params(
-    {'arg': 'message', 'type': int, 'required': True}
+    {'arg': 'message', 'type': int, 'required': True, 'description': 'description za parametar'}
 )
 def do_patch(message, **kwargs):
     """
-    Patch method of echo API call - test
+    Patch method of echo API call - title
+    :description:
+    Patch method of echo API call - description
+
     """
 
     log.info('echo.do_patch')

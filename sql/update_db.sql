@@ -43,8 +43,8 @@ CREATE TABLE IF NOT EXISTS sequencers (
 DROP TABLE IF EXISTS options;
 CREATE TABLE options(
 	id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  o_key VARCHAR(32) NOT NULL,
-  o_value VARCHAR(128) NOT NULL,
+  o_key VARCHAR(255) NOT NULL,
+  o_value longtext NOT NULL,
   INDEX (o_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

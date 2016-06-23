@@ -10,26 +10,17 @@
 
 <title>API specification</title>
 
-<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://getbootstrap.com/dist/css/bootstrap-theme.min.css" rel="stylesheet">
-<link href="http://getbootstrap.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-<!--<link href="{{static_url('css/style.css')}}" rel="stylesheet">-->
+<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
 <link href="/static/css/style.css" rel="stylesheet">
 
-<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-<!--[if lt IE 9]><script src="http://getbootstrap.com/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-<script src="http://getbootstrap.com/assets/js/ie-emulation-modes-warning.js"></script>
-<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
 
 
 </head>
 
 <body role="document">
-<div class="container theme-showcase" role="main">
+<div class="container ">
   <div class="page-header">
     <h1>Projects</h1>
   </div>
@@ -45,7 +36,7 @@
                 {% if items[num]['name']!='BASE'  %}
 
                     {% if 'APP_VERSION' in items[num]['data'] %}
-                         {% set app_version  = items[num]['data']['APP_VERSION'] %}
+                         {% set app_version  = '- '+items[num]['data']['APP_VERSION'] %}
                     {% else %}
                         {% set app_version = '' %}
                     {% end  %}
@@ -55,7 +46,7 @@
 
                 {% end %}
 
-                <h3>{{ name }} - {{app_version}}</h3><hr>
+                <h3>{{ name }} {{app_version}}</h3><hr>
 
 
 
@@ -87,7 +78,6 @@
                         {% set g =g + 1 %}
 
 
-                        <table id="tableSearchResults" class=" table table-hover  table-striped table-condensed">
                                 {% set method = methods[m] %}
                                 {% if 'name' in data %}
                                     {% set name = data['name'] %}
@@ -101,189 +91,116 @@
                                     {% set short_desc_doc = '' %}
                                     {% set long_desc_doc = '' %}
                                 {% end %}
+                             <h2 id="" class="capitalize">{{ name }}</h2>
+                             <h5 style="color:darkgray;"> {{ short_desc_doc }} ({{long_desc_doc}})</h5>
+                                <div id="quickpay-swagger">
 
-                                        <h4 style="color:gray;">{{ name }}</h4><h5 style="color:darkgray;"> {{ short_desc_doc }} ({{long_desc_doc}})</h5>
                                 {% for s in method %}
                                 {% if method[s] != 'Missing docstring' %}
 
                                     {% set bg_stil = s.lower()+'_bg' %}
-                                     <tr style="border-top:8px solid white;">
                                     {% if s == 'DELETE' or s == 'PATCH' or s == 'POST' or s == 'PUT'  or s == 'GET' %}
 
                                         {% if type(method[s])!=str %}
-                                        <div style="margin-bottom:10px;">
-                                            <tr id="package{{s}}-{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle"
-                                                data-toggle="collapse" data-parent="#OrderPackages"
-                                                data-target=".packageDetails{{s}}-{{g}}">
-                                                <td style="margin-top:10px;padding:7px; top:10px;  border-top-left-radius:0px;border-top-right-radius:0px;">
+                                            {% set ms = method[s]  %}
+                                            {% set t = type(ms) %}
 
-                                                   {% if s == 'GET' %}
-                                                        <span class=" label label-primary">{{s}}</span>
-                                                            {% if method[s]['authorization'] %}
-                                                                <img src="/static/img/key_base.png" width="20px" />
-                                                            {% end %}
-                                                    - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp </span>
-                                                        <span class="indicator right"> {{method[s]['func_description']}}</span>
-                                                        {% set clasa = 'get_th ' %}
-                                                   {% end %}
+                                                {% if t!=str %}
 
-                                                   {% if s == 'PUT' %}
-                                                        <span class="label label-success">{{s}}</span>
-                                                            {% if method[s]['authorization'] %}
-                                                                <img src="/static/img/key_base.png" width="20px" />
-                                                            {% end %}
-                                                    -  {{link}}  <span class="lab"> &nbsp&nbsp&nbsp  </span>
+                                              <div class="panel qp-http-method-{{s}}-light">
+                                                <div class="panel-heading" data-toggle="collapse" data-target="#collapse{{s}}-account--{{g}}-format-" aria-expanded="false" aria-controls="collapse{{s}}-account--{{g}}-format-">
+                                                  <a href="javascript:void(0);" data-toggle="collapse" data-target="#collapse{{s}}-account--{{g}}-format-" aria-expanded="false" aria-controls="collapse{{s}}-account--{{g}}-format-">
+                                                    </a><h3 class="panel-title" id="{{s}}-account--{{g}}-format-"><a href="javascript:void(0);" data-toggle="collapse" data-target="#collapse{{s}}-account--{{g}}-format-" aria-expanded="false" aria-controls="collapseGET-account---format-">
+                                                      <span class="label qp-http-method-{{s}}">{{s}}</span>
+                                                      {% if method[s]['authorization'] %}
+                                                        <img src="/static/img/key_base.png" width="20px" />
+                                                      {% end %}
+                                                    -  {{link}}
+                                                      </a><a style="display: inline-block; margin: 2px 5px; float: right; cursor: pointer;" href="#{{s}}-account--{{g}}-format-"><i class="fa fa-link"></i></a>
+                                                      <span style="float: right">{{method[s]['func_description']}}</span>
+                                                    </h3>
+                                                </div>
+                                                <div class="panel-body collapse" id="collapse{{s}}-account--{{g}}-format-">
+                                                  <!-- parameters -->
+                                                  <h4 style="">Description</h4>
+                                                  <table class="table t" style="">
+                                                    <thead>
+                                                      <tr>
+                                                        <td>Description</td>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                      <!--  -->
+                                                      <tr>
+                                                        <td>{{method[s]['func_description_long']}}</td>
+                                                      </tr>
+                                                      <!--  -->
+                                                    </tbody>
+                                                  </table>
+                                                  <!-- HTTP codes -->
+                                                  <h4 style="">Parameters</h4>
+                                                  <table class="table t" style="">
+                                                    <thead>
+                                                      <tr>
+                                                        <td>Parameter</td>
+                                                        <td>Description</td>
+                                                        <td>Type</td>
+                                                        <td>Required</td>
+                                                        <td>Example</td>
+                                                      </tr>
+                                                    </thead>
+                                                      <tbody>
 
-                                                        <span class="indicator right">  {{method[s]['func_description']}}</span>
-                                                        {% set clasa = 'put_th' %}
-                                                   {% end %}
+                                                    {% for keys in ms['parameters'] %}
+                                                       {% if 'description' in ms['parameters'][keys] %}
+                                                            {% set p_description = ms['parameters'][keys]['description'] %}
+                                                       {% else %}
+                                                            {% set p_description = '' %}
+                                                       {% end %}
 
-                                                   {% if s == 'DELETE' %}
-                                                        <span class="label label-warning">{{s}}</span>
-                                                            {% if method[s]['authorization'] %}
-                                                                <img src="/static/img/key_base.png" width="20px" />
-                                                            {% end %}
-                                                    -  {{link}} <span class="lab"> &nbsp&nbsp&nbsp</span>
-                                                         <span class="indicator right"> {{method[s]['func_description']}}</span>
-                                                        {% set clasa = 'delete_th' %}{% else %}
-                                                   {% end %}
+                                                       {% if 'type' in ms['parameters'][keys] %}
+                                                            {% set p_type = ms['parameters'][keys]['type'] %}
+                                                       {% else %}
+                                                            {% set p_type = '' %}
+                                                       {% end %}
 
-                                                    {% if s == 'PATCH' %}
-                                                        <span class="label label-patch">{{s}}</span>
-                                                            {% if method[s]['authorization'] %}
-                                                                <img src="/static/img/key_base.png" width="20px" />
-                                                            {% end %}
-                                                    - <span class="lab"> {{link}}   &nbsp&nbsp&nbsp
-                                                        <span class="indicator right"> {{method[s]['func_description']}}</span>
-                                                        {% set clasa = 'patch_th' %}
-                                                   {% end %}
+                                                        {% if 'req' in ms['parameters'][keys] %}
+                                                            {% set p_req = ms['parameters'][keys]['req'] %}
+                                                       {% else %}
+                                                            {% set p_req = '' %}
+                                                       {%end%}
 
-                                                   {% if s == 'POST' %}
-                                                        <span class="label label-danger">{{s}}</span>
-                                                            {% if method[s]['authorization'] %}
-                                                                <img src="/static/img/key_base.png" width="20px" />
-                                                            {% end %}
-                                                    - <span class="lab"> {{link}} &nbsp&nbsp&nbsp
-                                                        <span class="indicator right"> {{method[s]['func_description']}}</span>
-                                                        {% set clasa = 'post_th' %}
-                                                   {% end %}
+                                                       {% if 'example' in ms['parameters'][keys] %}
+                                                            {% set p_example = ms['parameters'][keys]['example'] %}
+                                                       {% else %}
+                                                            {% set p_example = '' %}
+                                                       {% end %}
 
-                                                </td>
-                                            </tr>
+                                                        <tr>
+                                                          <td>{{keys}}</td>
+                                                          <td>{{ p_description }}</td>
+                                                          <td>{{ p_type }}</td>
+                                                          <td>{{ p_req }}</td>
+                                                          <td>{{ p_example }}</td>
 
-                                            {% if s == 'DELETE' or s == 'POST' or s == 'PATCH' or s == 'PUT' or s == 'GET' %}
+                                                        </tr>
 
-                                                    <td colspan="{{s}}-{{g}}" class=" hiddenRow {{bg_stil}}" >
+                                                {% end %}
+                                                 </tbody>
 
-                                                        <div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
+                                                  </table>
 
-                                                            {% set ms = method[s]  %}
+                                                  <!-- Models -->
 
-                                                            {% set t = type(ms) %}
-
-                                                            {% if t!=str %}
-
-
-                                                            <table class="bgd ">
-                                                                    <tbody>
-                                                                        <tr>
-                                                                         <td class=" siz bold "></td>
-                                                                         <td class=" siz"></td>
-                                                                         <td class=" siz"> </td>
-                                                                         <td class=" sizr"></td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            <table class="  backgroundtable">
-                                                                      <tbody class="padd-t margina">
-                                                                        <tr>
-                                                                         <tr class="{{clasa}}" >
-                                                                                <th class="bg">Description :</th >
-                                                                          
-
-                                                                         </tr>
-
-
-
-                                                                        <tr class="siz">
-
-                                                                                  <td class="bg">{{method[s]['func_description_long']}}<td>
-
-
-                                                                                </tr>
-
-                                                                      </tbody>
-
-
-                                                              </table>
-
-                                                        </div>
-                                                        <div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
-                                                                    <br/><table class=" backgroundtable">
-
-                                                                          <tbody class="  ">
-
-                                                                             <tr class="{{clasa}}" >
-                                                                                    <th class="bg">Parameters :</th >
-                                                                                    <th class="bg" >Description</th>
-                                                                                    <th class="bg">Type</th>
-                                                                                    <th></th>
-                                                                                    <th
-                                                                                    class="bg">Required	</th>
-                                                                                    <th></th>
-                                                                                    <th class="bg">Example</th>
-                                                                             </tr>
-
-
-                                                                            {% for keys in ms['parameters'] %}
-                                                                                   {% if 'description' in ms['parameters'][keys] %}
-                                                                                        {% set p_description = ms['parameters'][keys]['description'] %}
-                                                                                   {% else %}
-                                                                                        {% set p_description = '' %}
-                                                                                   {% end %}
-
-
-
-                                                                                   {% if 'type' in ms['parameters'][keys] %}
-                                                                                        {% set p_type = ms['parameters'][keys]['type'] %}
-                                                                                   {% else %}
-                                                                                        {% set p_type = '' %}
-                                                                                   {% end %}
-
-                                                                                    {% if 'req' in ms['parameters'][keys] %}
-                                                                                        {% set p_req = ms['parameters'][keys]['req'] %}
-                                                                                   {% else %}
-                                                                                        {% set p_req = '' %}
-                                                                                   {%end%}
-
-                                                                                   {% if 'example' in ms['parameters'][keys] %}
-                                                                                        {% set p_example = ms['parameters'][keys]['example'] %}
-                                                                                   {% else %}
-                                                                                        {% set p_example = '' %}
-                                                                                   {% end %}
-                                                                             <tr class="siz">
-
-                                                                                      <td class="bg">{{keys}}</td>
-
-                                                                                      <td class="bg">{{ p_description }}</td>
-                                                                                      <td class="bg">{{ p_type }}<td>
-                                                                                      <td class="bg">{{ p_req }}<td>
-                                                                                      <td class="bg">{{ p_example }}<td>
-
-                                                                                    </tr>
-                                                                            {% end %}
-
-                                                                          </tbody>
-
-                                                                    </table>
-                                                             </div>
-                                                        <div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">
-                                                            <br/><table class="">
-                                                                 <tbody style="padding-top:0px;">
-                                                                           <tr class="{{clasa}} ">
-                                                                                 <th class="bg">HTTP Status Code</th>
-                                                                                 <th class="bg"></th>
-                                                                                 <th class="bg">Description</th>
+                                                  <h4>HTTP Status code</h4>
+                                                  <table class="table t">
+                                                    <thead>
+                                                      <tr>
+                                                        <td>HTTP Status code</td>
+                                                        <td>Description</td>
+                                                      </tr>
+                                                    </thead>
+                                                      </tbody>
 
                                                                                 {% for keys in ms['return'] %}
 
@@ -294,29 +211,222 @@
                                                                                     {% end %}
 
                                                                                     <tr class="siz">
-                                                                                        <td class="bg">{{keys}}</td>
-                                                                                        <td class="bg"></td>
-                                                                                        <td class="bg">{{ r_description }}</td>
+                                                                                        <td>{{keys}}</td>
+                                                                                        <td>{{ r_description }}</td>
                                                                                     </tr>
                                                                                 {% end %}
+                                                      </tbody>
 
-                                                                            </tr>
-                                                                 </tbody>
-                                                            </table><br/>
-                                                        </div>
+                                                  </table>
 
-                                                    </td>
-                                            {% end #str if%}
-                                            {% end %}
 
+                                                </div>
+                                              </div>
+                                             <!--<div style="margin:10px;">-->
+                                            <!--<tr id="package{{s}}-{{g}}" style=" cursor:pointer; margin-top:5px;" class="{{bg_stil}} accordion-toggle"-->
+                                                <!--data-toggle="collapse" data-parent="#OrderPackages"-->
+                                                <!--data-target=".packageDetails{{s}}-{{g}}">-->
+                                                <!--<td style="margin-top:10px;padding:7px; top:10px;  border-top-left-radius:0px;border-top-right-radius:0px;">-->
+
+                                                   <!--{% if s == 'GET' %}-->
+                                                        <!--<span class=" label label-primary">{{s}}</span>-->
+                                                            <!--{% if method[s]['authorization'] %}-->
+                                                                <!--<img src="/static/img/key_base.png" width="20px" />-->
+                                                            <!--{% end %}-->
+                                                    <!-- - <span class="lab"> {{link}}     &nbsp&nbsp&nbsp </span>-->
+                                                        <!--<span class="indicator right"> {{method[s]['func_description']}}</span>-->
+                                                        <!--{% set clasa = 'get_th ' %}-->
+                                                   <!--{% end %}-->
+
+                                                   <!--{% if s == 'PUT' %}-->
+                                                        <!--<span class="label label-success">{{s}}</span>-->
+                                                            <!--{% if method[s]['authorization'] %}-->
+                                                                <!--<img src="/static/img/key_base.png" width="20px" />-->
+                                                            <!--{% end %}-->
+                                                    <!-- -  {{link}}  <span class="lab"> &nbsp&nbsp&nbsp  </span>-->
+
+                                                        <!--<span class="indicator right">  {{method[s]['func_description']}}</span>-->
+                                                        <!--{% set clasa = 'put_th' %}-->
+                                                   <!--{% end %}-->
+
+                                                   <!--{% if s == 'DELETE' %}-->
+                                                        <!--<span class="label label-warning">{{s}}</span>-->
+                                                            <!--{% if method[s]['authorization'] %}-->
+                                                                <!--<img src="/static/img/key_base.png" width="20px" />-->
+                                                            <!--{% end %}-->
+                                                    <!-- -  {{link}} <span class="lab"> &nbsp&nbsp&nbsp</span>-->
+                                                         <!--<span class="indicator right"> {{method[s]['func_description']}}</span>-->
+                                                        <!--{% set clasa = 'delete_th' %}{% else %}-->
+                                                   <!--{% end %}-->
+
+                                                    <!--{% if s == 'PATCH' %}-->
+                                                        <!--<span class="label label-patch">{{s}}</span>-->
+                                                            <!--{% if method[s]['authorization'] %}-->
+                                                                <!--<img src="/static/img/key_base.png" width="20px" />-->
+                                                            <!--{% end %}-->
+                                                    <!-- - <span class="lab"> {{link}}   &nbsp&nbsp&nbsp-->
+                                                        <!--<span class="indicator right"> {{method[s]['func_description']}}</span>-->
+                                                        <!--{% set clasa = 'patch_th' %}-->
+                                                   <!--{% end %}-->
+
+                                                   <!--{% if s == 'POST' %}-->
+                                                        <!--<span class="label label-danger">{{s}}</span>-->
+                                                            <!--{% if method[s]['authorization'] %}-->
+                                                                <!--<img src="/static/img/key_base.png" width="20px" />-->
+                                                            <!--{% end %}-->
+                                                    <!-- - <span class="lab"> {{link}} &nbsp&nbsp&nbsp-->
+                                                        <!--<span class="indicator right"> {{method[s]['func_description']}}</span>-->
+                                                        <!--{% set clasa = 'post_th' %}-->
+                                                   <!--{% end %}-->
+
+                                                <!--</td>-->
+                                            <!--</tr>-->
+
+                                            <!--{% if s == 'DELETE' or s == 'POST' or s == 'PATCH' or s == 'PUT' or s == 'GET' %}-->
+
+                                                    <!--<td colspan="{{s}}-{{g}}" class=" hiddenRow {{bg_stil}}" >-->
+
+                                                        <!--<div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">-->
+
+                                                            <!--{% set ms = method[s]  %}-->
+
+                                                            <!--{% set t = type(ms) %}-->
+
+                                                            <!--{% if t!=str %}-->
+
+
+                                                            <!--<table class="bgd ">-->
+                                                                    <!--<tbody>-->
+                                                                        <!--<tr>-->
+                                                                         <!--<td class=" siz bold "></td>-->
+                                                                         <!--<td class=" siz"></td>-->
+                                                                         <!--<td class=" siz"> </td>-->
+                                                                         <!--<td class=" sizr"></td>-->
+                                                                        <!--</tr>-->
+                                                                    <!--</tbody>-->
+                                                                <!--</table>-->
+                                                            <!--<table class="  backgroundtable">-->
+                                                                      <!--<tbody class="padd-t margina">-->
+                                                                        <!--<tr>-->
+                                                                         <!--<tr class="{{clasa}}" >-->
+                                                                                <!--<th class="bg">Description :</th >-->
+
+
+                                                                         <!--</tr>-->
+
+
+
+                                                                        <!--<tr class="siz">-->
+
+                                                                                  <!--<td class="bg">{{method[s]['func_description_long']}}<td>-->
+
+
+                                                                                <!--</tr>-->
+
+                                                                      <!--</tbody>-->
+
+
+                                                              <!--</table>-->
+
+                                                        <!--</div>-->
+                                                        <!--<div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">-->
+                                                                    <!--<br/><table class=" backgroundtable">-->
+
+                                                                          <!--<tbody class="  ">-->
+
+                                                                             <!--<tr class="{{clasa}}" >-->
+                                                                                    <!--<th class="bg">Parameters :</th >-->
+                                                                                    <!--<th class="bg" >Description</th>-->
+                                                                                    <!--<th class="bg">Type</th>-->
+                                                                                    <!--<th></th>-->
+                                                                                    <!--<th-->
+                                                                                    <!--class="bg">Required	</th>-->
+                                                                                    <!--<th></th>-->
+                                                                                    <!--<th class="bg">Example</th>-->
+                                                                             <!--</tr>-->
+
+
+                                                                            <!--{% for keys in ms['parameters'] %}-->
+                                                                                   <!--{% if 'description' in ms['parameters'][keys] %}-->
+                                                                                        <!--{% set p_description = ms['parameters'][keys]['description'] %}-->
+                                                                                   <!--{% else %}-->
+                                                                                        <!--{% set p_description = '' %}-->
+                                                                                   <!--{% end %}-->
+
+
+
+                                                                                   <!--{% if 'type' in ms['parameters'][keys] %}-->
+                                                                                        <!--{% set p_type = ms['parameters'][keys]['type'] %}-->
+                                                                                   <!--{% else %}-->
+                                                                                        <!--{% set p_type = '' %}-->
+                                                                                   <!--{% end %}-->
+
+                                                                                    <!--{% if 'req' in ms['parameters'][keys] %}-->
+                                                                                        <!--{% set p_req = ms['parameters'][keys]['req'] %}-->
+                                                                                   <!--{% else %}-->
+                                                                                        <!--{% set p_req = '' %}-->
+                                                                                   <!--{%end%}-->
+
+                                                                                   <!--{% if 'example' in ms['parameters'][keys] %}-->
+                                                                                        <!--{% set p_example = ms['parameters'][keys]['example'] %}-->
+                                                                                   <!--{% else %}-->
+                                                                                        <!--{% set p_example = '' %}-->
+                                                                                   <!--{% end %}-->
+                                                                             <!--<tr class="siz">-->
+
+                                                                                      <!--<td class="bg">{{keys}}</td>-->
+
+                                                                                      <!--<td class="bg">{{ p_description }}</td>-->
+                                                                                      <!--<td class="bg">{{ p_type }}<td>-->
+                                                                                      <!--<td class="bg">{{ p_req }}<td>-->
+                                                                                      <!--<td class="bg">{{ p_example }}<td>-->
+
+                                                                                    <!--</tr>-->
+                                                                            <!--{% end %}-->
+
+                                                                          <!--</tbody>-->
+
+                                                                    <!--</table>-->
+                                                             <!--</div>-->
+                                                        <!--<div class="padd-l accordion-body {{bg_stil}} collapse packageDetails{{s}}-{{g}}" id="accordion{{s}}-{{g}}">-->
+                                                            <!--<br/><table class="">-->
+                                                                 <!--<tbody style="padding-top:0px;">-->
+                                                                           <!--<tr class="{{clasa}} ">-->
+                                                                                 <!--<th class="bg">HTTP Status Code</th>-->
+                                                                                 <!--<th class="bg"></th>-->
+                                                                                 <!--<th class="bg">Description</th>-->
+
+                                                                                <!--{% for keys in ms['return'] %}-->
+
+                                                                                    <!--{% if 'description' in ms['return'][keys] %}-->
+                                                                                        <!--{% set r_description = ms['return'][keys]['description'] %}-->
+                                                                                    <!--{% else %}-->
+                                                                                        <!--{% set r_description = '' %}-->
+                                                                                    <!--{% end %}-->
+
+                                                                                    <!--<tr class="siz">-->
+                                                                                        <!--<td class="bg">{{keys}}</td>-->
+                                                                                        <!--<td class="bg"></td>-->
+                                                                                        <!--<td class="bg">{{ r_description }}</td>-->
+                                                                                    <!--</tr>-->
+                                                                                <!--{% end %}-->
+
+                                                                            <!--</tr>-->
+                                                                 <!--</tbody>-->
+                                                            <!--</table><br/>-->
+                                                        <!--</div>-->
+
+                                                    <!--</td>-->
+                                            <!--{% end #str if%}-->
+                                            <!--{% end %}-->
+
+                                        {% end # if %}
                                         {% end # if %}
 
                                     {% end # if %}
-                                    </tbody>
                                 {% end %}
                              {% end #for mode  %}
 
-                        </table>
 
                     {% end #for mode  %}
               {% end #if  %}
@@ -328,17 +438,12 @@
 
 
 
-  </div>
-</div></div>
+        </div>
+    </div>
+</div>
+</div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 </body>
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="http://getbootstrap.com/assets/js/vendor/jquery.min.js"><\/script>')</script>
-<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-<script src="http://getbootstrap.com/assets/js/docs.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
 </html>

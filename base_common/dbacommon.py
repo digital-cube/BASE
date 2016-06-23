@@ -415,7 +415,7 @@ def params(*arguments):
                     esc = a['escaped'] if 'escaped' in a else (tip in [str, 'e-mail'])
 
                     converted = _convert_args(atr, tip, esc)
-                    if not converted:
+                    if tip != bool and not converted:
 
                         if not (tip == int and converted == 0):   # count 0 as int
 
