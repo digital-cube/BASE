@@ -19,6 +19,9 @@ def error(s, **kwargs):
     if kwargs:
         response.update(kwargs)
 
+    if 'forget_status' in kwargs and kwargs['forget_status']:
+        del response['http_status']
+
     return response
 
 
