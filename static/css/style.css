@@ -41,7 +41,6 @@ table thead * { font-weight: bold !important; }
 #left-menu li.section-header { font-size: 20px; font-weight: 500; margin-top: 20px; border-bottom: 1px solid #ccc; }
 #left-menu li.active { background: #eee; }
 #left-menu li.active a { color: inherit; }
-
 #quickpay-swagger h2 { font-size: 20px !important; text-transform: capitalize; }
 #quickpay-swagger a { color: inherit; }
 #quickpay-swagger .panel { margin: 5px 0; }
