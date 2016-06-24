@@ -285,7 +285,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
                 if not hasattr(fun, '__api_method_call__') or not fun.__api_method_call__:
                     self.set_status(500)
-                    self.write(json.dumps(base_common.msg.error(amsgs.NOT_API_CALL)))
+                    self.write(json.dumps(base_common.msg.error(amsgs.NOT_API_CALL, forget_status=True)))
                     return
 
                 # k = fun.__name__
@@ -297,7 +297,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                         method, fun.__name__, self.apimodule.__name__))
 
                     self.set_status(500)
-                    self.write(json.dumps(base_common.msg.error(self.e_msgs[method])))
+                    self.write(json.dumps(base_common.msg.error(self.e_msgs[method], forget_status=True)))
                     return
 
                 if csettings.LB:
@@ -327,7 +327,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                 log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method]))
                 self.set_status(404)
                 self.set_header('Content-Type', 'application/json')
-                self.write(json.dumps(base_common.msg.error(self.e_msgs[method])))
+                self.write(json.dumps(base_common.msg.error(self.e_msgs[method], forget_status=True)))
 
         except Exception as e:
 
@@ -335,4 +335,4 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                 "ip: {}, module: {}, function: {}, exception: e:{}".format(ip, self.apimodule.__name__, method, e))
             self.set_status(500)
             self.set_header('Content-Type', 'application/json')
-            self.write(json.dumps(base_common.msg.error(e)))
+            self.write(json.dumps(base_common.msg.error(e, forget_status=True)))
