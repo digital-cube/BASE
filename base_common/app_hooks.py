@@ -140,6 +140,7 @@ def change_username_hook(hash2param, newusername, dbuser, **kwargs):
     rh1 = BaseAPIRequestHandler()
     rh1.set_argument('sender', support_mail)
     rh1.set_argument('receiver', newusername)
+    rh1.set_argument('subject', 'Username change request')
     rh1.set_argument('message', message)
     kwargs['request_handler'] = rh1
     res = base_api.mail_api.save_mail.do_put(support_mail, newusername, message, **kwargs)
@@ -152,6 +153,7 @@ def change_username_hook(hash2param, newusername, dbuser, **kwargs):
     rh2 = BaseAPIRequestHandler()
     rh2.set_argument('sender', support_mail)
     rh2.set_argument('receiver', dbuser.username)
+    rh2.set_argument('subject', 'Username change request saved')
     rh2.set_argument('message', message2)
     kwargs['request_handler'] = rh2
     res = base_api.mail_api.save_mail.do_put(support_mail, dbuser.username, message2, **kwargs)
@@ -170,6 +172,7 @@ def change_username_success_hook(receiver, **kwargs):
     rh1 = BaseAPIRequestHandler()
     rh1.set_argument('sender', support_mail)
     rh1.set_argument('receiver', receiver)
+    rh1.set_argument('subject', 'Username successfully changed')
     rh1.set_argument('message', message)
     kwargs['request_handler'] = rh1
     res = base_api.mail_api.save_mail.do_put(support_mail, receiver, message, **kwargs)

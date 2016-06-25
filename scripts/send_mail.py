@@ -1,37 +1,46 @@
 #!/usr/bin/env python3
 
-import MySQLdb
-from MySQLdb import IntegrityError, cursors
-import json
-import time
-import sys
-import sendgrid
-from config.shortenerconfig import log
 import datetime
+import json
+import sys
+import time
 
-def get_mail_query_ok(id_msg, msg_datetime, res_msg):
+import MySQLdb
+import MySQLdb.cursors
+import sendgrid
+from MySQLdb import IntegrityError
 
-    q = '''UPDATE mail_queue set sent = true, time_sent = '{}', data = '{}' WHERE id = {} '''.format(str(msg_datetime), res_msg, id_msg)
+from send_mail_config import log, db_host, db_user, db_passwd, db_name, db_charset, sg_key
+
+MAIL_NOT_SENT = 0
+MAIL_ON_SENDING = 1
+MAIL_SUCCESSFULLY_SENT = 2
+MAIL_SENT_ERROR = 3
+
+
+def get_mail_query_ok(id_msg, msg_datetime, status, mdata):
+    q = '''UPDATE mail_queue set sent = {}, time_sent = '{}', data = '{}' WHERE id = {} '''.format(
+        status, str(msg_datetime), mdata, id_msg)
 
     return q
 
-def get_mail_query_err(id_msg, msg_datetime, res_msg):
 
-    q = '''UPDATE mail_queue set sent = FALSE , time_sent = '{}', data = '{}' WHERE id = {} '''.format(str(msg_datetime), res_msg, id_msg)
+def get_mail_query_err(id_msg, msg_datetime, status, mdata):
+    q = '''UPDATE mail_queue set sent = {}, time_sent = '{}', data = '{}' WHERE id = {} '''.format(
+        status, str(msg_datetime), mdata, id_msg)
 
     return q
 
 
 def conn_to_db():
+    print('AAA', db_name, db_host, db_user, db_passwd, db_charset)
     return MySQLdb.connect(
-    host='localhost',
-    user='shorty',
-    passwd='123',
-    db='shortener',  # Promenjeno za potrebe TESTA
-    charset='utf8',
-    cursorclass=MySQLdb.cursors.DictCursor)
-
-q = '''SELECT id, receiver, message FROM mail_queue ORDER BY id desc LIMIT 1'''
+        db=db_name,
+        host=db_host,
+        user=db_user,
+        passwd=db_passwd,
+        charset=db_charset,
+        cursorclass=MySQLdb.cursors.DictCursor)
 
 
 if __name__ == '__main__':
@@ -45,16 +54,24 @@ if __name__ == '__main__':
         print('Invalid value for port {}, has to be int '.format(sys.argv[1]))
         sys.exit(1)
 
-    while True:
+    db = conn_to_db()
+    dbc = db.cursor()
 
-        db = conn_to_db()
-        dbc = db.cursor()
+    q = '''SELECT
+            id, sender, sender_name, receiver, receiver_name, subject, message, data
+          FROM
+            mail_queue
+          WHERE
+            sent = {}'''.format(MAIL_NOT_SENT)
+
+    while True:
 
         try:
             dbc.execute(q)
         except IntegrityError as e:
             print('Query didnt execute correctly Q: {} : {}'.format(q, e))
             continue
+
         if dbc.rowcount == 0:
             print("There is no work to be done")
             if single_shot:
@@ -64,57 +81,80 @@ if __name__ == '__main__':
 
         else:
 
-            res = dbc.fetchone()
-            receiver = res['receiver']
-            emsg = res['message']
-            id_msg = res['id']
+            for res in dbc.fetchall():
 
-            sg = sendgrid.SendGridClient('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')
+                sender = res['sender']
+                sender_name = res['sender_name']
+                receiver = res['receiver']
+                receiver_name = res['receiver_name']
+                subject = res['subject']
+                emsg = res['message']
+                mdata = res['data']
+                id_msg = res['id']
 
-            id = 1
-            from_email = 'Min.bz@digitalcube.rs'
-            from_name = 'Min.bz URL Shorterner'
-            to_email = receiver
-            to_name = receiver
-            subject = 'Registration'
-            _message = emsg
+                try:
+                    mdata = json.loads(mdata)
+                except:
+                    mdata = {}
 
-            try:
+                sg = sendgrid.SendGridAPIClient(apikey=sg_key)
+                # sg = sendgrid.SendGridClient(sg_key)
 
-                message = sendgrid.Mail()
-                message.add_to('{} <{}>'.format(to_name, to_email))
-                message.set_subject(subject)
-                message.set_html(_message)
-                message.set_text(_message)
-                message.set_from('{} <{}>'.format(from_name, from_email))
-                status, msg = sg.send(message)
+                # try:
+                if True:
+                    from sendgrid.helpers.mail import *
+                    message = Mail()
+                    personal = Personalization()
+                    message.set_from(Email(sender, sender_name))
+                    personal.add_to(Email(receiver, receiver_name))
+                    message.add_personalization(personal)
+                    message.set_subject(subject)
+                    message.add_content(Content("text/html", emsg))
+                    m_data = message.get()
+                    response = sg.client.mail.send.post(request_body=m_data)
 
-                print(msg)
-                print(status)
-            except Exception as e:
-                print(e)
+                print(response, type(response))
+                # except Exception as e:
+                  #     print(e)
+                # print('*****************************')
+                # print(response.status_code, type(response.status_code))
+                # print('*****************************')
+                # print(response.headers, type(response.headers))
+                m_id = response.headers.get('X-Message-Id')
+                # print(m_id)
+                # print('*****************************')
+                # print(response.body, type(response.body))
+                # print('*****************************')
+                if m_id:
+                    mdata['message_id'] = m_id
 
-            res_msg = json.loads(msg.decode('utf-8'))
-            res_msg = res_msg['message']
+                res_msg = response.body.decode('utf-8')
+                n = str(datetime.datetime.now())[:19]
 
-            n = str(datetime.datetime.now())[:19]
+                try:
+                    mdata['send_result'] = res_msg
+                    mdata = json.dumps(mdata)
+                except Exception as e:
+                    print('ERROR PREPARING MESSAGE DATA |{}|{}| FOR DATABASE: {}'.format(mdata, res_msg, e))
+                    mdata = json.dumps(mdata)  # just save it like it was before
 
-            if status == 200:
-                q = get_mail_query_ok(id_msg, n, res_msg)
+                status = MAIL_ON_SENDING
+                if 200 <= response.status_code < 300:
+                    status = MAIL_SUCCESSFULLY_SENT
+                    q = get_mail_query_ok(id_msg, n, status, mdata)
 
-            else:
-                q = get_mail_query_err(id_msg, n, res_msg)
+                else:
+                    status = MAIL_SENT_ERROR
+                    q = get_mail_query_err(id_msg, n, status, mdata)
 
+                try:
+                    dbc.execute(q)
+                except IntegrityError as e:
+                    log.critical('Update mail queue: {}'.format(e))
 
-            try:
-                dbc.execute(q)
-            except IntegrityError as e:
-                log.critical('Update mail queue: {}'.format(e))
+                db.commit()
 
-            db.commit()
+                if single_shot:
+                    sys.exit()
 
-
-            if single_shot:
-                sys.exit()
-
-            time.sleep(5)
+                time.sleep(5)

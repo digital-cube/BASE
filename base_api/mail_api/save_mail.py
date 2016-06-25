@@ -18,15 +18,19 @@ location = "email/message/save"
 request_timeout = 10
 
 
-def get_mail_query(sender, receiver, message):
+def get_mail_query(sender, sender_name, receiver, receiver_name, subject, message, data):
     n = datetime.datetime.now()
-    q = "insert into mail_queue (id, sender, receiver, time_created, message) " \
+    q = "insert into mail_queue (id, sender, sender_name, receiver, receiver_name, time_created, subject, message, data) " \
         "VALUES " \
-        "(null, '{}', '{}', '{}', '{}')".format(
+        "(null, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
             sender,
+            sender_name,
             receiver,
+            receiver_name,
             str(n),
-            message
+            subject,
+            message,
+            data if data else ''
         )
 
     return q
@@ -39,11 +43,15 @@ def get_mail_query(sender, receiver, message):
 )
 @params(
     {'arg': 'sender', 'type': str, 'required': True, 'description': 'user who sends a mail'},
+    {'arg': 'sender_name', 'type': str, 'required': False, 'description': 'name of the sender'},
     {'arg': 'receiver', 'type': str, 'required': True, 'description': 'user who receive a mail'},
+    {'arg': 'receiver_name', 'type': str, 'required': False, 'description': 'user who receive a mail'},
+    {'arg': 'subject', 'type': str, 'required': True, 'description': 'subject of the message'},
     {'arg': 'message', 'type': str, 'required': True, 'description': 'message to send'},
     {'arg': '_get_id', 'type': bool, 'required': False, 'default': False, 'description': 'test flag'},
+    {'arg': 'data', 'type': json, 'required': False, 'description': 'additional email data'},
 )
-def do_put(sender, receiver, emessage, _get_id, **kwargs):
+def do_put(sender, sender_name, receiver, receiver_name, subject, emessage, _get_id, data, **kwargs):
     """
     Save e-mail message
     """
@@ -52,7 +60,12 @@ def do_put(sender, receiver, emessage, _get_id, **kwargs):
     dbc = _db.cursor()
     rdb = get_redis_db()
 
-    q = get_mail_query(sender, receiver, emessage)
+    if sender_name is None:
+        sender_name = sender
+    if receiver_name is None:
+        receiver_name = receiver
+
+    q = get_mail_query(sender, sender_name, receiver, receiver_name, subject, emessage, data)
     from MySQLdb import IntegrityError
     try:
         dbc.execute(q)
@@ -62,12 +75,13 @@ def do_put(sender, receiver, emessage, _get_id, **kwargs):
 
     _db.commit()
     m_id = dbc.lastrowid
-    subject = 'General mail subject'
 
     r_data = {
         'id': m_id,
         'sender': sender,
+        'sender_name': sender_name,
         'receiver': receiver,
+        'receiver_name': receiver_name,
         'subject': subject,
         'message': emessage
     }

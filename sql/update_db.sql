@@ -66,15 +66,19 @@ CREATE TABLE session_token (
 
 CREATE TABLE mail_queue (
 	id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	subject varchar(128) NOT NULL,
+	sender_name varchar(128) NOT NULL,
 	sender varchar(128) NOT NULL,
-	receiver TEXT NOT NULL,
+	receiver varchar(128) NOT NULL,
+	receiver_name varchar(128) NOT NULL,
 	time_created DATETIME NOT NULL,
 	time_sent DATETIME,
-	sent BOOLEAN NOT NULL DEFAULT FALSE,
+	sent int NOT NULL DEFAULT 0,
 	message TEXT NOT NULL,
 	data TEXT,
-	INDEX email_sender_idx (sender),
-	INDEX email_sent (sent)
+	INDEX (subject),
+	INDEX (sender),
+	INDEX (sent)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 insert into sequencers (id, s_partition, active_stage, size, check_sum_size, name ,type, s_table, ordered)
