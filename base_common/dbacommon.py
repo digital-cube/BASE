@@ -225,6 +225,7 @@ def get_url_token(request_handler):
 
     return tk
 
+
 def get_param_from_uri(uri):
 
     tk = None
@@ -468,3 +469,10 @@ def get_current_datetime():
         return _td_datetime
     else:
         return datetime.datetime.now()
+
+
+def check_user_registered(dbc, uname):
+
+    q = "select id from users where username = '{}'".format(uname)
+    dbc.execute(q)
+    return dbc.rowcount != 0

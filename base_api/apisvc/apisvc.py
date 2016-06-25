@@ -123,7 +123,8 @@ def fdoc_parser(url_methods, func):
         # print(func.__name__, 'nema auth')
         url_methods[_m]['authorization'] = False
 
-    try:
+    # try:
+    if hasattr(func, '__app_api_arguments__'):
         for p in func.__app_api_arguments__:
 
             url_methods[_m]['parameters'][p[0]] = {
@@ -135,8 +136,8 @@ def fdoc_parser(url_methods, func):
             if p[4]:
                 url_methods[_m]['parameters'][p[0]]['example'] = p[4]
 
-    except AttributeError as e:
-        print('READ DOCUMENT EXCEPTION: {}'.format(e))
+    # except AttributeError as e:
+    #     print('READ DOCUMENT EXCEPTION: {}'.format(e))
 
     if func.__api_return__:
         for r in func.__api_return__:

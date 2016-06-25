@@ -11,53 +11,21 @@ import base_api.mail_api.save_mail
 from base_config.service import log
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import check_password
+from base_common.dbacommon import format_password
 from base_common.dbacommon import get_db
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import authenticated_call
 from base_common.dbatokens import get_user_by_token
 from base_svc.comm import BaseAPIRequestHandler
-from base_config.service import support_mail
 import base_api.users.changing_username
-import base_config.settings
+from base_common.app_hooks import change_username_hook
+from base_common.dbacommon import check_user_registered
 
 
 name = "Change username"
 location = "user/username/change"
 request_timeout = 10
-
-
-def _get_email_warning(oldusername, newusername):
-    """
-    Create warning email for old username
-    :param request:  request handler
-    :param oldusername:  old username
-    :param newusername:  new username
-    :param h:  hash
-    :return:  message as string
-    """
-    m = '''Dear,<br/>we have receive request for changing username {} to {}.<br/> If You request the change take no
-    further actions.<br/>If this action is not performed by You please contact our support at {}.
-    Thank you for using {}'''.format(oldusername, newusername, support_mail, 'our services.')
-
-    return m
-
-
-def _get_email_message(h):
-    """
-    Create email message
-    :param request:  request handler
-    :param oldusername:  old username
-    :param newusername:  new username
-    :param h:  hash for change
-    :return:  message text as string
-    """
-
-    l = '{}/{}'.format(base_config.settings.CHANGE_EMAIL_ADDRESS, h)
-    m = '''Dear,<br/>You have requested username change. Please confirm change by following the link below:<br/>
-    {}<br/><br/>If You didn't requested the change, please ignore this message.<br/>Thank You!'''.format(l)
-
-    return m
 
 
 @authenticated_call()
@@ -68,13 +36,19 @@ def _get_email_message(h):
 @params(
     {'arg': 'username', 'type': 'e-mail', 'required': True, 'description': 'users new username'},
     {'arg': 'password', 'type': str, 'required': True, 'description': 'users password'},
+    {'arg': 'redirect_url', 'type': str, 'required': True,
+     'description': 'successfully changed username redirection url'},
 )
-def do_post(newusername, password, **kwargs):
+def do_post(newusername, password, redirect_url, **kwargs):
     """
-    Change password
+    Change username
     """
 
     _db = get_db()
+    dbc = _db.cursor()
+
+    if check_user_registered(dbc, newusername):
+        return base_common.msg.error(msgs.USERNAME_ALREADY_TAKEN)
 
     tk = kwargs['auth_token']
 
@@ -84,9 +58,13 @@ def do_post(newusername, password, **kwargs):
         log.critical('Wrong users password: {}'.format(password))
         return base_common.msg.error(msgs.WRONG_PASSWORD)
 
+    passwd = format_password(newusername, password)
+
     # SAVE HASH FOR USERNAME CHANGE
     rh = BaseAPIRequestHandler()
-    data = {'cmd': 'change_username', 'newusername': newusername, 'id_user': dbuser.id_user, 'password': password}
+    # encryptuj pass, successfully landing page
+    data = {'cmd': 'change_username', 'newusername': newusername, 'id_user': dbuser.id_user,
+            'password': passwd, 'redirect_url': redirect_url}
     rh.set_argument('data', json.dumps(data))
     kwargs['request_handler'] = rh
     res = base_api.hash2params.save_hash.do_put(json.dumps(data), **kwargs)
@@ -95,28 +73,9 @@ def do_post(newusername, password, **kwargs):
 
     h = res['h']
 
-    message = _get_email_message(h)
-
-    # SAVE EMAILS FOR SENDING
-    rh1 = BaseAPIRequestHandler()
-    rh1.set_argument('sender', support_mail)
-    rh1.set_argument('receiver', newusername)
-    rh1.set_argument('message', message)
-    kwargs['request_handler'] = rh1
-    res = base_api.mail_api.save_mail.do_put(support_mail, newusername, message, **kwargs)
-    if 'http_status' not in res or res['http_status'] != 204:
-        return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
-
-    message2 = _get_email_warning(dbuser.username, newusername)
-
-    rh2 = BaseAPIRequestHandler()
-    rh2.set_argument('sender', support_mail)
-    rh2.set_argument('receiver', dbuser.username)
-    rh2.set_argument('message', message2)
-    kwargs['request_handler'] = rh2
-    res = base_api.mail_api.save_mail.do_put(support_mail, dbuser.username, message2, **kwargs)
-    if 'http_status' not in res or res['http_status'] != 204:
-        return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
+    if not change_username_hook(h, newusername, dbuser, **kwargs):
+        log.critical('Error finishing username change process')
+        return base_common.msg.error(msgs.ERROR_CHANGE_USERNAME)
 
     return base_common.msg.post_ok(msgs.CHANGE_USERNAME_REQUEST)
 
