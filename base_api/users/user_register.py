@@ -14,17 +14,11 @@ from base_common.dbatokens import get_token
 from base_common.seq import sequencer
 from base_lookup import api_messages as msgs
 from base_config.service import log
+from base_common.dbacommon import check_user_registered
 
 name = "Registration"
 location = "user/register"
 request_timeout = 10
-
-
-def _check_user_registered(dbc, uname):
-
-    q = "select id from users where username = '{}'".format(uname)
-    dbc.execute(q)
-    return dbc.rowcount != 0
 
 
 @app_api_method(
@@ -44,7 +38,7 @@ def do_post(username, password, users_data, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    if _check_user_registered(dbc, username):
+    if check_user_registered(dbc, username):
         return base_common.msg.error(msgs.USERNAME_ALREADY_TAKEN)
 
     if hasattr(apphooks, 'check_password_is_valid') and not apphooks.check_password_is_valid(password):

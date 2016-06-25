@@ -315,6 +315,17 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
                     result = fun(request_handler=self, logged_user_dict=j, r_ip=ip, auth_token=self.auth_token)
 
+                if 'redirect' in result and result['redirect']:
+                    if not 'redirect_url' in result:
+                        self.set_status(500)
+                        self.set_header('Content-Type', 'application/json')
+                        self.write(json.dumps(base_common.msg.error(amsgs.MISSING_REDIRECTION_URL, forget_status=True)))
+
+                    _redirection_status = result['redirection_http_status'] if 'redirection_http_status' in result else 302
+                    _permanent = _redirection_status == 301 or 'permanent' in result and result['permanent']
+                    self.redirect(result['redirect_url'], permanent=_permanent, status=_redirection_status)
+                    return
+
                 self.set_status(200)
                 if 'http_status' in result:
                     self.set_status(result['http_status'])
