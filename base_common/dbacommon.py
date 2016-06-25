@@ -255,7 +255,7 @@ def _convert_args(el, tp, esc):
             el = int(el)
         except ValueError as e:
             log.critical('Invalid argument: expected int got {} ({}): {}'.format(el, type(el), e))
-            return False
+            return None
 
         return el
 
@@ -264,14 +264,14 @@ def _convert_args(el, tp, esc):
             el = float(el)
         except ValueError as e:
             log.critical('Invalid argument: expected float got {} ({}): {}'.format(el, type(el), e))
-            return False
+            return None
 
         return el
 
     if tp == str:
 
         if type(el) != str:
-            return False
+            return None
 
         return qu_esc(el) if esc else el
 
@@ -281,7 +281,7 @@ def _convert_args(el, tp, esc):
             el = datetime.datetime.strptime(el, "%Y-%m-%d %H:%M:%S")
         except ValueError as e:
             log.critical('Invalid argument: expected datetime got {} ({}): {}'.format(el, type(el), e))
-            return False
+            return None
 
         return str(el)[:19]
 
@@ -291,7 +291,7 @@ def _convert_args(el, tp, esc):
             el = datetime.datetime.strptime(el, "%Y-%m-%d")
         except ValueError as e:
             log.critical('Invalid argument: expected date got {} ({}): {}'.format(el, type(el), e))
-            return False
+            return None
 
         return str(el)[:10]
 
@@ -301,7 +301,7 @@ def _convert_args(el, tp, esc):
             el = json.dumps(json.loads(el))
         except json.decoder.JSONDecodeError as e:
             log.critical('Invalid argument: expected json got {} ({}): {}'.format(el, type(el), e))
-            return False
+            return None
 
         return qu_esc(el) if esc else el
 
@@ -309,7 +309,7 @@ def _convert_args(el, tp, esc):
 
         if '@' not in el:
             log.critical('Invalid argument: expected e-mail address, got {}'.format(el))
-            return False
+            return None
 
         return qu_esc(el) if esc else el
 
@@ -319,10 +319,10 @@ def _convert_args(el, tp, esc):
             el = ast.literal_eval(el)
         except SyntaxError as e:
             log.critical('Invalid argument: expected list, got {}: {}'.format(el, e))
-            return False
+            return None
 
         if type(el) != list:
-            return False
+            return None
 
         return el
 
@@ -332,10 +332,10 @@ def _convert_args(el, tp, esc):
             el = ast.literal_eval(el)
         except SyntaxError as e:
             log.critical('Invalid argument: expected dict, got {}: {}'.format(el, e))
-            return False
+            return None
 
         if type(el) != dict:
-            return False
+            return None
 
         return el
 
@@ -352,7 +352,7 @@ def _convert_args(el, tp, esc):
             el = decimal.Decimal(el)
         except decimal.InvalidOperation as e:
             log.critical('Invalid argument: expected Decimal, got {}: {}'.format(el, e))
-            return False
+            return None
 
         return el
 
@@ -404,7 +404,7 @@ def params(*arguments):
 
                 required = a['required'] if 'required' in a else True
 
-                if not atr:
+                if atr is None:
                     if not required:
                         converted = None
                     else:
@@ -415,7 +415,7 @@ def params(*arguments):
                     esc = a['escaped'] if 'escaped' in a else (tip in [str, 'e-mail'])
 
                     converted = _convert_args(atr, tip, esc)
-                    if tip != bool and not converted:
+                    if tip != bool and converted is None:
 
                         if not (tip == int and converted == 0):   # count 0 as int
 
