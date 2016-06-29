@@ -91,17 +91,20 @@ values
 drop table if exists s_users;
 CREATE TABLE s_users (
     id char(10) PRIMARY KEY,
-    active_stage char(3)
+    active_stage char(3),
+    index(active_stage)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 drop table if exists s_session_token;
 CREATE TABLE s_session_token (
     id char(64) PRIMARY KEY,
-    active_stage char(3)
+    active_stage char(3),
+    index(active_stage)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 drop table if exists s_hash_2_params ;
 CREATE TABLE s_hash_2_params (
 	id char(64) PRIMARY KEY,
-	active_stage char(3)
+	active_stage char(3),
+  index(active_stage)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
