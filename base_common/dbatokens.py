@@ -69,7 +69,7 @@ def __set_session_token_in_redis(uid, tk):
         'created': n,
         'id_user': uid
     }
-    r.set(tk, json.dumps(_rd))
+    r.set(tk, json.dumps(_rd, ensure_ascii=False))
 
 
 def __set_session_token_in_sql(dbc, uid, tk):

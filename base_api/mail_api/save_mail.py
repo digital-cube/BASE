@@ -88,7 +88,7 @@ def do_put(sender, sender_name, receiver, receiver_name, subject, emessage, _get
         'message': emessage
     }
 
-    r_data = json.dumps(r_data)
+    r_data = json.dumps(r_data, ensure_ascii=False)
 
     rdb.lpush(MAIL_CHANNEL, r_data)
 

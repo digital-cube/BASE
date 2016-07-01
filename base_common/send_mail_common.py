@@ -63,7 +63,7 @@ def set_message_sent(id_message, svc_port):
 
     rh = BaseAPIRequestHandler()
     data = {'id_message': id_message, 'sent_time': n}
-    rh.set_argument('data', json.dumps(data))
+    rh.set_argument('data', json.dumps(data, ensure_ascii=False))
     kwargs = {}
     kwargs['request_handler'] = rh
 
