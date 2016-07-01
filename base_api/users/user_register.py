@@ -46,8 +46,9 @@ def do_post(username, password, users_data, **kwargs):
         return base_common.msg.error(msgs.USERNAME_ALREADY_TAKEN)
 
     if base_config.settings.STRONG_PASSWORD:
-        if not apphooks.check_password_is_valid(username, password, users_data, **kwargs):
-            return base_common.msg.error(msgs.INVALID_PASSWORD)
+        result, server_message = apphooks.check_password_is_valid(username, password, users_data, **kwargs)
+        if not result:
+            return base_common.msg.error(server_message)
 
     u_id = sequencer().new('u')
 
