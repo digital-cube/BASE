@@ -61,9 +61,9 @@ def do_put(username, *args, **kwargs):
     # GET HASH FOR FORGOTTEN PASSWORD
     rh = BaseAPIRequestHandler()
     data = {'cmd': 'forgot_password', 'username': username}
-    rh.set_argument('data', json.dumps(data))
+    rh.set_argument('data', json.dumps(data, ensure_ascii=False))
     kwargs['request_handler'] = rh
-    res = base_api.hash2params.save_hash.do_put(json.dumps(data), *args, **kwargs)
+    res = base_api.hash2params.save_hash.do_put(json.dumps(data, ensure_ascii=False), *args, **kwargs)
     if 'http_status' not in res or res['http_status'] != 200:
         return base_common.msg.error('Cannot handle forgot password')
 

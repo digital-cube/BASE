@@ -41,7 +41,7 @@ def call(svc_url, port, location, data, method, request_timeout=10, force_json=F
     conn = http.client.HTTPConnection(svc_url, port)
 
     if force_json:
-        body = json.dumps(data)
+        body = json.dumps(data, ensure_ascii=False)
         _headers = {'content-type': 'application/json'}
     else:
         body = urllib.parse.urlencode(data)
@@ -286,7 +286,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
                 if not hasattr(fun, '__api_method_call__') or not fun.__api_method_call__:
                     self.set_status(500)
-                    self.write(json.dumps(base_common.msg.error(amsgs.NOT_API_CALL, forget_status=True)))
+                    self.write(json.dumps(base_common.msg.error(amsgs.NOT_API_CALL, forget_status=True),  ensure_ascii=False))
                     return
 
                 # k = fun.__name__
@@ -298,7 +298,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                         method, fun.__name__, self.apimodule.__name__))
 
                     self.set_status(500)
-                    self.write(json.dumps(base_common.msg.error(self.e_msgs[method], forget_status=True)))
+                    self.write(json.dumps(base_common.msg.error(self.e_msgs[method], forget_status=True), ensure_ascii=False))
                     return
 
                 if csettings.LB:
@@ -320,7 +320,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                     if not 'redirect_url' in result:
                         self.set_status(500)
                         self.set_header('Content-Type', 'application/json')
-                        self.write(json.dumps(base_common.msg.error(amsgs.MISSING_REDIRECTION_URL, forget_status=True)))
+                        self.write(json.dumps(base_common.msg.error(amsgs.MISSING_REDIRECTION_URL, forget_status=True), ensure_ascii=False))
 
                     _redirection_status = result['redirection_http_status'] if 'redirection_http_status' in result else 302
                     _permanent = _redirection_status == 301 or 'permanent' in result and result['permanent']
@@ -333,13 +333,13 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                     del result['http_status']
 
                 if result != {}:
-                    self.write(json.dumps(result))
+                    self.write(json.dumps(result, ensure_ascii=False))
 
             else:
                 log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method]))
                 self.set_status(404)
                 self.set_header('Content-Type', 'application/json')
-                self.write(json.dumps(base_common.msg.error(self.e_msgs[method], forget_status=True)))
+                self.write(json.dumps(base_common.msg.error(self.e_msgs[method], forget_status=True), ensure_ascii=False))
 
         except Exception as e:
 
@@ -347,4 +347,4 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                 "ip: {}, module: {}, function: {}, exception: e:{}".format(ip, self.apimodule.__name__, method, e))
             self.set_status(500)
             self.set_header('Content-Type', 'application/json')
-            self.write(json.dumps(base_common.msg.error(e, forget_status=True)))
+            self.write(json.dumps(base_common.msg.error(e, forget_status=True), ensure_ascii=False))

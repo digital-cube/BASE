@@ -67,9 +67,9 @@ def do_post(newusername, password, redirect_url, **kwargs):
     # encryptuj pass, successfully landing page
     data = {'cmd': 'change_username', 'newusername': newusername, 'id_user': dbuser.id_user,
             'password': passwd, 'redirect_url': redirect_url}
-    rh.set_argument('data', json.dumps(data))
+    rh.set_argument('data', json.dumps(data, ensure_ascii=False))
     kwargs['request_handler'] = rh
-    res = base_api.hash2params.save_hash.do_put(json.dumps(data), **kwargs)
+    res = base_api.hash2params.save_hash.do_put(json.dumps(data, ensure_ascii=False), **kwargs)
     if 'http_status' not in res or res['http_status'] != 200:
         return base_common.msg.error('Cannot handle forgot password')
 

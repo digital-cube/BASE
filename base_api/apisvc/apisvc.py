@@ -207,7 +207,7 @@ def get_api_specification(request, *args, **kwargs):
                 applications[app][mmod.name] = mm
 
     applist['applications'] = applications
-    applist = json.dumps(applist)
+    applist = json.dumps(applist, ensure_ascii=False)
 
     return applist
 

@@ -134,10 +134,10 @@ if __name__ == '__main__':
 
                 try:
                     mdata['send_result'] = res_msg
-                    mdata = json.dumps(mdata)
+                    mdata = json.dumps(mdata, ensure_ascii=False)
                 except Exception as e:
                     print('ERROR PREPARING MESSAGE DATA |{}|{}| FOR DATABASE: {}'.format(mdata, res_msg, e))
-                    mdata = json.dumps(mdata)  # just save it like it was before
+                    mdata = json.dumps(mdata, ensure_ascii=False)  # just save it like it was before
 
                 status = MAIL_ON_SENDING
                 if 200 <= response.status_code < 300:
