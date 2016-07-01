@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 User forgot password
 """
@@ -15,6 +17,7 @@ from base_config.service import support_mail
 
 import base_api.hash2params.save_hash
 import base_api.mail_api.save_mail
+from base_common.app_hooks import forgot_password_hook
 
 
 name = "Forgot password"
@@ -24,15 +27,15 @@ request_timeout = 10
 password_change_uri = 'user/password/new'
 
 
-def get_email_message(request, username, tk):
-
-    m = """Dear {},<br/> follow the link bellow to change your password:<br/>http://{}/{}/{}""".format(
-            username,
-            request.request.host,
-            password_change_uri,
-            tk)
-
-    return m
+# def get_email_message(request, username, tk):
+#
+#     m = """Dear {},<br/> follow the link bellow to change your password:<br/>http://{}/{}/{}""".format(
+#             username,
+#             request.request.host,
+#             password_change_uri,
+#             tk)
+#
+#     return m
 
 
 @app_api_method(
@@ -66,17 +69,22 @@ def do_put(username, *args, **kwargs):
 
     tk = res['h']
 
-    message = get_email_message(request, username, tk)
+    if not forgot_password_hook(request, username, tk, **kwargs):
+        log.critical('Error finishing username change process')
+        return base_common.msg.error(msgs.ERROR_PASSWORD_RESTORE)
 
-    # SAVE EMAIL FOR SENDING
-    rh1 = BaseAPIRequestHandler()
-    rh1.set_argument('sender', support_mail)
-    rh1.set_argument('receiver', username)
-    rh1.set_argument('message', message)
-    kwargs['request_handler'] = rh1
-    res = base_api.mail_api.save_mail.do_put(support_mail, username, message, *args, **kwargs)
-    if 'http_status' not in res or res['http_status'] != 204:
-        return base_common.msg.error('Error finishing change password request')
+    #
+    # message = get_email_message(request, username, tk)
+    #
+    # # SAVE EMAIL FOR SENDING
+    # rh1 = BaseAPIRequestHandler()
+    # rh1.set_argument('sender', support_mail)
+    # rh1.set_argument('receiver', username)
+    # rh1.set_argument('message', message)
+    # kwargs['request_handler'] = rh1
+    # res = base_api.mail_api.save_mail.do_put(support_mail, username, message, *args, **kwargs)
+    # if 'http_status' not in res or res['http_status'] != 204:
+    #     return base_common.msg.error('Error finishing change password request')
 
     return base_common.msg.post_ok(msgs.OK)
 

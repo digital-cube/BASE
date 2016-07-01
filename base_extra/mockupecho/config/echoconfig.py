@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 from collections import namedtuple
 DbConfig = namedtuple('DbConfig', 'db, host, user, passwd, charset')

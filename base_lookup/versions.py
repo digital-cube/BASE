@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 version_map= {
     '0.1.0': 'initial',

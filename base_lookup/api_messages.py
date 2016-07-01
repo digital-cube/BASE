@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 EXCEPTION = 1
 OK = 2
 USERNAME_ALREADY_TAKEN = 10
@@ -47,6 +49,7 @@ ERROR_PACK_LOOKUPS = 53
 SQL_QUERY_ERROR = 54
 ERROR_CHANGE_USERNAME = 55
 MISSING_REDIRECTION_URL = 56
+ERROR_PASSWORD_RESTORE = 57
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -98,3 +101,4 @@ msgs[ERROR_PACK_LOOKUPS] = "Error pack lookups"
 msgs[SQL_QUERY_ERROR] = "SQL Query error"
 msgs[ERROR_CHANGE_USERNAME] = "Change username error"
 msgs[MISSING_REDIRECTION_URL] = "Missing redirection url"
+msgs[ERROR_PASSWORD_RESTORE] = "Forget password error"

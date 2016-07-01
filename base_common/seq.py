@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import string
 import random
 from base_common import dbacommon

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from base_lookup.api_messages import msgs
 
 

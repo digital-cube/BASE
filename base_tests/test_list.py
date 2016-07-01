@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import sys
 import json
@@ -167,9 +169,9 @@ def base_user_change_username_test(svc_port):
     test(svc_port, base_api.users.change_username.location, 'POST', tk, {'username': 'user21@test.loc'}, 400,
          {'message': amsgs.msgs[amsgs.MISSING_REQUEST_ARGUMENT]})
     test(svc_port, base_api.users.change_username.location, 'POST', tk,
-         {'username': 'user21@test.loc', 'password': '12'}, 400, {'message': amsgs.msgs[amsgs.WRONG_PASSWORD]})
+         {'username': 'user21@test.loc', 'password': '12', 'redirect_url': '/mockurl/'}, 400, {'message': amsgs.msgs[amsgs.WRONG_PASSWORD]})
     test(svc_port, base_api.users.change_username.location, 'POST', tk,
-         {'username': 'user21@test.loc', 'password': '123'}, 200,
+         {'username': 'user21@test.loc', 'password': '123', 'redirect_url': '/mockurl/'}, 200,
          {'message': amsgs.msgs[amsgs.CHANGE_USERNAME_REQUEST]}, result_types={'message': str})
 
 
@@ -192,26 +194,26 @@ def base_user_changing_username_test(svc_port):
     dbuser = base_common.dbatokens.get_user_by_token(_db, tk, log)
 
     test(svc_port, base_api.users.change_username.location, 'POST', tk,
-         {'username': 'user21@test.loc', 'password': '123'}, 200,
+         {'username': 'user21@test.loc', 'password': '123', 'redirect_url': '/mockurl/'}, 200,
          {'message': amsgs.msgs[amsgs.CHANGE_USERNAME_REQUEST]}, result_types={'message': str})
 
     htk = base_tests.tests_common.parse_hash_from_change_username_mail(_db, 'user21@test.loc')
 
     loc = base_api.users.changing_username.location[:-2] + htk
-    test(svc_port, loc, 'GET', None, {}, 200, {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]},
-         result_types={'message': str})
+    test(svc_port, loc, 'GET', None, {}, 302,{})
+    # {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]}, result_types={'message': str})
     test(svc_port, loc, 'GET', None, {}, 400, {'message': amsgs.msgs[amsgs.PASSWORD_TOKEN_EXPIRED]},
          result_types={'message': str})
 
     test(svc_port, base_api.users.change_username.location, 'POST', tk,
-         {'username': 'user1@test.loc', 'password': '123'}, 200,
+         {'username': 'user1@test.loc', 'password': '123', 'redirect_url': '/mockurl/'}, 200,
          {'message': amsgs.msgs[amsgs.CHANGE_USERNAME_REQUEST]}, result_types={'message': str})
 
     htk1 = base_tests.tests_common.parse_hash_from_change_username_mail(_db,'user1@test.loc')
 
     loc1 = base_api.users.changing_username.location[:-2] + htk1
-    test(svc_port, loc1, 'GET', None, {}, 200, {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]},
-         result_types={'message': str})
+    test(svc_port, loc1, 'GET', None, {}, 302 ,{})
+         # {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]}, result_types={'message': str})
 
 
 def base_save_message_test(svc_port):

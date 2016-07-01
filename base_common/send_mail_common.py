@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import mandrill
 import base_config.settings
 from base_config.service import log

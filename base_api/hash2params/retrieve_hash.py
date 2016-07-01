@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Get params for id
 """

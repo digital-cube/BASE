@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 tests_included = [
     'echo_get_test',

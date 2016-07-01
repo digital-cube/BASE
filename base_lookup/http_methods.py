@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 GET = 1
 PUT = 2
 DELETE = 3

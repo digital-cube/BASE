@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 IMPORTS = [
     # 'base_api.users.user_data',
     'base_api.users.user_check',

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Application specific hooks will be added to this module, or
 existing will be overloaded if needed
@@ -11,6 +13,7 @@ prepare_login_query -- prepare query for user login (parameters: username)
 post_login_digest -- post login processing (parameters: id_user, username, password(plain), login token)
 change_username_hook -- change username modifications (parameters: hash for hash_2_param, new username, dbuser, **kwargs)
 change_username_success_hook -- change username modifications (parameters: )
+forgot_password_hook - forgot password (parameters: )
 """
 
 import base_config.settings
@@ -97,6 +100,17 @@ def prepare_login_query(username):
 
     return q
 
+password_change_uri = 'user/password/new'
+
+def get_email_message(request, username, tk):
+
+    m = """Dear {},<br/> follow the link bellow to change your password:<br/>http://{}/{}/{}""".format(
+            username,
+            request.request.host,
+            password_change_uri,
+            tk)
+
+    return m
 
 def _get_email_warning(oldusername, newusername):
     """
@@ -182,3 +196,20 @@ def change_username_success_hook(receiver, **kwargs):
 
     return True
 
+def forgot_password_hook(request, receiver, tk, **kwargs):
+
+    message = get_email_message(request, receiver, tk)
+
+    # SAVE EMAILS FOR SENDING
+    rh1 = BaseAPIRequestHandler()
+    rh1.set_argument('sender', support_mail)
+    rh1.set_argument('receiver', receiver)
+    rh1.set_argument('subject', 'Forgot password query')
+    rh1.set_argument('message', message)
+    kwargs['request_handler'] = rh1
+    res = base_api.mail_api.save_mail.do_put(support_mail, receiver, message, **kwargs)
+    if 'http_status' not in res or res['http_status'] != 204:
+        log.critical('Error save info message')
+        return False
+
+    return True
