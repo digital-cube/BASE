@@ -9,6 +9,7 @@ from MySQLdb import IntegrityError
 
 import base_common.msg
 import base_common.app_hooks as apphooks
+import base_config.settings
 from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import get_db
@@ -17,6 +18,7 @@ from base_common.seq import sequencer
 from base_lookup import api_messages as msgs
 from base_config.service import log
 from base_common.dbacommon import check_user_registered
+
 
 name = "Registration"
 location = "user/register"
@@ -43,8 +45,9 @@ def do_post(username, password, users_data, **kwargs):
     if check_user_registered(dbc, username):
         return base_common.msg.error(msgs.USERNAME_ALREADY_TAKEN)
 
-    if hasattr(apphooks, 'check_password_is_valid') and not apphooks.check_password_is_valid(password):
-        return base_common.msg.error(msgs.INVALID_PASSWORD)
+    if base_config.settings.STRONG_PASSWORD:
+        if not apphooks.check_password_is_valid(username, password, users_data, **kwargs):
+            return base_common.msg.error(msgs.INVALID_PASSWORD)
 
     u_id = sequencer().new('u')
 

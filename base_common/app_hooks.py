@@ -213,3 +213,74 @@ def forgot_password_hook(request, receiver, tk, **kwargs):
         return False
 
     return True
+
+
+def check_password_is_valid(password, *args, **kwargs):
+
+    import re
+
+    _password = password
+    password = _password.lower()
+    # _first_name = first_name.lower()
+    # _last_name = last_name.lower()
+    # _email = username.lower()
+
+    # email_uname = _email.split('@')[0]
+    # email_domain = _email.split('@')[1]
+
+    if len(password) < 8:
+        log.critical("Minimum password length should be 8 characters")
+        return False
+
+    if not (re.compile(r'.*[a-z]')).match(_password):
+        log.critical("Password should contain at least one lowercase character")
+        return False
+
+    if not (re.compile(r'.*[A-Z]')).match(_password):
+        log.critical("Password should contain at least one uppercase character")
+        return False
+
+    if not (re.compile(r'.*[0-9]')).match(_password):
+        log.critical("Password should contain at least one number")
+        return False
+
+    # if (re.compile(".*" + _first_name)).match(password) or (re.compile(".*" + _last_name)).match(password):
+    #     log.critical("Password should not contains first or last name :{},{}".format(first_name, last_name))
+    #     return False
+
+    # if (re.compile(".*" + email_uname)).match(password) or (re.compile(".*" + email_domain)).match(password):
+    #     log.critical("Password should not contains email or domain :{},{}".format(email_uname, email_domain))
+    #     return False
+
+    not_allowed = []
+    for i in range(1, 8):
+        res = str(i) + str(i + 1) + str(i + 2)
+        not_allowed.append(res)
+
+    for i in range(9, 2, -1):
+        res = str(i) + str(i - 1) + str(i - 2)
+        not_allowed.append(res)
+
+    not_allowed.extend(('qwe', 'asd', 'zxc', 'qaz', 'qay', 'abc', 'xyz'))
+
+    for i in range(len(not_allowed) - 1, -1, -1):
+        if (re.compile(".*" + not_allowed[i])).match(_password):
+            log.critical("Password should not contain :{}".format(not_allowed[i]))
+            return False
+
+    allowed = r'`!"?$%?^&*()_-={[}]:;@\'~#|\<,>.?/+'
+
+    for i in range(ord('a'), ord('z') + 1):
+        allowed += chr(i)
+
+    for i in range(ord('0'), ord('9') + 1):
+        allowed += chr(i)
+
+    for i in range(len(password) - 1, -1, -1):
+        k = password[i]
+        for j in range(0, len(allowed)):
+            if k not in allowed:
+                log.critical("Password should not contain :{}".format(k))
+                return False
+
+    return True
