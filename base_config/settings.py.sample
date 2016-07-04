@@ -36,4 +36,5 @@ MASTER=False    # IP address of the master server
 MAIL_API_KEY = 'mandrillapikey'
 MAIL_CHANNEL = 'BSM'
 MAIL_CHANNEL_TIMEOUT = 2
-STRONG_PASSWORD=False
+STRONG_PASSWORD = False
+
