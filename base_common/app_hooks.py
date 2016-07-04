@@ -218,8 +218,24 @@ def forgot_password_hook(request, receiver, tk, **kwargs):
 def check_password_is_valid(password, *args, **kwargs):
 
     import re
+    import json
 
     server_msg = None
+
+    # try:
+    #     users_data = json.loads(users_data)
+    # except (json.decoder.JSONDecodeError, TypeError) as e:
+    #     log.critical('Users data are not in json: {}'.format(e))
+    #     return False
+    #
+    # requested_args = ['fname', 'lname']  #Check how is mapped in project database
+    # for a in requested_args:
+    #     if a not in users_data:
+    #         log.critical('Missing argument {}'.format(a))
+    #         return False
+    #
+    # first_name = users_data['fname']
+    # last_name = users_data['lname']
 
     _password = password
     password = _password.lower()
