@@ -219,6 +219,8 @@ def check_password_is_valid(password, *args, **kwargs):
 
     import re
 
+    server_msg = None
+
     _password = password
     password = _password.lower()
     # _first_name = first_name.lower()
@@ -229,20 +231,24 @@ def check_password_is_valid(password, *args, **kwargs):
     # email_domain = _email.split('@')[1]
 
     if len(password) < 8:
-        log.critical("Minimum password length should be 8 characters")
-        return False
+        server_msg = "Minimum password length should be 8 characters"
+        log.critical(server_msg)
+        return False, server_msg
 
     if not (re.compile(r'.*[a-z]')).match(_password):
-        log.critical("Password should contain at least one lowercase character")
-        return False
+        server_msg = "Password should contain at least one lowercase character"
+        log.critical(server_msg)
+        return False, server_msg
 
     if not (re.compile(r'.*[A-Z]')).match(_password):
-        log.critical("Password should contain at least one uppercase character")
-        return False
+        server_msg = "Password should contain at least one uppercase character"
+        log.critical(server_msg)
+        return False, server_msg
 
     if not (re.compile(r'.*[0-9]')).match(_password):
-        log.critical("Password should contain at least one number")
-        return False
+        server_msg = "Password should contain at least one number"
+        log.critical(server_msg)
+        return False, server_msg
 
     # if (re.compile(".*" + _first_name)).match(password) or (re.compile(".*" + _last_name)).match(password):
     #     log.critical("Password should not contains first or last name :{},{}".format(first_name, last_name))
@@ -265,8 +271,9 @@ def check_password_is_valid(password, *args, **kwargs):
 
     for i in range(len(not_allowed) - 1, -1, -1):
         if (re.compile(".*" + not_allowed[i])).match(_password):
-            log.critical("Password should not contain :{}".format(not_allowed[i]))
-            return False
+            server_msg = "Password should not contain :{}".format(not_allowed[i])
+            log.critical(server_msg)
+            return False, server_msg
 
     allowed = r'`!"?$%?^&*()_-={[}]:;@\'~#|\<,>.?/+'
 
@@ -280,7 +287,8 @@ def check_password_is_valid(password, *args, **kwargs):
         k = password[i]
         for j in range(0, len(allowed)):
             if k not in allowed:
-                log.critical("Password should not contain :{}".format(k))
-                return False
+                server_msg = "Password should not contain :{}".format(k)
+                log.critical(server_msg)
+                return False, server_msg
 
-    return True
+    return True, 'ok'
