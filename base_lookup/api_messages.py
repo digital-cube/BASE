@@ -50,6 +50,7 @@ SQL_QUERY_ERROR = 54
 ERROR_CHANGE_USERNAME = 55
 MISSING_REDIRECTION_URL = 56
 ERROR_PASSWORD_RESTORE = 57
+INVALID_HASH_DATA = 58
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -102,3 +103,4 @@ msgs[SQL_QUERY_ERROR] = "SQL Query error"
 msgs[ERROR_CHANGE_USERNAME] = "Change username error"
 msgs[MISSING_REDIRECTION_URL] = "Missing redirection url"
 msgs[ERROR_PASSWORD_RESTORE] = "Forget password error"
+msgs[INVALID_HASH_DATA] = "Invalid hash data"

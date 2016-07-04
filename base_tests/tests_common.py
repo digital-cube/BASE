@@ -133,7 +133,7 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
 
 
 def test(svc_port, location, method, token, data, expected_status={}, expected_data={}, result_types={},
-         warning_level=WarningLevel.STRICT):
+         warning_level=WarningLevel.STRICT, skip_info_log = False):
     __result = {}
 
     if not test_db_is_active():
@@ -145,7 +145,9 @@ def test(svc_port, location, method, token, data, expected_status={}, expected_d
         log_failed(location, method, __result)
         finish_tests(base_config.settings.S_PID, success=False)
 
-    log_passed(location, method, __result)
+    if not skip_info_log:
+        log_passed(location, method, __result)
+
     return __result
 
 

@@ -57,6 +57,10 @@ def do_put(sender, sender_name, receiver, receiver_name, subject, emessage, _get
     """
     Save e-mail message
     """
+    return save_email(sender, sender_name, receiver, receiver_name, subject, emessage, _get_id, data)
+
+
+def save_email(sender, sender_name, receiver, receiver_name, subject, emessage, _get_id, data, **kwargs):
 
     _db = get_db()
     dbc = _db.cursor()
