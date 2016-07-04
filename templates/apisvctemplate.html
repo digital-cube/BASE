@@ -73,6 +73,7 @@
                   {% end %}
 
                     {% for m in methods %}
+
                     {% set link = m %}
 
                         {% set g =g + 1 %}
@@ -95,7 +96,7 @@
                              <h5 style="color:darkgray;"> {{ short_desc_doc }} ({{long_desc_doc}})</h5>
                                 <div id="quickpay-swagger">
 
-                                {% for s in method %}
+                                {% for s in sorted(method) %}
                                 {% if method[s] != 'Missing docstring' %}
 
                                     {% set bg_stil = s.lower()+'_bg' %}
