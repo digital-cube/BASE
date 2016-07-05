@@ -65,3 +65,20 @@ def do_put(hdata, **kwargs):
 
     return base_common.msg.post_ok({'h': h_id})
 
+
+def save_hash(hdata):
+
+    _db = get_db()
+    dbc = _db.cursor()
+
+    h_id = sequencer().new('h')
+
+    h2p = prepare_hash2params_query(h_id, hdata)
+    try:
+        dbc.execute(h2p)
+    except IntegrityError as e:
+        return False
+
+    _db.commit()
+
+    return h_id
