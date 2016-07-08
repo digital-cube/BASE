@@ -73,6 +73,7 @@
                   {% end %}
 
                     {% for m in methods %}
+
                     {% set link = m %}
 
                         {% set g =g + 1 %}
@@ -95,7 +96,7 @@
                              <h5 style="color:darkgray;"> {{ short_desc_doc }} ({{long_desc_doc}})</h5>
                                 <div id="quickpay-swagger">
 
-                                {% for s in method %}
+                                {% for s in sorted(method) %}
                                 {% if method[s] != 'Missing docstring' %}
 
                                     {% set bg_stil = s.lower()+'_bg' %}
@@ -132,7 +133,12 @@
                                                     <tbody>
                                                       <!--  -->
                                                       <tr>
-                                                        <td>{{method[s]['func_description_long']}}</td>
+
+                                                          {% set ful_desc = method[s]['func_description_long']  %}
+                                                          {% if ful_desc is None  %}
+                                                                {% set ful_desc = '' %}
+                                                          {% end %}
+                                                        <td>{{ful_desc}}</td>
                                                       </tr>
                                                       <!--  -->
                                                     </tbody>
@@ -165,6 +171,7 @@
                                                        {% end %}
 
                                                         {% if 'req' in ms['parameters'][keys] %}
+                                                        {{ms['parameters'][keys]['req']}}
                                                             {% set p_req = ms['parameters'][keys]['req'] %}
                                                        {% else %}
                                                             {% set p_req = '' %}
@@ -206,6 +213,9 @@
 
                                                                                     {% if 'description' in ms['return'][keys] %}
                                                                                         {% set r_description = ms['return'][keys]['description'] %}
+                                                                                        {% if r_description ==  "Missing description" %}
+                                                                                                {% set r_description = '' %}
+                                                                                        {% end %}
                                                                                     {% else %}
                                                                                         {% set r_description = '' %}
                                                                                     {% end %}
