@@ -96,6 +96,8 @@ def pack_user_by_id(db, id_user, get_dict=False):
 
 def prepare_login_query(username):
 
+    #TODO trebalo bi traziti username/password kombinaciju
+
     q = "select id, password from users where username = '{}' and active=1".format( username )
 
     return q
@@ -308,3 +310,7 @@ def check_password_is_valid(password, *args, **kwargs):
                 return False, server_msg
 
     return True, 'ok'
+
+
+def action_log_hook(id_user, ip, action, message):
+    return

@@ -38,9 +38,13 @@ def do_post(username, password, **kwargs):
 
     q = apphooks.prepare_login_query(username)
 
+    ip = kwargs['r_ip'];
+
     dbc.execute(q)
     if dbc.rowcount != 1:
-        log.critical('{} users found: {}'.format(username, dbc.rowcount))
+        msg = '{} users found: {}'.format(username, dbc.rowcount)
+        log.critical(msg)
+        apphooks.action_log_hook(None, ip, 'login', msg)
         return base_common.msg.error(msgs.USER_NOT_FOUND)
 
     us = dbc.fetchone()
@@ -48,7 +52,9 @@ def do_post(username, password, **kwargs):
     u_pwd = us['password']
 
     if not check_password(u_pwd, username, password):
-        log.critical('Username {} wrong password: {}'.format(username, password))
+        msg = 'Username {} wrong password: {}'.format(username, password)
+        log.critical(msg)
+        apphooks.action_log_hook(None, ip, 'login', msg)
         return base_common.msg.error(msgs.USER_NOT_FOUND)
 
     if hasattr(apphooks, 'login_expansion') and not apphooks.login_expansion(us):
@@ -72,6 +78,6 @@ def do_post(username, password, **kwargs):
         if isinstance(post_d, dict):
             res.update(post_d)
 
+    apphooks.action_log_hook(u_id,ip, 'login', 'user {} successfuly logged in'.format(username))
     return base_common.msg.post_ok(res)
-
 

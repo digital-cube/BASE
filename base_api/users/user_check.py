@@ -45,5 +45,6 @@ def do_post(**kwargs):
         if isinstance(_extend_res, dict):
             d.update(_extend_res)
 
+    apphooks.action_log_hook(dbuser.id_user, kwargs['r_ip'], 'check', 'user {} successfuly checked status'.format(dbuser.username))
     return base_common.msg.post_ok(d)
 
