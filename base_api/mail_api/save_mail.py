@@ -19,23 +19,23 @@ name = "E-mail Save"
 location = "email/message/save"
 request_timeout = 10
 
-
-def get_mail_query(sender, sender_name, receiver, receiver_name, subject, message, data):
-    n = datetime.datetime.now()
-    q = "insert into mail_queue (id, sender, sender_name, receiver, receiver_name, time_created, subject, message, data) " \
-        "VALUES " \
-        "(null, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
-            sender,
-            sender_name,
-            receiver,
-            receiver_name,
-            str(n),
-            subject,
-            message,
-            data if data else ''
-        )
-
-    return q
+#
+# def get_mail_query(sender, sender_name, receiver, receiver_name, subject, message, data):
+#     n = datetime.datetime.now()
+#     q = "insert into mail_queue (id, sender, sender_name, receiver, receiver_name, time_created, subject, message, data) " \
+#         "VALUES " \
+#         "(null, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
+#             sender,
+#             sender_name,
+#             receiver,
+#             receiver_name,
+#             str(n),
+#             subject,
+#             message,
+#             data if data else ''
+#         )
+#
+#     return q
 
 
 @app_api_method(
@@ -57,7 +57,15 @@ def do_put(sender, sender_name, receiver, receiver_name, subject, emessage, _get
     """
     Save e-mail message
     """
-    return save_email(sender, sender_name, receiver, receiver_name, subject, emessage, _get_id, data)
+    res, err, m_id = save_email(sender, sender_name, receiver, receiver_name, subject, emessage, _get_id, data)
+
+    if not res:
+        return base_common.msg.error(err)
+
+    if m_id:
+        return base_common.msg.ok({'message_id': m_id})
+
+    return base_common.msg.ok()
 
 
 def save_email(sender, sender_name, receiver, receiver_name, subject, emessage, _get_id, data, **kwargs):
@@ -71,13 +79,15 @@ def save_email(sender, sender_name, receiver, receiver_name, subject, emessage, 
     if receiver_name is None:
         receiver_name = receiver
 
-    q = get_mail_query(sender, sender_name, receiver, receiver_name, subject, emessage, data)
     from MySQLdb import IntegrityError
     try:
-        dbc.execute(q)
+        dbc.execute('insert into mail_queue (id, sender, sender_name, receiver, receiver_name, time_created, subject, message, data) values (%s,%s,%s,%s,%s,now(),%s,%s,%s)',
+                    (None, sender, sender_name, receiver, receiver_name, subject, emessage, data))
+
+        print (dbc._last_executed)
     except IntegrityError as e:
         log.critical('Inserting mail queue: {}'.format(e))
-        return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
+        return False, msgs.CANNOT_SAVE_MESSAGE, None
 
     _db.commit()
     m_id = dbc.lastrowid
@@ -97,6 +107,6 @@ def save_email(sender, sender_name, receiver, receiver_name, subject, emessage, 
     rdb.lpush(MAIL_CHANNEL, r_data)
 
     if _get_id:
-        return base_common.msg.post_ok({'message_id': m_id})
+        return True, None, m_id
 
-    return base_common.msg.post_ok()
+    return True, None, None
