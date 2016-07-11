@@ -20,10 +20,12 @@ from base_common.dbacommon import get_url_token
 from base_common.dbacommon import check_password
 from base_svc.comm import BaseAPIRequestHandler
 import base_api.hash2params.retrieve_hash
+from base_common.dbacommon import params
+
 
 
 name = "Change password"
-location = "user/password/change.*"
+location = "user/password/change"
 request_timeout = 10
 
 
@@ -31,7 +33,11 @@ request_timeout = 10
     method='POST',
     api_return=[(200, 'OK'), (404, '')]
 )
-def do_post(**kwargs):
+@params(
+    {'arg': 'newpassword', 'type': str, 'required': True, 'description': 'new password'},
+    {'arg': 'hash', 'type': str, 'required': True, 'description': 'hash'},
+)
+def do_post(newpassword, hash, **kwargs):
     """
     Change password
     """
@@ -40,21 +46,14 @@ def do_post(**kwargs):
     dbc = _db.cursor()
     request = kwargs['request_handler']
 
-    try:
-        newpassword = request.get_argument('newpassword')
-    except tornado.web.MissingArgumentError:
-        log.critical('Missing argument password')
-        return base_common.msg.error(msgs.MISSING_REQUEST_ARGUMENT)
-
     # CHANGE PASSWORD FROM FORGOT PASSWORD FLOW
-    h2p = get_url_token(request)
-    if h2p and len(h2p) > 60:
+    if hash and len(hash) > 60:
 
         rh = BaseAPIRequestHandler()
-        rh.set_argument('hash', h2p)
+        rh.set_argument('hash', hash)
         rh.r_ip = request.r_ip
         kwargs['request_handler'] = rh
-        res = base_api.hash2params.retrieve_hash.do_get(h2p, False, **kwargs)
+        res = base_api.hash2params.retrieve_hash.do_get(hash, False, **kwargs)
         if 'http_status' not in res or res['http_status'] != 200:
             return base_common.msg.error(msgs.PASSWORD_TOKEN_EXPIRED)
 

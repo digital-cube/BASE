@@ -102,9 +102,10 @@ def prepare_login_query(username):
 
     return q
 
-password_change_uri = 'user/password/new'
 
 def get_email_message(request, username, tk):
+
+    password_change_uri = 'user/password/new'
 
     m = """Dear {},<br/> follow the link bellow to change your password:<br/>http://{}/{}/{}""".format(
             username,
