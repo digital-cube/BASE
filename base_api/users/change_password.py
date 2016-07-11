@@ -28,14 +28,13 @@ name = "Change password"
 location = "user/password/change"
 request_timeout = 10
 
-
 @app_api_method(
     method='POST',
     api_return=[(200, 'OK'), (404, '')]
 )
 @params(
     {'arg': 'newpassword', 'type': str, 'required': True, 'description': 'new password'},
-    {'arg': 'hash', 'type': str, 'required': True, 'description': 'hash'},
+    {'arg': 'hash', 'type': str, 'required': False, 'description': 'hash'},
 )
 def do_post(newpassword, hash, **kwargs):
     """
