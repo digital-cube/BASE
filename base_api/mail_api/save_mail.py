@@ -38,9 +38,13 @@ request_timeout = 10
 #     return q
 
 
+#TODO: ograniciti ga samo na lokal!
+
 @app_api_method(
     method='PUT',
-    expose=False,
+
+    expose=True,    #TODO da bude expozovan samo na lokalu
+
     api_return=[(200, 'OK'), (404, 'notice')]
 )
 @params(
