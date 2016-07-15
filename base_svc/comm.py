@@ -337,6 +337,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
             else:
                 log.error("ip: {}, {} not implemented".format(ip, http_rev_map[method]))
+                log.error("ip: {}, {} ({}) not implemented, with module map: {}".format(ip, http_rev_map[method], method, self.apimodule_map))
                 self.set_status(404)
                 self.set_header('Content-Type', 'application/json')
                 self.write(json.dumps(base_common.msg.error(self.e_msgs[method], forget_status=True), ensure_ascii=False))

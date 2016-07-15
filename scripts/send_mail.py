@@ -92,6 +92,7 @@ if __name__ == '__main__':
                 receiver_name = res['receiver_name']
                 subject = res['subject']
                 emsg = res['message']
+
                 mdata = res['data']
                 id_msg = res['id']
 
@@ -160,4 +161,5 @@ if __name__ == '__main__':
                 if single_shot:
                     sys.exit()
 
-                time.sleep(.5)
+                time.sleep(0.5)
+
