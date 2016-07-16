@@ -55,8 +55,6 @@ if __name__ == '__main__':
         print('Invalid value for port {}, has to be int '.format(sys.argv[1]))
         sys.exit(1)
 
-    db = conn_to_db()
-    dbc = db.cursor()
 
     q = '''SELECT
             id, sender, sender_name, receiver, receiver_name, subject, message, data
@@ -66,6 +64,10 @@ if __name__ == '__main__':
             sent = {}'''.format(MAIL_NOT_SENT)
 
     while True:
+
+        db = conn_to_db()
+        dbc = db.cursor()
+
 
         try:
             dbc.execute(q)
@@ -160,3 +162,4 @@ if __name__ == '__main__':
                     sys.exit()
 
                 time.sleep(0.5)
+
