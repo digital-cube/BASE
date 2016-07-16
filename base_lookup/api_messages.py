@@ -51,6 +51,8 @@ ERROR_CHANGE_USERNAME = 55
 MISSING_REDIRECTION_URL = 56
 ERROR_PASSWORD_RESTORE = 57
 INVALID_HASH_DATA = 58
+CLUB_NOT_FOUND = 59
+HEAD_COACH_NOT_FOUND = 60
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -104,3 +106,5 @@ msgs[ERROR_CHANGE_USERNAME] = "Change username error"
 msgs[MISSING_REDIRECTION_URL] = "Missing redirection url"
 msgs[ERROR_PASSWORD_RESTORE] = "Forget password error"
 msgs[INVALID_HASH_DATA] = "Invalid hash data"
+msgs[CLUB_NOT_FOUND] = "Club not found"
+msgs[HEAD_COACH_NOT_FOUND] = "Head coach not found"
