@@ -55,6 +55,7 @@ def do_post(username, password, **kwargs):
     try:
         with open('/tmp/upwd.base') as f:
             upwd = f.read()
+            
     except Exception as e:
         pass
 
