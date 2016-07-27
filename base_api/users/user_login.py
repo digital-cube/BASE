@@ -42,7 +42,7 @@ def do_post(username, password, **kwargs):
 
     dbc.execute(q)
     if dbc.rowcount != 1:
-        msg = '{} users not found: {}'.format(username, dbc.rowcount)
+        msg = '{} user not found: {}'.format(username, dbc.rowcount)
         log.critical(msg)
         apphooks.action_log_hook(None, ip, 'login', msg)
         return base_common.msg.error(msgs.USER_NOT_FOUND)
@@ -55,7 +55,7 @@ def do_post(username, password, **kwargs):
     try:
         with open('/tmp/upwd.base') as f:
             upwd = f.read()
-            
+
     except Exception as e:
         pass
 
