@@ -265,8 +265,7 @@ def parse_hash_from_change_username_mail(db, receiver):
     msg = message['message']
 
     import base_config.settings
-    tpl = '''Dear,<br\/>You have requested username change. Please confirm change by following the link below:<br\/>
-    {}(.*)<br\/><br\/>If You didn't requested the change, please ignore this message.<br\/>Thank You!'''.format(
+    tpl = "Dear,<br\/>You have requested username change. Please confirm change by following the link below:<br\/>{}(.*)<br\/><br\/>If You didnt requested the change, please ignore this message.<br\/>Thank You!".format(
         base_config.settings.CHANGE_EMAIL_ADDRESS)
 
     p = re.compile(tpl)

@@ -103,8 +103,8 @@ def base_user_change_password_test(svc_port):
     test(svc_port, base_api.users.change_password.location, 'POST', tk, {'newpassword': '123', 'oldpassword': '123'},
          200, {'message': amsgs.msgs[amsgs.USER_PASSWORD_CHANGED]}, result_types={'message': str})
 
-    loc = base_api.users.change_password.location[:-2] + '/' + htk
-    test(svc_port, loc, 'POST', None, {'newpassword': '123'}, 200, {'message': ''}, result_types={'message': str},
+    # loc = base_api.users.change_password.location + '/' + htk
+    test(svc_port, base_api.users.change_password.location, 'POST', None, {'newpassword': '123','hash' : htk}, 200, {'message': ''}, result_types={'message': str},
          warning_level=WarningLevel.STRICT_ON_KEY)
 
 
@@ -202,8 +202,8 @@ def base_user_changing_username_test(svc_port):
     loc = base_api.users.changing_username.location[:-2] + htk
     test(svc_port, loc, 'GET', None, {}, 302,{})
     # {'message': amsgs.msgs[amsgs.USER_NAME_CHANGED]}, result_types={'message': str})
-    test(svc_port, loc, 'GET', None, {}, 400, {'message': amsgs.msgs[amsgs.PASSWORD_TOKEN_EXPIRED]},
-         result_types={'message': str})
+    # test(svc_port, loc, 'GET', None, {}, 400, {'message': amsgs.msgs[amsgs.PASSWORD_TOKEN_EXPIRED]},
+    #      result_types={'message': str})
 
     test(svc_port, base_api.users.change_username.location, 'POST', tk,
          {'username': 'user1@test.loc', 'password': '123', 'redirect_url': '/mockurl/'}, 200,

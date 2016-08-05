@@ -142,8 +142,7 @@ def _get_email_message(h):
     """
 
     l = '{}/{}'.format(base_config.settings.CHANGE_EMAIL_ADDRESS, h)
-    m = '''Dear,<br/>You have requested username change. Please confirm change by following the link below:<br/>
-    {}<br/><br/>If You didn't requested the change, please ignore this message.<br/>Thank You!'''.format(l)
+    m = '''Dear,<br/>You have requested username change. Please confirm change by following the link below:<br/>{}<br/><br/>If You didnt requested the change, please ignore this message.<br/>Thank You!'''.format(l)
 
     return m
 
