@@ -53,6 +53,7 @@ ERROR_PASSWORD_RESTORE = 57
 INVALID_HASH_DATA = 58
 CLUB_NOT_FOUND = 59
 HEAD_COACH_NOT_FOUND = 60
+INVALID_INVOICE_STATUS = 61
 
 msgs = {}
 msgs[EXCEPTION] = "Exception"
@@ -108,3 +109,4 @@ msgs[ERROR_PASSWORD_RESTORE] = "Forget password error"
 msgs[INVALID_HASH_DATA] = "Invalid hash data"
 msgs[CLUB_NOT_FOUND] = "Club not found"
 msgs[HEAD_COACH_NOT_FOUND] = "Head coach not found"
+msgs[INVALID_INVOICE_STATUS] = "Invalid invoice status"

@@ -16,9 +16,9 @@ log.addHandler(log_handler)
 log.setLevel(logging.DEBUG)
 
 db_host = 'localhost'
-db_user = 'one'
+db_user = 'avuser'
 db_passwd = '123'
-db_name = 'test_one'  # Promenjeno za potrebe TESTA
+db_name = 'avalon'  # Promenjeno za potrebe TESTA
 db_charset = 'utf8'
 
 sg_key = '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'
