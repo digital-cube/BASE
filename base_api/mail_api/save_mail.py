@@ -14,6 +14,7 @@ from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import get_db
 from base_common.dbacommon import get_redis_db
+import sys
 
 name = "E-mail Save"
 location = "email/message/save"
@@ -88,7 +89,7 @@ def save_email(sender, sender_name, receiver, receiver_name, subject, emessage, 
         dbc.execute('insert into mail_queue (id, sender, sender_name, receiver, receiver_name, time_created, subject, message, data) values (%s,%s,%s,%s,%s,now(),%s,%s,%s)',
                     (None, sender, sender_name, receiver, receiver_name, subject, emessage, data))
 
-        print (dbc._last_executed)
+        # print (dbc._last_executed)
     except IntegrityError as e:
         log.critical('Inserting mail queue: {}'.format(e))
         return False, msgs.CANNOT_SAVE_MESSAGE, None
@@ -108,7 +109,10 @@ def save_email(sender, sender_name, receiver, receiver_name, subject, emessage, 
 
     r_data = json.dumps(r_data, ensure_ascii=False)
 
-    rdb.lpush(MAIL_CHANNEL, r_data)
+    from config import send_mail_config
+
+    __SVC_PORT = send_mail_config.SVC_PORT
+    rdb.lpush("{} {}".format(MAIL_CHANNEL, __SVC_PORT), r_data)
 
     if _get_id:
         return True, None, m_id

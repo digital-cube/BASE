@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# This file should be located in project
+
+log_filename = "/var/log/base/send_mail.log"
+_log = "DGTL"
+
+db_host = 'localhost'
+db_user = 'one'
+db_passwd = '123'
+db_name = 'one'  # Promenjeno za potrebe TESTA
+db_charset = 'utf8'
+
+sg_key = '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'
+
+REDIS_SERVER = 'localhost'
+REDIS_PORT = 6379
+SVC_PORT = 8600

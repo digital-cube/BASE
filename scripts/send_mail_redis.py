@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import json
 import sys
 import time
+import json
+import urllib
 
 import MySQLdb
 import MySQLdb.cursors
@@ -12,18 +13,35 @@ import sendgrid
 from MySQLdb import IntegrityError
 import redis
 
-from send_mail_config import log, db_host, db_user, db_passwd, db_name, db_charset, sg_key
-from send_mail_config import REDIS_PORT, REDIS_SERVER
+# from send_mail_config import log, db_host, db_user, db_passwd, db_name, db_charset, sg_key
+# from send_mail_config import REDIS_PORT, REDIS_SERVER
+
 MAIL_NOT_SENT = 0
 MAIL_ON_SENDING = 1
 MAIL_SUCCESSFULLY_SENT = 2
 MAIL_SENT_ERROR = 3
 
 
-import importlib
+from base_svc.comm import call
 
-importlib.import_module('../../avalonapi/config/avlconfig.py')
-
+# def call(svc_url, port, location, data, method, request_timeout=10, force_json=False, call_headers=None):
+#     import http.client
+#     conn = http.client.HTTPConnection(svc_url, port)
+#
+#     if force_json:
+#         body = json.dumps(data, ensure_ascii=False)
+#         _headers = {'content-type': 'application/json'}
+#     else:
+#         body = urllib.parse.urlencode(data)
+#         _headers = {'content-type': 'application/x-www-form-urlencoded'}
+#
+#     if call_headers:
+#         _headers.update(call_headers)
+#
+#     conn.request(method, "/" + location, body, headers=_headers)
+#
+#     response = conn.getresponse()
+#     return response.read().decode('utf-8'), response.status
 
 def get_mail_query_ok(id_msg, msg_datetime, status, mdata):
     return '''UPDATE mail_queue set sent = {}, time_sent = '{}', data = '{}' WHERE id = {} '''.format(
@@ -33,30 +51,24 @@ def get_mail_query_err(id_msg, msg_datetime, status, mdata):
     return '''UPDATE mail_queue set sent = {}, time_sent = '{}', data = '{}' WHERE id = {} '''.format(
         status, str(msg_datetime), mdata, id_msg)
 
-def get_redis_db():
+def get_redis_db(res):
 
-    __redis = redis.Redis(host=REDIS_SERVER, port=REDIS_PORT)
+    __redis = redis.Redis(host=res['REDIS_SERVER'], port=res['REDIS_PORT'])
 
     return __redis
 
-def conn_to_db():
+def conn_to_db(res):
 
     return MySQLdb.connect(
-        db=db_name,
-        host=db_host,
-        user=db_user,
-        passwd=db_passwd,
-        charset=db_charset,
+        db=res['db_name'],
+        host=res['db_host'],
+        user=res['db_user'],
+        passwd=res['db_passwd'],
+        charset=res['db_charset'],
         cursorclass=MySQLdb.cursors.DictCursor)
 
 
 if __name__ == '__main__':
-
-    r = get_redis_db()
-
-    single_shot = '-s' in sys.argv
-
-    log.info('STARTING mail sender {}'.format(' in single shot mode' if single_shot else ''))
 
     try:
         svc_port = int(sys.argv[1])
@@ -65,12 +77,37 @@ if __name__ == '__main__':
         print('Invalid value for port {}, has to be int '.format(sys.argv[1]))
         sys.exit(1)
 
-    db = conn_to_db()
+    res = call('localhost', svc_port, 'params', {}, 'GET', request_timeout=10, force_json=False, call_headers=None)
+    _res = res[0]
+    __res = json.loads(_res)
+
+    import logging
+    from logging.handlers import TimedRotatingFileHandler
+
+    log_filename = __res['send_mail_log']
+    log_handler = TimedRotatingFileHandler(log_filename, when="midnight")
+    log_formatter = logging.Formatter(
+        '%(asctime)-6s %(name)s %(module)s %(funcName)s %(lineno)d - %(levelname)s %(message)s')
+    log_handler.setFormatter(log_formatter)
+
+    _log = __res['_log']
+    log = logging.getLogger(_log)
+    log.propagate = False
+    log.addHandler(log_handler)
+    log.setLevel(logging.DEBUG)
+
+    single_shot = '-s' in sys.argv
+
+    log.info('STARTING mail sender {}'.format(' in single shot mode' if single_shot else ''))
+
+    r = get_redis_db(__res)
+
+    db = conn_to_db(__res)
     dbc = db.cursor()
 
     while True:
 
-        task = r.brpop('BSM', 5)
+        task = r.brpop('BSM {}'.format(svc_port), 5)
         if task:
             log.info('Task found, working')
             t = task[1]
@@ -91,7 +128,7 @@ if __name__ == '__main__':
             except:
                 mdata = {}
 
-            sg = sendgrid.SendGridAPIClient(apikey=sg_key)
+            sg = sendgrid.SendGridAPIClient(apikey=__res['sg_key'])
 
             from sendgrid.helpers.mail import *
             message = Mail()
