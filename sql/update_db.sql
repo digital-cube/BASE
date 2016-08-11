@@ -28,7 +28,7 @@ CREATE TABLE hash_2_params_historylog (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS sequencers (
-	id char(2) NOT NULL,
+	id char(2) NOT NULL primary key,
 	s_partition char(2) NOT NULL,
 	size smallint NOT NULL,
 	active_stage char(3) NOT NULL,
