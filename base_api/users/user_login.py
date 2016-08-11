@@ -36,6 +36,7 @@ def do_post(username, password, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
+    username = username.lower()
     q = apphooks.prepare_login_query(username)
 
     ip = kwargs['r_ip'];

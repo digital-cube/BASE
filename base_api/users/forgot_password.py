@@ -53,6 +53,8 @@ def do_put(username, *args, **kwargs):
 
     request = kwargs['request_handler']
 
+    username = username.lower()
+
     if not check_user_exists(username, _db):
         log.critical('User check fail')
         return base_common.msg.error(msgs.USER_NOT_FOUND)

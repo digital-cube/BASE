@@ -42,6 +42,7 @@ def do_post(username, password, users_data, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
+    username = username.lower()
     if check_user_registered(dbc, username):
         return base_common.msg.error(msgs.USERNAME_ALREADY_TAKEN)
 
