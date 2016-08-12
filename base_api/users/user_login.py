@@ -36,10 +36,11 @@ def do_post(username, password, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
+    log.info('User {} trying to login'.format(username))
     username = username.lower()
     q = apphooks.prepare_login_query(username)
 
-    ip = kwargs['r_ip'];
+    ip = kwargs['r_ip']
 
     dbc.execute(q)
     if dbc.rowcount != 1:
@@ -90,5 +91,6 @@ def do_post(username, password, **kwargs):
             res.update(post_d)
 
     apphooks.action_log_hook(u_id,ip, 'login', 'user {} successfuly logged in'.format(username))
+    log.info('User {} successfully logged in'.format(username))
     return base_common.msg.post_ok(res)
 
