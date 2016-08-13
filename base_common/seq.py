@@ -90,7 +90,7 @@ class SequencerFactory:
 
         return True
 
-    def new(self, table_id):
+    def new(self, table_id, commit=True):
 
         if table_id not in self.s_table:
             return False
@@ -124,7 +124,8 @@ class SequencerFactory:
                 attempt+=1
                 continue
 
-            self.db.commit()
+            if commit:
+                self.db.commit()
             break
 
         return id
