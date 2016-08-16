@@ -134,11 +134,14 @@ class SequencerFactory:
 _sequencer = None
 
 
-def sequencer():
+def sequencer(db = None):
 
     global _sequencer
     if not _sequencer or not _sequencer.check_db():
-        _sequencer = SequencerFactory(dbacommon.get_db())
+        if db:
+            _sequencer = SequencerFactory(db)
+        else:
+            _sequencer = SequencerFactory(dbacommon.get_db())
 
     return _sequencer
 
