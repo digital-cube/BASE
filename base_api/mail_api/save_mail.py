@@ -73,9 +73,13 @@ def do_put(sender, sender_name, receiver, receiver_name, subject, emessage, _get
     return base_common.msg.ok()
 
 
-def save_email(sender, sender_name, receiver, receiver_name, subject, emessage, _get_id, data, **kwargs):
+def save_email(sender, sender_name, receiver, receiver_name, subject, emessage, _get_id, data, db=None, **kwargs):
 
-    _db = get_db()
+    if not db:
+        _db = get_db()
+    else:
+        _db = db
+    
     dbc = _db.cursor()
     rdb = get_redis_db()
 

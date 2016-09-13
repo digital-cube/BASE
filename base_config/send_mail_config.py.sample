@@ -11,7 +11,9 @@ db_passwd = '123'
 db_name = 'one'  # Promenjeno za potrebe TESTA
 db_charset = 'utf8'
 
-sg_key = '__PUT_YOUR_SEND_GRID_KEY__'
+
+sg_key = '__SENDGRID_KEY__'
+
 
 REDIS_SERVER = 'localhost'
 REDIS_PORT = 6379

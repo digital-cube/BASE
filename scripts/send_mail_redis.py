@@ -10,7 +10,7 @@ import urllib
 import MySQLdb
 import MySQLdb.cursors
 import sendgrid
-from MySQLdb import IntegrityError
+from MySQLdb import IntegrityError, OperationalError
 import redis
 
 # from send_mail_config import log, db_host, db_user, db_passwd, db_name, db_charset, sg_key
@@ -58,8 +58,7 @@ def get_redis_db(res):
     return __redis
 
 def conn_to_db(res):
-
-    return MySQLdb.connect(
+    db = MySQLdb.connect(
         db=res['db_name'],
         host=res['db_host'],
         user=res['db_user'],
@@ -67,6 +66,28 @@ def conn_to_db(res):
         charset=res['db_charset'],
         cursorclass=MySQLdb.cursors.DictCursor)
 
+    # cursor = db.cursor()
+    # try:
+    #     cursor.execute("SELECT VERSION()")
+    #     results = cursor.fetchone()
+    #
+    # except MySQLdb.Error:
+    #     print ("Error in db connection")
+
+    return db
+
+def execute_query(query,db,dbConnData,attempt):
+    try:
+        dbc = db.cursor()
+        dbc.execute(query)
+        db.commit()
+    except OperationalError as e:
+        if attempt>5:
+            return False
+        db = conn_to_db(dbConnData)
+        attempt = attempt + 1;
+        print ('reconnecting to database...{}'.format(attempt))
+        execute_query(query,db,dbConnData,attempt)
 
 if __name__ == '__main__':
 
@@ -166,11 +187,11 @@ if __name__ == '__main__':
                 q = get_mail_query_err(id_msg, n, status, mdata)
 
             try:
-                dbc.execute(q)
+                attempt = 0
+                execute_query(q,db,__res,attempt)
             except IntegrityError as e:
                 log.critical('Update mail queue: {}'.format(e))
 
-            db.commit()
 
         else:
             print("There is no work to be done")
