@@ -106,8 +106,14 @@ def import_from_settings(imported_modules, app_to_start):
     if hasattr(pm, 'CHANGE_EMAIL_ADDRESS'):
         base_config.settings.CHANGE_EMAIL_ADDRESS = pm.CHANGE_EMAIL_ADDRESS
 
+    if not hasattr(base_config.settings, 'STRONG_PASSWORD'):
+        setattr(base_config.settings, 'STRONG_PASSWORD', False)
+
     if hasattr(pm, 'STRONG_PASSWORD'):
         base_config.settings.STRONG_PASSWORD = pm.STRONG_PASSWORD
+
+
+
 
     def _add_to_imports(_mm, _f, _m):
 
