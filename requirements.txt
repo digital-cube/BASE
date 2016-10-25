@@ -1,4 +1,2 @@
-tornado
-bcrypt
-mysqlclient
 psycopg2
+mysqlclient

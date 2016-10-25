@@ -9,5 +9,5 @@ setup(
     author='DigitalCube doo',
     author_email='slobodan@digitalcube.rs',
     description='Base, simple scaling project',
-    install_requires=[]
+    install_requires=['tornado','bcrypt']
 )
