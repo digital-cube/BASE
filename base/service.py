@@ -101,9 +101,11 @@ entries = [
             # (r'^/(.*)/this/(.*)$', AnotherHandler3),
         ]
 
-if __name__ == '__main__':
 
+def baserun():
     # fill_entries()
+
+    svc_port = 8001
 
     app = tornado.web.Application(
         entries,
@@ -111,5 +113,11 @@ if __name__ == '__main__':
         cookie_secret='fuck_this_man'
     )
 
-    app.listen(8001)
+    print('starting base service on {}: http://localhost:{}'.format(svc_port, svc_port))
+    app.listen(svc_port)
     tornado.ioloop.IOLoop.instance().start()
+
+
+if __name__ == '__main__':
+
+    baserun()
