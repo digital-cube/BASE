@@ -2,7 +2,7 @@
 import tornado.web
 import tornado.ioloop
 import abc
-from functools import wraps
+# from functools import wraps
 
 
 # def route(*arguments):
@@ -51,7 +51,7 @@ class MainHandler(base):
 
 class AnotherHandler(base):
 
-    _route = r'^/fuck$'
+    _route = r'^/luck$'
 
     def get(self):
         return ok('another handler')
@@ -96,21 +96,25 @@ entries = []
 
 entries = [
             (r'^/$', MainHandler),
-            # (r'^/fuck$', AnotherHandler),
+            # (r'^/luck$', AnotherHandler),
             # (r'^/(.*)/this$', AnotherHandler2),
             # (r'^/(.*)/this/(.*)$', AnotherHandler3),
         ]
 
 
-def baserun():
+def engage():
     # fill_entries()
 
+    from configuration import __PORT__
+    from errors import MissingApplicationPort
+    if not __PORT__:
+        raise MissingApplicationPort('Application port not configured or missing from ')
     svc_port = 8001
 
     app = tornado.web.Application(
         entries,
         debug=True,
-        cookie_secret='fuck_this_man'
+        cookie_secret='secret_cookie'
     )
 
     print('starting base service on {}: http://localhost:{}'.format(svc_port, svc_port))
@@ -120,4 +124,4 @@ def baserun():
 
 if __name__ == '__main__':
 
-    baserun()
+    engage()
