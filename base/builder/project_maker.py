@@ -26,7 +26,7 @@ def copy_template(source, destination, tplname):
     for _f in glob.glob('{}/*'.format(source)):
 
         if os.path.isdir(_f):
-            dest_path = '{}/{}'.format(destination, '{}src'.format(tplname))
+            dest_path = '{}/{}'.format(destination, os.path.basename(_f))
             shutil.copytree(_f, dest_path)
         else:
             shutil.copy2(_f, destination)
