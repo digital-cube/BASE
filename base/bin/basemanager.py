@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from base.builder.project_maker import init_project
+from base.builder.project_maker import execute_builder_cmd
 
 if __name__ == '__main__':
-    init_project(sys.argv)
+    execute_builder_cmd(sys.argv)

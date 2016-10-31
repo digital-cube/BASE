@@ -1,3 +1,5 @@
+# coding= utf-8
+
 ERROR = 1
 EXCEPTION = 2
 

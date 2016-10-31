@@ -1,115 +1,44 @@
+# coding= utf-8
 
+import argparse
 import tornado.web
 import tornado.ioloop
-import abc
-# from functools import wraps
+
+from base.application.components import BaseHandler
+from base.application.helpers.exceptions import MissingApplicationPort
+from base.common.utils import log
+from base.application.helpers.importer import load_application
+
+import base.config.application_config
 
 
-# def route(*arguments):
-#
-#     def original_wrapper(original_f):
-#
-#         @wraps(original_f)
-#         def wrapper(*args, **kwargs):
-#
-#             return original_f(*args, **kwargs)
-#
-#         wrapper.__url__ =
+def check_arguments():
+
+    argparser = argparse.ArgumentParser(description=base.config.application_config.app_description)
+    argparser.add_argument('-p', '--port', help='the port on which application will listen')
+    return argparser.parse_args()
 
 
-class base(tornado.web.RequestHandler):
+def _get_svc_port(args):
 
-    __metaclass__ = abc.ABCMeta
+    if args.port:
+        return args.port
 
-    def ok(self, *args, **kwargs):
+    from base.config.application_config import port as svc_port
 
-        self.write('<h1>{}</h1>'.format(','.join(args)))
-
-    def error(self, *args, **kwargs):
-
-        self.set_status(400, reason='bad request')
-
-
-
-class MainHandler(base):
-
-    _route = r'^/$'
-
-    def get(self):
-        # self.write('get ok')
-        import bcrypt
-
-        username = 'd.olinics@gmail.com'
-        password = '123'
-        print(bcrypt.hashpw('{}{}'.format(username, password).encode('utf-8'), bcrypt.gensalt()).decode('utf-8'))
-
-        return self.ok('main get')
-
-    def post(self):
-        # self.write('post ok')
-        return self.ok('main post')
-
-class AnotherHandler(base):
-
-    _route = r'^/luck$'
-
-    def get(self):
-        return ok('another handler')
-
-
-class AnotherHandler2(base):
-
-    _route = r'^/(.*)/this$'
-
-    def get(self,name):
-        return ok('another handler 2 {}'.format(name))
-
-
-class AnotherHandler3(base):
-
-    _route = r'^/(.*)/this/(.*)$'
-
-    def get(self, name, second):
-        return ok('another handler 3 {} | {}'.format(name, second))
-
-entries = []
-
-
-# def build_request_handler(BaseClass):
-#
-#     class NewClass(tornado.web.RequestHandler): pass
-#     NewClass.__name__ = 'base_{}'.format(BaseClass.__name__)
-#     return NewClass
-
-
-# def fill_entries():
-#     global entries
-#
-#     for c in (MainHandler, AnotherHandler, AnotherHandler2, AnotherHandler3):
-#         print(type(c), c.__name__)
-#         nc = build_request_handler(c)
-#         if hasattr(c, 'get'):
-#             def g(self)
-#             setattr(nc, 'get', c.get)
-#
-#         print(type(nc), nc.__name__)
-
-entries = [
-            (r'^/$', MainHandler),
-            # (r'^/luck$', AnotherHandler),
-            # (r'^/(.*)/this$', AnotherHandler2),
-            # (r'^/(.*)/this/(.*)$', AnotherHandler3),
-        ]
+    return svc_port
 
 
 def engage():
-    # fill_entries()
 
-    from configuration import __PORT__
-    from errors import MissingApplicationPort
-    if not __PORT__:
-        raise MissingApplicationPort('Application port not configured or missing from ')
-    svc_port = 8001
+    args = check_arguments()
+
+    entries = [(BaseHandler.__URI__, BaseHandler), ]
+    load_application(entries)
+
+    svc_port = _get_svc_port(args)
+    if not svc_port:
+        raise MissingApplicationPort('Application port not configured or missing from command line options')
 
     app = tornado.web.Application(
         entries,
@@ -117,7 +46,13 @@ def engage():
         cookie_secret='secret_cookie'
     )
 
-    print('starting base service on {}: http://localhost:{}'.format(svc_port, svc_port))
+    start_message = 'starting {} {} service on {}: http://localhost:{}'.format(
+        base.config.application_config.app_name,
+        base.config.application_config.app_version,
+        svc_port, svc_port)
+
+    print(start_message)
+    log.info(start_message)
     app.listen(svc_port)
     tornado.ioloop.IOLoop.instance().start()
 
@@ -125,3 +60,4 @@ def engage():
 if __name__ == '__main__':
 
     engage()
+

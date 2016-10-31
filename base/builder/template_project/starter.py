@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
+# coding= utf-8
 
-import time
-
-__PROJECT_NAME__ = None
+from base.application.service import engage
 
 if __name__ == '__main__':
-
-    while True:
-        print('project started')
-        time.sleep(2)
+    engage()
 
