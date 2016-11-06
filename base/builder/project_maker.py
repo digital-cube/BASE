@@ -13,7 +13,8 @@ from base.config.settings import app_builder_description
 from base.config.settings import available_builder_commands
 
 
-def pars_command_line_argumenst(cmd_args):
+def pars_command_line_arguments():
+
     argparser = argparse.ArgumentParser(description=app_builder_description)
     argparser.add_argument('cmd', type=str, help=app['cmd'][1], choices=available_builder_commands)
     argparser.add_argument('-n', '--name', help=app['name'][1])
@@ -74,7 +75,10 @@ def _build_project(args):
     try:
         _site_dir = site.getsitepackages()
     except AttributeError as e:
-        print('WARNING! can not determine source directory, possible running in virtual environment and it is not handled at the time')
+        print('''WARNING!
+        can not determine source directory,
+        possible running in virtual environment and it is not handled at the time
+        ''')
         sys.exit(3)
 
     dir_path = '{}/{}'.format(args.destination, args.name)
@@ -95,9 +99,9 @@ def _build_project(args):
     _configure_project(args, dir_path, additions_dir)
 
 
-def execute_builder_cmd(cmd_args):
+def execute_builder_cmd():
 
-    parsed_args = pars_command_line_argumenst(cmd_args)
+    parsed_args = pars_command_line_arguments()
 
     if parsed_args.cmd == 'init':
         _build_project(parsed_args)

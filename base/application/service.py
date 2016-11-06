@@ -4,9 +4,10 @@ import argparse
 import tornado.web
 import tornado.ioloop
 
-from base.application.components import BaseHandler
-from base.application.helpers.exceptions import MissingApplicationPort
 from base.common.utils import log
+from base.application.components import BaseHandler
+from base.application.components import DefaultRouteHandler
+from base.application.helpers.exceptions import MissingApplicationPort
 from base.application.helpers.importer import load_application
 
 import base.config.application_config
@@ -42,8 +43,9 @@ def engage():
 
     app = tornado.web.Application(
         entries,
-        debug=True,
-        cookie_secret='secret_cookie'
+        debug=base.config.application_config.debug,
+        cookie_secret=base.config.application_config.secret_cookie,
+        default_handler_class=DefaultRouteHandler
     )
 
     start_message = 'starting {} {} service on {}: http://localhost:{}'.format(

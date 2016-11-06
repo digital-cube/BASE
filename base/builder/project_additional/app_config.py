@@ -9,3 +9,4 @@ imports = [
     'src.api.utils.options',
     'src.api.utils.hash2params',
 ]
+debug = True

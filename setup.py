@@ -21,7 +21,7 @@ setup(
               'base.application.helpers'],
     url='https://github.com/digital-cube/BASE',
     license='GNU',
-    author='Digitl Cube doo',
+    author='Digital Cube doo',
     author_email='slobodan@digitalcube.rs',
     description='Base, simple scaling project',
     install_requires=['tornado', 'bcrypt'],

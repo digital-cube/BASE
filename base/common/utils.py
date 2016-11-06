@@ -21,5 +21,5 @@ def retrieve_log(log_file_name, _logger):
 
     return log
 
-
 log = retrieve_log(log_filename, log_logger)
+
