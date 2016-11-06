@@ -13,7 +13,7 @@ setup(
               'base.builder.template_project.src',
               'base.builder.template_project.src.api',
               'base.builder.template_project.src.api.utils',
-              'base.builder.template_project.src.api.auth_user',
+              'base.builder.template_project.src.api.user',
               'base.builder.template_project.src.config',
               'base.builder.template_project.src.lookup',
               'base.application',
