@@ -46,13 +46,13 @@ def load_application(entries):
         (r'/spec', SpecificationHandler),
     ]
 
+    _has_root = False
     for _m in app_imports:
 
         log.info('Loading {} module'.format(_m))
 
         app_module = importlib.import_module(_m)
 
-        _has_root = False
         for _name, _handler in inspect.getmembers(app_module):
 
             if inspect.isclass(_handler) and hasattr(_handler, '__URI__'):

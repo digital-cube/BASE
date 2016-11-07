@@ -138,9 +138,22 @@ class api(object):
         self.uri = kwargs['URI']
         self.set_api_prefix = False if 'PREFIX' in kwargs and not kwargs['PREFIX'] else True
 
+    def replace_uri_arguments(self):
+        _split_url = self.uri.split('/')
+        _res = []
+        _kw_res = {}
+        for s in _split_url:
+            _res.append('([^/]+)' if s.startswith(':') else s)
+            if s.startswith(':'):
+                _kw_res[s[1:]] = _split_url.index(s)
+
+        return '/'.join(_res), _kw_res
+
     def __call__(self, cls):
-        cls.__URI__ = self.uri
+        cls.__PATH__ = self.uri
+        cls.__URI__, cls.__PATH__PARAMS__ = self.replace_uri_arguments()
         cls.__SET_API_PREFIX__ = self.set_api_prefix
+
         return cls
 
 
@@ -150,7 +163,8 @@ class params(object):
     def __init__(self, *args):
         self.params = args
 
-    def convert_arguments(self, argument, argument_value, argument_type):
+    @staticmethod
+    def convert_arguments(argument, argument_value, argument_type):
 
         if argument_type == bool:
             try:
@@ -247,6 +261,30 @@ class params(object):
 
         return argument_value
 
+    @staticmethod
+    def params_type_for_compare(_param_type):
+        if _param_type in [int, float, decimal.Decimal, datetime.date, datetime.datetime]:
+            return True
+        return False
+
+    @staticmethod
+    def param_is_lower_then_min(_param_type, _param_value, _param_min_value):
+
+        if not params.params_type_for_compare(_param_type):
+            return True
+        if _param_value < _param_min_value:
+            return False
+        return True
+
+    @staticmethod
+    def param_is_greater_then_max(_param_type, _param_value, _param_max_value):
+
+        if not params.params_type_for_compare(_param_type):
+            return True
+        if _param_value > _param_max_value:
+            return False
+        return True
+
     def __call__(self, _f):
 
         @wraps(_f)
@@ -255,22 +293,39 @@ class params(object):
             _arguments = []
 
             for _param in self.params:
-                # print('param', _param)
 
                 _argument = _param['name'].strip()
-                _default_param_value = _param['default'] if 'default' in _param else None
-                _param_value = _origin_self.get_argument(_argument, default=_default_param_value)
-                _param_required = _param['required'] if 'required' in _param else True
                 _param_type = _param['type']
+                _default_param_value = _param['default'] if 'default' in _param else None
+                _param_required = _param['required'] if 'required' in _param else True
+                _param_min_value = _param['min'] if 'min' in _param else None
+                _param_max_value = _param['max'] if 'max' in _param else None
+
+                if _argument in _origin_self.__PATH__PARAMS__:
+                    _param_value = _origin_self.request.uri.split('?')[0].split('/')[
+                                                                            _origin_self.__PATH__PARAMS__[_argument]]
+                    _param_required = True
+                else:
+                    _param_value = _origin_self.get_argument(_argument, default=_default_param_value)
 
                 if _param_value is None and _param_required:
                     log.critical('Missing required parameter {}'.format(_argument))
                     return _origin_self.error(msgs.MISSING_REQUEST_ARGUMENT)
 
-                _param_converted = self.convert_arguments(_argument, _param_value, _param_type)
+                _param_converted = params.convert_arguments(_argument, _param_value, _param_type)
                 if _param_converted is None:
                     log.critical('Invalid parameter {}'.format(_argument))
                     return _origin_self.error(msgs.MISSING_REQUEST_ARGUMENT)
+
+                if _param_min_value and not params.param_is_lower_then_min(_param_type, _param_converted, _param_min_value):
+                    log.warning('{} value {} is lower then required minimum {}'.format(
+                        _argument, _param_value, _param_min_value))
+                    return _origin_self.error(msgs.ARGUMENT_LOWER_THEN_MINIMUM)
+
+                if _param_max_value and not params.param_is_greater_then_max(_param_type, _param_converted, _param_max_value):
+                    log.warning('{} value {} is greater then required maximum {}'.format(
+                        _argument, _param_value, _param_min_value))
+                    return _origin_self.error(msgs.ARGUMENT_HIGHER_THEN_MINIMUM)
 
                 _arguments.append(_param_converted)
 
@@ -285,21 +340,24 @@ class DefaultRouteHandler(Base):
     def _dummy(self):
         method = self.request.method
         path = self.request.path
+
+        # Ignore request for favicon.ico
+        if 'favicon.ico' in path:
+            self.finish()
+            return
+
         ip = self.request.remote_ip
         self.set_status(404)
         log.warning('trying to call not allowed {} method on {} uri from {}'.format(method, path, ip))
         if method == 'POST':
-            return self.error(msgs.POST_NOT_ALLOWED)
+            return self.error(msgs.POST_NOT_FOUND)
         if method == 'PUT':
-            return self.error(msgs.PUT_NOT_ALLOWED)
+            return self.error(msgs.PUT_NOT_FOUND)
         if method == 'PATCH':
-            return self.error(msgs.PATCH_NOT_ALLOWED)
+            return self.error(msgs.PATCH_NOT_FOUND)
         if method == 'DELETE':
-            return self.error(msgs.DELETE_NOT_ALLOWED)
-        return self.error(msgs.GET_NOT_ALLOWED)
-
-    def write_error(self, status_code, **kwargs):
-        self.write('OVERLOADED ERROR')
+            return self.error(msgs.DELETE_NOT_FOUND)
+        return self.error(msgs.GET_NOT_FOUND)
 
     def get(self):
         return self._dummy()
