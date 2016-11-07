@@ -2,8 +2,12 @@
 
 import os
 import abc
+import ast
 import json
+import decimal
+import datetime
 import tornado.web
+from functools import wraps
 
 import base.application.lookup.responses
 import base.application.lookup.responses as msgs
@@ -142,6 +146,137 @@ class api(object):
 
 class params(object):
     """Examine API call parameters"""
+
+    def __init__(self, *args):
+        self.params = args
+
+    def convert_arguments(self, argument, argument_value, argument_type):
+
+        if argument_type == bool:
+            try:
+                return argument_value.lower() == 'true'
+            except AttributeError:
+                return isinstance(argument_value, bool) and argument_value
+
+        if argument_type == int:
+            if argument_value == '0':
+                return 0
+            try:
+                return int(argument_value)
+            except ValueError as e:
+                log.critical('Invalid argument {} expected int got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                return None
+
+        if argument_type == float:
+            try:
+                return float(argument_value)
+            except ValueError as e:
+                log.critical('Invalid argument {} expected float got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                return None
+
+        if argument_type == list:
+            try:
+                el = ast.literal_eval(argument_value)
+            except SyntaxError as e:
+                log.critical('Invalid argument {} expected list, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                return None
+
+            if type(el) != list:
+                log.critical('Invalid argument {} expected list, got {} ({})'.format(
+                    argument, argument_value, type(argument_value)))
+                return None
+
+            return el
+
+        if argument_type == dict:
+            try:
+                el = ast.literal_eval(argument)
+            except SyntaxError as e:
+                log.critical('Invalid argument {} expected dict, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                return None
+
+            if type(el) != dict:
+                log.critical('Invalid argument {} expected dict, got {} ({})'.format(
+                    argument, argument_value, type(argument_value)))
+                return None
+
+            return el
+
+        if argument_type == decimal.Decimal:
+            try:
+                return decimal.Decimal(argument_value)
+            except decimal.InvalidOperation as e:
+                log.critical('Invalid argument {} expected Decimal, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                return None
+
+        if argument_type == json:
+            try:
+                return json.loads(argument_value)
+            except json.JSONDecodeError as e:
+                log.critical('Invalid argument {} expected json, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                return None
+
+        if argument_type == 'e-mail':
+
+            if '@' not in argument_value:
+                log.critical('Invalid argument {} expected email, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), 'not an e-mail'))
+                return None
+
+        if argument_type == datetime.datetime:
+            try:
+                return datetime.datetime.strptime(argument_value, "%Y-%m-%d %H:%M:%S")
+            except ValueError as e:
+                log.critical('Invalid argument {} expected datetime, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                return None
+
+        if argument_type == datetime.date:
+            try:
+                return datetime.datetime.strptime(argument_value, "%Y-%m-%d")
+            except ValueError as e:
+                log.critical('Invalid argument {} expected date, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                return None
+
+        return argument_value
+
+    def __call__(self, _f):
+
+        @wraps(_f)
+        def wrapper(_origin_self, *args, **kwargs):
+
+            _arguments = []
+
+            for _param in self.params:
+                # print('param', _param)
+
+                _argument = _param['name'].strip()
+                _default_param_value = _param['default'] if 'default' in _param else None
+                _param_value = _origin_self.get_argument(_argument, default=_default_param_value)
+                _param_required = _param['required'] if 'required' in _param else True
+                _param_type = _param['type']
+
+                if _param_value is None and _param_required:
+                    log.critical('Missing required parameter {}'.format(_argument))
+                    return _origin_self.error(msgs.MISSING_REQUEST_ARGUMENT)
+
+                _param_converted = self.convert_arguments(_argument, _param_value, _param_type)
+                if _param_converted is None:
+                    log.critical('Invalid parameter {}'.format(_argument))
+                    return _origin_self.error(msgs.MISSING_REQUEST_ARGUMENT)
+
+                _arguments.append(_param_converted)
+
+            return _f(_origin_self, *_arguments, **kwargs)
+
+        return wrapper
 
 
 class DefaultRouteHandler(Base):
