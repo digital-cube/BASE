@@ -16,6 +16,7 @@ setup(
               'base.builder.template_project.src.api.user',
               'base.builder.template_project.src.config',
               'base.builder.template_project.src.lookup',
+              'base.builder.template_project.src.models',
               'base.application',
               'base.application.lookup',
               'base.application.helpers'],
