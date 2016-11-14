@@ -3,6 +3,13 @@
 app_builder_description = '''
     Base application builder
 '''
+
+app_subcommands_title = '''basemanager commands'''
+app_subcommands_description = '''
+    get help for available commands with: command -h
+'''
+
+# key: default argument value, value: argument help
 app = {
     'cmd': (None, 'basemanager command to execute'),
     'description': ('base application', 'the new application description'),
@@ -10,11 +17,27 @@ app = {
     'name': (None, 'the new application name'),
     'version': ('0.00.1', 'the new application version'),
     'prefix': ('api', 'the new application api calls prefix'),
-    'port': (8802, 'the port for the new application')
+    'port': (8802, 'the port for the new application'),
+    'database_type': ('mysql', 'type od the sql database'),
+    'database_name': (None, 'the name for database'),
+    'database_username': (None, 'database user name'),
+    'database_password': (None, 'database user password'),
+    'database_host': ('localhost', 'database host name'),
+    'database_port': ({'mysql': 3306, 'postgresql': 5432, 'sqlite': 5555}, 'database port'),
 }
-available_builder_commands = ['init']
 template_project_folder = 'template_project'
 project_additional_folder = 'project_additional'
+db_init_warning = '''
+#################################################
+#                                               #
+#               W A R N I N G                   #
+#                                               #
+#   Can not find configuration to initialize    #
+#   database. Please check that you are in      #
+#   project directory and try again.            #
+#                                               #
+#################################################
+'''
 
 
 log_directory = '/var/log/base'
