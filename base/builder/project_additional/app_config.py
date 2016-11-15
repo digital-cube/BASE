@@ -7,6 +7,7 @@ __APP_PREFIX__
 __APP_VERSION__
 models = [
     'src.models.utils',
+    'src.models.sequencers',
     'src.models.user',
 ]
 imports = [

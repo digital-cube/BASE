@@ -47,3 +47,10 @@ class User(common.orm.sql_base):
     def telephone_set(self, telephone):
         self.telephone = telephone
 
+
+def main():
+    pass
+
+if __name__ == '__main__':
+
+    main()

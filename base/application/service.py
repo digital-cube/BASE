@@ -9,6 +9,7 @@ from base.application.components import BaseHandler
 from base.application.components import DefaultRouteHandler
 from base.application.helpers.exceptions import MissingApplicationPort
 from base.application.helpers.importer import load_application
+from base.application.helpers.importer import load_orm
 
 import base.config.application_config
 
@@ -36,6 +37,7 @@ def engage():
 
     entries = [(BaseHandler.__URI__, BaseHandler), ]
     load_application(entries)
+    load_orm()
 
     svc_port = _get_svc_port(args)
     if not svc_port:

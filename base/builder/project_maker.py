@@ -144,7 +144,7 @@ def _configure_database(args):
             for _line in tf:
 
                 if "db_type" in _line and args.database_type:
-                    _line = "db_type = '{}',\n".format(args.database_type)
+                    _line = "db_type = '{}'\n".format(args.database_type)
                 if "'db_name'" in _line and args.database_name:
                     _line = "{}'db_name': '{}',\n".format(_tab, args.database_name)
                 if "'db_user'" in _line and args.user_name:
@@ -211,6 +211,7 @@ def _build_database(args):
                                  db_config['db_user'], db_config['db_password'])
 
     orm_builder = common.orm.orm_builder(__db_url, common.orm.sql_base)
+    setattr(common.orm, 'orm', orm_builder.orm())
 
     import src.config.app_config
     if not hasattr(src.config.app_config, 'models'):
@@ -218,13 +219,22 @@ def _build_database(args):
         return
 
     # PRESENT MODELS TO BASE
+    _models_modules = []
     for m in src.config.app_config.models:
         try:
-            importlib.import_module(m)
+            _m = importlib.import_module(m)
+            _models_modules.append(_m)
         except ImportError:
             print('Error loading model {}'.format(m))
 
     orm_builder.create_db_schema()
+
+    # PREPARE DATABASE
+    for m in _models_modules:
+        try:
+            m.main()
+        except AttributeError:
+            print(m.__name__, "doesn't have to be prepared")
 
 
 def execute_builder_cmd():

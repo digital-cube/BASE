@@ -2,6 +2,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from base.application.helpers.exceptions import UnknownDatabaseType
 
 
 sql_base = declarative_base()
@@ -13,8 +14,10 @@ def make_database_url(db_type, name, host, port, username, password):
         return 'mysql+mysqldb://{}:{}@{}:{}/{}'.format(username, password, host, port, name)
     if db_type == 'postgresql':
         return 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(username, password, host, port, name)
-    else:
+    if db_type == 'sqlite':
         return 'sqlite:///{}.db'.format(name)
+    else:
+        raise UnknownDatabaseType("Unknown database type: {}".format(db_type))
 
 
 class _orm(object):
@@ -65,4 +68,12 @@ class orm_builder(object):
 
 
 orm = None
+
+
+def activate_orm(db_url):
+
+    global orm
+    global sql_base
+    orm = _orm(db_url, sql_base)
+
 

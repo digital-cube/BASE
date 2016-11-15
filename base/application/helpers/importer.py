@@ -76,4 +76,25 @@ def load_application(entries):
     entries += _entries
 
 
+def load_orm():
+
+    import src.config.app_config
+    import common.orm
+    from application.helpers.exceptions import MissingApplicationConfigurationException
+
+    if not hasattr(src.config.app_config, 'db_config') or not hasattr(src.config.app_config, 'db_type'):
+        raise MissingApplicationConfigurationException('Missing database configuration or type')
+
+    __db_config = src.config.app_config.db_config
+    __db_type = src.config.app_config.db_type
+
+    __db_url = common.orm.make_database_url(__db_type, __db_config['db_name'], __db_config['db_host'],
+                                            __db_config['db_port'], __db_config['db_user'], __db_config['db_password'])
+
+    common.orm.activate_orm(__db_url)
+
+    # _orm = common.orm.orm(__db_url, common.orm.sql_base)
+    # setattr(common.orm, 'orm', _orm)
+
+
 
