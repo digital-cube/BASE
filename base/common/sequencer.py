@@ -6,12 +6,16 @@ import common.orm
 import sqlalchemy.exc
 from src.models.sequencers import Sequencer
 from application.helpers.exceptions import ToManyAttemptsException
+from application.helpers.exceptions import SequencerTypeError
+from common.utils import log
 
 
 class SequencerFactory:
     """
-    SequencerFactory
+    SequencerFactory - instantiated only once, as a singleton
     """
+
+    _reserved_table_name = 'normalseq'
 
     def __init__(self, db):
 
@@ -53,8 +57,7 @@ class SequencerFactory:
                 'name': s.name,
                 'type': s.type,
                 's_table': s.s_table,
-                'ordered': bool(s.ordered),
-                'orm_model': s.s_table
+                'ordered': bool(s.ordered)
             }
 
     def create_random_id(self, size, id_type):
@@ -84,13 +87,16 @@ class SequencerFactory:
     def new(self, table_id, commit=True):
 
         if table_id not in self.s_table:
+            log.critical('Wrong sequencer table id provided {}'.format(table_id))
             return False
 
         import src.models.sequencers
-        if not hasattr(src.models.sequencers, self.s_table[table_id]['orm_model']):
+        if not hasattr(src.models.sequencers, self.s_table[table_id]['s_table']):
+            log.critical('Missing {} model definition in {}'.format(
+                self.s_table[table_id]['s_table'], src.models.sequencers.__file__))
             return False
 
-        _orm_model =  getattr(src.models.sequencers, self.s_table[table_id]['orm_model'])
+        _orm_model =  getattr(src.models.sequencers, self.s_table[table_id]['s_table'])
 
         id_prefix = "{}{}{}".format(self.s_table[table_id]['table_id'],
                                     self.s_table[table_id]['partition_id'],
@@ -100,6 +106,7 @@ class SequencerFactory:
         while True:
 
             if self.s_table[table_id]['ordered']:
+                log.warning('Orderd table')
                 return False
 
             else:
@@ -117,6 +124,8 @@ class SequencerFactory:
                 except sqlalchemy.exc.IntegrityError as e:
                     self.db.session().rollback()
                     if attempt >= self.max_attempts:
+                        log.critical('To many attempts to create id for {} table'.format(
+                            self.s_table[table_id]['s_table']))
                         raise ToManyAttemptsException('creating id for {} table'.format(
                             self.s_table[table_id]['s_table']))
                     attempt += 1
@@ -126,11 +135,42 @@ class SequencerFactory:
 
         return _s_id
 
+    def get_sequence(self, sequence_id, sequence):
+
+        if sequence_id not in self.s_table:
+            log.critical('Sequence id {} is not in the system'.format(sequence_id))
+            return False
+
+        db_sequence = self.s_table[sequence_id]
+
+        db_sequence_lenght = len(sequence_id) + \
+                          len(db_sequence['partition_id']) + \
+                          len(db_sequence['active_stage']) +\
+                          int(db_sequence['size']) + \
+                          int(db_sequence['check_sum_size'])
+
+        import src.models.sequencers
+        _sequencer_model = getattr(src.models.sequencers, db_sequence['s_table'], None)
+        if not _sequencer_model:
+            log.critical('Missing sequencer {} table model in {}'.format(
+                db_sequence['s_table'], src.models.sequencers.__file__ ))
+            return False
+
+        _q = self.db.session().query(_sequencer_model).filter(_sequencer_model.id==sequence).all()
+
+        if len(_q) != 1:
+            log.critical('Sequence id {} is not in {} table'.format(sequence_id, db_sequence['s_table']))
+            return False
+
+        return True
+
 
 _sequencer = None
 
 
 def sequencer(db=None):
+    """Sequencer singleton getter"""
+
     global _sequencer
     if not _sequencer or not _sequencer.check_db():
         if db:
@@ -139,4 +179,16 @@ def sequencer(db=None):
             _sequencer = SequencerFactory(common.orm.orm)
 
     return _sequencer
+
+
+def sid(s_id, model_table=SequencerFactory._reserved_table_name):
+    """Return sequencer type with param 'model_table' which is used for retrieving table
+    row with s_id as id. 'normalseq' is the reserve word, do not create table
+    with id as the sequencer type and 'normalseq' as the name"""
+
+    if ':' in model_table:
+        raise SequencerTypeError('mode parameter can not contain the colon sign')
+
+    return 'sequencer:{}:{}'.format(model_table, s_id)
+
 

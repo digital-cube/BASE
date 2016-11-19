@@ -13,6 +13,7 @@ import base.application.lookup.responses
 import base.application.lookup.responses as msgs
 from base.application.helpers.exceptions import MissingApiRui
 from base.common.utils import log
+from base.common.sequencer import sequencer
 
 
 class Base(tornado.web.RequestHandler):
@@ -35,13 +36,13 @@ class Base(tornado.web.RequestHandler):
 
     def ok(self, s=None, **kwargs):
 
-        if 'http_status' in kwargs:
-            self.set_status(kwargs['http_status'])
+        _status = 204
+        if s or kwargs:
+            _status = 200
+        elif 'http_status' in kwargs:
+            _status = kwargs['http_status']
             del kwargs['http_status']
-        elif s or kwargs:
-            self.set_status(200)
-        else:
-            self.set_status(204)
+        self.set_status(_status)
 
         response = {}
 
@@ -67,11 +68,11 @@ class Base(tornado.web.RequestHandler):
         else:
             reason = 'bad request'
 
+        _status = 400
         if 'http_status' in kwargs:
-            self.set_status(kwargs['http_status'], reason=reason)
+            _status = kwargs['http_status']
             del kwargs['http_status']
-        else:
-            self.set_status(400, reason=reason)
+        self.set_status(_status, reason=reason)
 
         response = {}
         response['message'] = reason
@@ -114,17 +115,6 @@ class Base(tornado.web.RequestHandler):
         return self.error(msgs.API_CALL_EXCEPTION, http_status=status_code)
 
 
-class SpecificationHandler(tornado.web.RequestHandler):
-    """Retrieve application specification"""
-
-    def data_received(self, chunk):
-        pass
-
-    def get(self):
-
-        self.write('<h1>specification</h1>')
-
-
 class api(object):
     """Expose API classes decorator. Setup URI for API class"""
 
@@ -162,6 +152,12 @@ class params(object):
 
     def __init__(self, *args):
         self.params = args
+
+    @staticmethod
+    def get_sequencer_row(table, row_id):
+        print('TRAZI {} U {}'.format(row_id, table))
+
+        return False
 
     @staticmethod
     def convert_arguments(argument, argument_value, argument_type):
@@ -259,6 +255,27 @@ class params(object):
                     argument, argument_value, type(argument_value), e))
                 return None
 
+        if type(argument_type) == str and argument_type.startswith('sequencer'):
+
+            s = argument_type.split(':')
+            if len(s) != 3:
+                log.critical('Invalid sequence model {} for {} argument'.format(argument_type, argument))
+                return None
+
+            s_id = s[2]
+            s_model = s[1]
+
+            if not sequencer().get_sequence(s_id, argument_value):
+                log.critical('Invalid argument {} expected sequencer {}, got {}'.format(argument, s_id, argument_value))
+                return None
+
+            from common.sequencer import SequencerFactory
+            if s_model != SequencerFactory._reserved_table_name:
+                s_row = params.get_sequencer_row(s_model, s_id)
+                if not s_row:
+                    log.critical('Id {} is not in {} table'.format(s_id, s_model))
+                    return None
+
         return argument_value
 
     @staticmethod
@@ -287,6 +304,8 @@ class params(object):
 
     def __call__(self, _f):
 
+        _arguments_documentation = []
+
         @wraps(_f)
         def wrapper(_origin_self, *args, **kwargs):
 
@@ -295,7 +314,7 @@ class params(object):
             for _param in self.params:
 
                 _argument = _param['name'].strip()
-                _param_type = _param['type']
+                _param_type = _param['type'] if 'type' in _param else str
                 _default_param_value = _param['default'] if 'default' in _param else None
                 _param_required = _param['required'] if 'required' in _param else True
                 _param_min_value = _param['min'] if 'min' in _param else None
@@ -315,7 +334,7 @@ class params(object):
                 _param_converted = params.convert_arguments(_argument, _param_value, _param_type)
                 if _param_converted is None:
                     log.critical('Invalid parameter {}'.format(_argument))
-                    return _origin_self.error(msgs.MISSING_REQUEST_ARGUMENT)
+                    return _origin_self.error(msgs.INVALID_REQUEST_ARGUMENT)
 
                 if _param_min_value and not params.param_is_lower_then_min(_param_type, _param_converted, _param_min_value):
                     log.warning('{} value {} is lower then required minimum {}'.format(
@@ -329,7 +348,25 @@ class params(object):
 
                 _arguments.append(_param_converted)
 
+                # SAVE PARAMETERS DOCUMENTATION
+                _arg_doc = {
+                    'name': _argument,
+                    'type': str(_param_type),
+                    'required': _param_required,
+                }
+                if _default_param_value:
+                    _arg_doc['default'] = _default_param_value
+                if _param_min_value:
+                    _arg_doc['min'] = _param_min_value
+                if _param_max_value:
+                    _arg_doc['max'] = _param_max_value
+
+                _arguments_documentation.append(_arg_doc)
+
             return _f(_origin_self, *_arguments, **kwargs)
+
+        # setattr(wrapper, '__API_DOCUMENTATION__', _arguments_documentation)
+        wrapper.__API_DOCUMENTATION__ = _arguments_documentation
 
         return wrapper
 
@@ -381,4 +418,36 @@ class BaseHandler(DefaultRouteHandler):
 
     def _dummy(self):
         self.render('templates/introduction.html')
+
+
+@api(URI=r'/all-paths', PREFIX=False)
+class PathsWriter(DefaultRouteHandler):
+    """List all paths in debug mode"""
+
+    def _dummy(self):
+        _paths = [(handler.regex.pattern, handler.handler_class) for handler in self.application.handlers[0][1]]
+        _paths.sort()
+        _table_style = 'border-collapse: collapse;'
+        _model = '<table style="{}"><tbody>'.format(_table_style)
+        for _path in _paths:
+            _tr = '<tr><td>{}</td><td>{}</td></tr>'
+            _tr = _tr.format(_path[1].__name__, _path[0].strip('$'))
+            _model += _tr
+
+        _model += '</tbody></table>'
+        self.write(_model)
+
+
+@api(URI=r'/spec', PREFIX=False)
+class SpecificationHandler(DefaultRouteHandler):
+    """Retrieve application specification"""
+
+    def _dummy(self):
+
+        as_html = self.get_argument('html', default=False)
+
+        from application.helpers.api_specification import get_api_specification
+        _api_specification = get_api_specification(self)
+
+        self.write('<h1>specification{}</h1>'.format(' as html' if as_html else ''))
 

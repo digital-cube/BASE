@@ -24,3 +24,9 @@ class MissingApplicationConfigurationException(Exception):
 class UnknownDatabaseType(Exception):
     """Unknown database type provided"""
     pass
+
+
+class SequencerTypeError(Exception):
+    """Wrong Sequencer data type"""
+    pass
+

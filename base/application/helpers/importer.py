@@ -7,6 +7,7 @@ from base.common.utils import log
 import base.config.application_config
 from base.application.components import SpecificationHandler
 from base.application.components import BaseHandler
+from base.application.components import PathsWriter
 
 
 def _load_app_configuration():
@@ -43,7 +44,7 @@ def load_application(entries):
     from src.config.app_config import imports as app_imports
 
     _entries = [
-        (r'/spec', SpecificationHandler),
+        (SpecificationHandler.__URI__, SpecificationHandler),
     ]
 
     _has_root = False
@@ -70,6 +71,9 @@ def load_application(entries):
 
     if not _has_root:
         _entries.append((BaseHandler.__URI__, BaseHandler))
+
+    if base.config.application_config.debug:
+        _entries.append((PathsWriter.__URI__, PathsWriter))
 
     if len(_entries) > 1:
         del entries[:]
