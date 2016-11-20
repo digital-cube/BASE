@@ -1,12 +1,14 @@
 # coding= utf-8
 
+import base.common.orm
+from base.common.utils import log
 from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
-from src.models.utils import Options as OrmOptions
-import base.common.orm
-from base.common.utils import log
+from base.application.components import authenticated
+
 import src.lookup.response_messages as msgs
+from src.models.utils import Options as OrmOptions
 
 
 @api(
@@ -30,6 +32,7 @@ class Options(Base):
 
         return self.ok({_option.key: _option.value})
 
+    @authenticated()
     @params(
         {'name': 'key', 'type': str, 'required': True,  'doc': 'option key'},
         {'name': 'value', 'type': str, 'required': True,  'doc': 'option value'},

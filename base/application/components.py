@@ -4,6 +4,7 @@ import os
 import abc
 import ast
 import json
+import inspect
 import decimal
 import datetime
 import tornado.web
@@ -403,6 +404,38 @@ class params(object):
         setattr(wrapper, '__API_DOCUMENTATION__', _arguments_documentation)
 
         return wrapper
+
+
+class authenticated(object):
+
+    def __init__(self, *args):
+
+        self.roles = args
+
+    def __call__(self, _target):
+
+        if inspect.isclass(_target):
+            print('AUTHENTICATED CLASS', _target.__name__)
+
+            # for _method in ['get', 'post', 'put', 'patch', 'delete']:
+            #
+            #     if hasattr(_target, _method):
+            #         _m = getattr(_target, _method)
+            #         setattr(_target, _method, authenticated()
+
+            return _target
+
+        if inspect.isfunction(_target):
+            print('AUTHENTICATED FUNCTION', _target.__name__)
+            @wraps(_target)
+            def wrapper(*args, **kwargs):
+
+                return _target(*args, **kwargs)
+
+            return wrapper
+
+
+
 
 
 class DefaultRouteHandler(Base):
