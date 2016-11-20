@@ -5,7 +5,7 @@ import common.orm
 
 class AuthUser(common.orm.sql_base):
 
-    __tablename__ = 'auth_user'
+    __tablename__ = 'auth_users'
 
     id = Column(String(10), primary_key=True)
     username = Column(String(64), nullable=False)
@@ -23,13 +23,12 @@ class AuthUser(common.orm.sql_base):
 
 class User(common.orm.sql_base):
 
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = Column(String(10), ForeignKey(AuthUser.id), primary_key=True)
     first_name = Column(String(64))
     last_name = Column(String(64))
-    address = Column(Text)
-    telephone = Column(String(64))
+    data = Column(Text)
 
     def __init__(self, id_user):
 
