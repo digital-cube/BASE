@@ -435,9 +435,6 @@ class authenticated(object):
             return wrapper
 
 
-
-
-
 class DefaultRouteHandler(Base):
     """Base default route handler"""
 

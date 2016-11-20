@@ -5,7 +5,7 @@ from base.application.components import api
 
 
 @api(
-    URI='/',
+    URI='/login',
     PREFIX=False)
 class Login(Base):
 
