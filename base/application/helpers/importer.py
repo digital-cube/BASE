@@ -43,6 +43,12 @@ def _load_app_configuration():
         setattr(base.config.application_config, 'debug', src.config.app_config.debug)
     if hasattr(src.config.app_config, 'imports'):
         setattr(base.config.application_config, 'imports', src.config.app_config.imports)
+    if hasattr(src.config.app_config, 'models'):
+        setattr(base.config.application_config, 'models', src.config.app_config.models)
+    if hasattr(src.config.app_config, 'db_config'):
+        setattr(base.config.application_config, 'db_config', src.config.app_config.db_config)
+    if hasattr(src.config.app_config, 'db_type'):
+        setattr(base.config.application_config, 'db_type', src.config.app_config.db_type)
 
 
 def load_application(entries):
@@ -91,22 +97,23 @@ def load_application(entries):
 
 def load_orm():
 
-    import src.config.app_config
-    import common.orm
+    import base.config.application_config
+    import base.common.orm
 
-    if not hasattr(src.config.app_config, 'db_config') or not hasattr(src.config.app_config, 'db_type'):
+    if not hasattr(base.config.application_config, 'db_config') \
+            or not hasattr(base.config.application_config, 'db_type'):
         raise MissingApplicationConfiguration('Missing database configuration or type')
 
-    __db_config = src.config.app_config.db_config
-    __db_type = src.config.app_config.db_type
+    __db_config = base.config.application_config.db_config
+    __db_type = base.config.application_config.db_type
 
-    __db_url = common.orm.make_database_url(__db_type, __db_config['db_name'], __db_config['db_host'],
+    __db_url = base.common.orm.make_database_url(__db_type, __db_config['db_name'], __db_config['db_host'],
                                             __db_config['db_port'], __db_config['db_user'], __db_config['db_password'])
 
-    common.orm.activate_orm(__db_url)
+    base.common.orm.activate_orm(__db_url)
 
     # REMEMBER DATABASE MODELS
-    for m in src.config.app_config.models:
+    for m in base.config.application_config.models:
         try:
             _m = importlib.import_module(m)
         except ImportError:
