@@ -2,12 +2,15 @@
 
 import inspect
 import importlib
+from inspect import getmembers, isclass
+from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
 from base.common.utils import log
 import base.config.application_config
 from base.application.components import SpecificationHandler
 from base.application.components import BaseHandler
 from base.application.components import PathsWriter
+from base.application.helpers.exceptions import MissingApplicationConfiguration
 
 
 def _load_app_configuration():
@@ -21,7 +24,10 @@ def _load_app_configuration():
     if svc_port:
         setattr(base.config.application_config, 'port', svc_port)
 
-    import src.config.app_config
+    try:
+        import src.config.app_config
+    except ImportError:
+        raise MissingApplicationConfiguration('Missing application configuration file "src.config.app_config.py"')
 
     if hasattr(src.config.app_config, 'app_name'):
         setattr(base.config.application_config, 'app_name', src.config.app_config.app_name)
@@ -84,10 +90,9 @@ def load_orm():
 
     import src.config.app_config
     import common.orm
-    from application.helpers.exceptions import MissingApplicationConfigurationException
 
     if not hasattr(src.config.app_config, 'db_config') or not hasattr(src.config.app_config, 'db_type'):
-        raise MissingApplicationConfigurationException('Missing database configuration or type')
+        raise MissingApplicationConfiguration('Missing database configuration or type')
 
     __db_config = src.config.app_config.db_config
     __db_type = src.config.app_config.db_type
@@ -97,8 +102,16 @@ def load_orm():
 
     common.orm.activate_orm(__db_url)
 
-    # _orm = common.orm.orm(__db_url, common.orm.sql_base)
-    # setattr(common.orm, 'orm', _orm)
+    # REMEMBER DATABASE MODELS
+    for m in src.config.app_config.models:
+        try:
+            _m = importlib.import_module(m)
+        except ImportError:
+            print('Error loading model {}'.format(m))
+            continue
 
-
+        import config.application_config
+        for _member in getmembers(_m, isclass):
+            if type(_member[1]) == DeclarativeMeta and hasattr(_member[1], '__table__'):
+                config.application_config.orm_models[_member[1].__table__.name] = _member[1]
 

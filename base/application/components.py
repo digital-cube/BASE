@@ -9,6 +9,7 @@ import datetime
 import tornado.web
 from functools import wraps
 
+import base.common.orm
 import base.application.lookup.responses
 import base.application.lookup.responses as msgs
 from base.application.helpers.exceptions import MissingApiRui
@@ -109,8 +110,8 @@ class Base(tornado.web.RequestHandler):
             _message = '{} -> {} -> {}: {}'.format(_list, _c, _error_class, _error_value)
             log.critical(_message)
 
-        import base.config.application_config
-        if base.config.application_config.debug:
+        import config.application_config
+        if config.application_config.debug:
             return self.error(msgs.API_CALL_EXCEPTION, trace=_message, http_status=status_code)
         return self.error(msgs.API_CALL_EXCEPTION, http_status=status_code)
 
@@ -155,9 +156,24 @@ class params(object):
 
     @staticmethod
     def get_sequencer_row(table, row_id):
-        print('TRAZI {} U {}'.format(row_id, table))
 
-        return False
+        import common.orm
+        import config.application_config
+
+        if table not in config.application_config.orm_models:
+            log.critical('Missing table {}, can not retrieve row with id {}'.format(table, row_id))
+            return None
+
+        _orm_table = config.application_config.orm_models[table]
+
+        _q = common.orm.orm.session().query(_orm_table).filter(_orm_table.id == row_id)
+        _res = _q.all()
+
+        if len(_res) != 1:
+            log.warning('Row with id {} not found in {} table'.format(row_id, table))
+            return None
+
+        return _res[0]
 
     @staticmethod
     def convert_arguments(argument, argument_value, argument_type):
@@ -271,10 +287,7 @@ class params(object):
 
             from common.sequencer import SequencerFactory
             if s_model != SequencerFactory._reserved_table_name:
-                s_row = params.get_sequencer_row(s_model, s_id)
-                if not s_row:
-                    log.critical('Id {} is not in {} table'.format(s_id, s_model))
-                    return None
+                return params.get_sequencer_row(s_model, argument_value)
 
         return argument_value
 

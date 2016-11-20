@@ -76,4 +76,3 @@ def activate_orm(db_url):
     global sql_base
     orm = _orm(db_url, sql_base)
 
-

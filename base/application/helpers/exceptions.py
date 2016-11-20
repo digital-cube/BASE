@@ -16,7 +16,7 @@ class ToManyAttemptsException(Exception):
     pass
 
 
-class MissingApplicationConfigurationException(Exception):
+class MissingApplicationConfiguration(Exception):
     """Application configuration part is missing."""
     pass
 

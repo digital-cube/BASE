@@ -9,3 +9,4 @@ app_version = app['version'][0]
 app_description = app['description'][0]
 secret_cookie = 'cookie_secrete'
 debug = True
+orm_models = {}
