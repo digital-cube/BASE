@@ -128,6 +128,7 @@ class api(object):
 
         self.uri = kwargs['URI']
         self.set_api_prefix = False if 'PREFIX' in kwargs and not kwargs['PREFIX'] else True
+        self.specification_path = kwargs['SPECIFICATION_PATH'] if 'SPECIFICATION_PATH' in kwargs else None
 
     def replace_uri_arguments(self):
         _split_url = self.uri.split('/')
@@ -144,6 +145,7 @@ class api(object):
         cls.__PATH__ = self.uri
         cls.__URI__, cls.__PATH__PARAMS__ = self.replace_uri_arguments()
         cls.__SET_API_PREFIX__ = self.set_api_prefix
+        cls.__SPECIFICATION_PATH__ = self.specification_path if self.specification_path is not None else cls.__name__
 
         return cls
 
@@ -265,7 +267,7 @@ class params(object):
 
         if argument_type == datetime.date:
             try:
-                return datetime.datetime.strptime(argument_value, "%Y-%m-%d")
+                return datetime.datetime.strptime(argument_value, "%Y-%m-%d").date()
             except ValueError as e:
                 log.critical('Invalid argument {} expected date, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
@@ -319,6 +321,32 @@ class params(object):
 
         _arguments_documentation = []
 
+        # SAVE PARAMETERS DOCUMENTATION
+        for _param in self.params:
+
+            _argument = _param['name'].strip()
+            _param_type = _param['type'] if 'type' in _param else str
+            _default_param_value = _param['default'] if 'default' in _param else None
+            _param_required = _param['required'] if 'required' in _param else True
+            _param_min_value = _param['min'] if 'min' in _param else None
+            _param_max_value = _param['max'] if 'max' in _param else None
+
+            _arg_doc = {
+                'name': _argument,
+                'type': _param_type,
+                'required': _param_required,
+            }
+            if _default_param_value:
+                _arg_doc['default'] = _default_param_value
+            if _param_min_value and params.params_type_for_compare(_param_type):
+                _arg_doc['min'] = _param_min_value
+            if _param_max_value and params.params_type_for_compare(_param_type):
+                _arg_doc['max'] = _param_max_value
+
+            _arguments_documentation.append(_arg_doc)
+
+
+        # DECORATE HANDLER METHOD
         @wraps(_f)
         def wrapper(_origin_self, *args, **kwargs):
 
@@ -361,25 +389,9 @@ class params(object):
 
                 _arguments.append(_param_converted)
 
-                # SAVE PARAMETERS DOCUMENTATION
-                _arg_doc = {
-                    'name': _argument,
-                    'type': str(_param_type),
-                    'required': _param_required,
-                }
-                if _default_param_value:
-                    _arg_doc['default'] = _default_param_value
-                if _param_min_value:
-                    _arg_doc['min'] = _param_min_value
-                if _param_max_value:
-                    _arg_doc['max'] = _param_max_value
-
-                _arguments_documentation.append(_arg_doc)
-
             return _f(_origin_self, *_arguments, **kwargs)
 
-        # setattr(wrapper, '__API_DOCUMENTATION__', _arguments_documentation)
-        wrapper.__API_DOCUMENTATION__ = _arguments_documentation
+        setattr(wrapper, '__API_DOCUMENTATION__', _arguments_documentation)
 
         return wrapper
 
@@ -462,5 +474,8 @@ class SpecificationHandler(DefaultRouteHandler):
         from application.helpers.api_specification import get_api_specification
         _api_specification = get_api_specification(self)
 
-        self.write('<h1>specification{}</h1>'.format(' as html' if as_html else ''))
+        if as_html:
+            self.render('templates/specification.html', spec=_api_specification)
+        else:
+            self.write(json.dumps(_api_specification))
 

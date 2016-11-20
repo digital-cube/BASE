@@ -41,13 +41,16 @@ def _load_app_configuration():
         setattr(base.config.application_config, 'secret_cookie', src.config.app_config.secret_cookie)
     if hasattr(src.config.app_config, 'debug'):
         setattr(base.config.application_config, 'debug', src.config.app_config.debug)
+    if hasattr(src.config.app_config, 'imports'):
+        setattr(base.config.application_config, 'imports', src.config.app_config.imports)
 
 
 def load_application(entries):
 
     _load_app_configuration()
 
-    from src.config.app_config import imports as app_imports
+    # from src.config.app_config import imports as app_imports
+    from base.config.application_config import imports as app_imports
 
     _entries = [
         (SpecificationHandler.__URI__, SpecificationHandler),
@@ -111,7 +114,7 @@ def load_orm():
             continue
 
         import config.application_config
-        for _member in getmembers(_m, isclass):
-            if type(_member[1]) == DeclarativeMeta and hasattr(_member[1], '__table__'):
-                config.application_config.orm_models[_member[1].__table__.name] = _member[1]
+        for _name, _model in getmembers(_m, isclass):
+            if type(_model) == DeclarativeMeta and hasattr(_model, '__table__'):
+                config.application_config.orm_models[_model.__table__.name] = _model
 

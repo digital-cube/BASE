@@ -1,42 +1,69 @@
+import copy
 import inspect
 import importlib
 from src.config.app_config import imports as app_imports
 
 def get_api_specification(request_handler):
 
-    # for h in request_handler.application.handlers[0][1]:
-    #     hc = h.handler_class
-    #     print('Handler', hc, type(hc))
-    #     if hasattr(hc, '__API_DOCUMENTATION__'):
-    #         print('NASHO DOCS', hc.__API_DOCUMENTATION__)
-    #     if hasattr(hc, '__API_DOCUMENTATION2__'):
-    #         print('NASHO DOCS2', hc.__API_DOCUMENTATION2__)
-    #
-    #     for _method in ['get', 'post', 'put', 'patch', 'delete']:
-    #         if hasattr(hc, _method):
-    #             _m = getattr(hc, _method)
-    #             if hasattr(_m, '__API_DOCUMENTATION__'):
-    #                 _d = getattr(_m, '__API_DOCUMENTATION__')
-    #             if hasattr(_m, '__API_DOCUMENTATION2__'):
-    #                 _d = getattr(_m, '__API_DOCUMENTATION2__')
+    import base.config.application_config
 
-    # for _m in app_imports:
-    #     print('Loading {} module'.format(_m))
-    #     app_module = importlib.import_module(_m)   #                 print('NASHO DOCS', _d)
-    #     for _name, _handler in inspect.getmembers(app_module):
-    #
-    #         if hasattr(_handler, '__API_DOCUMENTATION__'):
-    #             print('NASHO')
-    #         print('DIR H', dir(_handler))
-            # if inspect.isclass(_handler) and hasattr(_handler, '__URI__'):
-            #     print('uchitan', _name)
-                #
-                # for _method in ['get', 'post', 'put', 'patch', 'delete']:
-                #     if hasattr(_handler, _method):
-                #         _m = getattr(_handler, _method)
-                #         print('DIR', dir(_m))
-                        # if hasattr(_m, '__API_DOCUMENTATION__'):
-                        #     _d = getattr(_m, '__API_DOCUMENTATION__')
-                        #     print(_method, _d)
+    _specification = {}
 
-    return {}
+    _specification['application'] = base.config.application_config.app_name
+    _specification['version'] = base.config.application_config.app_version
+    _specification['prefix'] = base.config.application_config.app_prefix
+    _specification['port'] = base.config.application_config.port
+    _specification['application_description'] = base.config.application_config.app_description
+    _specification['debug'] = base.config.application_config.debug
+    _specification['api'] = {}
+
+    for _m in app_imports:
+
+        app_module = importlib.import_module(_m)
+        # GET IMPORTED HANDLERS
+        for _name, _handler in inspect.getmembers(app_module, inspect.isclass):
+
+            # IF HANDLERS ARE FOR API
+            if hasattr(_handler, '__URI__'):
+
+                _specification_path = _handler.__SPECIFICATION_PATH__ if hasattr(_handler, '__SPECIFICATION_PATH__') \
+                    else 'UNKONWN_SPECIFICATION_PATH'
+
+                # _api_prefix = _handler.__SET_API_PREFIX__
+                # _query_params = _handler.__PATH__PARAMS__
+                _api_uri = '/'.join(
+                    [_u.replace(':','{') + '}' if _u.startswith(':') else _u for _u in _handler.__PATH__.split('/')])
+
+                _specification['api'][_specification_path] = {}
+
+                for _f_name, _func in inspect.getmembers(_handler, inspect.isfunction):
+                    if _f_name in ('get', 'post', 'put', 'patch', 'delete'):
+                        from application.components import Base
+                        _base_function = getattr(Base, _f_name)
+                        if _func.__code__ != _base_function.__code__:
+                            _specification['api'][_specification_path][_f_name] = {}
+                            _specification['api'][_specification_path][_f_name]['params'] = {}
+                            _specification['api'][_specification_path][_f_name]['uri'] = _api_uri
+                            _specification['api'][_specification_path][_f_name]['autenticated'] = False
+                            _specification['api'][_specification_path][_f_name]['description'] = \
+                                _func.__doc__ if _func.__doc__ else 'Missing description'
+
+                            if hasattr(_func, '__API_DOCUMENTATION__'):
+
+                                # _specification['api'][_specification_path][_f_name] = _func.__API_DOCUMENTATION__
+                                _param_api_documentation = []
+                                for _p in _func.__API_DOCUMENTATION__:
+                                    _param_api_documentation.append(_p)
+
+                                for _param in _param_api_documentation:
+                                    #GET PARAMETER TYPE FOR EXPORT
+                                    _type_name = '{} sequencer id'.format(_param['type'].split(':')[1]) \
+                                        if type(_param['type']) == str and 'sequencer:' in _param['type'] \
+                                        else _param['type'].__name__
+
+                                    _specification['api'][_specification_path][_f_name]['params'][_param['name']] = \
+                                        copy.deepcopy(_param)
+                                    _specification['api'][_specification_path][_f_name]['params'][_param['name']]['type'] = \
+                                        _type_name
+
+    return _specification
