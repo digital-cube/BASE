@@ -3,7 +3,6 @@
 from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
-from base.common.sequencer import sequencer
 
 
 @api(
@@ -17,15 +16,5 @@ class Options(Base):
         {'name': 'key', 'type': 'str', 'required': True,  'min': 20, 'max': 30, 'doc': 'key of a option'},
     )
     def get(self, id, value, key):
-        print('Here it is', id, type(id))
-        print('Here is another one', value, type(value))
-        print('Here is a key', key, type(key))
-
-        _s = sequencer()
-        print(_s.new('u'))
-        print(_s.new('u'))
-        print(_s.new('u'))
-        print(_s.new('u'))
-        print(_s.new('u'))
         return self.ok('options get')
 
