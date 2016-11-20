@@ -42,7 +42,7 @@ def _load_app_configuration():
     if hasattr(src.config.app_config, 'debug'):
         setattr(base.config.application_config, 'debug', src.config.app_config.debug)
     if hasattr(src.config.app_config, 'imports'):
-        setattr(base.config.application_config, 'imports', src.config.app_config.imports)
+        base.config.application_config.imports.extend(src.config.app_config.imports)
     if hasattr(src.config.app_config, 'models'):
         setattr(base.config.application_config, 'models', src.config.app_config.models)
     if hasattr(src.config.app_config, 'db_config'):

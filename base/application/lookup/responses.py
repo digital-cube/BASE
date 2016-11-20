@@ -12,6 +12,7 @@ MISSING_REQUEST_ARGUMENT = 9
 INVALID_REQUEST_ARGUMENT = 10
 ARGUMENT_LOWER_THEN_MINIMUM = 11
 ARGUMENT_HIGHER_THEN_MINIMUM = 12
+HTTP_METHOD_NOT_ALLOWED = 13
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -26,6 +27,7 @@ lmap[MISSING_REQUEST_ARGUMENT] = "Missing request argument"
 lmap[INVALID_REQUEST_ARGUMENT] = "Invalid request argument"
 lmap[ARGUMENT_LOWER_THEN_MINIMUM] = "Argument is lower then minimum limit"
 lmap[ARGUMENT_HIGHER_THEN_MINIMUM] = "Argument is higher then maximum limit"
+lmap[HTTP_METHOD_NOT_ALLOWED] = "Not allowed"
 
 lrev = {}
 for k in lmap:

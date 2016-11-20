@@ -101,6 +101,11 @@ class Base(tornado.web.RequestHandler):
     def write_error(self, status_code, **kwargs):
 
         _message = msgs.lmap[msgs.EXCEPTION]
+
+        if status_code == 405:
+            log.critical('Trying to {} on {}'.format(self.request.method, self.request.uri))
+            return self.error(msgs.HTTP_METHOD_NOT_ALLOWED, http_status=status_code)
+
         if status_code == 500:
 
             _error_info = kwargs['exc_info']
@@ -252,7 +257,7 @@ class params(object):
                     argument, argument_value, type(argument_value), e))
                 return None
 
-        if argument_type == json:
+        if argument_type == 'json':
             try:
                 return json.loads(argument_value)
             except json.JSONDecodeError as e:

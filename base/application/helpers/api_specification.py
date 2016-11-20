@@ -1,7 +1,8 @@
 import copy
 import inspect
 import importlib
-from src.config.app_config import imports as app_imports
+from base.config.application_config import imports as app_imports
+
 
 def get_api_specification(request_handler):
 
@@ -53,9 +54,12 @@ def get_api_specification(request_handler):
 
                                 for _param in _func.__API_DOCUMENTATION__:
                                     #GET PARAMETER TYPE FOR EXPORT
-                                    _type_name = '{} sequencer id'.format(_param['type'].split(':')[1]) \
-                                        if type(_param['type']) == str and 'sequencer:' in _param['type'] \
-                                        else _param['type'].__name__
+                                    if type(_param['type']) == str and 'sequencer:' in _param['type']:
+                                        _type_name = '{} sequencer id'.format(_param['type'].split(':')[1])
+                                    elif type(_param['type']) == str and _param['type'] in ['e-mail', 'json']:
+                                        _type_name = _param['type']
+                                    else:
+                                        _type_name = _param['type'].__name__
 
                                     _function_specification[_f_name]['params'][_param['name']] = \
                                         copy.deepcopy(_param)

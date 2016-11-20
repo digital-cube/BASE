@@ -8,7 +8,6 @@ __APP_VERSION__
 models = [
     'src.models.utils',
     'src.models.sequencers',
-    'src.models.user',
 ]
 imports = [
     'src.api.utils.options',

@@ -10,4 +10,7 @@ app_description = app['description'][0]
 secret_cookie = 'cookie_secrete'
 debug = True
 orm_models = {}
-imports = []
+imports = [
+    'base.application.api.user.login',
+    'base.application.api.user.register',
+]
