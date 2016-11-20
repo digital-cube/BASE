@@ -1,9 +1,14 @@
 # coding= utf-8
 
+import base.common.orm
+from base.common.utils import log
 from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
-from base.common.sequencer import sequencer
+from base.application.components import authenticated
+
+import src.lookup.response_messages as msgs
+from src.models.utils import Options as OrmOptions
 
 
 @api(
@@ -12,20 +17,45 @@ from base.common.sequencer import sequencer
 class Options(Base):
 
     @params(
-        {'name': 'id', 'type': str, 'min': 10, 'max': 20, 'doc': 'id of a option', 'default': 'id_bla'},
-        {'name': 'value', 'type': int, 'required': True,  'min': 20, 'max': 30, 'doc': 'value of a option'},
-        {'name': 'key', 'type': str, 'required': True,  'min': 20, 'max': 30, 'doc': 'key of a option'},
+        {'name': 'key', 'type': str, 'required': True,  'doc': 'option key'},
     )
-    def get(self, id, value, key):
-        print('Here it is', id, type(id))
-        print('Here is another one', value, type(value))
-        print('Here is a key', key, type(key))
+    def get(self, _key):
 
-        _s = sequencer()
-        print(_s.new('u'))
-        print(_s.new('u'))
-        print(_s.new('u'))
-        print(_s.new('u'))
-        print(_s.new('u'))
-        return self.ok('options get')
+        _q = base.common.orm.orm.session().query(OrmOptions).filter(OrmOptions.key == _key)
 
+        if _q.count() != 1:
+            log.warning('Missing option {}{}'.format(
+                _key, ' or {} occurrences found'.format(_q.count() if _q.count() != 0 else '')))
+            return self.error(msgs.MISSING_OPTION, option=_key)
+
+        _option = _q.one()
+
+        return self.ok({_option.key: _option.value})
+
+    @authenticated()
+    @params(
+        {'name': 'key', 'type': str, 'required': True,  'doc': 'option key'},
+        {'name': 'value', 'type': str, 'required': True,  'doc': 'option value'},
+    )
+    def put(self, _key, _value):
+
+        _session = base.common.orm.orm.session()
+        _q = _session.query(OrmOptions).filter(OrmOptions.key == _key)
+
+        if _q.count() == 1:
+
+            _option = _q.one()
+            _option.value = _value
+
+        elif _q.count() == 0:
+
+            _option = OrmOptions(_key, _value)
+            _session.add(_option)
+
+        else:
+            log.warning('Found {} occurrences for {}'.format(_q.count(), _key))
+            return self.error(msgs.OPTION_MISMATCH, option=_key)
+
+        _session.commit()
+
+        return self.ok({_option.key: _option.value})

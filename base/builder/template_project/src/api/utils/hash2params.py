@@ -2,8 +2,10 @@
 
 from base.application.components import Base
 from base.application.components import api
+from base.application.components import authenticated
 
 
+@authenticated()
 @api(
     URI='/h2p',
     PREFIX=False)

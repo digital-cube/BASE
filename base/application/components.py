@@ -4,13 +4,12 @@ import os
 import abc
 import ast
 import json
+import inspect
 import decimal
 import datetime
 import tornado.web
 from functools import wraps
 
-import base.common.orm
-import base.application.lookup.responses
 import base.application.lookup.responses as msgs
 from base.application.helpers.exceptions import MissingApiRui
 from base.common.utils import log
@@ -54,8 +53,8 @@ class Base(tornado.web.RequestHandler):
             response.update(s)
 
         if isinstance(s, int):
-            if s in base.application.lookup.responses.lmap:
-                response.update({'message': base.application.lookup.responses.lmap[s], 'code': s})
+            if s in msgs.lmap:
+                response.update({'message': msgs.lmap[s], 'code': s})
 
         response.update(kwargs)
 
@@ -81,8 +80,19 @@ class Base(tornado.web.RequestHandler):
         if isinstance(s, str):
             response['message'] = s
         elif isinstance(s, int):
-            if s in base.application.lookup.responses.lmap:
-                response['message'] = base.application.lookup.responses.lmap[s]
+            if s in msgs.lmap:
+                response['message'] = msgs.lmap[s]
+            else:
+                import importlib
+                import base.config.application_config
+                _application_responses_module = base.config.application_config.response_messages_module
+                try:
+                    _application_responses = importlib.import_module(_application_responses_module)
+                    if s in _application_responses.lmap:
+                        response['message'] = _application_responses.lmap[s]
+                except ImportError:
+                    log.warning('Error importing {} application response messages module'.format(
+                        _application_responses_module))
 
         response.update(kwargs)
 
@@ -110,8 +120,8 @@ class Base(tornado.web.RequestHandler):
             _message = '{} -> {} -> {}: {}'.format(_list, _c, _error_class, _error_value)
             log.critical(_message)
 
-        import config.application_config
-        if config.application_config.debug:
+        import base.config.application_config
+        if base.config.application_config.debug:
             return self.error(msgs.API_CALL_EXCEPTION, trace=_message, http_status=status_code)
         return self.error(msgs.API_CALL_EXCEPTION, http_status=status_code)
 
@@ -394,6 +404,35 @@ class params(object):
         setattr(wrapper, '__API_DOCUMENTATION__', _arguments_documentation)
 
         return wrapper
+
+
+class authenticated(object):
+
+    def __init__(self, *args):
+
+        self.roles = args
+
+    def __call__(self, _target):
+
+        if inspect.isclass(_target):
+            print('AUTHENTICATED CLASS', _target.__name__)
+
+            # for _method in ['get', 'post', 'put', 'patch', 'delete']:
+            #
+            #     if hasattr(_target, _method):
+            #         _m = getattr(_target, _method)
+            #         setattr(_target, _method, authenticated()
+
+            return _target
+
+        if inspect.isfunction(_target):
+            print('AUTHENTICATED FUNCTION', _target.__name__)
+            @wraps(_target)
+            def wrapper(*args, **kwargs):
+
+                return _target(*args, **kwargs)
+
+            return wrapper
 
 
 class DefaultRouteHandler(Base):
