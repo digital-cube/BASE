@@ -6,6 +6,7 @@ from base.application.components import params
 from src.models.utils import Options as OrmOptions
 import base.common.orm
 from base.common.utils import log
+import src.lookup.response_messages as msgs
 
 
 @api(
@@ -23,7 +24,7 @@ class Options(Base):
         if _q.count() != 1:
             log.warning('Missing option {}{}'.format(
                 _key, ' or {} occurrences found'.format(_q.count() if _q.count() != 0 else '')))
-            return self.error("Missing option '{}'".format(_key))   # TODO: make res messages return
+            return self.error(msgs.MISSING_OPTION, option=_key)
 
         _option = _q.one()
 
@@ -50,7 +51,7 @@ class Options(Base):
 
         else:
             log.warning('Found {} occurrences for {}'.format(_q.count(), _key))
-            return self.error('To many values for {}'.format(_key)) # TODO: change to res messages
+            return self.error(msgs.OPTION_MISMATCH, option=_key)
 
         _session.commit()
 

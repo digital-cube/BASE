@@ -49,6 +49,9 @@ def _load_app_configuration():
         setattr(base.config.application_config, 'db_config', src.config.app_config.db_config)
     if hasattr(src.config.app_config, 'db_type'):
         setattr(base.config.application_config, 'db_type', src.config.app_config.db_type)
+    if hasattr(src.config.app_config, 'response_messages_module'):
+        setattr(base.config.application_config, 'response_messages_module',
+                src.config.app_config.response_messages_module)
 
 
 def load_application(entries):
