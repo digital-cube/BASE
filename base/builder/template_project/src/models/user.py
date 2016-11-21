@@ -34,17 +34,14 @@ class User(common.orm.sql_base):
 
         self.id = id_user
 
-    def first_name_set(self, first_name):
+    def set_first_name(self, first_name):
         self.first_name = first_name
 
-    def last_name_set(self, last_name):
+    def set_last_name(self, last_name):
         self.last_name = last_name
 
-    def address_set(self, address):
-        self.address = address
-
-    def telephone_set(self, telephone):
-        self.telephone = telephone
+    def set_data(self, data):
+        self.data = data
 
 
 def main():

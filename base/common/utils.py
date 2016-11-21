@@ -6,20 +6,37 @@ from logging.handlers import TimedRotatingFileHandler
 from base.config.settings import log_filename
 from base.config.settings import log_logger
 
+_logs = {}
+
 
 def retrieve_log(log_file_name, _logger):
-    log_filename = log_file_name
-    log_handler = TimedRotatingFileHandler(log_filename, when="midnight")
+
+    if log_file_name in _logs:
+        return _logs[log_file_name]
+
+    _log_filename = log_file_name
+    log_handler = TimedRotatingFileHandler(_log_filename, when="midnight")
     log_formatter = logging.Formatter(
         '%(asctime)-6s %(name)s %(module)s %(funcName)s %(lineno)d - %(levelname)s %(message)s')
     log_handler.setFormatter(log_formatter)
 
-    log = logging.getLogger(_logger)
-    log.propagate = False
-    log.addHandler(log_handler)
-    log.setLevel(logging.DEBUG)
+    _log = logging.getLogger(_logger)
+    _log.propagate = False
+    _log.addHandler(log_handler)
+    _log.setLevel(logging.DEBUG)
 
-    return log
+    _logs[log_file_name] = _log
+
+    return _log
 
 log = retrieve_log(log_filename, log_logger)
+
+
+def get_request_ip(request_handler):
+
+    # INTENTIONALLY LEFT OUT OF EXCEPTION TO TRACK POSSIBLE EXCEPTIONS
+    _proxy_ip = request_handler.request.headers
+    _ip = _proxy_ip or request_handler.request.remote_ip
+
+    return _ip
 

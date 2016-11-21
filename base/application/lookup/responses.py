@@ -13,6 +13,10 @@ INVALID_REQUEST_ARGUMENT = 10
 ARGUMENT_LOWER_THEN_MINIMUM = 11
 ARGUMENT_HIGHER_THEN_MINIMUM = 12
 HTTP_METHOD_NOT_ALLOWED = 13
+USERNAME_ALREADY_TAKEN = 14
+INVALID_PASSWORD = 15
+ERROR_USER_REGISTER = 16
+ERROR_USER_SEQUENCE = 17
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -28,6 +32,10 @@ lmap[INVALID_REQUEST_ARGUMENT] = "Invalid request argument"
 lmap[ARGUMENT_LOWER_THEN_MINIMUM] = "Argument is lower then minimum limit"
 lmap[ARGUMENT_HIGHER_THEN_MINIMUM] = "Argument is higher then maximum limit"
 lmap[HTTP_METHOD_NOT_ALLOWED] = "Not allowed"
+lmap[USERNAME_ALREADY_TAKEN] = "Username already taken"
+lmap[INVALID_PASSWORD] = "Invalid password"
+lmap[ERROR_USER_REGISTER] = "Error registering user"
+lmap[ERROR_USER_SEQUENCE] = "Error making user sequence"
 
 lrev = {}
 for k in lmap:

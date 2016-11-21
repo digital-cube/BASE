@@ -11,6 +11,7 @@ from base.application.components import SpecificationHandler
 from base.application.components import BaseHandler
 from base.application.components import PathsWriter
 from base.application.helpers.exceptions import MissingApplicationConfiguration
+from base.application.helpers.exceptions import InvalidAPIHooksModule
 
 
 def _load_app_configuration():
@@ -41,6 +42,8 @@ def _load_app_configuration():
         setattr(base.config.application_config, 'secret_cookie', src.config.app_config.secret_cookie)
     if hasattr(src.config.app_config, 'debug'):
         setattr(base.config.application_config, 'debug', src.config.app_config.debug)
+    if hasattr(src.config.app_config, 'api_hooks'):
+        setattr(base.config.application_config, 'api_hooks', src.config.app_config.api_hooks)
     if hasattr(src.config.app_config, 'imports'):
         base.config.application_config.imports.extend(src.config.app_config.imports)
     if hasattr(src.config.app_config, 'models'):
@@ -52,13 +55,16 @@ def _load_app_configuration():
     if hasattr(src.config.app_config, 'response_messages_module'):
         setattr(base.config.application_config, 'response_messages_module',
                 src.config.app_config.response_messages_module)
+    if hasattr(src.config.app_config, 'strong_password '):
+        setattr(base.config.application_config, 'strong_password', src.config.app_config.strong_password)
 
 
 def load_application(entries):
 
     _load_app_configuration()
 
-    # from src.config.app_config import imports as app_imports
+    # LOAD APPLICATION ROUTES
+    import base.config.application_config
     from base.config.application_config import imports as app_imports
 
     _entries = [
@@ -96,6 +102,28 @@ def load_application(entries):
     if len(_entries) > 1:
         del entries[:]
     entries += _entries
+    # FINISH LOADING APPLICATION ROUTES
+
+    # LOAD APPLICATION HOOKS
+    try:
+        _hooks_module = importlib.import_module(base.config.application_config.api_hooks)
+    except ImportError:
+        log.critical('Can not load api hooks file {}, missing or invalid'.format(
+            base.config.application_config.api_hooks))
+        raise InvalidAPIHooksModule('Missing or wrong {} API hooks module'.format(
+            base.config.application_config.api_hooks))
+
+    import base.application.api.api_hooks
+    if hasattr(_hooks_module, 'hooks'):
+        for _hook in _hooks_module.hooks:
+
+            if not hasattr(_hooks_module, _hook):
+                log.warning('API hook {} missing in module {}'.format(_hook, base.application.api.api_hooks))
+                continue
+
+            _real_hook = getattr(_hooks_module, _hook)
+            setattr(base.application.api.api_hooks, _hook, _real_hook)
+    # FINISH LOADING APPLICATION HOOKS
 
 
 def load_orm():
@@ -123,8 +151,7 @@ def load_orm():
             print('Error loading model {}'.format(m))
             continue
 
-        import config.application_config
         for _name, _model in getmembers(_m, isclass):
             if type(_model) == DeclarativeMeta and hasattr(_model, '__table__'):
-                config.application_config.orm_models[_model.__table__.name] = _model
+                base.config.application_config.orm_models[_model.__table__.name] = _model
 

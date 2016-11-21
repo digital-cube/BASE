@@ -30,3 +30,7 @@ class SequencerTypeError(Exception):
     """Wrong Sequencer data type"""
     pass
 
+
+class InvalidAPIHooksModule(Exception):
+    """API Hooks module not configured or invalid"""
+    pass

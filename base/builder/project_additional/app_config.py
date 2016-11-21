@@ -22,5 +22,7 @@ db_config = {
     'db_host': '__db_host__',
     'db_port': '__db_port__',
 }
+api_hooks = 'src.api_hooks.hooks'
 response_messages_module = 'src.lookup.response_messages'
+strong_password = False
 debug = True
