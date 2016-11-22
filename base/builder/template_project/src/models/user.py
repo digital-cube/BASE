@@ -8,17 +8,20 @@ class AuthUser(common.orm.sql_base):
     __tablename__ = 'auth_users'
 
     id = Column(String(10), primary_key=True)
-    username = Column(String(64), nullable=False)
+    username = Column(String(64), index=True, nullable=False, unique=True)
     password = Column(String(64), nullable=False)
-    role_flags = Column(Integer, nullable=False)
-    active = Column(Boolean, nullable=False, default=False)
+    role_flags = Column(Integer, index=True, nullable=False)
+    active = Column(Boolean, index=True, nullable=False, default=False)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now())
 
-    def __init__(self, username, password, role_flags):
+    def __init__(self, _id, username, password, role_flags=1, active=False):
 
+        self.id = _id
         self.username = username
         self.password = password
         self.role_flags = role_flags
+        self.active = active
+        self.created = datetime.datetime.now()
 
 
 class User(common.orm.sql_base):
@@ -26,21 +29,15 @@ class User(common.orm.sql_base):
     __tablename__ = 'users'
 
     id = Column(String(10), ForeignKey(AuthUser.id), primary_key=True)
-    first_name = Column(String(64))
+    first_name = Column(String(64), index=True)
     last_name = Column(String(64))
     data = Column(Text)
 
-    def __init__(self, id_user):
+    def __init__(self, id_user, first_name, last_name, data):
 
         self.id = id_user
-
-    def set_first_name(self, first_name):
         self.first_name = first_name
-
-    def set_last_name(self, last_name):
         self.last_name = last_name
-
-    def set_data(self, data):
         self.data = data
 
 

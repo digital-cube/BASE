@@ -55,7 +55,7 @@ def _load_app_configuration():
     if hasattr(src.config.app_config, 'response_messages_module'):
         setattr(base.config.application_config, 'response_messages_module',
                 src.config.app_config.response_messages_module)
-    if hasattr(src.config.app_config, 'strong_password '):
+    if hasattr(src.config.app_config, 'strong_password'):
         setattr(base.config.application_config, 'strong_password', src.config.app_config.strong_password)
 
 

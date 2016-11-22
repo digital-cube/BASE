@@ -28,7 +28,6 @@ class Register(Base):
     def post(self, username, password, data):
 
         import base.config.application_config
-        print('MODES2', base.config.application_config.orm_models)
         AuthUsers = base.config.application_config.orm_models['auth_users']
         User = base.config.application_config.orm_models['users']
 
@@ -42,12 +41,8 @@ class Register(Base):
                 log.warning('Password {} is not valid'.format(password))
                 return self.error(msgs.INVALID_PASSWORD)
 
-        # TODO: problem with sequencer orm connection - cannot get session
-        # from base.common.sequencer import sequencer
-        # id_user = sequencer().new('u')
-        # TODO: remove this id making
-        import datetime, hashlib
-        id_user = hashlib.md5(str(datetime.datetime.now()).encode('utf-8')).hexdigest()[:10]
+        from base.common.sequencer import sequencer
+        id_user = sequencer().new('u')
 
         if not id_user:
             return self.error(msgs.ERROR_USER_SEQUENCE)
@@ -62,13 +57,27 @@ class Register(Base):
 
         if isinstance(_user_registered, dict):
             response.update(_user_registered)
-        elif _user_registered is not None:
+        elif _user_registered != True:
             try:
                 response['message'] = str(_user_registered)
             except Exception:
                 log.error('Can not make string from user register response')
 
+        from base.common.tokens_services import get_token
+        _token = get_token()
+        if not _token:
+            log.critial('Error getting token for new user {} - {}'.format(id_user, username))
+            return self.error(msgs.ERROR_GET_NEW_TOKEN)
+        response.update(_token)
+
         if hasattr(api_hooks, 'post_register_process'):
-            api_hooks.post_register_process(usernam)
+            _post_register_result = api_hooks.post_register_process(id_user, username, password, data)
+            if not _post_register_result:
+                log.critical('Post register process error for user {} - {}'.format(id_user, username))
+                return self.error(msgs.ERROR_USER_POSTREGISTER)
+
+            if isinstance(_post_register_result, dict):
+                response.update(_post_register_result)
 
         return self.ok(response)
+

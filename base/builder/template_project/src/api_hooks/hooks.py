@@ -10,12 +10,15 @@ check_password_is_valid(password) -> bool:
 register_user(id_user, username, password, data) -> [dict, str, convertible to string, None]:
         - register user on system
         - populate auth_users and users tables here
+post_register_process(id_user, username, password, data) -> [dict, None]:
+        - process user's data after user registration
 
 """
 
 hooks = [
     'check_password_is_valid',
     # 'register_user',
+    # 'post_register_process'
 ]
 
 

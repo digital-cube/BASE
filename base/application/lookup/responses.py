@@ -17,6 +17,8 @@ USERNAME_ALREADY_TAKEN = 14
 INVALID_PASSWORD = 15
 ERROR_USER_REGISTER = 16
 ERROR_USER_SEQUENCE = 17
+ERROR_GET_NEW_TOKEN = 18
+ERROR_USER_POSTREGISTER = 19
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -36,6 +38,8 @@ lmap[USERNAME_ALREADY_TAKEN] = "Username already taken"
 lmap[INVALID_PASSWORD] = "Invalid password"
 lmap[ERROR_USER_REGISTER] = "Error registering user"
 lmap[ERROR_USER_SEQUENCE] = "Error making user sequence"
+lmap[ERROR_GET_NEW_TOKEN] = "Error getting a new token"
+lmap[ERROR_USER_POSTREGISTER] = "Post-register error"
 
 lrev = {}
 for k in lmap:

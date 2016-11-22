@@ -2,12 +2,12 @@
 
 import string
 import random
-import common.orm
+import base.common.orm
 import sqlalchemy.exc
 from src.models.sequencers import Sequencer
-from application.helpers.exceptions import ToManyAttemptsException
-from application.helpers.exceptions import SequencerTypeError
-from common.utils import log
+from base.application.helpers.exceptions import ToManyAttemptsException
+from base.application.helpers.exceptions import SequencerTypeError
+from base.common.utils import log
 
 
 class SequencerFactory:
@@ -176,7 +176,7 @@ def sequencer(db=None):
         if db:
             _sequencer = SequencerFactory(db)
         else:
-            _sequencer = SequencerFactory(common.orm.orm)
+            _sequencer = SequencerFactory(base.common.orm.orm)
 
     return _sequencer
 

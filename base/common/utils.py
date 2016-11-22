@@ -1,5 +1,6 @@
 # coding= utf-8
 
+import bcrypt
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
@@ -39,4 +40,10 @@ def get_request_ip(request_handler):
     _ip = _proxy_ip or request_handler.request.remote_ip
 
     return _ip
+
+
+def format_password(username, password):
+
+    return bcrypt.hashpw('{}{}'.format(username, password).encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
 

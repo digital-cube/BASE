@@ -1,5 +1,7 @@
 """
-DAU - developer admin user
+User role flags for access levels.
+DAU - developer admin user.
+At least USER required.
 """
 
 DEVELOPER = 4
