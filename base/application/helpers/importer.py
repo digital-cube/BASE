@@ -44,6 +44,8 @@ def _load_app_configuration():
         setattr(base.config.application_config, 'debug', src.config.app_config.debug)
     if hasattr(src.config.app_config, 'api_hooks'):
         setattr(base.config.application_config, 'api_hooks', src.config.app_config.api_hooks)
+    if hasattr(src.config.app_config, 'session_storage'):
+        setattr(base.config.application_config, 'session_storage', src.config.app_config.session_storage)
     if hasattr(src.config.app_config, 'imports'):
         base.config.application_config.imports.extend(src.config.app_config.imports)
     if hasattr(src.config.app_config, 'models'):

@@ -34,3 +34,14 @@ class SequencerTypeError(Exception):
 class InvalidAPIHooksModule(Exception):
     """API Hooks module not configured or invalid"""
     pass
+
+
+class UnknownSessionStorage(Exception):
+    """Unknown session storage type"""
+    pass
+
+
+class ErrorSetSessionToken(Exception):
+    """Error setting session token in configured storage"""
+    pass
+

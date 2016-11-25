@@ -2,6 +2,7 @@
 
 from base.application.components import Base
 from base.application.components import api
+from base.common.tokens_services import get_token
 
 
 @api(
@@ -9,5 +10,9 @@ from base.application.components import api
     PREFIX=False)
 class Login(Base):
 
-    def get(self):
-        return self.ok('login')
+    def post(self):
+
+        _uid = 'asdf'
+        _token = get_token(_uid)
+
+        return self.ok(_token)

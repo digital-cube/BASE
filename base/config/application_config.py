@@ -19,3 +19,5 @@ imports = [
     'base.application.api.user.login',
     'base.application.api.user.register',
 ]
+session_storage = 'DB'
+

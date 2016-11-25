@@ -15,7 +15,7 @@ app = {
     'description': ('base application', 'the new application description'),
     'destination': ('.', 'the destination directory'),
     'name': (None, 'the new application name'),
-    'version': ('0.00.1', 'the new application version'),
+    'version': ('0.0.1', 'the new application version'),
     'prefix': ('api', 'the new application api calls prefix'),
     'port': (8802, 'the port for the new application'),
     'database_type': ('mysql', 'type od the sql database'),

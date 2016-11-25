@@ -15,7 +15,6 @@ models = [
 imports = [
     'src.api.utils.options',
     'src.api.utils.hash2params',
-    'src.api.user.login',
 ]
 db_type = 'mysql'
 db_config = {
@@ -26,6 +25,7 @@ db_config = {
     'db_port': '__db_port__',
 }
 api_hooks = 'src.api_hooks.hooks'
+session_storage = 'DB'  # 'DB'|'REDIS'
 response_messages_module = 'src.lookup.response_messages'
 strong_password = False
 debug = True

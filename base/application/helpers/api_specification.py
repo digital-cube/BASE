@@ -1,6 +1,7 @@
 import copy
 import inspect
 import importlib
+import base
 from base.config.application_config import imports as app_imports
 
 
@@ -10,6 +11,7 @@ def get_api_specification(request_handler):
 
     _specification = {}
 
+    _specification['base_version'] = base.__VERSION__
     _specification['application'] = base.config.application_config.app_name
     _specification['version'] = base.config.application_config.app_version
     _specification['prefix'] = base.config.application_config.app_prefix
@@ -28,7 +30,7 @@ def get_api_specification(request_handler):
             if hasattr(_handler, '__URI__'):
 
                 _specification_path = _handler.__SPECIFICATION_PATH__ if hasattr(_handler, '__SPECIFICATION_PATH__') \
-                    else 'UNKONWN_SPECIFICATION_PATH'
+                    else 'UNKNOWN_SPECIFICATION_PATH'
                 if _specification_path not in _specification['api']:
                     _specification['api'][_specification_path] = []
 
