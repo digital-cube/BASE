@@ -12,13 +12,19 @@ register_user(id_user, username, password, data) -> [dict, str, convertible to s
         - populate auth_users and users tables here
 post_register_process(id_user, username, password, data) -> [dict, None]:
         - process user's data after user registration
+user_exists(username) -> [User object]
+        - check if username exists in the system
+post_login_process(username, password, Auth_user) -> [dict, None]
+        - after login processing
 
 """
 
 hooks = [
     'check_password_is_valid',
     # 'register_user',
-    # 'post_register_process'
+    # 'post_register_process',
+    # 'user_exists',
+    # 'post_login_process',
 ]
 
 

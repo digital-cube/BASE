@@ -48,7 +48,7 @@ class s_session_token(common.orm.sql_base):
 
     __tablename__ = 's_session_token'
 
-    id = Column(String(10), primary_key=True)
+    id = Column(String(64), primary_key=True)
     active_stage = Column(String(3), index=True, nullable=False)
 
     # __table_args__ = (Index('_s_session_token_idx0', 'active_stage'),)
@@ -63,7 +63,7 @@ class s_hash_2_params(common.orm.sql_base):
 
     __tablename__ = 's_hash_2_params'
 
-    id = Column(String(10), primary_key=True)
+    id = Column(String(64), primary_key=True)
     active_stage = Column(String(3), index=True, nullable=False)
 
     # __table_args__ = (Index('_s_hash_2_params_idx0', 'active_stage'),)

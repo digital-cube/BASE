@@ -26,6 +26,7 @@ class Register(Base):
         {'name': 'data', 'type': 'json', 'required': True,  'doc': "user's additional data"},
     )
     def post(self, username, password, data):
+        """Register user on the system"""
 
         import base.config.application_config
         AuthUsers = base.config.application_config.orm_models['auth_users']
@@ -64,10 +65,10 @@ class Register(Base):
                 log.error('Can not make string from user register response')
 
         from base.common.tokens_services import get_token
-        _token = get_token()
+        _token = get_token(id_user)
         if not _token:
             log.critial('Error getting token for new user {} - {}'.format(id_user, username))
-            return self.error(msgs.ERROR_GET_NEW_TOKEN)
+            return self.error(msgs.ERROR_RETRIEVE_SESSION)
         response.update(_token)
 
         if hasattr(api_hooks, 'post_register_process'):

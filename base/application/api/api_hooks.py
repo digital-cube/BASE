@@ -8,14 +8,20 @@ register_user(id_user, username, password, data) -> [dict, str, convertible to s
         - populate auth_users and users tables here
 post_register_process(id_user, username, password, data) -> [dict, None]:
         - process user's data after user registration
+user_exists(username) -> [User object]
+        - check if username exists in the system
+check_username_and_password(username, password, Auth_user) -> [bool]
+        - check username / password match
 
 """
 
 import json
 from base.common.utils import log
 from base.common.utils import format_password
+from base.common.utils import password_match
 
 
+# REGISTER USER PROCESS
 def check_password_is_valid(password):
     if len(password) < 6:
         log.critical('Password {} length {} is lower than minimal of 6'.format(password, len(password)))
@@ -27,14 +33,14 @@ def register_user(id_user, username, password, data):
 
     import base.config.application_config
     import base.common.orm
-    AuthUsers = base.config.application_config.orm_models['auth_users']
+    AuthUser = base.config.application_config.orm_models['auth_users']
     User = base.config.application_config.orm_models['users']
     _session = base.common.orm.orm.session()
 
     password = format_password(username, password)
 
     print('REGISTER', id_user, username, password, data)
-    _auth_user = AuthUsers(id_user, username, password)
+    _auth_user = AuthUser(id_user, username, password)
     _session.add(_auth_user)
     _session.commit()
 
@@ -46,4 +52,32 @@ def register_user(id_user, username, password, data):
     _session.commit()
 
     return True
+# END OF THE REGISTER USER PROCESS
+
+
+# LOGIN USER PROCESS
+def user_exists(username):
+
+    import base.config.application_config
+    import base.common.orm
+    AuthUser = base.config.application_config.orm_models['auth_users']
+    _session = base.common.orm.orm.session()
+
+    _q = _session.query(AuthUser).filter(AuthUser.username == username)
+    if _q.count() != 1:
+        log.warning('User {} not found'.format(username))
+        return None
+
+    return _q.one()
+
+
+def check_username_and_password(username, password, user):
+
+    if not password_match(username, password, user.password):
+        log.critical('User {} enters a wrong password: {}'.format(username, password))
+        return False
+
+    return True
+
+# END OF THE LOGIN USER PROCESS
 

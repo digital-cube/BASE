@@ -47,3 +47,8 @@ def format_password(username, password):
     return bcrypt.hashpw('{}{}'.format(username, password).encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 
+def password_match(username, password, db_password):
+
+    generated_password = '{}{}'.format(username, password).encode('utf-8')
+    database_password = db_password.encode('utf-8')
+    return database_password == bcrypt.hashpw(generated_password, database_password)
