@@ -1,5 +1,5 @@
-from sqlalchemy import Column, String, SmallInteger, Boolean, Index
 import common.orm
+from sqlalchemy import Column, String, SmallInteger, Boolean, Index
 
 
 class Sequencer(common.orm.sql_base):

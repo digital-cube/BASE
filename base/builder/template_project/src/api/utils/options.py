@@ -11,6 +11,7 @@ import src.lookup.response_messages as msgs
 from src.models.utils import Options as OrmOptions
 
 
+@authenticated()
 @api(
     URI='/option/:key',
     PREFIX=False)
@@ -32,13 +33,14 @@ class Options(Base):
 
         return self.ok({_option.key: _option.value})
 
-    @authenticated()
     @params(
         {'name': 'key', 'type': str, 'required': True,  'doc': 'option key'},
         {'name': 'value', 'type': str, 'required': True,  'doc': 'option value'},
     )
     def put(self, _key, _value):
 
+
+        _user =
         _session = base.common.orm.orm.session()
         _q = _session.query(OrmOptions).filter(OrmOptions.key == _key)
 
@@ -56,6 +58,7 @@ class Options(Base):
             log.warning('Found {} occurrences for {}'.format(_q.count(), _key))
             return self.error(msgs.OPTION_MISMATCH, option=_key)
 
+        log.info('User {} set option {} -> {}'.format('username', _key, _valuea))
         _session.commit()
 
         return self.ok({_option.key: _option.value})

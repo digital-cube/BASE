@@ -5,6 +5,8 @@ name as in the 'hooks' list.
 
 Possible hooks:
 
+pack_user(AuthUser) -> [dict, None]:
+        - return users data as dictionary
 check_password_is_valid(password) -> bool:
         - check for password validation
 register_user(id_user, username, password, data) -> [dict, str, convertible to string, None]:
@@ -20,6 +22,7 @@ post_login_process(username, password, Auth_user) -> [dict, None]
 """
 
 hooks = [
+    # 'pack_user',
     'check_password_is_valid',
     # 'register_user',
     # 'post_register_process',

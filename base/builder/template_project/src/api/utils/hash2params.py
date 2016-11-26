@@ -14,3 +14,6 @@ class Hash2Params(Base):
     def get(self):
         return self.ok('get h2p')
 
+    def put(self):
+        return self.ok('get h2p')
+

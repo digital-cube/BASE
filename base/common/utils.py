@@ -36,7 +36,7 @@ log = retrieve_log(log_filename, log_logger)
 def get_request_ip(request_handler):
 
     # INTENTIONALLY LEFT OUT OF EXCEPTION TO TRACK POSSIBLE EXCEPTIONS
-    _proxy_ip = request_handler.request.headers
+    _proxy_ip = request_handler.request.headers.get('X-Forwarded-For')
     _ip = _proxy_ip or request_handler.request.remote_ip
 
     return _ip
@@ -52,3 +52,20 @@ def password_match(username, password, db_password):
     generated_password = '{}{}'.format(username, password).encode('utf-8')
     database_password = db_password.encode('utf-8')
     return database_password == bcrypt.hashpw(generated_password, database_password)
+
+
+def is_implemented(_target_class, _target_function_name, _target_function):
+
+    if _target_function_name not in ('get', 'post', 'put', 'patch', 'delete'):
+        return False
+
+    from base.application.components import Base
+    _base_function = getattr(Base, _target_function_name, None)
+    if _base_function is None:
+        return False
+
+    if _target_function.__code__ == _base_function.__code__:
+        print(_target_class.__name__, _target_function_name, 'JE KAO U BASE-U')
+        return False
+
+    return True

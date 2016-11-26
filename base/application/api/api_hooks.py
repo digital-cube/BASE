@@ -1,6 +1,8 @@
 """
 Application specific hooks:
 
+pack_user(AuthUser) -> [dict, None]:
+        - return users data as dictionary
 check_password_is_valid(password) -> bool:
         - check for password validation
 register_user(id_user, username, password, data) -> [dict, str, convertible to string, None]:
@@ -20,6 +22,25 @@ from base.common.utils import log
 from base.common.utils import format_password
 from base.common.utils import password_match
 
+def pack_user(user):
+
+    _user = {}
+    _user['id'] = user.id
+    _user['username'] = user.username
+
+    import base.config.application_config
+    import base.common.orm
+    User = base.config.application_config.orm_models['users']
+    _session = base.common.orm.orm.session()
+
+    _q = _session.query(User).filter(User.id == user.id)
+
+    if _q.count() == 1:
+        _db_user = _q.one()
+
+        _user['id'] = user.id
+
+    return _user
 
 # REGISTER USER PROCESS
 def check_password_is_valid(password):
@@ -38,9 +59,10 @@ def register_user(id_user, username, password, data):
     _session = base.common.orm.orm.session()
 
     password = format_password(username, password)
+    import src.lookup.user_roles as user_roles
+    role_flags = int(data['role_flags']) if 'role_flags' in data else user_roles.USER
 
-    print('REGISTER', id_user, username, password, data)
-    _auth_user = AuthUser(id_user, username, password)
+    _auth_user = AuthUser(id_user, username, password, role_flags, True)
     _session.add(_auth_user)
     _session.commit()
 

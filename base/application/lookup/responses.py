@@ -20,6 +20,9 @@ ERROR_USER_SEQUENCE = 17
 ERROR_RETRIEVE_SESSION = 18
 ERROR_USER_POSTREGISTER = 19
 WRONG_USERNAME_OR_PASSWORD = 20
+UNAUTHORIZED_REQUEST = 21
+USER_IS_NOT_ACTIVE = 22
+LOGOUT_ERROR = 23
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -42,6 +45,9 @@ lmap[ERROR_USER_SEQUENCE] = "Error making user sequence"
 lmap[ERROR_RETRIEVE_SESSION] = "Error getting a new token"
 lmap[ERROR_USER_POSTREGISTER] = "Post-register error"
 lmap[WRONG_USERNAME_OR_PASSWORD] = "Wrong username or password"
+lmap[UNAUTHORIZED_REQUEST] = "Unauthorized request"
+lmap[USER_IS_NOT_ACTIVE] = "User is not active"
+lmap[LOGOUT_ERROR] = "Error logging out"
 
 lrev = {}
 for k in lmap:

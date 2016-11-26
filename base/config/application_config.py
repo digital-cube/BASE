@@ -17,6 +17,7 @@ models = []
 orm_models = {}
 imports = [
     'base.application.api.user.login',
+    'base.application.api.user.logout',
     'base.application.api.user.register',
 ]
 session_storage = 'DB'

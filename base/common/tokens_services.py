@@ -34,6 +34,14 @@ class Tokenizer(object):
         """set token in database"""
         raise NotImplemented('set_session_token has to be implemented')
 
+    def get_user_by_token(self, tk, pack=True):
+        """retrieve user by given token"""
+        raise NotImplemented('get_user_by_token has to be implemented')
+
+    def close_session(self, tk):
+        """close session by given token"""
+        raise NotImplemented('close_session has to be implemented')
+
 
 class SqlTokenizer(Tokenizer):
     """Session tokens from sql database"""
@@ -79,6 +87,63 @@ class SqlTokenizer(Tokenizer):
 
         return {'token_type': session_token_type.lmap[_session_token.type], 'token': _id_session_token}
 
+    def get_user_by_token(self, tk, pack=True):
+        """retrieve user by given token"""
+
+        import base.application.api.api_hooks
+        import base.config.application_config
+        import base.common.orm
+        SessionToken = base.config.application_config.orm_models['session_tokens']
+        AuthUser = base.config.application_config.orm_models['auth_users']
+        _session = base.common.orm.orm.session()
+
+        _qs = _session.query(SessionToken).filter(SessionToken.id == tk)
+
+        if _qs.count() != 1:
+            log.critical('Cannot retrieve session with id: {}'.format(tk))
+            return None
+
+        _db_session = _qs.one()
+
+        if not _db_session.active:
+            log.critical('Session {} is not active'.format(tk))
+            return None
+
+        _q = _session.query(AuthUser).filter(AuthUser.id == _db_session.id_user)
+        if _q.count() != 1:
+            log.critical('User {} not found'.format(_db_session.id_user))
+            return None
+
+        _user = _q.one()
+
+        if not _user.active:
+            log.critical('User {} -> {} is not active'.format(_user.id, _user.username))
+            return None
+
+        return base.application.api.api_hooks.pack_user(_user) if pack else _user
+
+    def close_session(self, tk):
+        """close session by given token"""
+
+        import base.application.api.api_hooks
+        import base.config.application_config
+        import base.common.orm
+        SessionToken = base.config.application_config.orm_models['session_tokens']
+        _session = base.common.orm.orm.session()
+
+        _q = _session.query(SessionToken).filter(SessionToken.id == tk)
+
+        if _q.count() != 1:
+            log.critical('Session {} not found'.format(tk))
+            return False
+
+        _db_session = _q.one()
+        _db_session.active = False
+        log.info('Closing {} session'.format(tk))
+        _session.commit()
+
+        return True
+
 
 class RedisTokenizer(Tokenizer):
     """Session tokens from redis database"""
@@ -93,6 +158,14 @@ class RedisTokenizer(Tokenizer):
     def set_session_token(self, uid, tk, token_type=session_token_type.SIMPLE):
         """set token in database"""
         print('SET', )
+
+    def get_user_by_token(self, tk, pack=True):
+        """retrieve user by given token"""
+        print('GET USER')
+
+    def close_session(self, tk):
+        """close session by given token"""
+        print('CLOSE SESSION')
 
 
 def get_token(uid, token_type=session_token_type.SIMPLE):
@@ -109,3 +182,17 @@ def get_token(uid, token_type=session_token_type.SIMPLE):
         return _tokenizer.set_session_token(uid, __tk, token_type)
     except ErrorSetSessionToken:
         return None
+
+
+def get_user_by_token(_token, pack=True):
+
+    print('TRAZI USER-A po', _token)
+    _tokenizer = Tokenizer.get_tokenizer()
+
+    return _tokenizer.get_user_by_token(_token, pack)
+
+
+def close_session(_token):
+
+    _tokenizer = Tokenizer.get_tokenizer()
+    return _tokenizer.close_session(_token)

@@ -3,6 +3,7 @@ import inspect
 import importlib
 import base
 from base.config.application_config import imports as app_imports
+import base.application.components
 
 
 def get_api_specification(request_handler):
@@ -41,7 +42,7 @@ def get_api_specification(request_handler):
 
                 for _f_name, _func in inspect.getmembers(_handler, inspect.isfunction):
                     if _f_name in ('get', 'post', 'put', 'patch', 'delete'):
-                        from application.components import Base
+                        from base.application.components import Base
                         _base_function = getattr(Base, _f_name)
                         if _func.__code__ != _base_function.__code__:
                             _function_specification = {}

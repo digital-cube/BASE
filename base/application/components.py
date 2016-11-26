@@ -14,12 +14,17 @@ import base.application.lookup.responses as msgs
 from base.application.helpers.exceptions import MissingApiRui
 from base.common.utils import log
 from base.common.sequencer import sequencer
+from base.common.tokens_services import get_user_by_token
 
 
 class Base(tornado.web.RequestHandler):
     """Base class for base application endpoints"""
 
     __metaclass__ = abc.ABCMeta
+
+    def __init__(self, application, request, **kwargs):
+        self.auth_token = None
+        super().__init__(application, request, **kwargs)
 
     def data_received(self, chunk):
         pass
@@ -57,6 +62,10 @@ class Base(tornado.web.RequestHandler):
                 response.update({'message': msgs.lmap[s], 'code': s})
 
         response.update(kwargs)
+
+        if _status == 204:
+            self.finish()
+            return
 
         self.write(json.dumps(response, ensure_ascii=False))
 
@@ -129,6 +138,9 @@ class Base(tornado.web.RequestHandler):
         if base.config.application_config.debug:
             return self.error(msgs.API_CALL_EXCEPTION, trace=_message, http_status=status_code)
         return self.error(msgs.API_CALL_EXCEPTION, http_status=status_code)
+
+    def set_authorization_token(self, _auth_token):
+        self.auth_token = _auth_token
 
 
 class api(object):
@@ -360,7 +372,6 @@ class params(object):
 
             _arguments_documentation.append(_arg_doc)
 
-
         # DECORATE HANDLER METHOD
         @wraps(_f)
         def wrapper(_origin_self, *args, **kwargs):
@@ -378,7 +389,7 @@ class params(object):
 
                 if _argument in _origin_self.__PATH__PARAMS__:
                     _param_value = _origin_self.request.uri.split('?')[0].split('/')[
-                                                                            _origin_self.__PATH__PARAMS__[_argument]]
+                        _origin_self.__PATH__PARAMS__[_argument]]
                     _param_required = True
                 else:
                     _param_value = _origin_self.get_argument(_argument, default=_default_param_value)
@@ -392,12 +403,14 @@ class params(object):
                     log.critical('Invalid parameter {}'.format(_argument))
                     return _origin_self.error(msgs.INVALID_REQUEST_ARGUMENT)
 
-                if _param_min_value and not params.param_is_lower_then_min(_param_type, _param_converted, _param_min_value):
+                if _param_min_value and not params.param_is_lower_then_min(_param_type, _param_converted,
+                                                                           _param_min_value):
                     log.warning('{} value {} is lower then required minimum {}'.format(
                         _argument, _param_value, _param_min_value))
                     return _origin_self.error(msgs.ARGUMENT_LOWER_THEN_MINIMUM)
 
-                if _param_max_value and not params.param_is_greater_then_max(_param_type, _param_converted, _param_max_value):
+                if _param_max_value and not params.param_is_greater_then_max(_param_type, _param_converted,
+                                                                             _param_max_value):
                     log.warning('{} value {} is greater then required maximum {}'.format(
                         _argument, _param_value, _param_min_value))
                     return _origin_self.error(msgs.ARGUMENT_HIGHER_THEN_MINIMUM)
@@ -412,7 +425,6 @@ class params(object):
 
 
 class authenticated(object):
-
     def __init__(self, *args):
 
         self.roles = args
@@ -420,22 +432,31 @@ class authenticated(object):
     def __call__(self, _target):
 
         if inspect.isclass(_target):
-            print('AUTHENTICATED CLASS', _target.__name__)
 
-            # for _method in ['get', 'post', 'put', 'patch', 'delete']:
-            #
-            #     if hasattr(_target, _method):
-            #         _m = getattr(_target, _method)
-            #         setattr(_target, _method, authenticated()
+            from base.common.utils import is_implemented
+            for _f_name, _func in inspect.getmembers(_target, inspect.isfunction):
+                if is_implemented(_target, _f_name, _func):
+                    setattr(_target, _f_name, self.__call__(_func))
 
             return _target
 
         if inspect.isfunction(_target):
-            print('AUTHENTICATED FUNCTION', _target.__name__)
-            @wraps(_target)
-            def wrapper(*args, **kwargs):
 
-                return _target(*args, **kwargs)
+            @wraps(_target)
+            def wrapper(_origin_self, *args, **kwargs):
+
+                _auth_token = _origin_self.request.headers.get('Authorization')
+                if not _auth_token:
+                    return _origin_self.error(msgs.UNAUTHORIZED_REQUEST)
+
+                _user = get_user_by_token(_auth_token, pack=False)
+                if not _user:
+                    log.critical('Can not get user from token {}'.format(_auth_token))
+                    return _origin_self.error(msgs.UNAUTHORIZED_REQUEST)
+
+                _origin_self.set_authorization_token(_auth_token)
+
+                return _target(_origin_self, *args, **kwargs)
 
             return wrapper
 
@@ -522,4 +543,3 @@ class SpecificationHandler(DefaultRouteHandler):
             self.render('templates/specification.html', spec=_api_specification)
         else:
             self.write(json.dumps(_api_specification))
-
