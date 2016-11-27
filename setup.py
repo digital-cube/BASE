@@ -1,10 +1,20 @@
+# try:
+#     from setuptools import setup
+# except ImportError:
+#     from distutils.core import setup
+import base
 from distutils.core import setup
-
 
 setup(
     name='base',
-    version='1.00.0',
+    version=base.__VERSION__,
     packages=['base',
+              'base.application',
+              'base.application.api',
+              'base.application.api.user',
+              'base.application.api.utils',
+              'base.application.lookup',
+              'base.application.helpers',
               'base.common',
               'base.config',
               'base.builder',
@@ -12,19 +22,15 @@ setup(
               'base.builder.template_project',
               'base.builder.template_project.src',
               'base.builder.template_project.src.api',
-              'base.builder.template_project.src.api.utils',
               'base.builder.template_project.src.api_hooks',
               'base.builder.template_project.src.config',
               'base.builder.template_project.src.lookup',
-              'base.builder.template_project.src.models',
-              'base.application',
-              'base.application.lookup',
-              'base.application.helpers'],
+              'base.builder.template_project.src.models'],
     url='https://github.com/digital-cube/BASE',
     license='GNU',
     author='Digital Cube doo',
     author_email='slobodan@digitalcube.rs',
     description='Base, simple scaling project',
     install_requires=['tornado', 'bcrypt'],
-    data_files=[('/usr/local/bin', ['base/bin/basemanager']), ],
+    data_files=[('/usr/local/bin', ['base/bin/basemanager.py', 'base/bin/basemanager']), ],
 )

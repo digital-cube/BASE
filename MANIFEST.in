@@ -1,3 +1,4 @@
 include LICENSE.txt
 include INSTALL.txt
-
+include base/bin/basemanager
+include base/bin/basemanager.py
