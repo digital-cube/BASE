@@ -15,9 +15,24 @@
 * enter project directory
 * install it with pip:
 
-    `pip3 install .`
-    `pip3 install -r requirements.txt`
+
+    pip3 install .
+    pip3 install -r requirements.txt
     
+### Initialize project
+
+
+    basemanager init project_name
+
+
+### Initialize database
+
+
+* database has to be created before this step
+
+
+    cd project_name
+    basemanager db_init db_username db_password
 
 ### About
 
