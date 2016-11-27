@@ -454,6 +454,13 @@ class authenticated(object):
                     log.critical('Can not get user from token {}'.format(_auth_token))
                     return _origin_self.error(msgs.UNAUTHORIZED_REQUEST)
 
+                for _role in self.roles:
+                    if not (_role & _user.role_flags):
+                        log.critical('User {} with role {} trying anouthorized access on {}'.format(
+                            _user.username, _user.role_flags, _origin_self.request.uri))
+                        return _origin_self.error(msgs.UNAUTHORIZED_REQUEST)
+
+
                 _origin_self.set_authorization_token(_auth_token)
 
                 return _target(_origin_self, *args, **kwargs)
