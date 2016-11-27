@@ -23,6 +23,7 @@ WRONG_USERNAME_OR_PASSWORD = 20
 UNAUTHORIZED_REQUEST = 21
 USER_IS_NOT_ACTIVE = 22
 LOGOUT_ERROR = 23
+MISSING_OPTION = 24
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -48,6 +49,7 @@ lmap[WRONG_USERNAME_OR_PASSWORD] = "Wrong username or password"
 lmap[UNAUTHORIZED_REQUEST] = "Unauthorized request"
 lmap[USER_IS_NOT_ACTIVE] = "User is not active"
 lmap[LOGOUT_ERROR] = "Error logging out"
+lmap[MISSING_OPTION] = 'Missing option'
 
 lrev = {}
 for k in lmap:

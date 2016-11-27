@@ -12,6 +12,7 @@ from base.application.components import BaseHandler
 from base.application.components import PathsWriter
 from base.application.helpers.exceptions import MissingApplicationConfiguration
 from base.application.helpers.exceptions import InvalidAPIHooksModule
+from base.application.helpers.exceptions import MissingRolesLookup
 
 
 def _load_app_configuration():
@@ -57,13 +58,28 @@ def _load_app_configuration():
     if hasattr(src.config.app_config, 'response_messages_module'):
         setattr(base.config.application_config, 'response_messages_module',
                 src.config.app_config.response_messages_module)
+    if hasattr(src.config.app_config, 'user_roles_module'):
+        setattr(base.config.application_config, 'user_roles_module', src.config.app_config.user_roles_module)
     if hasattr(src.config.app_config, 'strong_password'):
         setattr(base.config.application_config, 'strong_password', src.config.app_config.strong_password)
+
+
+def load_lookups():
+
+    import base.config.application_config
+    try:
+        import base.application.lookup.user_roles
+        _mod = importlib.import_module(base.config.application_config.user_roles_module)
+        base.application.lookup.user_roles = _mod
+    except ImportError:
+        log.warning('Error loading user_roles module {}'.format(base.config.application_config.user_roles_module))
+        raise MissingRolesLookup('User roles file is missing or not configured')
 
 
 def load_application(entries):
 
     _load_app_configuration()
+    load_lookups()
 
     # LOAD APPLICATION ROUTES
     import base.config.application_config

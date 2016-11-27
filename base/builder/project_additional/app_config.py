@@ -27,5 +27,6 @@ db_config = {
 api_hooks = 'src.api_hooks.hooks'
 session_storage = 'DB'  # 'DB'|'REDIS'
 response_messages_module = 'src.lookup.response_messages'
+user_roles_module = 'src.lookup.user_roles'
 strong_password = False
 debug = True

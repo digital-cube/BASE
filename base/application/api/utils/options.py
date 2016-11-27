@@ -7,8 +7,7 @@ from base.application.components import api
 from base.application.components import params
 from base.application.components import authenticated
 
-import src.lookup.response_messages as msgs
-from src.models.utils import Options as OrmOptions
+import base.application.lookup.responses as msgs
 
 
 @authenticated()
@@ -22,7 +21,12 @@ class Options(Base):
     )
     def get(self, _key):
 
-        _q = base.common.orm.orm.session().query(OrmOptions).filter(OrmOptions.key == _key)
+        import base.config.application_config
+        import base.common.orm
+        OrmOptions = base.config.application_config.orm_models['options']
+        _session = base.common.orm.orm.session()
+
+        _q = _session.query(OrmOptions).filter(OrmOptions.key == _key)
 
         if _q.count() != 1:
             log.warning('Missing option {}{}'.format(
@@ -40,7 +44,9 @@ class Options(Base):
     def put(self, _key, _value):
 
 
-        _user =
+        import base.config.application_config
+        import base.common.orm
+        OrmOptions = base.config.application_config.orm_models['options']
         _session = base.common.orm.orm.session()
         _q = _session.query(OrmOptions).filter(OrmOptions.key == _key)
 

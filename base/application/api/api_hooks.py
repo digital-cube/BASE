@@ -59,7 +59,8 @@ def register_user(id_user, username, password, data):
     _session = base.common.orm.orm.session()
 
     password = format_password(username, password)
-    import src.lookup.user_roles as user_roles
+
+    import base.application.lookup.user_roles as user_roles
     role_flags = int(data['role_flags']) if 'role_flags' in data else user_roles.USER
 
     _auth_user = AuthUser(id_user, username, password, role_flags, True)

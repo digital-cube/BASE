@@ -45,3 +45,7 @@ class ErrorSetSessionToken(Exception):
     """Error setting session token in configured storage"""
     pass
 
+
+class MissingRolesLookup(Exception):
+    """User roles lookup file is missiong or not configured"""
+    pass

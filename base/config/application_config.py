@@ -21,4 +21,5 @@ imports = [
     'base.application.api.user.register',
 ]
 session_storage = 'DB'
+user_roles_module = 'src.lookup.user_roles'
 
