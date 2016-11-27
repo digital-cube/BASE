@@ -1,9 +1,9 @@
 import datetime
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, DateTime, Text
-import common.orm
+import base.common.orm
 
 
-class AuthUser(common.orm.sql_base):
+class AuthUser(base.common.orm.sql_base):
 
     __tablename__ = 'auth_users'
 
@@ -24,7 +24,7 @@ class AuthUser(common.orm.sql_base):
         self.created = datetime.datetime.now()
 
 
-class User(common.orm.sql_base):
+class User(base.common.orm.sql_base):
 
     __tablename__ = 'users'
 

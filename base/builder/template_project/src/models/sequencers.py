@@ -1,8 +1,8 @@
-import common.orm
+import base.common.orm
 from sqlalchemy import Column, String, SmallInteger, Boolean, Index
 
 
-class Sequencer(common.orm.sql_base):
+class Sequencer(base.common.orm.sql_base):
 
     __tablename__ = 'sequencer'
 
@@ -29,7 +29,7 @@ class Sequencer(common.orm.sql_base):
         self.ordered = ordered
 
 
-class s_users(common.orm.sql_base):
+class s_users(base.common.orm.sql_base):
 
     __tablename__ = 's_users'
 
@@ -44,7 +44,7 @@ class s_users(common.orm.sql_base):
         self.active_stage = active_stage
 
 
-class s_session_token(common.orm.sql_base):
+class s_session_token(base.common.orm.sql_base):
 
     __tablename__ = 's_session_token'
 
@@ -59,7 +59,7 @@ class s_session_token(common.orm.sql_base):
         self.active_stage = active_stage
 
 
-class s_hash_2_params(common.orm.sql_base):
+class s_hash_2_params(base.common.orm.sql_base):
 
     __tablename__ = 's_hash_2_params'
 
@@ -76,7 +76,7 @@ class s_hash_2_params(common.orm.sql_base):
 
 def main():
 
-    _session = common.orm.orm.session()
+    _session = base.common.orm.orm.session()
 
     for _s in [
         ('u', '00', '000', 4, 0, 'users', 'STR', 's_users', False),

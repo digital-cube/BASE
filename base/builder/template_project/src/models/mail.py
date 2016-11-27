@@ -1,9 +1,9 @@
 import datetime
 from sqlalchemy import Column, String, Boolean, DateTime, BigInteger, Text
-import common.orm
+import base.common.orm
 
 
-class MailQueue(common.orm.sql_base):
+class MailQueue(base.common.orm.sql_base):
 
     __tablename__ = 'mail_queue'
 

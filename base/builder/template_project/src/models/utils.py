@@ -1,9 +1,9 @@
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, Text, ForeignKey
 import datetime
-import common.orm
+import base.common.orm
 
 
-class Options(common.orm.sql_base):
+class Options(base.common.orm.sql_base):
 
     __tablename__ = 'options'
 
@@ -17,7 +17,7 @@ class Options(common.orm.sql_base):
         self.value = value
 
 
-class Hash2Params(common.orm.sql_base):
+class Hash2Params(base.common.orm.sql_base):
 
     __tablename__ = 'hash_2_params'
 
@@ -42,7 +42,7 @@ class Hash2Params(common.orm.sql_base):
         self.last_access = access_datetime
 
 
-class Hash2ParamsHistory(common.orm.sql_base):
+class Hash2ParamsHistory(base.common.orm.sql_base):
 
     __tablename__ = 'hash_2_params_history_log'
 
@@ -59,7 +59,7 @@ class Hash2ParamsHistory(common.orm.sql_base):
 
 def main():
 
-    _session = common.orm.orm.session()
+    _session = base.common.orm.orm.session()
 
     import src.config.app_config
     _o = Options('version', src.config.app_config.app_version)

@@ -1,10 +1,10 @@
 import datetime
 from sqlalchemy import Column, String, ForeignKey, Boolean, DateTime, SmallInteger
-import common.orm
+import base.common.orm
 import base.application.lookup.session_token_type as token_type
 
 
-class SessionTokens(common.orm.sql_base):
+class SessionTokens(base.common.orm.sql_base):
 
     __tablename__ = 'session_tokens'
 
