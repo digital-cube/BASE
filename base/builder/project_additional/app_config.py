@@ -13,8 +13,7 @@ models = [
     'src.models.utils',
 ]
 imports = [
-    'src.api.utils.options',
-    'src.api.utils.hash2params',
+    'src.api.hello',
 ]
 db_type = 'mysql'
 db_config = {

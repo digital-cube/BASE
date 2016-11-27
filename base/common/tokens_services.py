@@ -69,7 +69,6 @@ class SqlTokenizer(Tokenizer):
 
     def set_session_token(self, uid, tk, token_type=session_token_type.SIMPLE):
         """set token in database"""
-        print('SET', )
 
         import base.config.application_config
         import base.common.orm
@@ -186,7 +185,6 @@ def get_token(uid, token_type=session_token_type.SIMPLE):
 
 def get_user_by_token(_token, pack=True):
 
-    print('TRAZI USER-A po', _token)
     _tokenizer = Tokenizer.get_tokenizer()
 
     return _tokenizer.get_user_by_token(_token, pack)
