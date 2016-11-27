@@ -16,8 +16,8 @@ from base.config.settings import app_subcommands_title
 from base.config.settings import app_subcommands_description
 from base.config.settings import db_init_warning
 
-import common.orm
-from common.orm import make_database_url
+import base.common.orm
+from base.common.orm import make_database_url
 
 
 def pars_command_line_arguments():
@@ -210,8 +210,8 @@ def _build_database(args):
     __db_url = make_database_url(args.database_type, db_config['db_name'], db_config['db_host'], db_config['db_port'],
                                  db_config['db_user'], db_config['db_password'])
 
-    orm_builder = common.orm.orm_builder(__db_url, common.orm.sql_base)
-    setattr(common.orm, 'orm', orm_builder.orm())
+    orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
+    setattr(base.common.orm, 'orm', orm_builder.orm())
 
     import src.config.app_config
     if not hasattr(src.config.app_config, 'models'):
