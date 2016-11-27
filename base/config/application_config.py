@@ -19,6 +19,7 @@ imports = [
     'base.application.api.user.login',
     'base.application.api.user.logout',
     'base.application.api.user.register',
+    'base.application.api.utils.options',
 ]
 session_storage = 'DB'
 user_roles_module = 'src.lookup.user_roles'

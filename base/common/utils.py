@@ -65,7 +65,6 @@ def is_implemented(_target_class, _target_function_name, _target_function):
         return False
 
     if _target_function.__code__ == _base_function.__code__:
-        print(_target_class.__name__, _target_function_name, 'JE KAO U BASE-U')
         return False
 
     return True
