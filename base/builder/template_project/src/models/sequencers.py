@@ -76,6 +76,7 @@ class s_hash_2_params(base.common.orm.sql_base):
 
 def main():
 
+    import base.common.orm
     _session = base.common.orm.orm.session()
 
     for _s in [

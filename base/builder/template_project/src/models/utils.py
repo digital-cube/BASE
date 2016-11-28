@@ -59,6 +59,7 @@ class Hash2ParamsHistory(base.common.orm.sql_base):
 
 def main():
 
+    import base.common.orm
     _session = base.common.orm.orm.session()
 
     import src.config.app_config
