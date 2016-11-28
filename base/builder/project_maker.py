@@ -7,6 +7,7 @@ import shutil
 import tempfile
 import argparse
 import importlib
+import importlib.util
 
 from base.config.settings import app
 from base.config.settings import template_project_folder
@@ -18,6 +19,9 @@ from base.config.settings import db_init_warning
 
 import base.common.orm
 from base.common.orm import make_database_url
+
+
+__project_path = None
 
 
 def pars_command_line_arguments():
@@ -170,9 +174,13 @@ def _configure_database(args):
 
 def __db_is_configured(args):
 
+    #global __project_path
     try:
+        #module_spec = importlib.util.spec_from_file_location('starter', os.path.join(__project_path, 'starter.py'))
+        #starter = importlib.util.module_from_spec(module_spec)
+        #module_spec.loader.exec_module(starter)
         from starter import engage
-    except ImportError as e:
+    except (FileNotFoundError, ImportError) as e:
         print(db_init_warning)
         return False
 
@@ -202,6 +210,10 @@ def __db_is_configured(args):
 
 
 def _build_database(args):
+
+    global __project_path
+    __project_path = os.getcwd()
+    sys.path.append(__project_path)
 
     db_config = __db_is_configured(args)
     if not db_config:
