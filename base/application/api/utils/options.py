@@ -64,7 +64,7 @@ class Options(Base):
             log.warning('Found {} occurrences for {}'.format(_q.count(), _key))
             return self.error(msgs.OPTION_MISMATCH, option=_key)
 
-        log.info('User {} set option {} -> {}'.format('username', _key, _valuea))
+        log.info('User {} set option {} -> {}'.format('username', _key, _value))
         _session.commit()
 
         return self.ok({_option.key: _option.value})

@@ -7,6 +7,8 @@ import unittest
 from base.tests.api.user.test_user_login import TestUserLogin
 from base.tests.api.user.test_user_register import TestUserRegister
 from base.tests.api.user.test_user_logout import TestUserLogout
+from base.tests.api.utils.test_options import TestOptions
+from tests.hello import TestHello
 
 
 # def all():
