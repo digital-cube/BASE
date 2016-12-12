@@ -16,6 +16,7 @@ from base.config.settings import app_builder_description
 from base.config.settings import app_subcommands_title
 from base.config.settings import app_subcommands_description
 from base.config.settings import db_init_warning
+from base.application.lookup import exit_status
 
 import base.common.orm
 from base.common.orm import make_database_url
@@ -94,11 +95,11 @@ def _build_project(args):
 
     if not args.name:
         print("CRITICAL: missing project's name, check for option -n")
-        sys.exit(1)
+        sys.exit(exit_status.MISSING_PROJECT_NAME)
 
     if not os.path.isdir(args.destination):
         print("CRITICAL: missing project's name, check for option -n")
-        sys.exit(2)
+        sys.exit(exit_status.MISSING_PROJECT_DESTINATION)
 
     try:
         _site_dir = site.getsitepackages()
@@ -107,7 +108,7 @@ def _build_project(args):
         can not determine source directory,
         possible running in virtual environment and it is not handled at the time
         ''')
-        sys.exit(3)
+        sys.exit(exit_status.MISSING_SOURCE_DIRECTORY)
 
     dir_path = '{}/{}'.format(args.destination, args.name)
     source_dir = '{}/base/builder/{}'.format(_site_dir[0], template_project_folder)
@@ -117,10 +118,10 @@ def _build_project(args):
         os.mkdir(dir_path)
     except FileExistsError as e:
         print('Directory {} already exists, please provide another name or rename/remove existing one'.format(dir_path))
-        sys.exit(4)
+        sys.exit(exit_status.PROJECT_DIRECTORY_ALREADY_EXISTS)
     except PermissionError as e:
         print('Can not create {} directory, insufficient permissions'.format(dir_path))
-        sys.exit(5)
+        sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
 
     copy_template(source_dir, dir_path)
 
@@ -172,54 +173,51 @@ def _configure_database(args):
     return True
 
 
-def __db_is_configured(args):
+def __db_is_configured(args, test):
 
-    #global __project_path
     try:
-        #module_spec = importlib.util.spec_from_file_location('starter', os.path.join(__project_path, 'starter.py'))
-        #starter = importlib.util.module_from_spec(module_spec)
-        #module_spec.loader.exec_module(starter)
         from starter import engage
     except (FileNotFoundError, ImportError) as e:
         print(db_init_warning)
-        return False
+        return False, False
 
-    if not _configure_database(args):
+    if not test and not _configure_database(args):
         print('Error configuring database')
-        return False
+        return False, False
 
     try:
         import src.config.app_config
     except ImportError as e:
         print('Can not find application configuration')
-        return False
+        return False, False
 
     if not hasattr(src.config.app_config, 'db_config'):
         print('Missing Database configuration in config file')
-        return False
+        return False, False
 
     __db_config = src.config.app_config.db_config
+    __db_type = src.config.app_config.db_type
 
     for k in __db_config:
 
         if __db_config[k].startswith('__') or __db_config[k].endswith('__'):
             print("Database not properly configured: the {} can not be '{}'".format(k, __db_config[k]))
-            return False
+            return False, False
 
-    return __db_config
+    return __db_config, __db_type
 
 
-def _build_database(args):
+def _build_database(args, test=False):
 
-    global __project_path
     __project_path = os.getcwd()
     sys.path.append(__project_path)
 
-    db_config = __db_is_configured(args)
+    db_config, db_type = __db_is_configured(args, test)
     if not db_config:
-        sys.exit(6)
+        sys.exit(exit_status.DATABASE_CONFIGURATION_ERROR)
 
-    __db_url = make_database_url(args.database_type, db_config['db_name'], db_config['db_host'], db_config['db_port'],
+    _database_name = 'test_{}'.format(db_config['db_name']) if test else db_config['db_name']
+    __db_url = make_database_url(db_type, _database_name, db_config['db_host'], db_config['db_port'],
                                  db_config['db_user'], db_config['db_password'])
 
     orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
@@ -247,6 +245,8 @@ def _build_database(args):
             m.main()
         except AttributeError:
             print(m.__name__, "doesn't have to be prepared")
+
+    return orm_builder
 
 
 def execute_builder_cmd():

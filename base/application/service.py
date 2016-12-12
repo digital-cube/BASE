@@ -31,6 +31,20 @@ def _get_svc_port(args):
     return svc_port
 
 
+class Application(tornado.web.Application):
+
+    def __init__(self, entries):
+
+        self.entries = entries
+
+        super(Application, self).__init__(
+            self.entries,
+            debug=base.config.application_config.debug,
+            cookie_secret=base.config.application_config.secret_cookie,
+            default_handler_class=DefaultRouteHandler
+        )
+
+
 def engage():
 
     args = check_arguments()
@@ -43,12 +57,7 @@ def engage():
     if not svc_port:
         raise MissingApplicationPort('Application port not configured or missing from command line options')
 
-    app = tornado.web.Application(
-        entries,
-        debug=base.config.application_config.debug,
-        cookie_secret=base.config.application_config.secret_cookie,
-        default_handler_class=DefaultRouteHandler
-    )
+    app = Application(entries)
 
     start_message = 'starting {} {} service on {}: http://localhost:{}'.format(
         base.config.application_config.app_name,

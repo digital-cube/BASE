@@ -14,8 +14,8 @@ from base.application.components import authenticated
     )
 class Hello(Base):
 
-    # @authenticated()  # if every get method has to be authenticated
-    # @params(          # if you want to add params - uncoment method declaration also
+    # @authenticated()  # if get method has to be authenticated
+    # @params(          # if you want to add params - uncomment method declaration also
     #     {'name': 'key', 'type': str, 'required': True,  'doc': 'option key',
     #           'default': 'key', 'min': 10, 'max': 20},
     # )
