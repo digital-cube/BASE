@@ -543,7 +543,7 @@ class SpecificationHandler(DefaultRouteHandler):
 
         as_html = self.get_argument('html', default=False)
 
-        from application.helpers.api_specification import get_api_specification
+        from base.application.helpers.api_specification import get_api_specification
         _api_specification = get_api_specification(self)
 
         if as_html:
