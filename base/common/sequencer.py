@@ -4,7 +4,7 @@ import string
 import random
 import base.common.orm
 import sqlalchemy.exc
-from src.models.sequencers import Sequencer
+# from src.models.sequencers import Sequencer
 from base.application.helpers.exceptions import ToManyAttemptsException
 from base.application.helpers.exceptions import SequencerTypeError
 from base.common.utils import log
@@ -45,6 +45,10 @@ class SequencerFactory:
         self.load_s_table()
 
     def load_s_table(self):
+
+        import base.config.application_config
+        import base.common.orm
+        Sequencer = base.config.application_config.orm_models['sequencer']
 
         _q = self.db.session().query(Sequencer)
         for s in _q.all():
