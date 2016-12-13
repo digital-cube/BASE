@@ -15,6 +15,7 @@ setup(
               'base.application.api.utils',
               'base.application.lookup',
               'base.application.helpers',
+              'base.application.templates',
               'base.common',
               'base.config',
               'base.builder',
