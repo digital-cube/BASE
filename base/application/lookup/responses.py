@@ -26,6 +26,7 @@ LOGOUT_ERROR = 23
 MISSING_OPTION = 24
 PRE_LOGIN_ERROR = 25
 POST_LOGIN_ERROR = 26
+SAVE_HASH_PARAMS_ERROR = 27
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -54,6 +55,7 @@ lmap[LOGOUT_ERROR] = "Error logging out"
 lmap[MISSING_OPTION] = 'Missing option'
 lmap[PRE_LOGIN_ERROR] = 'Pre login error'
 lmap[POST_LOGIN_ERROR] = 'Post login error'
+lmap[SAVE_HASH_PARAMS_ERROR] = 'Save hash data error'
 
 lrev = {}
 for k in lmap:

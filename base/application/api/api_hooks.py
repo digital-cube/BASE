@@ -20,15 +20,17 @@ pre_login_process(Auth_user) -> [dict, str, None]
 post_login_process(Auth_user) -> [dict, str, None]
         - after login processing
         - on error raise PostLoginError
-save_hash(hash_data, Auth_user) -> [dict, str, None]
-        - save hash_2_params
+save_hash(hash_data) -> [dict, str, None]
+        - save hash data
 
 """
 
 import json
+from base.application.helpers.exceptions import SaveHash2ParamsException
 from base.common.utils import log
 from base.common.utils import format_password
 from base.common.utils import password_match
+
 
 def pack_user(user):
 
@@ -115,6 +117,27 @@ def check_username_and_password(username, password, user):
 
 # HASH_2_PARAMS
 
-def save_hash(hash_data, user):
+def save_hash(hash_data):
 
-    return {}
+    import base.config.application_config
+    import base.common.orm
+    Hash2Params= base.config.application_config.orm_models['hash_2_params']
+    _session = base.common.orm.orm.session()
+
+    # Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
+
+    from base.common.sequencer import sequencer
+    _hash = sequencer().new('h')
+
+    if not _hash:
+        log.critical('Error getting new hash')
+        raise SaveHash2ParamsException('Error get new hash for data')
+
+    hash_data = json.dumps(hash_data)
+    h2p = Hash2Params(_hash, hash_data)
+
+    _session.add(h2p)
+    _session.commit()
+
+    return {'h2p': _hash}
+

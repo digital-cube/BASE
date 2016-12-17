@@ -40,24 +40,23 @@ class TestHash2Params(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.UNAUTHORIZED_REQUEST])
 
-    # def test_set_option(self):
-    #
-    #     self._register()
-    #
-    #     _b = {
-    #         'value': '123'
-    #     }
-    #     body = urllib.parse.urlencode(_b)
-    #     headers = {'Authorization': self.token}
-    #     res = self.fetch('/option/test_option?value=321', method='PUT', body=body, headers=headers)
-    #
-    #     self.assertEqual(res.code, 200)
-    #     res = res.body.decode('utf-8')
-    #     res = json.loads(res)
-    #
-    #     self.assertIn('test_option', res)
-    #     self.assertEqual(res['test_option'], '321')
-    #
+    def test_save_hash(self):
+
+        self._register('user@test.loc', '123')
+
+        _b = {
+            'data': json.dumps({'test': 'data'})
+        }
+        body = urllib.parse.urlencode(_b)
+        headers = {'Authorization': self.token}
+        res = self.fetch('/h2p', method='PUT', body=body, headers=headers)
+
+        self.assertEqual(res.code, 200)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('h2p', res)
+
     # def test_get_option(self):
     #
     #     self._register()

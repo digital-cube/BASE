@@ -59,3 +59,8 @@ class PreLoginException(Exception):
 class PostLoginException(Exception):
     """Post login process hook exception"""
     pass
+
+
+class SaveHash2ParamsException(Exception):
+    """Error save hash"""
+    pass

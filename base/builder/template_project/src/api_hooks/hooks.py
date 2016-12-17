@@ -25,7 +25,7 @@ post_login_process(Auth_user) -> [dict, str, None]
         - after login processing
         - on error raise PostLoginError
 save_hash(hash_data, Auth_user) -> [dict, str, None]
-        - save hash_2_params
+        - save hash data
 
 """
 
