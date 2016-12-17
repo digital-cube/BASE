@@ -16,8 +16,16 @@ post_register_process(id_user, username, password, data) -> [dict, None]:
         - process user's data after user registration
 user_exists(username) -> [User object]
         - check if username exists in the system
-post_login_process(username, password, Auth_user) -> [dict, None]
+check_username_and_password(username, password, Auth_user) -> [bool]
+        - check username / password match
+pre_login_process(Auth_user) -> [dict, str, None]
+        - pre login data processing
+        - on error raise PreLoginError
+post_login_process(Auth_user) -> [dict, str, None]
         - after login processing
+        - on error raise PostLoginError
+save_hash(hash_data, Auth_user) -> [dict, str, None]
+        - save hash_2_params
 
 """
 
@@ -27,7 +35,9 @@ hooks = [
     # 'register_user',
     # 'post_register_process',
     # 'user_exists',
+    # 'pre_login_process',
     # 'post_login_process',
+    # 'save_hash',
 ]
 
 

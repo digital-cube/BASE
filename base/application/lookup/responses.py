@@ -24,6 +24,8 @@ UNAUTHORIZED_REQUEST = 21
 USER_IS_NOT_ACTIVE = 22
 LOGOUT_ERROR = 23
 MISSING_OPTION = 24
+PRE_LOGIN_ERROR = 25
+POST_LOGIN_ERROR = 26
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -50,6 +52,8 @@ lmap[UNAUTHORIZED_REQUEST] = "Unauthorized request"
 lmap[USER_IS_NOT_ACTIVE] = "User is not active"
 lmap[LOGOUT_ERROR] = "Error logging out"
 lmap[MISSING_OPTION] = 'Missing option'
+lmap[PRE_LOGIN_ERROR] = 'Pre login error'
+lmap[POST_LOGIN_ERROR] = 'Post login error'
 
 lrev = {}
 for k in lmap:

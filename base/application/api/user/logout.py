@@ -7,12 +7,11 @@ from base.application.components import api
 from base.application.components import authenticated
 from base.common.tokens_services import close_session
 
-
 @authenticated()
 @api(
     URI='/logout',
     PREFIX=False)
-class Login(Base):
+class Logout(Base):
 
     def post(self, *args):
         """Logout user - close session"""

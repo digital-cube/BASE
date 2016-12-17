@@ -1,5 +1,7 @@
 # coding: utf-8
 
+import json
+import urllib
 from tornado.testing import AsyncHTTPTestCase
 from base.application.service import Application
 from base.application.components import BaseHandler
@@ -24,4 +26,23 @@ class TestBase(AsyncHTTPTestCase):
         self.orm_builder.orm().session().close()
         self.orm_builder.clear_database()
 
+    def _register(self, username, password, data=None):
+
+        _b = {
+            'username': username,
+            'password': password,
+            'data': data if data else {}
+        }
+
+        body = urllib.parse.urlencode(_b)
+        res = self.fetch('/register', method='POST', body=body)
+
+        self.assertEqual(res.code, 200)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('token', res)
+        self.assertIn('token_type', res)
+
+        self.token = res['token']
 

@@ -14,6 +14,14 @@ user_exists(username) -> [User object]
         - check if username exists in the system
 check_username_and_password(username, password, Auth_user) -> [bool]
         - check username / password match
+pre_login_process(Auth_user) -> [dict, str, None]
+        - pre login data processing
+        - on error raise PreLoginError
+post_login_process(Auth_user) -> [dict, str, None]
+        - after login processing
+        - on error raise PostLoginError
+save_hash(hash_data, Auth_user) -> [dict, str, None]
+        - save hash_2_params
 
 """
 
@@ -104,3 +112,9 @@ def check_username_and_password(username, password, user):
 
 # END OF THE LOGIN USER PROCESS
 
+
+# HASH_2_PARAMS
+
+def save_hash(hash_data, user):
+
+    return {}

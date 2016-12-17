@@ -49,3 +49,13 @@ class ErrorSetSessionToken(Exception):
 class MissingRolesLookup(Exception):
     """User roles lookup file is missiong or not configured"""
     pass
+
+
+class PreLoginException(Exception):
+    """Pre login process hook exception"""
+    pass
+
+
+class PostLoginException(Exception):
+    """Post login process hook exception"""
+    pass

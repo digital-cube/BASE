@@ -8,27 +8,9 @@ import base.application.lookup.responses as msgs
 
 class TestUserLogin(TestBase):
 
-    def _register(self):
-
-        _b = {
-            'username': 'user@test.loc',
-            'password': '123',
-            'data': {}
-        }
-
-        body = urllib.parse.urlencode(_b)
-        res = self.fetch('/register', method='POST', body=body)
-
-        self.assertEqual(res.code, 200)
-        res = res.body.decode('utf-8')
-        res = json.loads(res)
-
-        self.assertIn('token', res)
-        self.assertIn('token_type', res)
-
     def test_login(self):
 
-        self._register()
+        self._register('user@test.loc', '123')
 
         _b = {
             'username': 'user@test.loc',
@@ -47,7 +29,7 @@ class TestUserLogin(TestBase):
 
     def test_login_with_non_existent_username(self):
 
-        self._register()
+        self._register('user@test.loc', '123')
 
         _b = {
             'username': 'user@test',
@@ -66,7 +48,7 @@ class TestUserLogin(TestBase):
 
     def test_login_with_wrong_password(self):
 
-        self._register()
+        self._register('user@test.loc', '123')
 
         _b = {
             'username': 'user@test.loc',

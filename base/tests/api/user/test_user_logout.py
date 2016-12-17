@@ -8,28 +8,9 @@ import base.application.lookup.responses as msgs
 
 class TestUserLogout(TestBase):
 
-    def _register(self):
-
-        _b = {
-            'username': 'user@test.loc',
-            'password': '123',
-            'data': {}
-        }
-
-        body = urllib.parse.urlencode(_b)
-        res = self.fetch('/register', method='POST', body=body)
-
-        self.assertEqual(res.code, 200)
-        res = res.body.decode('utf-8')
-        res = json.loads(res)
-
-        self.assertIn('token', res)
-        self.assertIn('token_type', res)
-        self.token = res['token']
-
     def test_logout_unauthorized(self):
 
-        self._register()
+        self._register('user@test.loc', '123')
 
         body = urllib.parse.urlencode({})
         res = self.fetch('/logout', method='POST', body=body)
@@ -42,7 +23,7 @@ class TestUserLogout(TestBase):
 
     def test_logout(self):
 
-        self._register()
+        self._register('user@test.loc', '123')
 
         body = urllib.parse.urlencode({})
         headers = {'Authorization': self.token}
@@ -53,7 +34,7 @@ class TestUserLogout(TestBase):
 
     def test_logout_twice(self):
 
-        self._register()
+        self._register('user@test.loc', '123')
 
         body = urllib.parse.urlencode({})
         headers = {'Authorization': self.token}
