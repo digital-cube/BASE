@@ -12,7 +12,6 @@ from functools import wraps
 
 import base.application.lookup.responses as msgs
 from base.application.helpers.exceptions import MissingApiRui
-from base.common.utils import log
 from base.common.sequencer import sequencer
 from base.common.tokens_services import get_user_by_token
 
@@ -71,6 +70,8 @@ class Base(tornado.web.RequestHandler):
 
     def error(self, s, **kwargs):
 
+        from base.common.utils import log
+
         if 'reason' in kwargs:
             reason = kwargs['reason']
             del kwargs['reason']
@@ -108,6 +109,8 @@ class Base(tornado.web.RequestHandler):
         self.write(json.dumps(response, ensure_ascii=False))
 
     def write_error(self, status_code, **kwargs):
+
+        from base.common.utils import log
 
         _message = msgs.lmap[msgs.EXCEPTION]
 
@@ -188,6 +191,7 @@ class params(object):
 
         import common.orm
         import config.application_config
+        from base.common.utils import log
 
         if table not in config.application_config.orm_models:
             log.critical('Missing table {}, can not retrieve row with id {}'.format(table, row_id))
@@ -207,6 +211,7 @@ class params(object):
     @staticmethod
     def convert_arguments(argument, argument_value, argument_type):
 
+        from base.common.utils import log
         if argument_type == bool:
             try:
                 return argument_value.lower() == 'true'
@@ -354,6 +359,8 @@ class params(object):
 
     def __call__(self, _f):
 
+        from base.common.utils import log
+
         _arguments_documentation = []
 
         # SAVE PARAMETERS DOCUMENTATION
@@ -454,6 +461,8 @@ class authenticated(object):
 
     def __call__(self, _target):
 
+        from base.common.utils import log
+
         if inspect.isclass(_target):
 
             from base.common.utils import is_implemented
@@ -497,6 +506,7 @@ class DefaultRouteHandler(Base):
     def _dummy(self):
         method = self.request.method
         path = self.request.path
+        from base.common.utils import log
 
         # Ignore request for favicon.ico
         if 'favicon.ico' in path:

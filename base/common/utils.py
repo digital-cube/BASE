@@ -30,7 +30,7 @@ def retrieve_log(log_file_name, _logger):
 
     return _log
 
-log = retrieve_log(log_filename, log_logger)
+log = None
 
 
 def get_request_ip(request_handler):

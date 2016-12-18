@@ -5,7 +5,10 @@ import importlib
 from inspect import getmembers, isclass
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
-from base.common.utils import log
+# LOG HAS TO BE SET DYNAMICALLY
+log = None
+
+import base.config.settings
 import base.config.application_config
 from base.application.components import SpecificationHandler
 from base.application.components import BaseHandler
@@ -15,13 +18,14 @@ from base.application.helpers.exceptions import InvalidAPIHooksModule
 from base.application.helpers.exceptions import MissingRolesLookup
 
 
-def _load_app_configuration():
-    svc_port = None
+def _load_app_configuration(svc_port):
+
     try:
         from src.config.app_config import port
-        svc_port = port
+        svc_port = svc_port if svc_port else port
     except ImportError as e:
-        log.warning('Service port not found in application configuration')
+        # LOG FILE IS NOT CONFIGURED AND ACTIVE YET
+        print('Service port not found in application configuration')
 
     if svc_port:
         setattr(base.config.application_config, 'port', svc_port)
@@ -76,9 +80,27 @@ def load_lookups():
         raise MissingRolesLookup('User roles file is missing or not configured')
 
 
-def load_application(entries):
+def _set_log_file():
 
-    _load_app_configuration()
+    import base.common.utils
+    import base.config.application_config
+
+    _dir = base.config.settings.log_directory
+    _app = base.config.application_config.app_name
+    _port = base.config.application_config.port
+    _log_filename = '{}/{}_{}.log'.format(_dir, _app, _port)
+
+    _log = base.common.utils.retrieve_log(_log_filename, base.config.settings.log_logger)
+    setattr(base.common.utils, 'log', _log)
+
+    global log
+    log = _log
+
+
+def load_application(entries, svc_port):
+
+    _load_app_configuration(svc_port)
+    _set_log_file()
     load_lookups()
 
     # LOAD APPLICATION ROUTES
@@ -92,7 +114,8 @@ def load_application(entries):
     _has_root = False
     for _m in app_imports:
 
-        log.info('Loading {} module'.format(_m))
+        if base.config.application_config.debug:
+            log.info('Loading {} module'.format(_m))
 
         app_module = importlib.import_module(_m)
 
@@ -105,7 +128,9 @@ def load_application(entries):
                     getattr(_handler, '__SET_API_PREFIX__') else '',
                     getattr(_handler, '__URI__'))
 
-                log.info('Exposing {} on {}'.format(_name, _uri))
+                if base.config.application_config.debug:
+                    log.info('Exposing {} on {}'.format(_name, _uri))
+
                 _entries.append((_uri, _handler))
 
                 if _uri == '/':

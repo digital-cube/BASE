@@ -53,7 +53,7 @@ def pars_command_line_arguments():
     return argparser.parse_args()
 
 
-def copy_template(source, destination):
+def copy_template(source, destination, project_name):
 
     import glob
 
@@ -64,6 +64,9 @@ def copy_template(source, destination):
             shutil.copytree(_f, dest_path)
         else:
             shutil.copy2(_f, destination)
+
+    # RENAME A PROJECT RUNNER INTO THE NAME OF THE PROJECT
+    shutil.move('{}/starter.py'.format(destination), '{}/{}'.format(destination, project_name))
 
 
 def _configure_project(args, destination, additions_dir):
@@ -123,17 +126,12 @@ def _build_project(args):
         print('Can not create {} directory, insufficient permissions'.format(dir_path))
         sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
 
-    copy_template(source_dir, dir_path)
+    copy_template(source_dir, dir_path, args.name)
 
     _configure_project(args, dir_path, additions_dir)
 
 
-def _configure_database(args):
-
-    src = 'src/config/app_config.py'
-    if not os.path.isfile(src):
-        print('Missing configuration file')
-        return False
+def _configure_database(args, src):
 
     tmp_dir = tempfile.gettempdir()
     tmp_filename = 'app_tmp.py'
@@ -175,13 +173,12 @@ def _configure_database(args):
 
 def __db_is_configured(args, test):
 
-    try:
-        from starter import engage
-    except (FileNotFoundError, ImportError) as e:
+    src = 'src/config/app_config.py'
+    if not os.path.isfile(src):
         print(db_init_warning)
         return False, False
 
-    if not test and not _configure_database(args):
+    if not test and not _configure_database(args, src):
         print('Error configuring database')
         return False, False
 

@@ -4,7 +4,6 @@ import argparse
 import tornado.web
 import tornado.ioloop
 
-from base.common.utils import log
 from base.application.components import BaseHandler
 from base.application.components import DefaultRouteHandler
 from base.application.helpers.exceptions import MissingApplicationPort
@@ -21,13 +20,9 @@ def check_arguments():
     return argparser.parse_args()
 
 
-def _get_svc_port(args):
-
-    if args.port:
-        return args.port
+def _get_svc_port():
 
     from base.config.application_config import port as svc_port
-
     return svc_port
 
 
@@ -50,10 +45,10 @@ def engage():
     args = check_arguments()
 
     entries = [(BaseHandler.__URI__, BaseHandler), ]
-    load_application(entries)
+    load_application(entries, args.port)
     load_orm()
 
-    svc_port = _get_svc_port(args)
+    svc_port = _get_svc_port()
     if not svc_port:
         raise MissingApplicationPort('Application port not configured or missing from command line options')
 
@@ -64,6 +59,7 @@ def engage():
         base.config.application_config.app_version,
         svc_port, svc_port)
 
+    from base.common.utils import log
     print(start_message)
     log.info(start_message)
     app.listen(svc_port)
