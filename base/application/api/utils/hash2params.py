@@ -18,6 +18,7 @@ from base.application.helpers.exceptions import SaveHash2ParamsException
 class Hash2Params(Base):
 
     def get(self):
+
         return self.ok('get h2p')
 
     @params(

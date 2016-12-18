@@ -53,10 +53,8 @@ class SqlTokenizer(Tokenizer):
     def get_assigned_token(self, uid, token_type=session_token_type.SIMPLE):
         """get token from database"""
 
-        import base.config.application_config
         import base.common.orm
-        SessionToken = base.config.application_config.orm_models['session_tokens']
-        _session = base.common.orm.orm.session()
+        SessionToken, _session = base.common.orm.get_orm_model('session_tokens')
         _q = _session.query(SessionToken).filter(
             SessionToken.id_user == uid, SessionToken.active, SessionToken.type == token_type).order_by(
             desc(SessionToken.created))
@@ -71,10 +69,8 @@ class SqlTokenizer(Tokenizer):
     def set_session_token(self, uid, tk, token_type=session_token_type.SIMPLE):
         """set token in database"""
 
-        import base.config.application_config
         import base.common.orm
-        SessionToken = base.config.application_config.orm_models['session_tokens']
-        _session = base.common.orm.orm.session()
+        SessionToken, _session = base.common.orm.get_orm_model('session_tokens')
 
         _id_session_token = sequencer().new('s')
         if not _id_session_token:
@@ -91,11 +87,9 @@ class SqlTokenizer(Tokenizer):
         """retrieve user by given token"""
 
         import base.application.api.api_hooks
-        import base.config.application_config
         import base.common.orm
-        SessionToken = base.config.application_config.orm_models['session_tokens']
-        AuthUser = base.config.application_config.orm_models['auth_users']
-        _session = base.common.orm.orm.session()
+        SessionToken, _session = base.common.orm.get_orm_model('session_tokens')
+        AuthUser, _session = base.common.orm.get_orm_model('auth_users')
 
         _qs = _session.query(SessionToken).filter(SessionToken.id == tk)
 
@@ -125,11 +119,8 @@ class SqlTokenizer(Tokenizer):
     def close_session(self, tk):
         """close session by given token"""
 
-        import base.application.api.api_hooks
-        import base.config.application_config
         import base.common.orm
-        SessionToken = base.config.application_config.orm_models['session_tokens']
-        _session = base.common.orm.orm.session()
+        SessionToken, _session = base.common.orm.get_orm_model('session_tokens')
 
         _q = _session.query(SessionToken).filter(SessionToken.id == tk)
 

@@ -8,9 +8,7 @@ from base.common.utils import log
 from base.common.utils import get_request_ip
 
 
-def user_exists(username, AuthUser):
-    import base.common.orm
-    _session = base.common.orm.orm.session()
+def user_exists(username, AuthUser, _session):
     _q = _session.query(AuthUser).filter(AuthUser.username == username)
     return _q.count() == 1
 
@@ -28,11 +26,11 @@ class Register(Base):
     def post(self, username, password, data):
         """Register user on the system"""
 
-        import base.config.application_config
-        AuthUsers = base.config.application_config.orm_models['auth_users']
-        User = base.config.application_config.orm_models['users']
+        import base.common.orm
+        AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
+        User, _ = base.common.orm.get_orm_model('users')
 
-        if user_exists(username, AuthUsers):
+        if user_exists(username, AuthUsers, _session):
             log.warning('Username {} already taken, requested from {}'.format(username, get_request_ip(self)))
             return self.error(msgs.USERNAME_ALREADY_TAKEN)
 

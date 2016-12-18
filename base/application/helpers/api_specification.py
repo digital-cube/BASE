@@ -64,8 +64,11 @@ def get_api_specification(request_handler):
                                     else:
                                         _type_name = _param['type'].__name__
 
-                                    _function_specification[_f_name]['params'][_param['name']] = \
-                                        copy.deepcopy(_param)
+                                    _function_specification[_f_name]['params'][_param['name']] = {}
+                                    for _p in _param:
+                                        _function_specification[_f_name]['params'][_param['name']][_p] = _param[_p]
+                                    # _function_specification[_f_name]['params'][_param['name']] = \
+                                    #     copy.deepcopy(_param)
                                     _function_specification[_f_name]['params'][_param['name']]['type'] = \
                                         _type_name
 

@@ -21,10 +21,8 @@ class Options(Base):
     )
     def get(self, _key):
 
-        import base.config.application_config
-        import base.common.orm
-        OrmOptions = base.config.application_config.orm_models['options']
-        _session = base.common.orm.orm.session()
+        # import base.common.orm
+        OrmOptions, _session = base.common.orm.get_orm_model('options')
 
         _q = _session.query(OrmOptions).filter(OrmOptions.key == _key)
 
@@ -43,11 +41,8 @@ class Options(Base):
     )
     def put(self, _key, _value):
 
-
-        import base.config.application_config
-        import base.common.orm
-        OrmOptions = base.config.application_config.orm_models['options']
-        _session = base.common.orm.orm.session()
+        # import base.common.orm
+        OrmOptions, _session = base.common.orm.get_orm_model('options')
         _q = _session.query(OrmOptions).filter(OrmOptions.key == _key)
 
         if _q.count() == 1:

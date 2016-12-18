@@ -38,19 +38,20 @@ def pack_user(user):
     _user['id'] = user.id
     _user['username'] = user.username
 
-    import base.config.application_config
     import base.common.orm
-    User = base.config.application_config.orm_models['users']
-    _session = base.common.orm.orm.session()
+    User, _session = base.common.orm.get_orm_model('users')
 
     _q = _session.query(User).filter(User.id == user.id)
 
     if _q.count() == 1:
         _db_user = _q.one()
 
-        _user['id'] = user.id
+        _user['first_name'] = _db_user.first_name
+        _user['last_name'] = _db_user.last_name
+        _user['data'] = _db_user.data
 
     return _user
+
 
 # REGISTER USER PROCESS
 def check_password_is_valid(password):
@@ -62,11 +63,9 @@ def check_password_is_valid(password):
 
 def register_user(id_user, username, password, data):
 
-    import base.config.application_config
     import base.common.orm
-    AuthUser = base.config.application_config.orm_models['auth_users']
-    User = base.config.application_config.orm_models['users']
-    _session = base.common.orm.orm.session()
+    AuthUser, _session = base.common.orm.get_orm_model('auth_users')
+    User, _ = base.common.orm.get_orm_model('users')
 
     password = format_password(username, password)
 
@@ -91,10 +90,8 @@ def register_user(id_user, username, password, data):
 # LOGIN USER PROCESS
 def user_exists(username):
 
-    import base.config.application_config
     import base.common.orm
-    AuthUser = base.config.application_config.orm_models['auth_users']
-    _session = base.common.orm.orm.session()
+    AuthUser, _session = base.common.orm.get_orm_model('auth_users')
 
     _q = _session.query(AuthUser).filter(AuthUser.username == username)
     if _q.count() != 1:
@@ -119,12 +116,12 @@ def check_username_and_password(username, password, user):
 
 def save_hash(hash_data):
 
-    import base.config.application_config
+    # import base.config.application_config
     import base.common.orm
-    Hash2Params= base.config.application_config.orm_models['hash_2_params']
-    _session = base.common.orm.orm.session()
+    # Hash2Params= base.config.application_config.orm_models['hash_2_params']
+    # _session = base.common.orm.orm.session()
 
-    # Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
+    Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
 
     from base.common.sequencer import sequencer
     _hash = sequencer().new('h')
