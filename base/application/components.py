@@ -276,6 +276,14 @@ class params(object):
                 log.critical('Invalid argument {} expected json, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
                 return None
+            except TypeError as e:
+                # IF JSON IS SENT AND REQUEST BODY IS LOADED LIKE JSON THIS WILL BE A DICT
+                if isinstance(argument_value, dict):
+                    return argument_value
+                else:
+                    log.critical('Invalid argument {} expected json, got {} ({}): {}'.format(
+                        argument, argument_value, type(argument_value), e))
+                    return None
 
         if argument_type == 'e-mail':
 
@@ -378,6 +386,16 @@ class params(object):
 
             _arguments = []
 
+            _origin_body = _origin_self.request.body
+            # IF JSON IS SENT IN BODY
+            _body = {}
+            try:
+                _body = json.loads(_origin_body.decode('utf-8'))
+            except AttributeError as e:
+                log.critical('Error decoding body ->|{}|<- : {}'.format(_origin_body, e))
+            except json.JSONDecodeError as e:
+                log.critical('Error loading body ->|{}|<- : {}'.format(_origin_body, e))
+
             for _param in self.params:
 
                 _argument = _param['name'].strip()
@@ -387,12 +405,17 @@ class params(object):
                 _param_min_value = _param['min'] if 'min' in _param else None
                 _param_max_value = _param['max'] if 'max' in _param else None
 
+                # GET URL PARAMETERS
                 if _argument in _origin_self.__PATH__PARAMS__:
                     _param_value = _origin_self.request.uri.split('?')[0].split('/')[
                         _origin_self.__PATH__PARAMS__[_argument]]
                     _param_required = True
                 else:
+                    # GET BODY ARGUMENTS
                     _param_value = _origin_self.get_argument(_argument, default=_default_param_value)
+                    if _param_value is None:
+                        _param_value = _default_param_value if _default_param_value else None
+                        _param_value = _body[_argument] if _argument in _body else _param_value
 
                 if _param_value is None and _param_required:
                     log.critical('Missing required parameter {}'.format(_argument))

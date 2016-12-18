@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import json
-import urllib
 from base.tests.helpers.testing import TestBase
 import base.application.lookup.responses as msgs
 
@@ -13,7 +12,7 @@ class TestHash2Params(TestBase):
         _b = {
             'value': '123'
         }
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         headers = {'Authorization': self.token}
         res = self.fetch('/h2p', method='PUT', body=body, headers=headers)
 
@@ -21,8 +20,8 @@ class TestHash2Params(TestBase):
         res = res.body.decode('utf-8')
         res = json.loads(res)
 
-        # self.assertIn('test_option', res)
-        # self.assertEqual(res['test_option'], '321')
+        self.assertIn('h2p', res)
+        self._h2p = res['h2p']
 
     def test_set_h2p_unauthorized(self):
 
@@ -30,7 +29,7 @@ class TestHash2Params(TestBase):
             'value': '123'
         }
 
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/h2p', method='PUT', body=body)
 
         self.assertEqual(res.code, 400)
@@ -47,13 +46,14 @@ class TestHash2Params(TestBase):
         _b = {
             'data': json.dumps({'test': 'data'})
         }
-        body = urllib.parse.urlencode(_b)
+        _body = json.dumps(_b)
         headers = {'Authorization': self.token}
-        res = self.fetch('/h2p', method='PUT', body=body, headers=headers)
+        res = self.fetch('/h2p', method='PUT', body=_body, headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
         res = json.loads(res)
+        # print('RES', res)
 
         self.assertIn('h2p', res)
 

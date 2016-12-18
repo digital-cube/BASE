@@ -1,42 +1,20 @@
 # coding: utf-8
 
 import json
-import urllib
-import unittest
 from base.tests.helpers.testing import TestBase
 import base.application.lookup.responses as msgs
 
 
 class TestOptions(TestBase):
 
-    # def _register(self):
-    #
-    #     _b = {
-    #         'username': 'user@test.loc',
-    #         'password': '123',
-    #         'data': {}
-    #     }
-    #
-    #     body = urllib.parse.urlencode(_b)
-    #     res = self.fetch('/register', method='POST', body=body)
-    #
-    #     self.assertEqual(res.code, 200)
-    #     res = res.body.decode('utf-8')
-    #     res = json.loads(res)
-    #
-    #     self.assertIn('token', res)
-    #     self.assertIn('token_type', res)
-    #
-    #     self.token = res['token']
-
     def _set_option(self):
 
         _b = {
-            'value': '123'
+            'value': '321'
         }
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         headers = {'Authorization': self.token}
-        res = self.fetch('/option/test_option?value=321', method='PUT', body=body, headers=headers)
+        res = self.fetch('/option/test_option', method='PUT', body=body, headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -51,7 +29,7 @@ class TestOptions(TestBase):
             'value': '123'
         }
 
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/option/test_option', method='PUT', body=body)
 
         self.assertEqual(res.code, 400)
@@ -66,11 +44,11 @@ class TestOptions(TestBase):
         self._register('user@test.loc', '123')
 
         _b = {
-            'value': '123'
+            'value': '321'
         }
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         headers = {'Authorization': self.token}
-        res = self.fetch('/option/test_option?value=321', method='PUT', body=body, headers=headers)
+        res = self.fetch('/option/test_option', method='PUT', body=body, headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')

@@ -34,7 +34,7 @@ class TestBase(AsyncHTTPTestCase):
             'data': data if data else {}
         }
 
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/register', method='POST', body=body)
 
         self.assertEqual(res.code, 200)

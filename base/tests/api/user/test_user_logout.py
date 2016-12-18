@@ -12,7 +12,7 @@ class TestUserLogout(TestBase):
 
         self._register('user@test.loc', '123')
 
-        body = urllib.parse.urlencode({})
+        body = json.dumps({})
         res = self.fetch('/logout', method='POST', body=body)
 
         self.assertEqual(res.code, 400)
@@ -25,7 +25,7 @@ class TestUserLogout(TestBase):
 
         self._register('user@test.loc', '123')
 
-        body = urllib.parse.urlencode({})
+        body = json.dumps({})
         headers = {'Authorization': self.token}
         res = self.fetch('/logout', method='POST', body=body, headers=headers)
 
@@ -36,7 +36,7 @@ class TestUserLogout(TestBase):
 
         self._register('user@test.loc', '123')
 
-        body = urllib.parse.urlencode({})
+        body = json.dumps({})
         headers = {'Authorization': self.token}
         res = self.fetch('/logout', method='POST', body=body, headers=headers)
 

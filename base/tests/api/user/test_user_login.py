@@ -17,7 +17,7 @@ class TestUserLogin(TestBase):
             'password': '123'
         }
 
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/login', method='POST', body=body)
 
         self.assertEqual(res.code, 200)
@@ -36,7 +36,7 @@ class TestUserLogin(TestBase):
             'password': '123'
         }
 
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/login', method='POST', body=body)
 
         self.assertEqual(res.code, 400)
@@ -55,7 +55,7 @@ class TestUserLogin(TestBase):
             'password': '12'
         }
 
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/login', method='POST', body=body)
 
         self.assertEqual(res.code, 400)

@@ -16,7 +16,7 @@ class TestUserRegister(TestBase):
             'data': {}
         }
 
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/register', method='POST', body=body)
 
         self.assertEqual(res.code, 200)
@@ -33,7 +33,7 @@ class TestUserRegister(TestBase):
             'password': '123',
             'data': {}
         }
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/register', method='POST', body=body)
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -56,7 +56,7 @@ class TestUserRegister(TestBase):
             'password': '123',
             'data': {}
         }
-        body = urllib.parse.urlencode(_b)
+        body = json.dumps(_b)
         res = self.fetch('/register', method='POST', body=body)
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
