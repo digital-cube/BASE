@@ -3,6 +3,7 @@
 import os
 import sys
 import site
+import stat
 import shutil
 import tempfile
 import argparse
@@ -66,7 +67,12 @@ def copy_template(source, destination, project_name):
             shutil.copy2(_f, destination)
 
     # RENAME A PROJECT RUNNER INTO THE NAME OF THE PROJECT
-    shutil.move('{}/starter.py'.format(destination), '{}/{}'.format(destination, project_name))
+    _src = '{}/starter.py'.format(destination)
+    _dst = '{}/{}'.format(destination, project_name)
+    shutil.move(_src, _dst)
+
+    st = os.stat(_dst)
+    os.chmod(_dst, st.st_mode | stat.S_IEXEC)
 
 
 def _configure_project(args, destination, additions_dir):
