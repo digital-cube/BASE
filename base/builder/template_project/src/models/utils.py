@@ -48,7 +48,7 @@ class Hash2ParamsHistory(base.common.orm.sql_base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_hash_2_params = Column(Integer, ForeignKey('hash_2_params.id'), nullable=False)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now())
+    log_time = Column(DateTime, nullable=False, default=datetime.datetime.now())
     data = Column(Text, nullable=False)
 
     def __init__(self, id_hash, data):

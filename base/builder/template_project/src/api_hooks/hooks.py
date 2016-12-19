@@ -24,9 +24,10 @@ pre_login_process(Auth_user) -> [dict, str, None]
 post_login_process(Auth_user) -> [dict, str, None]
         - after login processing
         - on error raise PostLoginError
-save_hash(hash_data, Auth_user) -> [dict, str, None]
+save_hash(hash_data) -> [dict, str]
         - save hash data
-
+get_hash_data(hash) -> [dict, None]
+        - retrieve data from hash
 """
 
 hooks = [
@@ -38,6 +39,7 @@ hooks = [
     # 'pre_login_process',
     # 'post_login_process',
     # 'save_hash',
+    # 'get_hash_data',
 ]
 
 

@@ -20,12 +20,14 @@ pre_login_process(Auth_user) -> [dict, str, None]
 post_login_process(Auth_user) -> [dict, str, None]
         - after login processing
         - on error raise PostLoginError
-save_hash(hash_data) -> [dict, str, None]
+save_hash(hash_data) -> [dict, str]
         - save hash data
-
+get_hash_data(hash) -> [dict, None]
+        - retrieve data from hash
 """
 
 import json
+import datetime
 from base.application.helpers.exceptions import SaveHash2ParamsException
 from base.common.utils import log
 from base.common.utils import format_password
@@ -116,12 +118,9 @@ def check_username_and_password(username, password, user):
 
 def save_hash(hash_data):
 
-    # import base.config.application_config
     import base.common.orm
-    # Hash2Params= base.config.application_config.orm_models['hash_2_params']
-    # _session = base.common.orm.orm.session()
-
     Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
+    Hash2ParamsHistory, _session = base.common.orm.get_orm_model('hash_2_params_history_log')
 
     from base.common.sequencer import sequencer
     _hash = sequencer().new('h')
@@ -136,5 +135,39 @@ def save_hash(hash_data):
     _session.add(h2p)
     _session.commit()
 
+    h2p_history = Hash2ParamsHistory(h2p.id, '{}')
+    _session.add(h2p_history)
+    _session.commit()
+
     return {'h2p': _hash}
+
+
+def get_hash_data(h2p):
+
+    import base.common.orm
+    Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
+    Hash2ParamsHistory, _session = base.common.orm.get_orm_model('hash_2_params_history_log')
+
+    _q = _session.query(Hash2Params).filter(Hash2Params.hash == h2p)
+    if _q.count() == 0:
+        log.warning('Data for hash {} not found'.format(h2p))
+        return {}
+
+    res = {}
+
+    db_h2p = _q.one()
+    _res = db_h2p.data
+    try:
+        res = json.loads(_res)
+    except json.JSONDecodeError as e:
+        log.warning('Error loading hash {} data {}: {}'.format(h2p, _res, e))
+
+    db_h2p.set_last_access(datetime.datetime.now())
+
+    h2p_history = Hash2ParamsHistory(db_h2p.id, '{}')
+    _session.add(h2p_history)
+
+    _session.commit()
+
+    return res
 

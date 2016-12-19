@@ -9,6 +9,7 @@ from base.application.components import api
 from base.application.components import params
 from base.application.components import authenticated
 from base.application.helpers.exceptions import SaveHash2ParamsException
+from base.application.helpers.exceptions import GetHash2ParamsException
 
 
 @authenticated()
@@ -16,10 +17,6 @@ from base.application.helpers.exceptions import SaveHash2ParamsException
     URI='/h2p',
     PREFIX=False)
 class Hash2Params(Base):
-
-    def get(self):
-
-        return self.ok('get h2p')
 
     @params(
         {'name': 'data', 'type': json, 'required': True,  'doc': 'hash data'},
@@ -35,3 +32,23 @@ class Hash2Params(Base):
 
         return self.ok(_res)
 
+
+@authenticated()
+@api(
+    URI='/h2p/:h2p',
+    PREFIX=False)
+class Hash2ParamsGet(Base):
+
+    @params(
+        {'name': 'h2p', 'type': str, 'required': True,  'doc': 'hash to get data from'},
+    )
+    def get(self, h2p):
+
+        from base.application.api import api_hooks
+        try:
+            _res = api_hooks.get_hash_data(h2p)
+        except GetHash2ParamsException as e:
+            log.critical(str(e))
+            return self.error(msgs.GET_HASH_PARAMS_ERROR)
+
+        return self.ok(_res)

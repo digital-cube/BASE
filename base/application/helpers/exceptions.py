@@ -64,3 +64,8 @@ class PostLoginException(Exception):
 class SaveHash2ParamsException(Exception):
     """Error save hash"""
     pass
+
+
+class GetHash2ParamsException(Exception):
+    """Error get hash data"""
+    pass
