@@ -53,7 +53,7 @@ class Hash2ParamsHistory(base.common.orm.sql_base):
 
     def __init__(self, id_hash, data):
 
-        self.hash = hash
+        self.id_hash_2_params = id_hash
         self.data = data
 
 
