@@ -17,7 +17,7 @@ from base_common.dbatokens import get_token
 from base_common.seq import sequencer
 from base_lookup import api_messages as msgs
 from base_config.service import log
-from base_common.dbacommon import check_user_registered
+# from base_common.dbacommon import check_user_registered
 
 
 name = "Registration"
@@ -43,7 +43,7 @@ def do_post(username, password, users_data, **kwargs):
     dbc = _db.cursor()
 
     username = username.lower()
-    if check_user_registered(dbc, username):
+    if apphooks.check_user_registered(dbc, username):
         return base_common.msg.error(msgs.USERNAME_ALREADY_TAKEN)
 
     if base_config.settings.STRONG_PASSWORD:

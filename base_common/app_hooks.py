@@ -14,6 +14,7 @@ post_login_digest -- post login processing (parameters: id_user, username, passw
 change_username_hook -- change username modifications (parameters: hash for hash_2_param, new username, dbuser, **kwargs)
 change_username_success_hook -- change username modifications (parameters: )
 forgot_password_hook - forgot password (parameters: )
+check_user_registered - check if user with username is already registered
 """
 
 import base_config.settings
@@ -22,6 +23,13 @@ from base_config.service import log
 from base_config.service import support_mail
 from base_svc.comm import BaseAPIRequestHandler
 import base_api.mail_api.save_mail
+
+
+def check_user_registered(dbc, uname):
+
+    q = "select id from users where username = '{}'".format(uname)
+    dbc.execute(q)
+    return dbc.rowcount != 0
 
 
 def prepare_user_query(u_id, username, password, *args, **kwargs):

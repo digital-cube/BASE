@@ -10,6 +10,7 @@ import json
 import base_common.msg
 import base_api.hash2params.save_hash
 import base_api.mail_api.save_mail
+import base_common.app_hooks as apphooks
 from base_config.service import log
 from base_lookup import api_messages as msgs
 from base_common.dbacommon import check_password
@@ -22,7 +23,7 @@ from base_common.dbatokens import get_user_by_token
 from base_svc.comm import BaseAPIRequestHandler
 import base_api.users.changing_username
 from base_common.app_hooks import change_username_hook
-from base_common.dbacommon import check_user_registered
+# from base_common.dbacommon import check_user_registered
 
 
 name = "Change username"
@@ -49,7 +50,7 @@ def do_post(newusername, password, redirect_url, **kwargs):
     _db = get_db()
     dbc = _db.cursor()
 
-    if check_user_registered(dbc, newusername):
+    if apphooks.check_user_registered(dbc, newusername):
         return base_common.msg.error(msgs.USERNAME_ALREADY_TAKEN)
 
     tk = kwargs['auth_token']
