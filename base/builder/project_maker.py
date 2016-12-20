@@ -10,6 +10,9 @@ import argparse
 import importlib
 import importlib.util
 
+from inspect import getmembers, isclass
+from sqlalchemy.ext.declarative.api import DeclarativeMeta
+
 from base.config.settings import app
 from base.config.settings import template_project_folder
 from base.config.settings import project_additional_folder
@@ -50,6 +53,9 @@ def pars_command_line_arguments():
     db_init_parser.add_argument('-dp', '--database_port', help=app['database_port'][1])
     db_init_parser.add_argument('user_name', type=str, help=app['database_username'][1])
     db_init_parser.add_argument('password', type=str, help=app['database_password'][1])
+
+    db_init_parser = subparsers.add_parser('db_show_create', help="show sql create table query")
+    db_init_parser.add_argument('table_name', type=str, help=app['table_name'][1])
 
     return argparser.parse_args()
 
@@ -210,10 +216,24 @@ def __db_is_configured(args, test):
     return __db_config, __db_type
 
 
+def _get_orm_models(models_list, orm_models):
+    for m in orm_models:
+        try:
+            _m = importlib.import_module(m)
+            models_list.append(_m)
+        except ImportError:
+            print('Error loading model {}'.format(m))
+
+
+def _update_path():
+
+    _project_path = os.getcwd()
+    sys.path.append(_project_path)
+
+
 def _build_database(args, test=False):
 
-    __project_path = os.getcwd()
-    sys.path.append(__project_path)
+    _update_path()
 
     db_config, db_type = __db_is_configured(args, test)
     if not db_config:
@@ -233,12 +253,7 @@ def _build_database(args, test=False):
 
     # PRESENT MODELS TO BASE
     _models_modules = []
-    for m in src.config.app_config.models:
-        try:
-            _m = importlib.import_module(m)
-            _models_modules.append(_m)
-        except ImportError:
-            print('Error loading model {}'.format(m))
+    _get_orm_models(_models_modules, src.config.app_config.models)
 
     orm_builder.create_db_schema()
 
@@ -252,6 +267,70 @@ def _build_database(args, test=False):
     return orm_builder
 
 
+def _show_create_table(args):
+
+    _update_path()
+
+    src = 'src/config/app_config.py'
+    if not os.path.isfile(src):
+        print(db_init_warning)
+        sys.exit(exit_status.MISSING_PROJECT_CONFIGURATION)
+
+    import src.config.app_config
+    if not hasattr(src.config.app_config, 'models'):
+        print('No orm models in configuration file')
+        sys.exit(exit_status.MISSING_ORM_MODELS)
+
+    if not hasattr(src.config.app_config, 'db_type'):
+        print('No database type in configuration file')
+        sys.exit(exit_status.MISSING_DATABASE_TYPE)
+
+    if not hasattr(src.config.app_config, 'db_config'):
+        print('No database configuration in configuration file')
+        sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
+
+    db_type = src.config.app_config.db_type
+    db_config = src.config.app_config.db_config
+
+    for k in db_config:
+        if db_config[k].startswith('__') or db_config[k].endswith('__'):
+            print("Database not properly configured: the {} can not be '{}'".format(k, db_config[k]))
+            sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+
+    _models_modules = []
+    _get_orm_models(_models_modules, src.config.app_config.models)
+
+    __db_url = make_database_url(db_type, db_config['db_name'], db_config['db_host'], db_config['db_port'],
+                                 db_config['db_user'], db_config['db_password'])
+
+    orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
+
+    # PREPARE DATABASE
+
+    _orm_model = None
+    for m in _models_modules:
+
+        break1 = False
+        for _name, _model in getmembers(m, isclass):
+            if type(_model) == DeclarativeMeta and hasattr(_model, '__table__'):
+                if _model.__table__.name == args.table_name:
+                    _orm_model = _model
+                    break1 = True
+                    break
+        if break1:
+            break
+
+    if _orm_model is None:
+        print('Table {} has no model, or model not configured'.format(args.table_name))
+        sys.exit(exit_status.TABLE_NOT_PRESENT)
+
+    _db_engine = orm_builder.orm().engine()
+    from sqlalchemy.schema import CreateTable
+    _create_table_query = CreateTable(_orm_model.__table__).compile(_db_engine)
+    print('{} table create query:\n'.format(args.table_name))
+    print(_create_table_query)
+
+
 def execute_builder_cmd():
 
     parsed_args = pars_command_line_arguments()
@@ -262,3 +341,5 @@ def execute_builder_cmd():
     if parsed_args.cmd == 'db_init':
         _build_database(parsed_args)
 
+    if parsed_args.cmd == 'db_show_create':
+        _show_create_table(parsed_args)
