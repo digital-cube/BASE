@@ -429,7 +429,7 @@ class params(object):
                     return _origin_self.error(msgs.MISSING_REQUEST_ARGUMENT)
 
                 _param_converted = params.convert_arguments(_argument, _param_value, _param_type)
-                if _param_converted is None:
+                if _param_converted is None and _param_required:
                     log.critical('Invalid parameter {}'.format(_argument))
                     return _origin_self.error(msgs.INVALID_REQUEST_ARGUMENT)
 
