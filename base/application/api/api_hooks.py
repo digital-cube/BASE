@@ -24,6 +24,8 @@ save_hash(hash_data) -> [dict, str]
         - save hash data
 get_hash_data(hash) -> [dict, None]
         - retrieve data from hash
+save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, get_data) -> [dict, None]
+        - save mail queue
 """
 
 import json
@@ -35,7 +37,11 @@ from base.common.utils import password_match
 
 
 def pack_user(user):
-
+    """
+    Prepare user's data
+    :param user: orm Auth_user
+    :return: dict with user's data
+    """
     _user = {}
     _user['id'] = user.id
     _user['username'] = user.username
@@ -57,6 +63,11 @@ def pack_user(user):
 
 # REGISTER USER PROCESS
 def check_password_is_valid(password):
+    """
+    Check if provided password is valid
+    :param password: user's password
+    :return: bool valid
+    """
     if len(password) < 6:
         log.critical('Password {} length {} is lower than minimal of 6'.format(password, len(password)))
         return False
@@ -64,7 +75,14 @@ def check_password_is_valid(password):
 
 
 def register_user(id_user, username, password, data):
-
+    """
+    Save user into database
+    :param id_user: database user id
+    :param username: user's username
+    :param password: user's password
+    :param data: user's data
+    :return: bool success
+    """
     import base.common.orm
     AuthUser, _session = base.common.orm.get_orm_model('auth_users')
     User, _ = base.common.orm.get_orm_model('users')
@@ -86,12 +104,18 @@ def register_user(id_user, username, password, data):
     _session.commit()
 
     return True
+
+
 # END OF THE REGISTER USER PROCESS
 
 
 # LOGIN USER PROCESS
 def user_exists(username):
-
+    """
+    Check if username is already taken/used
+    :param username: user's username
+    :return: bool used
+    """
     import base.common.orm
     AuthUser, _session = base.common.orm.get_orm_model('auth_users')
 
@@ -104,12 +128,19 @@ def user_exists(username):
 
 
 def check_username_and_password(username, password, user):
-
+    """
+    Check username and password for correctness
+    :param username: user's username
+    :param password: user's password
+    :param user: orm Auth_user
+    :return: bool correct
+    """
     if not password_match(username, password, user.password):
         log.critical('User {} enters a wrong password: {}'.format(username, password))
         return False
 
     return True
+
 
 # END OF THE LOGIN USER PROCESS
 
@@ -117,7 +148,11 @@ def check_username_and_password(username, password, user):
 # HASH_2_PARAMS
 
 def save_hash(hash_data):
-
+    """
+    Save hash and corresponding data to database
+    :param hash_data: data to be saved with new hash
+    :return: hash
+    """
     import base.common.orm
     Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
     Hash2ParamsHistory, _session = base.common.orm.get_orm_model('hash_2_params_history_log')
@@ -143,7 +178,11 @@ def save_hash(hash_data):
 
 
 def get_hash_data(h2p):
-
+    """
+    Retrieve data for give hash
+    :param h2p: hash to find data for
+    :return: dict
+    """
     import base.common.orm
     Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
     Hash2ParamsHistory, _session = base.common.orm.get_orm_model('hash_2_params_history_log')
@@ -171,3 +210,31 @@ def get_hash_data(h2p):
 
     return res
 
+
+# END OF HASH_2_PARAMS
+
+# E-MAIL QUEUE
+
+def save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data):
+    """
+    Save mail to database
+    :param sender: email address of the sender
+    :param sender_name: display name of the sender
+    :param receiver:  email address of the receiver
+    :param receiver_name: display name of the receiver
+    :param subject: subject of the message
+    :param message: body of the message
+    :param data: additional message data in json form
+    :param get_data: weather to retrieve data in response
+    :return: None, dict
+    """
+
+    import base.common.orm
+    MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
+
+    data = json.dumps(data) if data else data
+    mail_queue = MailQueue(sender, sender_name, receiver, receiver_name, subject, message, data)
+    _session.add(mail_queue)
+    _session.commit()
+
+    return mail_queue.id

@@ -19,14 +19,19 @@ class MailQueue(base.common.orm.sql_base):
     message = Column(Text, nullable=False)
     data = Column(Text)
 
-    def __init__(self, _id, username, password, role_flags=1, active=False):
+    def __init__(self, sender, sender_name, receiver, receiver_name, subject, message, data=None):
 
-        self.id = _id
-        self.username = username
-        self.password = password
-        self.role_flags = role_flags
-        self.active = active
-        self.created = datetime.datetime.now()
+        self.sender = sender
+        self.sender_name = sender_name
+        if not self.sender_name:
+            self.sender_name = sender
+        self.receiver = receiver
+        self.receiver_name = receiver_name
+        if not self.receiver_name:
+            self.receiver_name = receiver
+        self.subject = subject
+        self.message = message
+        self.data = data
 
 
 def main():

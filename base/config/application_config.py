@@ -21,6 +21,7 @@ imports = [
     'base.application.api.user.register',
     'base.application.api.utils.options',
     'base.application.api.utils.hash2params',
+    'base.application.api.utils.mail_queue',
 ]
 session_storage = 'DB'
 user_roles_module = 'src.lookup.user_roles'
