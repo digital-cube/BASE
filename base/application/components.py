@@ -38,6 +38,9 @@ class Base(tornado.web.RequestHandler):
     #     self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization')
     #     self.finish('OK')
 
+    def set_default_headers(self):
+        self.set_header('Access-Control-Allow-Origin', '*')
+
     def ok(self, s=None, **kwargs):
 
         _status = 204
@@ -189,17 +192,17 @@ class params(object):
     @staticmethod
     def get_sequencer_row(table, row_id):
 
-        import common.orm
-        import config.application_config
+        import base.common.orm
+        import base.config.application_config
         from base.common.utils import log
 
-        if table not in config.application_config.orm_models:
+        if table not in base.config.application_config.orm_models:
             log.critical('Missing table {}, can not retrieve row with id {}'.format(table, row_id))
             return None
 
-        _orm_table = config.application_config.orm_models[table]
+        _orm_table = base.config.application_config.orm_models[table]
 
-        _q = common.orm.orm.session().query(_orm_table).filter(_orm_table.id == row_id)
+        _q = base.common.orm.orm.session().query(_orm_table).filter(_orm_table.id == row_id)
         _res = _q.all()
 
         if len(_res) != 1:
@@ -327,7 +330,7 @@ class params(object):
                 log.critical('Invalid argument {} expected sequencer {}, got {}'.format(argument, s_id, argument_value))
                 return None
 
-            from common.sequencer import SequencerFactory
+            from base.common.sequencer import SequencerFactory
             if s_model != SequencerFactory._reserved_table_name:
                 return params.get_sequencer_row(s_model, argument_value)
 
