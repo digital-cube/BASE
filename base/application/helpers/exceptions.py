@@ -69,3 +69,13 @@ class SaveHash2ParamsException(Exception):
 class GetHash2ParamsException(Exception):
     """Error get hash data"""
     pass
+
+
+class PreLogoutException(Exception):
+    """Pre logout process hook exception"""
+    pass
+
+
+class PostLogoutException(Exception):
+    """Post logout process hook exception"""
+    pass

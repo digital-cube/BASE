@@ -1,5 +1,6 @@
 # coding= utf-8
 
+import json
 import base.application.lookup.responses as msgs
 from base.common.utils import log
 from base.application.components import Base
@@ -18,8 +19,9 @@ class Login(Base):
     @params(
         {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': "user's username"},
         {'name': 'password', 'type': str, 'required': True,  'doc': "user's password"},
+        {'name': 'data', 'type': json, 'required': False,  'doc': "user's additional data"},
     )
-    def post(self, username, password):
+    def post(self, username, password, data):
         """Login user - retrieve session"""
 
         from base.application.api import api_hooks
@@ -33,7 +35,7 @@ class Login(Base):
         _pre_login = None
         if hasattr(api_hooks, 'pre_login_process'):
             try:
-                _pre_login = api_hooks.pre_login_process(user)
+                _pre_login = api_hooks.pre_login_process(user, data)
             except PreLoginException as e:
                 log.critial('Pre login error: {}'.format(e))
                 return self.error(msgs.PRE_LOGIN_ERROR)
@@ -46,7 +48,7 @@ class Login(Base):
         _post_login = None
         if hasattr(api_hooks, 'post_login_process'):
             try:
-                _post_login = api_hooks.post_login_process(user)
+                _post_login = api_hooks.post_login_process(user, data)
             except PostLoginException as e:
                 log.critial('Post login error: {}'.format(e))
                 return self.error(msgs.POST_LOGIN_ERROR)

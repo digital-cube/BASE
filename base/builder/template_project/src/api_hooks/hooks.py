@@ -18,10 +18,10 @@ user_exists(username) -> [User object]
         - check if username exists in the system
 check_username_and_password(username, password, Auth_user) -> [bool]
         - check username / password match
-pre_login_process(Auth_user) -> [dict, str, None]
+pre_login_process(Auth_user, json_data) -> [dict, str, None]
         - pre login data processing
         - on error raise PreLoginError
-post_login_process(Auth_user) -> [dict, str, None]
+post_login_process(Auth_user, json_data) -> [dict, str, None]
         - after login processing
         - on error raise PostLoginError
 save_hash(hash_data) -> [dict, str]
@@ -30,6 +30,10 @@ get_hash_data(hash) -> [dict, None]
         - retrieve data from hash
 save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, get_data) -> [dict, None]
         - save mail queue
+pre_logout_process() -> [dict, None]
+        - pre logout data processing
+post_logout_process() -> [dict, None]
+        - post logout data processing
 """
 
 hooks = [
@@ -43,6 +47,8 @@ hooks = [
     # 'save_hash',
     # 'get_hash_data',
     # 'save_mail_queue',
+    # 'pre_logout_process'
+    # 'post_logout_process'
 ]
 
 
