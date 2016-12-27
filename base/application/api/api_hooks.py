@@ -39,6 +39,8 @@ from base.common.utils import log
 from base.common.utils import format_password
 from base.common.utils import password_match
 
+def pre_register_user(username):
+    return True
 
 def pack_user(user):
     """

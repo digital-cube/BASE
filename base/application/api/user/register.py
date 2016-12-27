@@ -26,6 +26,13 @@ class Register(Base):
     def post(self, username, password, data):
         """Register user on the system"""
 
+        from base.application.api import api_hooks
+
+        pre_reg_usr = api_hooks.pre_register_user(username)
+        if pre_reg_usr is False:
+            log.critical('error - pre reg user return false')
+            return self.error(msgs.ERROR_USER_REGISTER)
+
         import base.common.orm
         AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
         User, _ = base.common.orm.get_orm_model('users')
@@ -34,7 +41,6 @@ class Register(Base):
             log.warning('Username {} already taken, requested from {}'.format(username, get_request_ip(self)))
             return self.error(msgs.USERNAME_ALREADY_TAKEN)
 
-        from base.application.api import api_hooks
         if base.config.application_config.strong_password and hasattr(api_hooks, 'check_password_is_valid'):
             if not api_hooks.check_password_is_valid(password):
                 log.warning('Password {} is not valid'.format(password))
