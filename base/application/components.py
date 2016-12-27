@@ -29,17 +29,20 @@ class Base(tornado.web.RequestHandler):
         pass
 
     # UNCOMMENT THIS METHOD IF NEEDED
-    # def options(self, *args, **kwargs):
+    def options(self, *args, **kwargs):
     #
-    #     self.set_status(200)
-    #     self.set_header('Access-Control-Allow-Origin', '*')
-    #     self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS')
-    #     self.set_header('Access-Control-Max-Age', 1000)
-    #     self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization')
-    #     self.finish('OK')
+        self.set_status(200)
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS')
+        self.set_header('Access-Control-Max-Age', 1000)
+        self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization, cache-control')
+        self.finish('OK')
 
     def set_default_headers(self):
         self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS')
+        self.set_header('Access-Control-Max-Age', 1000)
+        self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization, cache-control')
 
     def ok(self, s=None, **kwargs):
 

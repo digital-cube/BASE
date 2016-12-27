@@ -9,12 +9,20 @@ from base.application.components import params
 from base.common.tokens_services import get_token
 from base.application.helpers.exceptions import PreLoginException
 from base.application.helpers.exceptions import PostLoginException
+from base.application.components import authenticated
+from base.common.tokens_services import get_user_by_token
 
 
 @api(
     URI='/login',
     PREFIX=False)
 class Login(Base):
+
+    @authenticated()
+    def get(self):
+        user_by_token = get_user_by_token(self.auth_token)
+        return self.ok({'id':user_by_token['id'], 'username':user_by_token['username']})
+
 
     @params(
         {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': "user's username"},
