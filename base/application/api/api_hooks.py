@@ -26,7 +26,7 @@ get_hash_data(hash) -> [dict, None]
         - retrieve data from hash
 save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, get_data) -> [dict, None]
         - save mail queue
-pre_logout_process() -> [dict, None]
+pre_logout_process(auth_token) -> [dict, None]
         - pre logout data processing
 post_logout_process() -> [dict, None]
         - post logout data processing
@@ -38,6 +38,9 @@ from base.application.helpers.exceptions import SaveHash2ParamsException
 from base.common.utils import log
 from base.common.utils import format_password
 from base.common.utils import password_match
+
+def auth_token(auth_token):
+    return True
 
 def pre_register_user(username):
     return True
