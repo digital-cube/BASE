@@ -39,7 +39,7 @@ from base.common.utils import log
 from base.common.utils import format_password
 from base.common.utils import password_match
 
-def auth_token(auth_token):
+def pre_logout_process(auth_token):
     return True
 
 def pre_register_user(username):
