@@ -17,6 +17,8 @@
 
     `pip3 install .`
     `pip3 install -r requirements.txt`
+    `cat requirements.txt`
+    `pip3 install [required_database_connector]`
 
 ### About
 

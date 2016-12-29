@@ -23,7 +23,6 @@ class Login(Base):
         user_by_token = get_user_by_token(self.auth_token)
         return self.ok({'id':user_by_token['id'], 'username':user_by_token['username']})
 
-
     @params(
         {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': "user's username"},
         {'name': 'password', 'type': str, 'required': True,  'doc': "user's password"},

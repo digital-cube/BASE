@@ -22,8 +22,8 @@ class Logout(Base):
         _res = {}
         _pre_logout = None
         if hasattr(api_hooks, 'pre_logout_process'):
-            try:    # TODO: provide auth user after set it in the self attribute
-                _pre_logout = api_hooks.pre_logout_process(self.auth_token)
+            try:
+                _pre_logout = api_hooks.pre_logout_process(self.auth_user)
             except PreLogoutException as e:
                 log.critial('Pre logout error: {}'.format(e))
                 return self.error(msgs.PRE_LOGOUT_ERROR)
@@ -37,8 +37,8 @@ class Logout(Base):
 
         _post_logout = None
         if hasattr(api_hooks, 'post_logout_process'):
-            try:    # TODO: provide auth user after set it in the self attribute
-                _post_logout = api_hooks.post_logout_process()
+            try:
+                _post_logout = api_hooks.post_logout_process(self.auth_user)
             except PostLogoutException as e:
                 log.critial('Post logout error: {}'.format(e))
                 return self.error(msgs.POST_LOGOUT_ERROR)

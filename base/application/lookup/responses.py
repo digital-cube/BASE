@@ -31,6 +31,7 @@ GET_HASH_PARAMS_ERROR = 28
 SAVE_MAIL_QUEUE_ERROR = 29
 PRE_LOGOUT_ERROR = 30
 POST_LOGOUT_ERROR = 31
+ERROR_USER_PRE_REGISTER = 32
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -64,6 +65,7 @@ lmap[GET_HASH_PARAMS_ERROR] = 'Get hash data error'
 lmap[SAVE_MAIL_QUEUE_ERROR] = 'Error save mail queue'
 lmap[PRE_LOGOUT_ERROR] = 'Pre logout error'
 lmap[POST_LOGOUT_ERROR] = 'Post logout error'
+lmap[ERROR_USER_PRE_REGISTER] = 'Pre register error'
 
 lrev = {}
 for k in lmap:

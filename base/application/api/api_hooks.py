@@ -8,6 +8,8 @@ check_password_is_valid(password) -> bool:
 register_user(id_user, username, password, data) -> [dict, str, convertible to string, None]:
         - register user on system
         - populate auth_users and users tables here
+pre_register_user(username) -> [None]:
+        - process user's data before user registration
 post_register_process(id_user, username, password, data) -> [dict, None]:
         - process user's data after user registration
 user_exists(username) -> [User object]
@@ -26,9 +28,9 @@ get_hash_data(hash) -> [dict, None]
         - retrieve data from hash
 save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, get_data) -> [dict, None]
         - save mail queue
-pre_logout_process(auth_token) -> [dict, None]
+pre_logout_process(Auth_user) -> [dict, None]
         - pre logout data processing
-post_logout_process() -> [dict, None]
+post_logout_process(Auth_user) -> [dict, None]
         - post logout data processing
 """
 
@@ -39,11 +41,6 @@ from base.common.utils import log
 from base.common.utils import format_password
 from base.common.utils import password_match
 
-def pre_logout_process(auth_token):
-    return True
-
-def pre_register_user(username):
-    return True
 
 def pack_user(user):
     """

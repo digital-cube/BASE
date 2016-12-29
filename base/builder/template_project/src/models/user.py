@@ -1,5 +1,6 @@
 import datetime
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, DateTime, Text
+from sqlalchemy.orm import relationship
 import base.common.orm
 
 
@@ -13,6 +14,7 @@ class AuthUser(base.common.orm.sql_base):
     role_flags = Column(Integer, index=True, nullable=False)
     active = Column(Boolean, index=True, nullable=False, default=False)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now())
+    user = relationship('User', uselist=False, back_populates='auth_user')
 
     def __init__(self, _id, username, password, role_flags=1, active=False):
 
@@ -32,6 +34,7 @@ class User(base.common.orm.sql_base):
     first_name = Column(String(64), index=True)
     last_name = Column(String(64))
     data = Column(Text)
+    auth_user = relationship("AuthUser", back_populates="user")
 
     def __init__(self, id_user, first_name, last_name, data):
 

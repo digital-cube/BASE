@@ -23,26 +23,29 @@ class Base(tornado.web.RequestHandler):
 
     def __init__(self, application, request, **kwargs):
         self.auth_token = None
+        self.auth_user = None
         super().__init__(application, request, **kwargs)
 
     def data_received(self, chunk):
         pass
 
-    # UNCOMMENT THIS METHOD IF NEEDED
     def options(self, *args, **kwargs):
-    #
-        self.set_status(200)
+
         self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS')
+        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
         self.set_header('Access-Control-Max-Age', 1000)
-        self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization, cache-control')
+        self.set_header('Access-Control-Allow-Headers',
+                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control')
+        self.set_status(200)
         self.finish('OK')
 
     def set_default_headers(self):
+
         self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS')
+        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
         self.set_header('Access-Control-Max-Age', 1000)
-        self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization, cache-control')
+        self.set_header('Access-Control-Allow-Headers',
+                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control')
 
     def ok(self, s=None, **kwargs):
 
@@ -150,6 +153,9 @@ class Base(tornado.web.RequestHandler):
 
     def set_authorization_token(self, _auth_token):
         self.auth_token = _auth_token
+
+    def set_authorized_user(self, auth_user):
+        self.auth_user = auth_user
 
 
 class api(object):
@@ -498,8 +504,8 @@ class authenticated(object):
                             _user.username, _user.role_flags, _origin_self.request.uri))
                         return _origin_self.error(msgs.UNAUTHORIZED_REQUEST)
 
-
                 _origin_self.set_authorization_token(_auth_token)
+                _origin_self.set_authorized_user(_user)
 
                 return _target(_origin_self, *args, **kwargs)
 

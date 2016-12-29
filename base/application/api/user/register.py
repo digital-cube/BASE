@@ -28,10 +28,11 @@ class Register(Base):
 
         from base.application.api import api_hooks
 
-        pre_reg_usr = api_hooks.pre_register_user(username)
-        if pre_reg_usr is False:
-            log.critical('error - pre reg user return false')
-            return self.error(msgs.ERROR_USER_REGISTER)
+        if hasattr(api_hooks, 'pre_register_user'):
+            pre_reg_usr = api_hooks.pre_register_user(username)
+            if pre_reg_usr is False:
+                log.critical('Pre register user process error')
+                return self.error(msgs.ERROR_USER_REGISTER)
 
         import base.common.orm
         AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
