@@ -72,7 +72,7 @@ class Register(Base):
         from base.common.tokens_services import get_token
         _token = get_token(id_user)
         if not _token:
-            log.critial('Error getting token for new user {} - {}'.format(id_user, username))
+            log.critical('Error getting token for new user {} - {}'.format(id_user, username))
             return self.error(msgs.ERROR_RETRIEVE_SESSION)
         response.update(_token)
 

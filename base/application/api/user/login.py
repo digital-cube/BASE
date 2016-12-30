@@ -44,12 +44,12 @@ class Login(Base):
             try:
                 _pre_login = api_hooks.pre_login_process(user, data)
             except PreLoginException as e:
-                log.critial('Pre login error: {}'.format(e))
+                log.critical('Pre login error: {}'.format(e))
                 return self.error(msgs.PRE_LOGIN_ERROR)
 
         _token = get_token(user.id)
         if not _token:
-            log.critial('Error getting token for user {} - {}'.format(user.id, username))
+            log.critical('Error getting token for user {} - {}'.format(user.id, username))
             return self.error(msgs.ERROR_RETRIEVE_SESSION)
 
         _post_login = None
@@ -57,7 +57,7 @@ class Login(Base):
             try:
                 _post_login = api_hooks.post_login_process(user, data)
             except PostLoginException as e:
-                log.critial('Post login error: {}'.format(e))
+                log.critical('Post login error: {}'.format(e))
                 return self.error(msgs.POST_LOGIN_ERROR)
 
         response = {}
