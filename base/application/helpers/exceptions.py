@@ -79,3 +79,8 @@ class PreLogoutException(Exception):
 class PostLogoutException(Exception):
     """Post logout process hook exception"""
     pass
+
+
+class CheckUserError(Exception):
+    """Check user error exception"""
+    pass

@@ -7,10 +7,10 @@ from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
 from base.common.tokens_services import get_token
+from base.application.helpers.exceptions import CheckUserError
 from base.application.helpers.exceptions import PreLoginException
 from base.application.helpers.exceptions import PostLoginException
 from base.application.components import authenticated
-from base.common.tokens_services import get_user_by_token
 
 
 @api(
@@ -20,8 +20,13 @@ class Login(Base):
 
     @authenticated()
     def get(self):
-        user_by_token = get_user_by_token(self.auth_token)
-        return self.ok({'id':user_by_token['id'], 'username':user_by_token['username']})
+
+        from base.application.api import api_hooks
+        try:
+            return self.ok(api_hooks.check_user(self.auth_user))
+        except CheckUserError as e:
+            log.critical('Check user {} error {}'.format(self.auth_user.id, e))
+            return self.error(msgs.CHECK_USER_ERROR)
 
     @params(
         {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': "user's username"},

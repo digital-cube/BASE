@@ -32,6 +32,8 @@ pre_logout_process(Auth_user) -> [dict, None]
         - pre logout data processing
 post_logout_process(Auth_user) -> [dict, None]
         - post logout data processing
+check_user(Auth_user) -> [dict]
+        - check user process
 """
 
 import json
@@ -148,6 +150,23 @@ def check_username_and_password(username, password, user):
     return True
 
 
+def check_user(auth_user):
+    """
+    Check logged user and return it's data.
+    On error raise CheckUserError exception
+    :param auth_user:
+    :return: dict with user's data
+    """
+
+    res = {
+        'id': auth_user.id,
+        'username': auth_user.username,
+        'first_name': auth_user.user.first_name,
+        'last_name': auth_user.user.last_name
+    }
+
+    return res
+
 # END OF THE LOGIN USER PROCESS
 
 
@@ -244,3 +263,7 @@ def save_mail_queue(sender, sender_name, receiver, receiver_name, subject, messa
     _session.commit()
 
     return mail_queue.id
+
+# END OF E-MAIL QUEUE
+
+

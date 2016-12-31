@@ -24,18 +24,18 @@ class Hello(Base):
         # return self.ok('hello get', key)
         return self.ok('hello get')
 
-    # @authenticated()  # if every put method has to be authenticated
+    # @authenticated()  # if put method has to be authenticated
     def put(self):
         return self.ok('hello put')
 
-    # @authenticated()  # if every post method has to be authenticated
+    # @authenticated()  # if post method has to be authenticated
     def post(self):
         return self.ok('hello post')
 
-    # @authenticated()  # if every patch method has to be authenticated
+    # @authenticated()  # if patch method has to be authenticated
     def patch(self):
         return self.ok('hello patch')
 
-    # @authenticated()  # if every delete method has to be authenticated
+    # @authenticated()  # if delete method has to be authenticated
     def delete(self):
         return self.ok('hello delete')

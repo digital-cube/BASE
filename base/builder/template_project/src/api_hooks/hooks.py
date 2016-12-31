@@ -36,6 +36,8 @@ pre_logout_process(Auth_user) -> [dict, None]
         - pre logout data processing
 post_logout_process(Auth_user) -> [dict, None]
         - post logout data processing
+check_user(Auth_user) -> [dict]
+        - check user process
 """
 
 hooks = [
@@ -52,6 +54,7 @@ hooks = [
     # 'save_mail_queue',
     # 'pre_logout_process'
     # 'post_logout_process'
+    # 'check_user'
 ]
 
 
