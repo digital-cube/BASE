@@ -1,13 +1,14 @@
 import datetime
-from sqlalchemy import Column, String, Boolean, DateTime, BigInteger, Text
+from sqlalchemy import Column, String, Boolean, DateTime, Integer, Text
 import base.common.orm
 
 
 class MailQueue(base.common.orm.sql_base):
 
     __tablename__ = 'mail_queue'
+    __table_args__ = {'sqlite_autoincrement': True}
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     subject = Column(String(128), index=True, nullable=False)
     sender_name = Column(String(128), nullable=False)
     sender = Column(String(128), index=True, nullable=False)

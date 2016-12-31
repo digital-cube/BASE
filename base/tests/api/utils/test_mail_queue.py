@@ -7,28 +7,6 @@ import base.application.lookup.responses as msgs
 
 class TestMailQueue(TestBase):
 
-    # def _set_option(self):
-    #
-    #     _msg = '<h1>this message is a test</h1></br><p>we just need to check if this mail is properly saved</p>'
-    #     _b = {
-    #          'sender': 'user@test.loc',
-    #          'sender_name': 'test user',
-    #          'receiver': 'receiver@test.loc',
-    #          'receiver_name': 'receive user',
-    #          'subject': 'test email subject',
-    #          'message': _msg,
-    #          # 'data': '',
-    #          # 'get_data': '',
-    #     }
-    #
-    #     body = json.dumps(_b)
-    #     headers = {'Authorization': self.token}
-    #     res = self.fetch('/mail', method='PUT', body=body, headers=headers)
-    #
-    #     self.assertEqual(res.code, 204)
-    #     res = res.body.decode('utf-8')
-    #     res = json.loads(res)
-    #
     def test_save_mail_unauthorized(self):
 
         _msg = '<h1>this message is a test</h1></br><p>we just need to check if this mail is properly saved</p>'

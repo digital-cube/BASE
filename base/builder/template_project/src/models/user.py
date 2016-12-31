@@ -31,7 +31,7 @@ class User(base.common.orm.sql_base):
     __tablename__ = 'users'
 
     id = Column(String(10), ForeignKey(AuthUser.id), primary_key=True)
-    first_name = Column(String(64), index=True)
+    first_name = Column(String(64))
     last_name = Column(String(64))
     data = Column(Text)
     auth_user = relationship("AuthUser", back_populates="user")

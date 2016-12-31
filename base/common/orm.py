@@ -1,3 +1,4 @@
+import os
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -59,9 +60,13 @@ class orm_builder(object):
         self.__orm.session().commit()
 
     def clear_database(self):
-        __meta = sqlalchemy.MetaData(self.__orm.engine())
-        __meta.reflect()
-        __meta.drop_all()
+        if self.__orm.engine().name == 'sqlite':
+            _db_name = self.__orm.db_url()[len('sqlite:///'):]
+            os.remove(_db_name)
+        else:
+            __meta = sqlalchemy.MetaData(self.__orm.engine())
+            __meta.reflect()
+            __meta.drop_all()
 
     def orm(self):
         return self.__orm
