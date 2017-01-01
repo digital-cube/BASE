@@ -7,6 +7,7 @@ from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
 from base.application.components import authenticated
+from base.application.helpers.exceptions import MailQueueError
 
 import base.application.lookup.responses as msgs
 
@@ -41,8 +42,8 @@ class MailQueue(Base):
 
         try:
             id_message = api_hooks.save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data)
-        except:
-            log.critical('Error save mail queue')
+        except MailQueueError as e:
+            log.critical('Error save mail queue: {}'.format(e))
             return self.error(msgs.SAVE_MAIL_QUEUE_ERROR)
 
         if get_data:
@@ -52,8 +53,39 @@ class MailQueue(Base):
 
     @params(
         {'name': 'id_message', 'type': int, 'required': True,  'doc': 'message id'},
+        {'name': 'sent', 'type': bool, 'required': False,  'doc': 'message is sent'},
+        {'name': 'data', 'type': 'json', 'required': False,  'doc': 'message data to update'},
     )
-    def patch(self, id_message):
+    def patch(self, id_message, sent, data):
+
+        # TODO test this call
+        MQ, _session = base.common.orm.get_orm_model('mail_queue')
+
+        q = _session.query(MQ).filter(MQ.id == id_message)
+
+        if q.count() == 0:
+            log.warning('No message with id {} found'.format(id_message))
+            return self.error(msgs.MESSAGE_NOT_FOUND)
+
+        msg = q.one()
+        _commit = False
+        if sent is not None:
+            msg.sent = sent
+            _commit = True
+
+        if data is not None:
+            try:
+                msg_data = json.loads(msg.data)
+            except json.JSONDecodeError as e:
+                log.error('Error loading message {} data {}: {}'.format(id_message, msg.data, e))
+                msg_data = {}
+
+            msg_data.update(data)
+            msg.data = json.dumps(msg_data)
+            _commit = True
+
+        if _commit:
+            _session.commit()
 
         return self.ok()
 

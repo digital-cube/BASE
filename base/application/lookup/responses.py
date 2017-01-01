@@ -33,6 +33,7 @@ PRE_LOGOUT_ERROR = 30
 POST_LOGOUT_ERROR = 31
 ERROR_USER_PRE_REGISTER = 32
 CHECK_USER_ERROR = 33
+MESSAGE_NOT_FOUND = 34
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -68,6 +69,7 @@ lmap[PRE_LOGOUT_ERROR] = 'Pre logout error'
 lmap[POST_LOGOUT_ERROR] = 'Post logout error'
 lmap[ERROR_USER_PRE_REGISTER] = 'Pre register error'
 lmap[CHECK_USER_ERROR] = 'Check user error'
+lmap[MESSAGE_NOT_FOUND] = 'Message not found'
 
 lrev = {}
 for k in lmap:

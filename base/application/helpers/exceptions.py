@@ -84,3 +84,8 @@ class PostLogoutException(Exception):
 class CheckUserError(Exception):
     """Check user error exception"""
     pass
+
+
+class MailQueueError(Exception):
+    """Create mail queue error execption"""
+    pass
