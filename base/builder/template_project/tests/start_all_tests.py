@@ -6,6 +6,7 @@ import unittest
 # import tornado.testing
 # from unittest import TestSuite
 
+from base.tests.api.user.test_user_change_password import TestUserChangePassword
 from base.tests.api.user.test_user_forgot_password import TestUserForgot
 from base.tests.api.user.test_user_login import TestUserLogin
 from base.tests.api.user.test_user_logout import TestUserLogout
