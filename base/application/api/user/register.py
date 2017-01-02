@@ -14,7 +14,7 @@ def user_exists(username, AuthUser, _session):
 
 
 @api(
-    URI='/register',
+    URI='/user/register',
     PREFIX=False)
 class Register(Base):
 

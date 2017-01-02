@@ -14,16 +14,9 @@ import base.application.lookup.responses as msgs
 
 @authenticated()
 @api(
-    URI='/mail',
+    URI='/tools/mail',
     PREFIX=False)
 class MailQueue(Base):
-
-    @params(
-        {'name': 'id_message', 'type': int, 'required': True,  'doc': 'message id'},
-    )
-    def get(self, id_message):
-
-        return self.ok()
 
     @params(
         {'name': 'sender', 'type': str, 'required': True,  'doc': 'message sender email address'},
@@ -50,6 +43,13 @@ class MailQueue(Base):
             return self.ok({'id_message': id_message})
 
         return self.ok()
+
+
+@authenticated()
+@api(
+    URI='/tools/mail/:id_message',
+    PREFIX=False)
+class MailQueueHandle(Base):
 
     @params(
         {'name': 'id_message', 'type': int, 'required': True,  'doc': 'message id'},
@@ -88,4 +88,19 @@ class MailQueue(Base):
             _session.commit()
 
         return self.ok()
+
+    @params(
+        {'name': 'id_message', 'type': int, 'required': True,  'doc': 'message id'},
+    )
+    def get(self, id_message):
+
+        from base.application.api import api_hooks
+
+        try:
+            _message_data = api_hooks.get_mail_from_queue(id_message)
+        except MailQueueError as e:
+            log.critical('Error save mail queue: {}'.format(e))
+            return self.error(msgs.SAVE_MAIL_QUEUE_ERROR)
+
+        return self.ok(_message_data)
 

@@ -8,7 +8,7 @@ class Options(base.common.orm.sql_base):
     __tablename__ = 'options'
 
     id = Column(Integer, primary_key=True)
-    key = Column(String(64), nique=True, nullable=False)
+    key = Column(String(64), unique=True, nullable=False)
     value = Column(String(64), nullable=False)
 
     def __init__(self, key, value):

@@ -14,7 +14,7 @@ from base.application.helpers.exceptions import GetHash2ParamsException
 
 @authenticated()
 @api(
-    URI='/h2p',
+    URI='/tools/h2p',
     PREFIX=False)
 class Hash2Params(Base):
 
@@ -35,7 +35,7 @@ class Hash2Params(Base):
 
 @authenticated()
 @api(
-    URI='/h2p/:h2p',
+    URI='/tools/h2p/:h2p',
     PREFIX=False)
 class Hash2ParamsGet(Base):
 

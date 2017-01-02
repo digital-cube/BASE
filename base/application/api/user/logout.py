@@ -11,7 +11,7 @@ from base.application.helpers.exceptions import PostLogoutException
 
 @authenticated()
 @api(
-    URI='/logout',
+    URI='/user/logout',
     PREFIX=False)
 class Logout(Base):
 

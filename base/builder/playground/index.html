@@ -1,0 +1,402 @@
+<html>
+    <head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>playground</h1>
+        <p id="info"></p>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input1_address">address:</label>
+                <input type="text" class="address-input" id="input1_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input1_token" placeholder="token"/>
+            </div>
+			<div class="item-controls">
+				<textarea class="left" id="input1"></textarea>
+				<button id="input1_submit" >submit</button>
+				<textarea class="right" id="input1_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input2_address">address:</label>
+			    <input type="text" class="address-input" id="input2_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input2_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input2"></textarea>
+				<button id="input2_submit" >submit</button>
+				<textarea class="right" id="input2_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input3_address">address:</label>
+			    <input type="text" class="address-input" id="input3_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input3_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input3"></textarea>
+				<button id="input3_submit" >submit</button>
+				<textarea class="right" id="input3_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input4_address">address:</label>
+			    <input type="text" class="address-input" id="input4_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input4_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input4"></textarea>
+				<button id="input4_submit" >submit</button>
+				<textarea class="right" id="input4_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input5_address">address:</label>
+			    <input type="text" class="address-input" id="input5_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input5_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input5"></textarea>
+				<button id="input5_submit" >submit</button>
+				<textarea class="right" id="input5_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input6_address">address:</label>
+			    <input type="text" class="address-input" id="input6_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input6_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input6"></textarea>
+				<button id="input6_submit" >submit</button>
+				<textarea class="right" id="input6_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input7_address">address:</label>
+			    <input type="text" class="address-input" id="input7_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input7_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input7"></textarea>
+				<button id="input7_submit" >submit</button>
+				<textarea class="right" id="input7_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input8_address">address:</label>
+			    <input type="text" class="address-input" id="input8_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input8_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input8"></textarea>
+				<button id="input8_submit" >submit</button>
+				<textarea class="right" id="input8_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        -<div class="play-item">
+            <div class="settings">
+                <label for="input9_address">address:</label>
+			    <input type="text" class="address-input" id="input9_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input9_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input9"></textarea>
+				<button id="input9_submit" >submit</button>
+				<textarea class="right" id="input9_res" placeholder="result"></textarea>
+			</div>
+        </div>
+        <div class="play-item">
+            <div class="settings">
+                <label for="input10_address">address:</label>
+			    <input type="text" class="address-input" id="input10_address" placeholder="api address"/>
+                <input type="text" class="token-input" id="input10_token" placeholder="token"/>
+			</div>
+			<div class="item-controls">
+				<textarea class="left" id="input10"></textarea>
+				<button id="input10_submit" >submit</button>
+				<textarea class="right" id="input10_res" placeholder="result"></textarea>
+            </div>
+        </div>
+    </body>
+<style>
+	.play-item {
+		display: flex;
+		flex-direction: column;
+        border-bottom: 1px solid black;
+        margin-bottom: 1em;
+	}
+	.settings {
+		margin-bottom: 0.5em;
+	}
+	.settings input {
+        width: 40%;
+	}
+	.item-controls {
+		display: flex;
+		justify-content: space-between;
+        align-items: center;
+	}
+	textarea {
+		height: 4em;
+		width: 40%;
+	}
+	button {
+		width: 8%;
+		text-overflow: ellipsis;
+    	overflow: hidden;
+	}
+    .error {
+        color: red;
+    }
+    .success {
+        color: green;
+    }
+
+</style>
+
+<script>
+	var set_up = function() {
+		console.log('FUCK');
+        // REGISTER
+		$('#input1_address').val('/user/register');
+        $('#input1').val(JSON.stringify({"username":"user@test.loc","password":"123", "data":"{}"}));
+        // LOGIN
+		$('#input2_address').val('/user/login');
+        $('#input2').val(JSON.stringify({"username":"user@test.loc","password":"123"}));
+        // LOGOUT
+		$('#input3_address').val('/user/logout');
+        $('#input3').val(JSON.stringify({}));
+        // SET OPTION
+		$('#input4_address').val('/tools/option/test_key');
+        $('#input4').val(JSON.stringify({"value":"123"}));
+        // GET OPTION
+		$('#input5_address').val('/tools/option/test_key');
+        $('#input5').val(JSON.stringify({}));
+        // SET HASH
+		$('#input6_address').val('/tools/h2p');
+        $('#input6').val(JSON.stringify({"data":{"cmd":"custom cmd","additional_data":"additional"}}));
+        // GET HASH
+		$('#input7_address').val('/tools/h2p/put-the-hash-here');
+        $('#input7').val(JSON.stringify({}));
+        // SAVE MAIL QUEUE
+		$('#input8_address').val('/tools/mail');
+        $('#input8').val(JSON.stringify({
+            "sender":"sender@test.loc",
+            "sender_name":"sender",
+            "receiver":"receiver@test.loc",
+            "receiver_name":"receiver",
+            "subject":"test mail",
+            "message":"test message body",
+            "data": {"additional":"test_data"},
+            "get_data": true
+        }));
+        // SET MAIL QUEUE DATA
+		$('#input9_address').val('/tools/mail/put-message-id-here');
+        $('#input9').val(JSON.stringify({"sent":true, "data":{"additional":"additional data"}}));
+        // // GET MAIL QUEUE 
+		$('#input10_address').val('/tools/mail/put-message-id-here');
+        $('#input10').val(JSON.stringify({}));
+	}
+	var shoot = function(url, data, method, on_success, on_error, token) {
+		var _headers = {};
+		if (token) {
+			_headers.authorization = token;
+		}
+        var _settings =  {
+			url: url,
+			data: data,
+            method: method,
+			dataType: 'json',
+			headers: _headers
+		};
+        console.log('SETTINGS', _settings);
+        $.ajax(_settings).done( function(res) {
+            reset_info();
+            if (on_success && typeof on_success === 'function') {
+                on_success(res);
+            }
+        }).fail( function(res) {
+            if (on_error && typeof on_error === 'function') {
+                on_error(res);
+            }
+        });
+	}
+
+    var call_error = function(res) {
+        console.log('ERROR', res);
+        $('#info').html(JSON.stringify(res));
+        $('#info').addClass('error');
+    }
+
+    var reset_info = function() {
+        $('#info').html('');
+        $('#info').removeClass('error');
+        $('#info').removeClass('success');
+    }
+
+    var register_ok = function(res) {
+        console.log('SUCCESS REGISER', res);
+        $('#input1_res').val(JSON.stringify(res));
+        $(document).trigger('set-token', [res.token]);
+    }
+
+	var register = function() {
+		var _userdata = $('#input1').val();
+		var _url = $('#input1_address').val();
+		console.log('FUCK', _userdata, _url);
+        shoot(_url, _userdata, 'POST', register_ok, call_error);
+	}
+
+    var login_ok = function(res)  {
+        console.log('SUCCESS LOGIN', res);
+        $('#input2_res').val(JSON.stringify(res));
+        $(document).trigger('set-token', [res.token]);
+    }
+
+    var login = function() {
+		var _userdata = $('#input2').val();
+		var _url = $('#input2_address').val();
+		console.log('FUCK', _userdata, _url);
+        shoot(_url, _userdata, 'POST', login_ok, call_error);
+	}
+	
+    var logout_ok = function(res)  {
+        console.log('SUCCESS LOGIN', res);
+        $('#input3_res').val('204, LOGIN SUCCESS');
+    }
+    var logout = function() {
+		var _userdata = $('#input3').val();
+		var _url = $('#input3_address').val();
+        var _token = $('#input3_token').val();
+		console.log('FUCK', _userdata, _url, _token);
+        shoot(_url, _userdata, 'POST', logout_ok, call_error, _token);
+	}
+
+    var set_token = function (event, token) {
+        $('#input3_token').val(token);
+        $('#input4_token').val(token);
+        $('#input5_token').val(token);
+        $('#input6_token').val(token);
+        $('#input7_token').val(token);
+        $('#input8_token').val(token);
+        $('#input9_token').val(token);
+        $('#input10_token').val(token);
+    }
+
+    var set_option_ok = function(res) {
+        console.log('SUCCESS SET OPTION', res);
+        $('#input4_res').val(JSON.stringify(res));
+    }
+
+    var set_option = function() {
+		var _userdata = $('#input4').val();
+		var _url = $('#input4_address').val();
+        var _token = $('#input4_token').val();
+		console.log('FUCK', _userdata, _url, _token);
+        shoot(_url, _userdata, 'PUT', set_option_ok, call_error, _token);
+    }
+	
+    var get_option_ok = function(res) {
+        console.log('SUCCESS GET OPTION', res);
+        $('#input5_res').val(JSON.stringify(res));
+    }
+
+    var get_option = function() {
+		var _userdata = $('#input5').val();
+		var _url = $('#input5_address').val();
+        var _token = $('#input5_token').val();
+		console.log('FUCK', _userdata, _url, _token);
+        shoot(_url, _userdata, 'GET', get_option_ok, call_error, _token);
+    }
+	
+    var set_hash_ok = function(res) {
+        console.log('SUCCESS SET HASH', res);
+        $('#input6_res').val(JSON.stringify(res));
+    }
+
+    var set_hash = function() {
+		var _userdata = $('#input6').val();
+		var _url = $('#input6_address').val();
+        var _token = $('#input6_token').val();
+		console.log('FUCK', _userdata, _url, _token);
+        shoot(_url, _userdata, 'PUT', set_hash_ok, call_error, _token);
+    }
+
+    var get_hash_ok = function(res) {
+        console.log('SUCCESS GET HASH', res);
+        $('#input7_res').val(JSON.stringify(res));
+    }
+
+    var get_hash = function() {
+		var _userdata = $('#input7').val();
+		var _url = $('#input7_address').val();
+        var _token = $('#input7_token').val();
+		console.log('FUCK', _userdata, _url, _token);
+        shoot(_url, _userdata, 'GET', get_hash_ok, call_error, _token);
+    }
+
+    var save_mail_ok = function(res) {
+        console.log('SUCCESS SAVE MAIL', res);
+        $('#input8_res').val(res ? JSON.stringify(res) : '204, SAVE MAIL SUCCESS');
+    }
+
+    var save_mail = function() {
+		var _userdata = $('#input8').val();
+		var _url = $('#input8_address').val();
+        var _token = $('#input8_token').val();
+		console.log('FUCK', _userdata, _url, _token);
+        shoot(_url, _userdata, 'PUT', save_mail_ok, call_error, _token);
+    }
+
+    var save_mail_data_ok = function(res) {
+        console.log('SUCCESS SAVE MAIL DATA', res);
+        $('#input9_res').val('204, SAVE MAIL DATA SUCCESS');
+    }
+
+    var save_mail_data = function() {
+		var _userdata = $('#input9').val();
+		var _url = $('#input9_address').val();
+        var _token = $('#input9_token').val();
+		console.log('FUCK', _userdata, _url, _token);
+        shoot(_url, _userdata, 'PATCH', save_mail_data_ok, call_error, _token);
+    }
+
+    var get_mail_ok = function(res) {
+        console.log('SUCCESS GET MAIL DATA', res);
+        $('#input10_res').val(JSON.stringify(res));
+    }
+
+    var get_mail = function() {
+		var _userdata = $('#input10').val();
+		var _url = $('#input10_address').val();
+        var _token = $('#input10_token').val();
+		console.log('FUCK', _userdata, _url, _token);
+        shoot(_url, _userdata, 'GET', get_mail_ok, call_error, _token);
+    }
+
+
+	$(document).ready(function() {
+		set_up();
+        $(document).on('set-token',set_token);
+		$('#input1_submit').on('click', register);
+		$('#input2_submit').on('click', login);
+		$('#input3_submit').on('click', logout);
+		$('#input4_submit').on('click', set_option);
+		$('#input5_submit').on('click', get_option);
+		$('#input6_submit').on('click', set_hash);
+		$('#input7_submit').on('click', get_hash);
+		$('#input8_submit').on('click', save_mail);
+		$('#input9_submit').on('click', save_mail_data);
+		$('#input10_submit').on('click', get_mail);
+	}
+);
+</script>
+</html>

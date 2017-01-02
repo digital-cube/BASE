@@ -14,7 +14,7 @@ from base.application.components import authenticated
 
 
 @api(
-    URI='/login',
+URI='/user/login',
     PREFIX=False)
 class Login(Base):
 

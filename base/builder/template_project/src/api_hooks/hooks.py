@@ -38,6 +38,8 @@ post_logout_process(Auth_user) -> [dict, None]
         - post logout data processing
 check_user(Auth_user) -> [dict]
         - check user process
+get_mail_from_queue(id_message) -> [dict]
+        - get mail data
 """
 
 hooks = [
@@ -52,9 +54,10 @@ hooks = [
     # 'save_hash',
     # 'get_hash_data',
     # 'save_mail_queue',
-    # 'pre_logout_process'
-    # 'post_logout_process'
-    # 'check_user'
+    # 'pre_logout_process',
+    # 'post_logout_process',
+    # 'check_user',
+    # 'get_mail_from_queue',
 ]
 
 

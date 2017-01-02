@@ -34,6 +34,8 @@ post_logout_process(Auth_user) -> [dict, None]
         - post logout data processing
 check_user(Auth_user) -> [dict]
         - check user process
+get_mail_from_queue(id_message) -> [dict]
+        - get mail data
 """
 
 import json
@@ -263,6 +265,41 @@ def save_mail_queue(sender, sender_name, receiver, receiver_name, subject, messa
     _session.commit()
 
     return mail_queue.id
+
+
+def get_mail_from_queue(id_message):
+    """
+    Get message data from queue table by message id
+    :param id_message: id of the message to retrieve
+    :return: message data dictionary
+    """
+
+    import base.common.orm
+    MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
+
+    q = _session.query(MailQueue).filter(MailQueue.id == id_message)
+
+    res = {}
+
+    if q.count() == 0:
+        log.info('No message with id {} found'.format(id_message))
+        return {}
+
+    msg = q.one()
+
+    res['sender'] = msg.sender
+    res['sender_name'] = msg.sender_name
+    res['receiver'] = msg.receiver
+    res['receiver_name'] = msg.receiver_name
+    res['subject'] = msg.subject
+    res['message'] = msg.message
+    res['created'] = str(msg.time_created)
+    res['sent'] = msg.sent
+    if msg.sent:
+        res['time_sent'] = str(msg.time_sent)
+    res['data'] = msg.data
+
+    return res
 
 # END OF E-MAIL QUEUE
 

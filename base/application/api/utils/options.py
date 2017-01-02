@@ -12,7 +12,7 @@ import base.application.lookup.responses as msgs
 
 @authenticated()
 @api(
-    URI='/option/:key',
+    URI='/tools/option/:key',
     PREFIX=False)
 class Options(Base):
 
