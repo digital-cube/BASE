@@ -20,6 +20,7 @@ from base.config.settings import app_builder_description
 from base.config.settings import app_subcommands_title
 from base.config.settings import app_subcommands_description
 from base.config.settings import db_init_warning
+from base.config.settings import playground_usage
 from base.application.lookup import exit_status
 
 import base.common.orm
@@ -56,6 +57,8 @@ def pars_command_line_arguments():
 
     db_init_parser = subparsers.add_parser('db_show_create', help="show sql create table query")
     db_init_parser.add_argument('table_name', type=str, help=app['table_name'][1])
+
+    db_init_parser = subparsers.add_parser('playground', help="create api playground frontend with nginx virtual host")
 
     return argparser.parse_args()
 
@@ -110,15 +113,7 @@ def _configure_project(args, destination, additions_dir):
                 _new_config.write(_line)
 
 
-def _build_project(args):
-
-    if not args.name:
-        print("CRITICAL: missing project's name, check for option -n")
-        sys.exit(exit_status.MISSING_PROJECT_NAME)
-
-    if not os.path.isdir(args.destination):
-        print("CRITICAL: missing project's name, check for option -n")
-        sys.exit(exit_status.MISSING_PROJECT_DESTINATION)
+def _get_install_directory():
 
     try:
         _site_dir = site.getsitepackages()
@@ -129,9 +124,10 @@ def _build_project(args):
         ''')
         sys.exit(exit_status.MISSING_SOURCE_DIRECTORY)
 
-    dir_path = '{}/{}'.format(args.destination, args.name)
-    source_dir = '{}/base/builder/{}'.format(_site_dir[0], template_project_folder)
-    additions_dir = '{}/base/builder/{}'.format(_site_dir[0], project_additional_folder)
+    return _site_dir
+
+
+def _create_directory(dir_path):
 
     try:
         os.mkdir(dir_path)
@@ -141,6 +137,23 @@ def _build_project(args):
     except PermissionError as e:
         print('Can not create {} directory, insufficient permissions'.format(dir_path))
         sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
+
+
+def _build_project(args):
+
+    if not args.name:
+        print("CRITICAL: missing project's name, check for option -n")
+        sys.exit(exit_status.MISSING_PROJECT_NAME)
+
+    if not os.path.isdir(args.destination):
+        print("CRITICAL: missing project's name, check for option -n")
+        sys.exit(exit_status.MISSING_PROJECT_DESTINATION)
+
+    _site_dir = _get_install_directory()
+    dir_path = '{}/{}'.format(args.destination, args.name)
+    source_dir = '{}/base/builder/{}'.format(_site_dir[0], template_project_folder)
+    additions_dir = '{}/base/builder/{}'.format(_site_dir[0], project_additional_folder)
+    _create_directory(dir_path)
 
     copy_template(source_dir, dir_path, args.name)
 
@@ -335,6 +348,25 @@ def _show_create_table(args):
     print(_create_table_query)
 
 
+def _create_playground(parsed_args):
+
+    _playground = 'playground'
+
+    _site_dir = _get_install_directory()
+    source_dir = '{}/base/builder/{}'.format(_site_dir[0], _playground)
+
+    try:
+        shutil.copytree(source_dir, _playground)
+    except FileExistsError as e:
+        print('Directory {} already exists, please rename/remove existing one'.format(_playground))
+        sys.exit(exit_status.PROJECT_DIRECTORY_ALREADY_EXISTS)
+    except PermissionError as e:
+        print('Can not create {} directory, insufficient permissions'.format(_playground))
+        sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
+
+    print(playground_usage)
+
+
 def execute_builder_cmd():
 
     parsed_args = pars_command_line_arguments()
@@ -347,3 +379,6 @@ def execute_builder_cmd():
 
     if parsed_args.cmd == 'db_show_create':
         _show_create_table(parsed_args)
+
+    if parsed_args.cmd == 'playground':
+        _create_playground(parsed_args)

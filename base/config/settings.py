@@ -45,3 +45,18 @@ log_directory = '/var/log/base'
 log_filename = '{}/base_v1.log'.format(log_directory)
 log_logger = 'BASEv1'
 log = None
+
+playground_usage = '''
+playground created...
+
+#################################################
+#                                               #
+#                     I N F O                   #
+#                                               #
+#   Copy playground/playground nginx virtual    #
+#   host file to nginx configuration or nginx   #
+#   sites available folder path, and make       #
+#   changes to suits playground needs.          #
+#                                               #
+#################################################
+'''
