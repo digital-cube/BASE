@@ -36,6 +36,8 @@ check_user(Auth_user) -> [dict]
         - check user process
 get_mail_from_queue(id_message) -> [dict]
         - get mail data
+forgot_password(AuthUser, data) -> [bool]
+        - save forgot password request and message
 """
 
 import json
@@ -169,6 +171,7 @@ def check_user(auth_user):
 
     return res
 
+
 # END OF THE LOGIN USER PROCESS
 
 
@@ -301,6 +304,49 @@ def get_mail_from_queue(id_message):
 
     return res
 
+
 # END OF E-MAIL QUEUE
 
+# FORGOT PASSWORD
 
+def forgot_password(auth_user, data):
+    _data = {
+        'cmd': 'forgot_password',
+        'username': auth_user.username,
+        'id_user': auth_user.id,
+    }
+
+    if data and isinstance(data, dict):
+        _data.update(data)
+
+    try:
+        _hash = save_hash(_data)
+    except SaveHash2ParamsException as e:
+        log.critical('Error save hash for forgot password with data: {}; error: {}'.format(_data, e))
+        return False
+
+    _hash = _hash['h2p']
+
+    from base.config.application_config import support_mail_address
+    from base.config.application_config import support_name
+    from base.config.application_config import forgot_password_message
+    from base.config.application_config import forgot_password_message_subject
+    from base.config.application_config import forgot_password_lending_address
+    _receiver_name = auth_user.user.first_name \
+        if hasattr(auth_user.user, 'first_name') and auth_user.user.first_name else auth_user.username
+    _forgot_address = '{}/{}'.format(forgot_password_lending_address, _hash)
+    _message = forgot_password_message.format(_forgot_address)
+
+    save_mail_queue(
+        support_mail_address,
+        support_name,
+        auth_user.username,
+        _receiver_name,
+        forgot_password_message_subject,
+        _message,
+        None)
+
+    return True
+
+
+# END OF FORGOT PASSWORD

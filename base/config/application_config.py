@@ -18,6 +18,7 @@ orm_models = {}
 imports = [
     'base.application.api.user.login',
     'base.application.api.user.logout',
+    'base.application.api.user.forgot',
     'base.application.api.user.register',
     'base.application.api.utils.options',
     'base.application.api.utils.hash2params',
@@ -25,4 +26,17 @@ imports = [
 ]
 session_storage = 'DB'
 user_roles_module = 'src.lookup.user_roles'
+support_mail_address = 'support@test.loc'
+support_name = 'support@test'
+forgot_password_lending_address = 'http://localhost:8802/user/password/change'
+forgot_password_message_subject = 'Forgot password request'
+forgot_password_message = '''
+We have received request for reset Your password.
+Please follow the link bellow to set Your new password:
+{}
+
+If You didn't request password change, please ignore this message.
+
+Best Regards
+'''
 

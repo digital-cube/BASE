@@ -66,6 +66,18 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'user_roles_module', src.config.app_config.user_roles_module)
     if hasattr(src.config.app_config, 'strong_password'):
         setattr(base.config.application_config, 'strong_password', src.config.app_config.strong_password)
+    if hasattr(src.config.app_config, 'support_mail_address'):
+        setattr(base.config.application_config, 'support_mail_address', src.config.app_config.support_mail_address)
+    if hasattr(src.config.app_config, 'support_name'):
+        setattr(base.config.application_config, 'support_name', src.config.app_config.support_name)
+    if hasattr(src.config.app_config, 'forgot_password_message_subject'):
+        setattr(base.config.application_config, 'forgot_password_message_subject',
+                src.config.app_config.forgot_password_message_subject)
+    if hasattr(src.config.app_config, 'forgot_password_message'):
+        setattr(base.config.application_config, 'forgot_password_message',
+                src.config.app_config.forgot_password_message)
+    if hasattr(src.config.app_config, 'forgot_password_lending_address'):
+        setattr(base.config.application_config, 'forgot_password_lending_address', src.config.app_config.forgot_password_lending_address)
 
 
 def load_lookups():

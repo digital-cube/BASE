@@ -40,6 +40,8 @@ check_user(Auth_user) -> [dict]
         - check user process
 get_mail_from_queue(id_message) -> [dict]
         - get mail data
+forgot_password(AuthUser, data) -> [bool]
+        - save forgot password request and message
 """
 
 hooks = [
@@ -58,6 +60,7 @@ hooks = [
     # 'post_logout_process',
     # 'check_user',
     # 'get_mail_from_queue',
+    # 'forgot_password',
 ]
 
 

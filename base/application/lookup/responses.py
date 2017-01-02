@@ -34,6 +34,8 @@ POST_LOGOUT_ERROR = 31
 ERROR_USER_PRE_REGISTER = 32
 CHECK_USER_ERROR = 33
 MESSAGE_NOT_FOUND = 34
+USER_NOT_FOUND = 35
+FORGOT_REQUEST_ERROR = 36
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -70,6 +72,8 @@ lmap[POST_LOGOUT_ERROR] = 'Post logout error'
 lmap[ERROR_USER_PRE_REGISTER] = 'Pre register error'
 lmap[CHECK_USER_ERROR] = 'Check user error'
 lmap[MESSAGE_NOT_FOUND] = 'Message not found'
+lmap[USER_NOT_FOUND] = 'User not found'
+lmap[FORGOT_REQUEST_ERROR] = 'Forgot reqeust error'
 
 lrev = {}
 for k in lmap:
