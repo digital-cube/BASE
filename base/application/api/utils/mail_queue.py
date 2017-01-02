@@ -58,7 +58,6 @@ class MailQueueHandle(Base):
     )
     def patch(self, id_message, sent, data):
 
-        # TODO test this call
         MQ, _session = base.common.orm.get_orm_model('mail_queue')
 
         q = _session.query(MQ).filter(MQ.id == id_message)
@@ -74,10 +73,14 @@ class MailQueueHandle(Base):
             _commit = True
 
         if data is not None:
+
             try:
                 msg_data = json.loads(msg.data)
             except json.JSONDecodeError as e:
                 log.error('Error loading message {} data {}: {}'.format(id_message, msg.data, e))
+                msg_data = {}
+            except TypeError as e:
+                log.warning('Message {} missing data {}: {}'.format(id_message, msg.data, e))
                 msg_data = {}
 
             msg_data.update(data)
@@ -101,6 +104,9 @@ class MailQueueHandle(Base):
         except MailQueueError as e:
             log.critical('Error save mail queue: {}'.format(e))
             return self.error(msgs.SAVE_MAIL_QUEUE_ERROR)
+
+        if not _message_data:
+            return self.error(msgs.MESSAGE_NOT_FOUND)
 
         return self.ok(_message_data)
 

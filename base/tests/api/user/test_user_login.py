@@ -18,7 +18,7 @@ class TestUserLogin(TestBase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/login', method='POST', body=body)
+        res = self.fetch('/user/login', method='POST', body=body)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -37,7 +37,7 @@ class TestUserLogin(TestBase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/login', method='POST', body=body)
+        res = self.fetch('/user/login', method='POST', body=body)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -56,7 +56,7 @@ class TestUserLogin(TestBase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/login', method='POST', body=body)
+        res = self.fetch('/user/login', method='POST', body=body)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -75,7 +75,7 @@ class TestUserLogin(TestBase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/login', method='POST', body=body)
+        res = self.fetch('/user/login', method='POST', body=body)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -87,7 +87,7 @@ class TestUserLogin(TestBase):
         token = res['token']
 
         headers = {'Authorization': token}
-        res = self.fetch('/login', method='GET', body=None, headers=headers)
+        res = self.fetch('/user/login', method='GET', body=None, headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -110,7 +110,7 @@ class TestUserLogin(TestBase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/login', method='POST', body=body)
+        res = self.fetch('/user/login', method='POST', body=body)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -122,11 +122,11 @@ class TestUserLogin(TestBase):
         headers = {'Authorization': token}
 
         body = json.dumps({})
-        res = self.fetch('/logout', method='POST', body=body, headers=headers)
+        res = self.fetch('/user/logout', method='POST', body=body, headers=headers)
         self.assertEqual(res.code, 204)
         self.assertEqual(res.body, b'')
 
-        res = self.fetch('/login', method='GET', body=None, headers=headers)
+        res = self.fetch('/user/login', method='GET', body=None, headers=headers)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')

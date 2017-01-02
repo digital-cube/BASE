@@ -35,7 +35,7 @@ class TestBase(AsyncHTTPTestCase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/register', method='POST', body=body)
+        res = self.fetch('/user/register', method='POST', body=body)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')

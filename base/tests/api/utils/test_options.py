@@ -14,7 +14,7 @@ class TestOptions(TestBase):
         }
         body = json.dumps(_b)
         headers = {'Authorization': self.token}
-        res = self.fetch('/option/test_option', method='PUT', body=body, headers=headers)
+        res = self.fetch('/tools/option/test_option', method='PUT', body=body, headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -30,7 +30,7 @@ class TestOptions(TestBase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/option/test_option', method='PUT', body=body)
+        res = self.fetch('/tools/option/test_option', method='PUT', body=body)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -48,7 +48,7 @@ class TestOptions(TestBase):
         }
         body = json.dumps(_b)
         headers = {'Authorization': self.token}
-        res = self.fetch('/option/test_option', method='PUT', body=body, headers=headers)
+        res = self.fetch('/tools/option/test_option', method='PUT', body=body, headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -63,7 +63,7 @@ class TestOptions(TestBase):
         self._set_option()
 
         headers = {'Authorization': self.token}
-        res = self.fetch('/option/test_option', method='GET', headers=headers)
+        res = self.fetch('/tools/option/test_option', method='GET', headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -78,7 +78,7 @@ class TestOptions(TestBase):
         self._set_option()
 
         headers = {'Authorization': self.token}
-        res = self.fetch('/option/test_option_not_exists', method='GET', headers=headers)
+        res = self.fetch('/tools/option/test_option_not_exists', method='GET', headers=headers)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')

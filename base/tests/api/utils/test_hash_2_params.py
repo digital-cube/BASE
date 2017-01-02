@@ -15,7 +15,7 @@ class TestHash2Params(TestBase):
         }
         body = json.dumps(_b)
         headers = {'Authorization': self.token}
-        res = self.fetch('/h2p', method='PUT', body=body, headers=headers)
+        res = self.fetch('/tools/h2p', method='PUT', body=body, headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -31,7 +31,7 @@ class TestHash2Params(TestBase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/h2p', method='PUT', body=body)
+        res = self.fetch('/tools/h2p', method='PUT', body=body)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -49,7 +49,7 @@ class TestHash2Params(TestBase):
         }
         _body = json.dumps(_b)
         headers = {'Authorization': self.token}
-        res = self.fetch('/h2p', method='PUT', body=_body, headers=headers)
+        res = self.fetch('/tools/h2p', method='PUT', body=_body, headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -63,7 +63,7 @@ class TestHash2Params(TestBase):
         self._set_h2p()
 
         headers = {'Authorization': self.token}
-        res = self.fetch('/h2p/{}'.format(self._h2p), method='GET', headers=headers)
+        res = self.fetch('/tools/h2p/{}'.format(self._h2p), method='GET', headers=headers)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -77,7 +77,7 @@ class TestHash2Params(TestBase):
         self._register('user@test.loc', '123')
 
         headers = {'Authorization': self.token}
-        res = self.fetch('/h2p/xxx', method='GET', headers=headers)
+        res = self.fetch('/tools/h2p/xxx', method='GET', headers=headers)
 
         self.assertEqual(res.code, 204)
         res = res.body.decode('utf-8')

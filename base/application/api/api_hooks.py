@@ -283,7 +283,7 @@ def get_mail_from_queue(id_message):
 
     if q.count() == 0:
         log.info('No message with id {} found'.format(id_message))
-        return {}
+        return False
 
     msg = q.one()
 

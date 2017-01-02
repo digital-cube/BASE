@@ -17,7 +17,7 @@ class TestUserRegister(TestBase):
         }
 
         body = json.dumps(_b)
-        res = self.fetch('/register', method='POST', body=body)
+        res = self.fetch('/user/register', method='POST', body=body)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -34,13 +34,13 @@ class TestUserRegister(TestBase):
             'data': {}
         }
         body = json.dumps(_b)
-        res = self.fetch('/register', method='POST', body=body)
+        res = self.fetch('/user/register', method='POST', body=body)
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
         self.assertIn('token', res)
         self.assertIn('token_type', res)
 
-        res2 = self.fetch('/register', method='POST', body=body)
+        res2 = self.fetch('/user/register', method='POST', body=body)
         self.assertEqual(res2.code, 400)
         res2 = res2.body.decode('utf-8')
         res2 = json.loads(res2)
@@ -57,7 +57,7 @@ class TestUserRegister(TestBase):
             'data': {}
         }
         body = json.dumps(_b)
-        res = self.fetch('/register', method='POST', body=body)
+        res = self.fetch('/user/register', method='POST', body=body)
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
         res = json.loads(res)
