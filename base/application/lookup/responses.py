@@ -36,6 +36,7 @@ CHECK_USER_ERROR = 33
 MESSAGE_NOT_FOUND = 34
 USER_NOT_FOUND = 35
 FORGOT_REQUEST_ERROR = 36
+CHANGE_PASSWORD_ERROR = 37
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -73,7 +74,8 @@ lmap[ERROR_USER_PRE_REGISTER] = 'Pre register error'
 lmap[CHECK_USER_ERROR] = 'Check user error'
 lmap[MESSAGE_NOT_FOUND] = 'Message not found'
 lmap[USER_NOT_FOUND] = 'User not found'
-lmap[FORGOT_REQUEST_ERROR] = 'Forgot reqeust error'
+lmap[FORGOT_REQUEST_ERROR] = 'Forgot request error'
+lmap[CHANGE_PASSWORD_ERROR] = 'Change password error'
 
 lrev = {}
 for k in lmap:

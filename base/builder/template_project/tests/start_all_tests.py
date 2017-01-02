@@ -6,14 +6,15 @@ import unittest
 # import tornado.testing
 # from unittest import TestSuite
 
+from base.tests.api.user.test_user_forgot_password import TestUserForgot
 from base.tests.api.user.test_user_login import TestUserLogin
-from base.tests.api.user.test_user_register import TestUserRegister
 from base.tests.api.user.test_user_logout import TestUserLogout
-from base.tests.api.utils.test_options import TestOptions
+from base.tests.api.user.test_user_register import TestUserRegister
 from base.tests.api.utils.test_hash_2_params import TestHash2Params
 from base.tests.api.utils.test_mail_queue import TestMailQueue
 from base.tests.api.utils.test_mail_queue import TestMailQueueSetOptions
 from base.tests.api.utils.test_mail_queue import TestMailQueueGet
+from base.tests.api.utils.test_options import TestOptions
 
 _current_dir = os.getcwd()
 _current_dir_from_file = os.path.dirname(os.path.abspath(__file__))

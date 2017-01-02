@@ -16,6 +16,7 @@ api_hooks = None
 models = []
 orm_models = {}
 imports = [
+    'base.application.api.user.change_password',
     'base.application.api.user.login',
     'base.application.api.user.logout',
     'base.application.api.user.forgot',
