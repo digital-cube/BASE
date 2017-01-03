@@ -21,6 +21,11 @@ class MissingApplicationConfiguration(Exception):
     pass
 
 
+class MissingDatabaseConfigurationForPort(Exception):
+    """Application port database configuration missing"""
+    pass
+
+
 class UnknownDatabaseType(Exception):
     """Unknown database type provided"""
     pass

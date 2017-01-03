@@ -107,6 +107,8 @@ def _configure_project(args, destination, additions_dir):
                     _line = "app_prefix = '{}'\n".format(args.prefix)
                 if '__APP_VERSION__' in _line:
                     _line = "app_version = '{}'\n".format(args.version)
+                if '__DB_PORT_CONFIG__' in _line:
+                    _line = _line.replace('__DB_PORT_CONFIG__', '{}'.format(args.port))
                 if '__APP_DB_NAME__' in _line:
                     _line = _line.replace('__APP_DB_NAME__', "'{}'".format(args.name))
 
@@ -168,7 +170,7 @@ def _configure_database(args, src):
     import shutil
     shutil.copy2(src, tmp_f)
 
-    _tab = '    '
+    _tab = '        '
 
     with open(tmp_f) as tf:
         with open(src, 'w') as cf:
@@ -223,6 +225,12 @@ def __db_is_configured(args, test):
 
     __db_config = src.config.app_config.db_config
     __db_type = src.config.app_config.db_type
+    __port = src.config.app_config.port
+
+    if __port not in __db_config:
+        print('Missing database configuration for port: {}'.format(__port))
+        return False, False
+    __db_config = __db_config[__port]
 
     for k in __db_config:
 

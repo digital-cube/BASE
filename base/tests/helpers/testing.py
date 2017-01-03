@@ -17,7 +17,8 @@ class TestBase(AsyncHTTPTestCase):
         entries = [(BaseHandler.__URI__, BaseHandler), ]
         load_application(entries, None)
         self.orm_builder = prepare_test_database()
-        load_orm()
+        from base.config.application_config import port as svc_port
+        load_orm(svc_port)
 
         return Application(entries)
 

@@ -13,6 +13,7 @@ import base.config.application_config
 from base.application.components import SpecificationHandler
 from base.application.components import BaseHandler
 from base.application.components import PathsWriter
+from base.application.helpers.exceptions import MissingDatabaseConfigurationForPort
 from base.application.helpers.exceptions import MissingApplicationConfiguration
 from base.application.helpers.exceptions import InvalidAPIHooksModule
 from base.application.helpers.exceptions import MissingRolesLookup
@@ -181,7 +182,7 @@ def load_application(entries, svc_port):
     # FINISH LOADING APPLICATION HOOKS
 
 
-def load_orm():
+def load_orm(svc_port):
 
     import base.config.application_config
     import base.common.orm
@@ -192,6 +193,11 @@ def load_orm():
 
     __db_config = base.config.application_config.db_config
     __db_type = base.config.application_config.db_type
+
+    svc_port = int(svc_port)
+    if svc_port not in __db_config:
+        raise MissingDatabaseConfigurationForPort('Missing database configuration for port {}'.format(svc_port))
+    __db_config = __db_config[svc_port]
 
     __db_url = base.common.orm.make_database_url(__db_type, __db_config['db_name'], __db_config['db_host'],
                                             __db_config['db_port'], __db_config['db_user'], __db_config['db_password'])
