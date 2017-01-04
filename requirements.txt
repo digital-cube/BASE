@@ -4,4 +4,5 @@ redis>=2.10.5
 tornado>=4.3
 bcrypt>=2.0.0
 mandrill>=1.0.57
+oauth2client>=3.0.0
 
