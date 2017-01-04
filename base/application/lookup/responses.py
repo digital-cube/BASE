@@ -37,6 +37,7 @@ MESSAGE_NOT_FOUND = 34
 USER_NOT_FOUND = 35
 FORGOT_REQUEST_ERROR = 36
 CHANGE_PASSWORD_ERROR = 37
+NOT_ALLOWED_FROM_REMOTE = 38
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -76,6 +77,7 @@ lmap[MESSAGE_NOT_FOUND] = 'Message not found'
 lmap[USER_NOT_FOUND] = 'User not found'
 lmap[FORGOT_REQUEST_ERROR] = 'Forgot request error'
 lmap[CHANGE_PASSWORD_ERROR] = 'Change password error'
+lmap[NOT_ALLOWED_FROM_REMOTE] = 'Not allowed from remote'
 
 lrev = {}
 for k in lmap:

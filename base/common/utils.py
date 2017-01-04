@@ -1,5 +1,6 @@
 # coding= utf-8
 
+import json
 import bcrypt
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -68,3 +69,26 @@ def is_implemented(_target_class, _target_function_name, _target_function):
         return False
 
     return True
+
+
+def client_call(url, port, location, method, data, headers=None, force_json=False):
+
+    import http.client
+    import urllib.parse
+    conn = http.client.HTTPConnection(url, port)
+
+    if force_json:
+        body = json.dumps(data, ensure_ascii=False)
+        _headers = {'content-type': 'application/json'}
+    else:
+        body = urllib.parse.urlencode(data)
+        _headers = {'content-type': 'application/x-www-form-urlencoded'}
+
+    if headers:
+        _headers.update(headers)
+
+    conn.request(method, location, body, headers=_headers)
+
+    response = conn.getresponse()
+    return response.read().decode('utf-8'), response.status
+

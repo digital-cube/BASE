@@ -12,6 +12,7 @@ from functools import wraps
 
 import base.application.lookup.responses as msgs
 from base.application.helpers.exceptions import MissingApiRui
+from base.common.utils import get_request_ip
 from base.common.sequencer import sequencer
 from base.common.tokens_services import get_user_by_token
 
@@ -467,6 +468,10 @@ class params(object):
 
 
 class authenticated(object):
+    """
+    Make request handler methods available only to logged user
+    """
+
     def __init__(self, *args):
 
         self.roles = args
@@ -510,6 +515,40 @@ class authenticated(object):
                 return _target(_origin_self, *args, **kwargs)
 
             return wrapper
+
+
+class local(object):
+    """
+    Define access only to specified hosts. Default localhost
+    """
+
+    def __init__(self, host='localhost'):
+
+        self.host = host
+
+    def __call__(self, _f):
+
+        from base.common.utils import log
+
+        @wraps(_f)
+        def wrapper(_origin_self, *args, **kwargs):
+
+            remote_ip = get_request_ip(_origin_self)
+
+            _allowed = True
+            if self.host == 'localhost':
+                if remote_ip not in ['localhost', '127.0.0.1']:
+                    _allowed = False
+            elif self.host != remote_ip:
+                _allowed = False
+
+            if not _allowed:
+                log.critical('Not allowed access from {} to {} {}'.format(
+                    remote_ip, _origin_self.__class__.__name__, _f.__name__))
+                return _origin_self.error(msgs.NOT_ALLOWED_FROM_REMOTE)
+
+            return _f(_origin_self, *args, **kwargs)
+        return wrapper
 
 
 class DefaultRouteHandler(Base):
@@ -595,3 +634,4 @@ class SpecificationHandler(DefaultRouteHandler):
             self.render('templates/specification.html', spec=_api_specification)
         else:
             self.write(json.dumps(_api_specification))
+
