@@ -206,6 +206,7 @@ def change_username_success_hook(receiver, **kwargs):
 
     return True
 
+
 def forgot_password_hook(request, receiver, tk, **kwargs):
 
     message = get_email_message(request, receiver, tk)

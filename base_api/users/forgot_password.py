@@ -70,6 +70,7 @@ def do_put(username, *args, **kwargs):
 
     tk = res['h']
 
+    kwargs['db'] = _db
     if not forgot_password_hook(request, username, tk, **kwargs):
         log.critical('Error finishing username change process')
         return base_common.msg.error(msgs.ERROR_PASSWORD_RESTORE)

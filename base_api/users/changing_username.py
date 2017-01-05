@@ -90,6 +90,8 @@ def do_get(hash2param, redirect, **kwargs):
 
     _db.commit()
 
+    kwargs['db'] = _db
+
     if not change_username_success_hook(newusername, **kwargs):
         log.critical('Error sending info message')
         return base_common.msg.error(msgs.CANNOT_SAVE_MESSAGE)
