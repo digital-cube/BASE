@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import json
-import urllib
 from base.tests.helpers.testing import TestBase
 import base.application.lookup.responses as msgs
 
@@ -24,7 +23,6 @@ class TestUserRegister(TestBase):
 
         self.assertIn('token', res)
         self.assertIn('token_type', res)
-        self.assertTrue(True)
 
     def test_register_with_same_username(self):
 
@@ -47,8 +45,6 @@ class TestUserRegister(TestBase):
         self.assertIn('message', res2)
         self.assertEqual(res2['message'], msgs.lmap[msgs.USERNAME_ALREADY_TAKEN])
 
-        self.assertTrue(True)
-
     def test_register_with_wrong_username(self):
 
         _b = {
@@ -64,4 +60,3 @@ class TestUserRegister(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.INVALID_REQUEST_ARGUMENT])
 
-        self.assertTrue(True)

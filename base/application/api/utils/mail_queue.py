@@ -1,15 +1,15 @@
 # coding= utf-8
 
 import json
-import base.common.orm
-from base.common.utils import log
-from base.application.components import Base
-from base.application.components import api
-from base.application.components import params
-from base.application.components import authenticated
-from base.application.helpers.exceptions import MailQueueError
 
 import base.application.lookup.responses as msgs
+import base.common.orm
+from base.application.components import Base
+from base.application.components import api
+from base.application.components import authenticated
+from base.application.components import params
+from base.application.helpers.exceptions import MailQueueError
+from base.common.utils import log
 
 
 @authenticated()
@@ -31,7 +31,7 @@ class MailQueue(Base):
     def put(self, sender, sender_name, receiver, receiver_name, subject, message, data, get_data):
 
         log.info('Save message for {} by {}'.format(receiver, sender))
-        from base.application.api import api_hooks
+        from base.application.api_hooks import api_hooks
 
         try:
             id_message = api_hooks.save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data)
@@ -97,7 +97,7 @@ class MailQueueHandle(Base):
     )
     def get(self, id_message):
 
-        from base.application.api import api_hooks
+        from base.application.api_hooks import api_hooks
 
         try:
             _message_data = api_hooks.get_mail_from_queue(id_message)

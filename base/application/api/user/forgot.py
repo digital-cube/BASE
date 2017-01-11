@@ -1,11 +1,12 @@
 # coding= utf-8
 
 import json
+
 import base.application.lookup.responses as msgs
-from base.common.utils import log
 from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
+from base.common.utils import log
 
 
 @api(
@@ -31,7 +32,7 @@ class Forgot(Base):
 
         user = _q.one()
 
-        from base.application.api import api_hooks
+        from base.application.api_hooks import api_hooks
         if not api_hooks.forgot_password(user, data):
             return self.error(msgs.FORGOT_REQUEST_ERROR)
 

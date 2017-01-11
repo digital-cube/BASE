@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import json
-import urllib
 from tornado.testing import AsyncHTTPTestCase
 from base.application.service import Application
 from base.application.components import BaseHandler
@@ -20,7 +19,19 @@ class TestBase(AsyncHTTPTestCase):
         from base.config.application_config import port as svc_port
         load_orm(svc_port)
 
+        self.load_test_hook()
+
         return Application(entries)
+
+    def load_test_hook(self):
+        try:
+            import tests_hooks.hook
+            if hasattr(tests_hooks.hook, 'register'):
+                from tests_hooks.hook import register
+                from types import MethodType
+                setattr(self, '_register', MethodType(register, self))
+        except ImportError as e:
+            print('There is no tests hook')
 
     def tearDown(self):
         self.stop()

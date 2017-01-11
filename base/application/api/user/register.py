@@ -4,8 +4,8 @@ import base.application.lookup.responses as msgs
 from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
-from base.common.utils import log
 from base.common.utils import get_request_ip
+from base.common.utils import log
 
 
 def user_exists(username, AuthUser, _session):
@@ -26,10 +26,10 @@ class Register(Base):
     def post(self, username, password, data):
         """Register user on the system"""
 
-        from base.application.api import api_hooks
+        from base.application.api_hooks import api_hooks
 
         if hasattr(api_hooks, 'pre_register_user'):
-            pre_reg_usr = api_hooks.pre_register_user(username)
+            pre_reg_usr = api_hooks.pre_register_user(username, password, data)
             if pre_reg_usr is False:
                 log.critical('Pre register user process error')
                 return self.error(msgs.ERROR_USER_REGISTER)
@@ -70,7 +70,7 @@ class Register(Base):
                 log.error('Can not make string from user register response')
 
         from base.common.tokens_services import get_token
-        _token = get_token(id_user)
+        _token = get_token(id_user, data)
         if not _token:
             log.critical('Error getting token for new user {} - {}'.format(id_user, username))
             return self.error(msgs.ERROR_RETRIEVE_SESSION)

@@ -12,7 +12,7 @@ check_password_is_valid(password) -> bool:
 register_user(id_user, username, password, data) -> [dict, str, convertible to string, None]:
         - register user on system
         - populate auth_users and users tables here
-pre_register_user(username) -> [None]:
+pre_register_user(username, password, data) -> [None]:
         - process user's data before user registration
 post_register_process(id_user, username, password, data) -> [dict, None]:
         - process user's data after user registration
@@ -42,6 +42,12 @@ get_mail_from_queue(id_message) -> [dict]
         - get mail data
 forgot_password(AuthUser, data) -> [bool]
         - save forgot password request and message
+class Tokenizer
+        - tokenizer prototype
+class SqlTokenizer
+        - tokenizer for sql token storage
+class RedisTokenizer
+        - tokenizer for redis token storage
 """
 
 hooks = [
@@ -61,6 +67,9 @@ hooks = [
     # 'check_user',
     # 'get_mail_from_queue',
     # 'forgot_password',
+    # 'Tokenizer',
+    # 'SqlTokenizer',
+    # 'RedisTokenizer',
 ]
 
 

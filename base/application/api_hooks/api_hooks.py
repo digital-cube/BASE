@@ -8,7 +8,7 @@ check_password_is_valid(password) -> bool:
 register_user(id_user, username, password, data) -> [dict, str, convertible to string, None]:
         - register user on system
         - populate auth_users and users tables here
-pre_register_user(username) -> [None]:
+pre_register_user(username, password, data) -> [None]:
         - process user's data before user registration
 post_register_process(id_user, username, password, data) -> [dict, None]:
         - process user's data after user registration
@@ -38,6 +38,12 @@ get_mail_from_queue(id_message) -> [dict]
         - get mail data
 forgot_password(AuthUser, data) -> [bool]
         - save forgot password request and message
+class Tokenizer
+        - tokenizer prototype
+class SqlTokenizer
+        - tokenizer for sql token storage
+class RedisTokenizer
+        - tokenizer for redis token storage
 """
 
 import json
@@ -46,6 +52,10 @@ from base.application.helpers.exceptions import SaveHash2ParamsException
 from base.common.utils import log
 from base.common.utils import format_password
 from base.common.utils import password_match
+
+from base.application.api_hooks.token_hooks import Tokenizer
+from base.application.api_hooks.token_hooks import SqlTokenizer
+from base.application.api_hooks.token_hooks import RedisTokenizer
 
 
 def pack_user(user):

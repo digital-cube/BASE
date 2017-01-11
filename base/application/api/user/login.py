@@ -1,16 +1,17 @@
 # coding= utf-8
 
 import json
+
 import base.application.lookup.responses as msgs
-from base.common.utils import log
 from base.application.components import Base
 from base.application.components import api
-from base.application.components import params
-from base.common.tokens_services import get_token
-from base.application.helpers.exceptions import CheckUserError
-from base.application.helpers.exceptions import PreLoginException
-from base.application.helpers.exceptions import PostLoginException
 from base.application.components import authenticated
+from base.application.components import params
+from base.application.helpers.exceptions import CheckUserError
+from base.application.helpers.exceptions import PostLoginException
+from base.application.helpers.exceptions import PreLoginException
+from base.common.tokens_services import get_token
+from base.common.utils import log
 
 
 @api(
@@ -21,7 +22,7 @@ class Login(Base):
     @authenticated()
     def get(self):
 
-        from base.application.api import api_hooks
+        from base.application.api_hooks import api_hooks
         try:
             return self.ok(api_hooks.check_user(self.auth_user))
         except CheckUserError as e:
@@ -36,7 +37,7 @@ class Login(Base):
     def post(self, username, password, data):
         """Login user - retrieve session"""
 
-        from base.application.api import api_hooks
+        from base.application.api_hooks import api_hooks
         user = api_hooks.user_exists(username)
         if not user:
             return self.error(msgs.WRONG_USERNAME_OR_PASSWORD)
@@ -52,7 +53,7 @@ class Login(Base):
                 log.critical('Pre login error: {}'.format(e))
                 return self.error(msgs.PRE_LOGIN_ERROR)
 
-        _token = get_token(user.id)
+        _token = get_token(user.id, data)
         if not _token:
             log.critical('Error getting token for user {} - {}'.format(user.id, username))
             return self.error(msgs.ERROR_RETRIEVE_SESSION)

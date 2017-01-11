@@ -1,8 +1,9 @@
 # coding= utf-8
 
-import inspect
 import importlib
+import inspect
 from inspect import getmembers, isclass
+
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
 # LOG HAS TO BE SET DYNAMICALLY
@@ -169,16 +170,16 @@ def load_application(entries, svc_port):
         raise InvalidAPIHooksModule('Missing or wrong {} API hooks module'.format(
             base.config.application_config.api_hooks))
 
-    import base.application.api.api_hooks
+    import base.application.api_hooks.api_hooks
     if hasattr(_hooks_module, 'hooks'):
         for _hook in _hooks_module.hooks:
 
             if not hasattr(_hooks_module, _hook):
-                log.warning('API hook {} missing in module {}'.format(_hook, base.application.api.api_hooks))
+                log.warning('API hook {} missing in module {}'.format(_hook, base.application.api_hooks.api_hooks))
                 continue
 
             _real_hook = getattr(_hooks_module, _hook)
-            setattr(base.application.api.api_hooks, _hook, _real_hook)
+            setattr(base.application.api_hooks.api_hooks, _hook, _real_hook)
     # FINISH LOADING APPLICATION HOOKS
 
 

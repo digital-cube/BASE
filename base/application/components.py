@@ -412,9 +412,9 @@ class params(object):
             try:
                 _body = json.loads(_origin_body.decode('utf-8'))
             except AttributeError as e:
-                log.critical('Error decoding body ->|{}|<- : {}'.format(_origin_body, e))
+                log.warning('Error decoding body ->|{}|<- : {}'.format(_origin_body, e))
             except json.JSONDecodeError as e:
-                log.critical('Error loading body ->|{}|<- : {}'.format(_origin_body, e))
+                log.warning('Error loading body ->|{}|<- : {}'.format(_origin_body, e))
 
             for _param in self.params:
 

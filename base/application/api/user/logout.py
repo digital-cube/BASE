@@ -1,13 +1,14 @@
 # coding= utf-8
 
 import base.application.lookup.responses as msgs
-from base.common.utils import log
 from base.application.components import Base
 from base.application.components import api
 from base.application.components import authenticated
-from base.common.tokens_services import close_session
-from base.application.helpers.exceptions import PreLogoutException
 from base.application.helpers.exceptions import PostLogoutException
+from base.application.helpers.exceptions import PreLogoutException
+from base.common.tokens_services import close_session
+from base.common.utils import log
+
 
 @authenticated()
 @api(
@@ -18,7 +19,7 @@ class Logout(Base):
     def post(self, *args):
         """Logout user - close session"""
 
-        from base.application.api import api_hooks
+        from base.application.api_hooks import api_hooks
         _res = {}
         _pre_logout = None
         if hasattr(api_hooks, 'pre_logout_process'):

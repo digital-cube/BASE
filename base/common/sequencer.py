@@ -7,7 +7,6 @@ import sqlalchemy.exc
 # from src.models.sequencers import Sequencer
 from base.application.helpers.exceptions import ToManyAttemptsException
 from base.application.helpers.exceptions import SequencerTypeError
-from base.common.utils import log
 
 
 class SequencerFactory:
@@ -90,6 +89,8 @@ class SequencerFactory:
 
     def new(self, table_id, commit=True):
 
+        from base.common.utils import log
+
         if table_id not in self.s_table:
             log.critical('Wrong sequencer table id provided {}'.format(table_id))
             return False
@@ -140,6 +141,8 @@ class SequencerFactory:
         return _s_id
 
     def get_sequence(self, sequence_id, sequence):
+
+        from base.common.utils import log
 
         if sequence_id not in self.s_table:
             log.critical('Sequence id {} is not in the system'.format(sequence_id))

@@ -1,19 +1,13 @@
 # coding= utf-8
 
-import json
 import base.application.lookup.responses as msgs
-from base.common.utils import log
-from base.common.utils import format_password
-from base.common.utils import password_match
-from base.common.tokens_services import get_user_by_token
 from base.application.components import Base
 from base.application.components import api
-from base.application.components import params
-from base.common.tokens_services import get_token
-from base.application.helpers.exceptions import CheckUserError
-from base.application.helpers.exceptions import PreLoginException
-from base.application.helpers.exceptions import PostLoginException
 from base.application.components import authenticated
+from base.application.components import params
+from base.common.utils import format_password
+from base.common.utils import log
+from base.common.utils import password_match
 
 
 @api(
@@ -28,7 +22,7 @@ class ChangePassword(Base):
     def post(self, new_password, _hash):
         """Change user's password"""
 
-        from base.application.api import api_hooks
+        from base.application.api_hooks import api_hooks
         hash_data = api_hooks.get_hash_data(_hash)
         if 'id_user' not in hash_data:
             log.critical('Wrong hash data {} for change password request'.format(hash_data))
