@@ -16,6 +16,7 @@ from base_lookup.http_methods import rev as http_rev_map
 from base_lookup.http_methods import map as http_map
 from base_api.apisvc.apisvc import get_api_specification
 from base_config.service import log
+from base_config.service import log_a
 
 _c = 0
 
@@ -158,6 +159,21 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.allowed = allowed
         self.denied = denied
         log.info(self.api_module_name)
+        self.log_input()
+
+    def log_input(self):
+
+        if self.request.method != 'OPTIONS':
+            log_a.info('URI {}: {}'.format(self.request.method, self.request.uri))
+            log_a.info('BODY: {}'.format(self.request.body))
+            log_a.info('ARGUMENTS: {}'.format(self.request.arguments))
+            log_a.info('BODY ARGUMENTS: {}'.format(self.request.body_arguments))
+
+    def log_output(self, result, res):
+
+        if self.request.method != 'OPTIONS':
+            log_a.info('RETURN {} FOR URI {}: {}'.format(res, self.request.method, self.request.uri))
+            log_a.info('RETURN {} RESULT: {}'.format(res, result))
 
     def write_error(self, status_code, **kwargs):
         if not csettings.DEBUG:
@@ -327,12 +343,16 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                     self.redirect(result['redirect_url'], permanent=_permanent, status=_redirection_status)
                     return
 
+                res = 'SUCCESS'
                 self.set_status(200)
                 if 'http_status' in result:
                     self.set_status(result['http_status'])
+                    if result['http_status'] > 399:
+                        res = 'ERROR'
                     del result['http_status']
 
                 if result != {}:
+                    self.log_output(result, res)
                     self.write(json.dumps(result, ensure_ascii=False))
 
             else:
