@@ -13,6 +13,7 @@ setup(
               'base.application.api',
               'base.application.api.user',
               'base.application.api.utils',
+              'base.application.api_hooks',
               'base.application.lookup',
               'base.application.helpers',
               'base.application.templates',
