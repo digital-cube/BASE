@@ -301,7 +301,7 @@ def _convert_args(el, tp, esc):
     if tp == json:
 
         try:
-            el = json.dumps(json.loads(el))
+            el = json.dumps(json.loads(el), ensure_ascii=False)
         except json.decoder.JSONDecodeError as e:
             log.critical('Invalid argument: expected json got {} ({}): {}'.format(el, type(el), e))
             return None
