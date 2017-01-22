@@ -12,7 +12,7 @@ pre_register_user(username, password, data) -> [None]:
         - process user's data before user registration
 post_register_process(id_user, username, password, data) -> [dict, None]:
         - process user's data after user registration
-user_exists(username, password, data) -> [User object]
+user_exists(username, password, data, handler) -> [User object]
         - check if username exists in the system
 check_username_and_password(username, password, Auth_user) -> [bool]
         - check username / password match
@@ -132,7 +132,7 @@ def register_user(id_user, username, password, data):
 
 
 # LOGIN USER PROCESS
-def user_exists(username, password, data):
+def user_exists(username, password, data, handler):
     """
     Check if username is already taken/used
     :param username: user's username
