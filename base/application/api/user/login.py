@@ -38,7 +38,7 @@ class Login(Base):
         """Login user - retrieve session"""
 
         from base.application.api_hooks import api_hooks
-        user = api_hooks.user_exists(username, password, data)
+        user = api_hooks.user_exists(username, password, data, self)
         if not user:
             return self.error(msgs.WRONG_USERNAME_OR_PASSWORD)
 
