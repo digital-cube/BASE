@@ -90,6 +90,8 @@ def check_password_is_valid(password):
     :param password: user's password
     :return: bool valid
     """
+    from base.common.utils import log
+
     if len(password) < 6:
         log.critical('Password {} length {} is lower than minimal of 6'.format(password, len(password)))
         return False
@@ -106,6 +108,7 @@ def register_user(id_user, username, password, data):
     :return: bool success
     """
     import base.common.orm
+    from base.common.utils import log
     AuthUser, _session = base.common.orm.get_orm_model('auth_users')
     User, _ = base.common.orm.get_orm_model('users')
 
@@ -113,6 +116,10 @@ def register_user(id_user, username, password, data):
 
     import base.application.lookup.user_roles as user_roles
     role_flags = int(data['role_flags']) if 'role_flags' in data else user_roles.USER
+
+    if role_flags not in user_roles.lmap:
+        log.critical('Wrong role type: {}'.format(role_flags))
+        return 'Wrong user role type {}'.format(role_flags)
 
     _auth_user = AuthUser(id_user, username, password, role_flags, True)
     _session.add(_auth_user)
