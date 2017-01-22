@@ -25,7 +25,7 @@ class Base(tornado.web.RequestHandler):
     def __init__(self, application, request, **kwargs):
         self.auth_token = None
         self.auth_user = None
-        super().__init__(application, request, **kwargs)
+        super(Base, self).__init__(application, request, **kwargs)
 
     def data_received(self, chunk):
         pass
