@@ -1,6 +1,44 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
 <style>
+@font-face { font-family: 'Roboto'; src: local("Roboto Light"), local("Roboto-Light"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-light-webfont.eot"); src: local("Roboto Light"), local("Roboto-Light"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-light-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-light-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-light-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-light-webfont.svg#open_sanslight") format("svg"); font-weight: 300; font-style: normal; }
+@font-face { font-family: 'Roboto'; src: local("Roboto Light Italic"), local("Roboto-Light-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-lightitalic-webfont.eot"); src: local("Roboto Light Italic"), local("Roboto-Light-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-lightitalic-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-lightitalic-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-lightitalic-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-lightitalic-webfont.svg#open_sanslight_italic") format("svg"); font-weight: 300; font-style: italic; }
+@font-face { font-family: 'Roboto'; src: local("Roboto"), local("Roboto"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-regular-webfont.eot"); src: local("Roboto"), local("Roboto"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-regular-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-regular-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-regular-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-regular-webfont.svg#open_sansregular") format("svg"); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'Roboto'; src: local("Roboto Italic"), local("Roboto-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-italic-webfont.eot"); src: local("Roboto Italic"), local("Roboto-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-italic-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-italic-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-italic-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-italic-webfont.svg#open_sansitalic") format("svg"); font-weight: 400; font-style: italic; }
+@font-face { font-family: 'Roboto'; src: local("Roboto Semibold"), local("Roboto-Semibold"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-medium-webfont.eot"); src: local("Roboto Semibold"), local("Roboto-Semibold"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-medium-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-medium-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-medium-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-medium-webfont.svg#open_sansmedium") format("svg"); font-weight: 500; font-style: normal; }
+@font-face { font-family: 'Roboto'; src: local("Roboto Semibold Italic"), local("Roboto-Semibold-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-mediumitalic-webfont.eot"); src: local("Roboto Semibold Italic"), local("Roboto-Semibold-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-mediumitalic-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-mediumitalic-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-mediumitalic-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-mediumitalic-webfont.svg#open_sansmedium_italic") format("svg"); font-weight: 500; font-style: italic; }
+@font-face { font-family: 'Roboto'; src: local("Roboto Bold"), local("Roboto-Bold"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bold-webfont.eot"); src: local("Roboto Bold"), local("Roboto-Bold"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bold-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bold-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bold-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bold-webfont.svg#open_sansbold") format("svg"); font-weight: 700; font-style: normal; }
+@font-face { font-family: 'Roboto'; src: local("Roboto Bold Italic"), local("Roboto-Bold-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bolditalic-webfont.eot"); src: local("Roboto Bold Italic"), local("Roboto-Bold-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bolditalic-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bolditalic-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bolditalic-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-bolditalic-webfont.svg#open_sansbold_italic") format("svg"); font-weight: 700; font-style: italic; }
+@font-face { font-family: 'Roboto'; src: local("Roboto Extrabold"), local("Roboto-Extrabold"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-black-webfont.eot"); src: local("Roboto Extrabold"), local("Roboto-Extrabold"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-black-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-black-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-black-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-black-webfont.svg#open_sansblack") format("svg"); font-weight: 900; font-style: normal; }
+@font-face { font-family: 'Roboto'; src: local("Roboto Extrabold Italic"), local("Roboto-Extrabold-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-blackitalic-webfont.eot"); src: local("Roboto Extrabold Italic"), local("Roboto-Extrabold-Italic"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-blackitalic-webfont.eot?#iefix") format("embedded-opentype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-blackitalic-webfont.woff") format("woff"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-blackitalic-webfont.ttf") format("truetype"), url("http://tech.quickpay.net/public/fonts/roboto/roboto-blackitalic-webfont.svg#open_sansblack_italic") format("svg"); font-weight: 900; font-style: italic; }
+
+*, th, td { font-family: 'Roboto', 'Arial Narrow', sans-serif; font-weight: 300; }
+
+strong, b { font-weight: 500 !important; }
+
+body { padding: 0px 0 50px 0; margin-top: 0px; background: #fff; }
+
+h1, h2, h3, h4, h5, h6 { font-weight: 700; }
+
+h1 { font-weight: 900; font-size: 40px; }
+
+h2 { font-size: 24px !important; border-bottom: 1px solid #ccc; margin-top: 48px !important; }
+
+h3 { font-size: 18px !important; }
+
+h4 { font-size: 14px !important; }
+
+pre, code { font-family: Monaco, monospace !important; }
+
+code { white-space: nowrap; }
+
+table thead * { font-weight: bold !important; }
+
 
 .inline{
   display:inline;
@@ -9,18 +47,19 @@
   font-weight: 300;
   background:#fafafa;
 }
-.table{margin-top:20px;width:100%;background:white;padding:10px; margin:0px;}
-.table thead * {
+.tables{margin-top:20px;width:100%;background:white;padding:0px; margin:0px;
+font-family: 'Roboto', 'Arial Narrow', sans-serif;}
+.tables thead * {
     font-weight: bold !important;
     background: #e5e5e5 !important;
 }
-.table td{
+.tables td{
       padding: 8px;
     line-height: 1.42857143;
     vertical-align: top;
     border-top: 1px solid #ddd;
 }
-.label {
+.labels {
     display: inline;
     padding: .2em .6em .3em;
     font-size: 75%;
@@ -34,9 +73,9 @@
 
 }
 
-.h2{
+.tab2{
   width:100wv;
-  height:25px;
+  height:34px;
   text-align:center;
   padding:4px 4px 5px 4px;
   margin-top:5px;
@@ -52,7 +91,10 @@
   border-bottom-left-radius: .25em;
   border-bottom-right-radius: .25em;
 }
-.method{
+.methods{
+    font-family: 'Roboto', 'Arial Narrow', sans-serif;
+    font-weight: 300;
+    font-size: 75%;
     display: inline-block;
     min-width: 80px;
     padding: 4px;
@@ -90,9 +132,8 @@
     background-color: #d9534f;
     color: #fff;}
 
-.content{
+.pagecontent{
   width:100wv;
-
   display:none;
   padding:10px;
 }
@@ -100,7 +141,7 @@
 <script>
 $(document).ready(function(){
 
-    $(".btn").click(function(){
+    $(".btns").click(function(){
       $(this).toggleClass('border-bottom');
       var id = $(this).attr('data-id')
       $("#drop-"+id).slideToggle()
@@ -109,121 +150,112 @@ $(document).ready(function(){
 });
 </script>
 
-
 <div id="cc">
-{% set color = '' %}
-                {% set x = 0 %}
+    <div class="container">
+        <div class="row">
+        <div class="col-md-12">
 
-    {% for req in spec['api'] %}
-        {% for r in spec['api'][req] %}
+            <h3>Base: v{{ spec['base_version'] }}
+                <br><br>
+                {{ spec['application'] }} : v{{ spec['version'] }}
+                - port: {{ spec['port'] }}</h3>
+            <h5 style="color:darkgray">{{ spec['application_description'] }}</h5>
+            <br><br>
+            <h3>{{ spec['application'] }}</h3><hr>
 
+            {% set color = '' %}
+            {% set x = 0 %}
 
-        {% for s in r %}
-            {% if s == 'post' %}
-                {% set color = 'green' %}
-            {% elif s == 'get' %}
-                {% set color = 'blue' %}
-            {% elif s == 'put' %}
-                {% set color = 'yellow' %}
-            {% else %}
-                {% set color = 'red' %}
-            {% end %}
-            {% if  r[s]['uri'] != None %}
-                {% set url = r[s]['uri'] %}
-            {% else %}
-                {% set url = 'Missing url' %}
-            {% end %}
-            {% if  r[s]['description'] != None %}
-                {% set desc = r[s]['description'] %}
-            {% else %}
-                {% set desc = 'Missing description' %}
-            {% end %}
-            {% if  r[s]['autenticated'] != None %}
-                {% set auth = r[s]['autenticated'] %}
-            {% else %}
-                {% set auth = 'Missing description' %}
-            {% end %}
-            {% set method = s %}
+            {% for req in spec['api'] %}
+
+                <h3 style="margin:30px 0px 0 0px;">{{ req }}</h3>
+                <h5 style="margin:5px 0px;color:darkgray;font-weight: 200;">{{ req }}</h5>
+
+                {% for r in spec['api'][req] %}
 
 
-            <div class='btn border-bottom h2 light-{{color}}' data-id='{{ x }}' id='btn-{{x}}' >
-                <div class='label method dark-{{color}}'>{{ method }}</div>
-                    <span class='color-{{color}}' style='float:left;padding-left:10px;'>{{url}}</span>
-                    <a style='display: inline-block; margin: 2px 5px; float: right; cursor: pointer;'>
-                        <i class='fa fa-link'></i>
-                    </a>
-                    <span class='color-{{color}}' style='float: right'>{{ desc }} - {{ auth }}</span>
-                </div>
-                <div id='drop-{{x}}' class='light-{{color}} content '>
-                    <!--START CONTENT-->
-
-
-
-
-                    <h4 style=''>Request Parameters</h4>
-                    <table class='table'>
-                        <thead>
-                            <tr>
-                                <td>Parameter</td>
-                                <td>Description</td>
-                                <td>Parameter Type</td>
-                                <td>Data Type</td>
-                                <td>Default</td>
-                                <td>Required?</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% set params = r[s]['params'] %}
-                            {% for i in params %}
-                            <tr>
-                                <td>{{ params[i]['name'] }}</td>
-                                <td></td>
-                                <td>{{ params[i]['type'] }}</td>
-                                <td>{{ params[i]['type'] }}</td>
-                                <td>
-
-                                </td>
-                                <td>{{ params[i]['required'] }}</td>
-                            </tr>
+                    {% for s in r %}
+                        {% if s == 'post' %}
+                            {% set color = 'green' %}
+                        {% elif s == 'get' %}
+                            {% set color = 'blue' %}
+                        {% elif s == 'put' %}
+                            {% set color = 'yellow' %}
+                        {% else %}
+                            {% set color = 'red' %}
                         {% end %}
-                        </tbody>
-                    </table>
+                        {% if  r[s]['uri'] != None %}
+                            {% set url = r[s]['uri'] %}
+                        {% else %}
+                            {% set url = 'Missing url' %}
+                        {% end %}
+                        {% if  r[s]['description'] != None %}
+                            {% set desc = r[s]['description'] %}
+                        {% else %}
+                            {% set desc = 'Missing description' %}
+                        {% end %}
+                        {% if  r[s]['authenticated'] != None %}
+                            {% set auth = r[s]['authenticated'] %}
+                        {% else %}
+                            {% set auth = 'Missing description' %}
+                        {% end %}
+                        {% if auth == True %}
+                            {% set auth = '<img src="/static/img/key_base.png" width="20px" />' %}
+                        {% else %}
+                            {% set auth = '<i class="fa fa-link"></i>' %}
+                        {% end %}
+                        {% set method = s %}
 
+                        <div class='btns border-bottom tab2 light-{{color}}' data-id='{{ x }}' id='btn-{{x}}' >
+                            <div class='labels methods dark-{{color}}'>{{ method }}</div>
+                                <span class='color-{{color}}' style='float:left;padding-left:10px;'>
+                                    {{url}}
+                                </span>
 
-                <!--END CONTENT-->
-                </div>
+                                <span class='color-{{color}}' style='float: right'>{{ desc }}
+                                    {%  raw auth %}
+                                </span>
+                        </div>
+                        <div id='drop-{{x}}' class='light-{{color}} pagecontent '>
+                            <!--START CONTENT-->
 
-            </div>
-            {% set x = x+1 %}
-        {% end %}
+                            <h4 style=''>Request Parameters</h4>
+                            <table class='tables'>
+                                    <thead>
+                                        <tr>
+                                            <td>Parameter</td>
+                                            <td>Description</td>
+                                            <td>Parameter Type</td>
+                                            <td>Data Type</td>
+                                            <td>Default</td>
+                                            <td>Required?</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% set params = r[s]['params'] %}
+                                        {% for i in params %}
+                                        <tr>
+                                            <td>{{ params[i]['name'] }}</td>
+                                            <td></td>
+                                            <td>{{ params[i]['type'] }}</td>
+                                            <td>{{ params[i]['type'] }}</td>
+                                            <td>
 
-        {% end %}
-{% end %}
+                                            </td>
+                                            <td>{{ params[i]['required'] }}</td>
+                                        </tr>
+                                    {% end %}
+                                    </tbody>
+                                </table>
 
-Potrebi su jos Response Messages unutar svakog poziva... Napisao sam responsive_msg ispod
-            "get":{
-               "params":{
-                  "key":{
-                     "name":"key",
-                     "required":true,
-                     "type":"str"
-                  }
-               },
-               "uri":"/tools/option/{key}",
-               "autenticated":false,
-               "description":"Missing description"
-            -----------------------------------------
-                "response_msg":{
-                    "201":{
-                        "status_code":"201",
-                        "reason":"Created",
-                    },"400":{
-                        "status_code":"400",
-                        "reason":"Invalid parameters",
-                    },"403":{
-                        "status_code":"201",
-                        "reason":"Not authorized",
-                    },
+                            <!--END CONTENT-->
+                        </div>
+                        {% set x = x+1 %}
+                    {% end %}
 
-
-            -----------------------------------------
+                {% end %}
+            {% end %}
+        </div>
+    </div>
+    </div>
+</div>
