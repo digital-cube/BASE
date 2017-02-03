@@ -190,7 +190,8 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS')
         self.set_header('Access-Control-Max-Age', 1000)
-        self.set_header('Access-Control-Allow-Headers', 'Origin, X-CSRFToken, Content-Type, Accept, Authorization')
+        self.set_header('Access-Control-Allow-Headers',
+                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, App-Interface')
         self.finish('OK')
 
     @tornado.web.asynchronous
@@ -256,6 +257,13 @@ class GeneralPostHandler(tornado.web.RequestHandler):
             tka = tka.split(' ')
             if len(tka) == 1:
                 tk = tka[0].strip()
+
+        import base_common.app_hooks as apphooks
+        if hasattr(apphooks, 'process_custom_header'):
+            try:
+                apphooks.process_custom_header(self)
+            except Exception as e:
+                log.critical('Error with custom header processing: {}'.format(e))
 
         self.auth_token = tk
         self.r_ip = ip
