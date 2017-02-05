@@ -287,7 +287,7 @@ class params(object):
                     argument, argument_value, type(argument_value), e))
                 return None
 
-        if argument_type == 'json':
+        if argument_type == 'json' or argument_type == json:
             try:
                 return json.loads(argument_value)
             except json.JSONDecodeError as e:
