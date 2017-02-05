@@ -49,7 +49,7 @@ def get_api_specification(request_handler):
                             _function_specification[_f_name] = {}
                             _function_specification[_f_name]['params'] = {}
                             _function_specification[_f_name]['uri'] = _api_uri
-                            _function_specification[_f_name]['autenticated'] = False
+                            _function_specification[_f_name]['authenticated'] = False
                             _function_specification[_f_name]['description'] = \
                                 _func.__doc__ if _func.__doc__ else 'Missing description'
 
