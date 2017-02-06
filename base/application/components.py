@@ -180,7 +180,7 @@ class api(object):
         for s in _split_url:
             _res.append('([^/]+)' if s.startswith(':') else s)
             if s.startswith(':'):
-                _kw_res[s[1:]] = _split_url.index(s)
+                _kw_res[s[1:]] = _split_url.index(s) + 1 if self.set_api_prefix else _split_url.index(s)
 
         return '/'.join(_res), _kw_res
 

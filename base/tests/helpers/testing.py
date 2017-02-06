@@ -31,7 +31,8 @@ class TestBase(AsyncHTTPTestCase):
                 from types import MethodType
                 setattr(self, '_register', MethodType(register, self))
         except ImportError as e:
-            print('There is no tests hook')
+            pass
+            # print('There is no tests hook')
 
     def tearDown(self):
         self.stop()
