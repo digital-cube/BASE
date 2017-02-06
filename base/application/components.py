@@ -372,8 +372,6 @@ class params(object):
 
     def __call__(self, _f):
 
-        from base.common.utils import log
-
         _arguments_documentation = []
 
         # SAVE PARAMETERS DOCUMENTATION
@@ -404,6 +402,7 @@ class params(object):
         @wraps(_f)
         def wrapper(_origin_self, *args, **kwargs):
 
+            from base.common.utils import log
             _arguments = []
 
             _origin_body = _origin_self.request.body

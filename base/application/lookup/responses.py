@@ -38,6 +38,7 @@ USER_NOT_FOUND = 35
 FORGOT_REQUEST_ERROR = 36
 CHANGE_PASSWORD_ERROR = 37
 NOT_ALLOWED_FROM_REMOTE = 38
+OPTION_MISMATCH = 39
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -78,6 +79,7 @@ lmap[USER_NOT_FOUND] = 'User not found'
 lmap[FORGOT_REQUEST_ERROR] = 'Forgot request error'
 lmap[CHANGE_PASSWORD_ERROR] = 'Change password error'
 lmap[NOT_ALLOWED_FROM_REMOTE] = 'Not allowed from remote'
+lmap[OPTION_MISMATCH] = 'Option do not exists'
 
 lrev = {}
 for k in lmap:

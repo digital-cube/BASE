@@ -10,6 +10,28 @@ from base.application.components import authenticated
 import base.application.lookup.responses as msgs
 
 
+def save_option(key, value):
+
+    import base.common.orm
+    from base.common.utils import log
+    OrmOptions, _session = base.common.orm.get_orm_model('options')
+    _q = _session.query(OrmOptions).filter(OrmOptions.key == key)
+
+    if _q.count() == 1:
+        _option = _q.one()
+        _option.value = value
+
+    elif _q.count() == 0:
+        _option = OrmOptions(key, value)
+        _session.add(_option)
+
+    else:
+        log.warning('Found {} occurrences for {}'.format(_q.count(), _key))
+        return False
+
+    return _option
+
+
 @authenticated()
 @api(
     URI='/tools/option/:key',
@@ -22,6 +44,7 @@ class Options(Base):
     def get(self, _key):
 
         # import base.common.orm
+        from base.common.utils import log
         OrmOptions, _session = base.common.orm.get_orm_model('options')
 
         _q = _session.query(OrmOptions).filter(OrmOptions.key == _key)
@@ -41,22 +64,10 @@ class Options(Base):
     )
     def put(self, _key, _value):
 
-        # import base.common.orm
+        from base.common.utils import log
         OrmOptions, _session = base.common.orm.get_orm_model('options')
-        _q = _session.query(OrmOptions).filter(OrmOptions.key == _key)
-
-        if _q.count() == 1:
-
-            _option = _q.one()
-            _option.value = _value
-
-        elif _q.count() == 0:
-
-            _option = OrmOptions(_key, _value)
-            _session.add(_option)
-
-        else:
-            log.warning('Found {} occurrences for {}'.format(_q.count(), _key))
+        _option = save_option(_key, _value)
+        if not _option:
             return self.error(msgs.OPTION_MISMATCH, option=_key)
 
         log.info('User {} set option {} -> {}'.format('username', _key, _value))
