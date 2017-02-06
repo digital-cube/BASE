@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, Boolean, Text, ForeignKey, CHAR
 import datetime
 import base.common.orm
 
@@ -22,7 +22,7 @@ class Hash2Params(base.common.orm.sql_base):
     __tablename__ = 'hash_2_params'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    hash = Column(String(64), index=True, nullable=False, unique=True)
+    hash = Column(CHAR(64), index=True, nullable=False, unique=True)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now())
     time_to_live = Column(Integer)
     expire_after_first_access = Column(Boolean, nullable=False, default=False)
