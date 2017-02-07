@@ -16,11 +16,13 @@ from base.common.utils import log
 
 @api(
 URI='/user/login',
-    PREFIX=False)
+    PREFIX=False,
+    SPECIFICATION_PATH='User')
 class Login(Base):
 
     @authenticated()
     def get(self):
+        """Login user - check user is logged in"""
 
         from base.application.api_hooks import api_hooks
         try:
@@ -32,7 +34,7 @@ class Login(Base):
     @params(
         {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': "user's username"},
         {'name': 'password', 'type': str, 'required': True,  'doc': "user's password"},
-        {'name': 'data', 'type': json, 'required': False,  'doc': "user's additional data"},
+        {'name': 'data', 'type': 'json', 'required': False,  'doc': "user's additional data"},
     )
     def post(self, username, password, data):
         """Login user - retrieve session"""

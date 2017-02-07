@@ -484,6 +484,7 @@ class authenticated(object):
             from base.common.utils import is_implemented
             for _f_name, _func in inspect.getmembers(_target, inspect.isfunction):
                 if is_implemented(_target, _f_name, _func):
+                    setattr(_func, '__AUTHENTICATED__', True)
                     setattr(_target, _f_name, self.__call__(_func))
 
             return _target
@@ -510,6 +511,8 @@ class authenticated(object):
 
                 _origin_self.set_authorization_token(_auth_token)
                 _origin_self.set_authorized_user(_user)
+
+                setattr(_target, '__AUTHENTICATED__', True)
 
                 return _target(_origin_self, *args, **kwargs)
 

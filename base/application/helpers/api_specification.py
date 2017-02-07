@@ -1,9 +1,8 @@
-import copy
+# coding: utf-8
 import inspect
 import importlib
-import base
 from base.config.application_config import imports as app_imports
-import base.application.components
+from types import ModuleType
 
 
 def get_api_specification(request_handler):
@@ -35,10 +34,12 @@ def get_api_specification(request_handler):
                 if _specification_path not in _specification['api']:
                     _specification['api'][_specification_path] = []
 
-                # _api_prefix = _handler.__SET_API_PREFIX__
-                # _query_params = _handler.__PATH__PARAMS__
+                _api_prefix = _handler.__SET_API_PREFIX__
+
                 _api_uri = '/'.join(
-                    [_u.replace(':','{') + '}' if _u.startswith(':') else _u for _u in _handler.__PATH__.split('/')])
+                    [_u.replace(':', '{') + '}' if _u.startswith(':') else _u for _u in _handler.__PATH__.split('/')])
+                if _api_prefix:
+                    _api_uri = '/{}{}'.format(base.config.application_config.app_prefix, _api_uri)
 
                 for _f_name, _func in inspect.getmembers(_handler, inspect.isfunction):
                     if _f_name in ('get', 'post', 'put', 'patch', 'delete'):
@@ -49,7 +50,8 @@ def get_api_specification(request_handler):
                             _function_specification[_f_name] = {}
                             _function_specification[_f_name]['params'] = {}
                             _function_specification[_f_name]['uri'] = _api_uri
-                            _function_specification[_f_name]['authenticated'] = False
+                            _function_specification[_f_name]['authenticated'] = \
+                                hasattr(_func, '__AUTHENTICATED__') and _func.__AUTHENTICATED__
                             _function_specification[_f_name]['description'] = \
                                 _func.__doc__ if _func.__doc__ else 'Missing description'
 
@@ -61,14 +63,14 @@ def get_api_specification(request_handler):
                                         _type_name = '{} sequencer id'.format(_param['type'].split(':')[1])
                                     elif type(_param['type']) == str and _param['type'] in ['e-mail', 'json']:
                                         _type_name = _param['type']
+                                    elif isinstance(_param['type'], ModuleType) and _param['type'].__name__ == 'json':
+                                        _type_name = 'json'
                                     else:
                                         _type_name = _param['type'].__name__
 
                                     _function_specification[_f_name]['params'][_param['name']] = {}
                                     for _p in _param:
                                         _function_specification[_f_name]['params'][_param['name']][_p] = _param[_p]
-                                    # _function_specification[_f_name]['params'][_param['name']] = \
-                                    #     copy.deepcopy(_param)
                                     _function_specification[_f_name]['params'][_param['name']]['type'] = \
                                         _type_name
 

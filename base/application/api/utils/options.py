@@ -42,6 +42,7 @@ class Options(Base):
         {'name': 'key', 'type': str, 'required': True,  'doc': 'option key'},
     )
     def get(self, _key):
+        """Get option"""
 
         # import base.common.orm
         from base.common.utils import log
@@ -63,6 +64,7 @@ class Options(Base):
         {'name': 'value', 'type': str, 'required': True,  'doc': 'option value'},
     )
     def put(self, _key, _value):
+        """Save option"""
 
         from base.common.utils import log
         OrmOptions, _session = base.common.orm.get_orm_model('options')
