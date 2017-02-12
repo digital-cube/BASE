@@ -37,7 +37,8 @@ class Hash2Params(Base):
 @authenticated()
 @api(
     URI='/tools/h2p/:h2p',
-    PREFIX=False)
+    PREFIX=False,
+    SPECIFICATION_PATH='Hash2Params')
 class Hash2ParamsGet(Base):
 
     @params(
