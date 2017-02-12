@@ -310,31 +310,30 @@ def _show_create_table(args):
         print('No orm models in configuration file')
         sys.exit(exit_status.MISSING_ORM_MODELS)
 
-    if not hasattr(src.config.app_config, 'db_type'):
-        print('No database type in configuration file')
-        sys.exit(exit_status.MISSING_DATABASE_TYPE)
-
     if not hasattr(src.config.app_config, 'db_config'):
         print('No database configuration in configuration file')
         sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
 
-    db_type = src.config.app_config.db_type
-    db_config = src.config.app_config.db_config
-
-    for port in db_config:
-        for k in db_config[port]:
-            if db_config[port][k].startswith('__') or db_config[port][k].endswith('__'):
-                print("Database not properly configured: the {} can not be '{}'".format(k, db_config[port][k]))
-                sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+    __dest_dir = os.path.dirname(src.config.app_config.__file__)
+    __db_config_file = '{}/{}'.format(__dest_dir, src.config.app_config.db_config)
+    db_config = {}
+    with open(__db_config_file) as _db_cfg:
+        try:
+            db_config = json.load(_db_cfg)
+        except json.JSONDecodeError:
+            print('Can not load database configuration')
+            sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
 
     _models_modules = []
     _get_orm_models(_models_modules, src.config.app_config.models)
 
-    _port = src.config.app_config.port
+    _port = str(src.config.app_config.port)
     if _port not in db_config:
         print('Missing database configuration for port: {}'.format(_port))
-        return False, False
+        sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+
     _db_config = db_config[_port]
+    db_type = _db_config['db_type']
 
     __db_url = make_database_url(db_type, _db_config['db_name'], _db_config['db_host'], _db_config['db_port'],
                                  _db_config['db_user'], _db_config['db_password'])
