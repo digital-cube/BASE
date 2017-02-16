@@ -90,5 +90,9 @@ def client_call(url, port, location, method, data, headers=None, force_json=Fals
     conn.request(method, location, body, headers=_headers)
 
     response = conn.getresponse()
-    return response.read().decode('utf-8'), response.status
+    res = response.read().decode('utf-8'), response.status
+
+    conn.close()
+
+    return res
 
