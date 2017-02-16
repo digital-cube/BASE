@@ -4,12 +4,13 @@ import os
 import sys
 import site
 import stat
+import json
 import shutil
-import tempfile
 import argparse
 import importlib
 import importlib.util
 
+import sqlalchemy.exc
 from inspect import getmembers, isclass
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
@@ -52,6 +53,7 @@ def pars_command_line_arguments():
                                 help=app['database_name'][1])
     db_init_parser.add_argument('-dh', '--database_host', default=app['database_host'][0], help=app['database_host'][1])
     db_init_parser.add_argument('-dp', '--database_port', help=app['database_port'][1])
+    db_init_parser.add_argument('-p', '--application_port', default=str(app['port'][0]), help=app['port'][1], type=str)
     db_init_parser.add_argument('user_name', type=str, help=app['database_username'][1])
     db_init_parser.add_argument('password', type=str, help=app['database_password'][1])
 
@@ -107,10 +109,6 @@ def _configure_project(args, destination, additions_dir):
                     _line = "app_prefix = '{}'\n".format(args.prefix)
                 if '__APP_VERSION__' in _line:
                     _line = "app_version = '{}'\n".format(args.version)
-                if '__DB_PORT_CONFIG__' in _line:
-                    _line = _line.replace('__DB_PORT_CONFIG__', '{}'.format(args.port))
-                if '__APP_DB_NAME__' in _line:
-                    _line = _line.replace('__APP_DB_NAME__', "'{}'".format(args.name))
 
                 _new_config.write(_line)
 
@@ -162,56 +160,47 @@ def _build_project(args):
     _configure_project(args, dir_path, additions_dir)
 
 
-def _configure_database(args, src):
+def _configure_database(args, app_config, _db_config, test=False):
 
-    tmp_dir = tempfile.gettempdir()
-    tmp_filename = 'app_tmp.py'
-    tmp_f = os.path.join(tmp_dir, tmp_filename)
-    import shutil
-    shutil.copy2(src, tmp_f)
+    __dest_dir = os.path.dirname(app_config.__file__)
+    __db_config_file = '{}/{}'.format(__dest_dir, app_config.db_config)
 
-    _tab = '        '
+    if not os.path.isfile(__db_config_file):
+        print('Create database configuration for application port {}'.format(args.application_port))
+    else:
+        if not test:
+            print('Update database configuration with application port {}'.format(args.application_port))
+        with open(__db_config_file) as _db_cfg:
+            try:
+                _db_conf = json.load(_db_cfg)
+                for _k in _db_conf:
+                    _db_config[_k] = _db_conf[_k]
+            except json.JSONDecodeError:
+                pass
 
-    with open(tmp_f) as tf:
-        with open(src, 'w') as cf:
+    if not test:
+        _db_config[args.application_port] = {
+            'db_name': args.database_name,
+            'db_user': args.user_name,
+            'db_password': args.password,
+            'db_host': args.database_host,
+            'db_type': args.database_type,
+        }
 
-            for _line in tf:
+        try:
+            _db_config[args.application_port]['db_port'] = args.database_port if args.database_port else \
+                str(app['database_port'][0][args.database_type])
+        except KeyError as e:
+            print('Wrong database type configured: {}'.format(args.database_type))
+            return False
 
-                if "db_type" in _line and args.database_type:
-                    _line = "db_type = '{}'\n".format(args.database_type)
-                if "'db_name'" in _line and args.database_name:
-                    _line = "{}'db_name': '{}',\n".format(_tab, args.database_name)
-                if "'db_user'" in _line and args.user_name:
-                    _line = "{}'db_user': '{}',\n".format(_tab, args.user_name)
-                if "'db_password'" in _line and args.password:
-                    _line = "{}'db_password': '{}',\n".format(_tab, args.password)
-                if "'db_host'" in _line and args.database_host:
-                    _line = "{}'db_host': '{}',\n".format(_tab, args.database_host)
-                if "'db_port'" in _line:
-                    try:
-                        port = args.database_port if args.database_port else\
-                            app['database_port'][0][args.database_type]
-                    except KeyError as e:
-                        print('Wrong database type configured: {}'.format(args.database_type))
-                        return False
-
-                    _line = "{}'db_port': '{}',\n".format(_tab, port)
-
-                cf.write(_line)
+        with open(__db_config_file, 'w') as _db_cfg:
+            _db_cfg.write(json.dumps(_db_config, ensure_ascii=False, sort_keys=True, indent=4))
 
     return True
 
 
 def __db_is_configured(args, test):
-
-    src = 'src/config/app_config.py'
-    if not os.path.isfile(src):
-        print(db_init_warning)
-        return False, False
-
-    if not test and not _configure_database(args, src):
-        print('Error configuring database')
-        return False, False
 
     try:
         import src.config.app_config
@@ -223,14 +212,18 @@ def __db_is_configured(args, test):
         print('Missing Database configuration in config file')
         return False, False
 
-    __db_config = src.config.app_config.db_config
-    __db_type = src.config.app_config.db_type
-    __port = src.config.app_config.port
+    __db_config = {}
+    if not _configure_database(args, src.config.app_config, __db_config, test):
+        print('Error configuring database')
+        return False, False
+
+    __port = str(src.config.app_config.port) if test else args.application_port
 
     if __port not in __db_config:
         print('Missing database configuration for port: {}'.format(__port))
         return False, False
     __db_config = __db_config[__port]
+    __db_type = __db_config['db_type']
 
     for k in __db_config:
 
@@ -280,7 +273,11 @@ def _build_database(args, test=False):
     _models_modules = []
     _get_orm_models(_models_modules, src.config.app_config.models)
 
-    orm_builder.create_db_schema()
+    try:
+        orm_builder.create_db_schema()
+    except sqlalchemy.exc.OperationalError:
+        print('Database {} is missing, please create it'.format(args.database_name))
+        sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
 
     # PREPARE DATABASE
     for m in _models_modules:
@@ -288,6 +285,13 @@ def _build_database(args, test=False):
             m.main()
         except AttributeError:
             print(m.__name__, "doesn't have to be prepared")
+
+        except sqlalchemy.exc.IntegrityError:
+            print('Database {} already exists, please recreate it'.format(args.database_name))
+            sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
+
+    if not test:
+        print('Database {} created successfully'.format(args.database_name))
 
     return orm_builder
 
@@ -306,31 +310,30 @@ def _show_create_table(args):
         print('No orm models in configuration file')
         sys.exit(exit_status.MISSING_ORM_MODELS)
 
-    if not hasattr(src.config.app_config, 'db_type'):
-        print('No database type in configuration file')
-        sys.exit(exit_status.MISSING_DATABASE_TYPE)
-
     if not hasattr(src.config.app_config, 'db_config'):
         print('No database configuration in configuration file')
         sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
 
-    db_type = src.config.app_config.db_type
-    db_config = src.config.app_config.db_config
-
-    for port in db_config:
-        for k in db_config[port]:
-            if db_config[port][k].startswith('__') or db_config[port][k].endswith('__'):
-                print("Database not properly configured: the {} can not be '{}'".format(k, db_config[port][k]))
-                sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+    __dest_dir = os.path.dirname(src.config.app_config.__file__)
+    __db_config_file = '{}/{}'.format(__dest_dir, src.config.app_config.db_config)
+    db_config = {}
+    with open(__db_config_file) as _db_cfg:
+        try:
+            db_config = json.load(_db_cfg)
+        except json.JSONDecodeError:
+            print('Can not load database configuration')
+            sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
 
     _models_modules = []
     _get_orm_models(_models_modules, src.config.app_config.models)
 
-    _port = src.config.app_config.port
+    _port = str(src.config.app_config.port)
     if _port not in db_config:
         print('Missing database configuration for port: {}'.format(_port))
-        return False, False
+        sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+
     _db_config = db_config[_port]
+    db_type = _db_config['db_type']
 
     __db_url = make_database_url(db_type, _db_config['db_name'], _db_config['db_host'], _db_config['db_port'],
                                  _db_config['db_user'], _db_config['db_password'])

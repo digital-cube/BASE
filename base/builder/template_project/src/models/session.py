@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, String, ForeignKey, Boolean, DateTime, SmallInteger
+from sqlalchemy import Column, ForeignKey, Boolean, DateTime, SmallInteger, CHAR
 import base.common.orm
 import base.application.lookup.session_token_type as token_type
 
@@ -8,8 +8,8 @@ class SessionTokens(base.common.orm.sql_base):
 
     __tablename__ = 'session_tokens'
 
-    id = Column(String(64), primary_key=True)
-    id_user = Column(String(10), ForeignKey('auth_users.id'), nullable=False)
+    id = Column(CHAR(64), primary_key=True)
+    id_user = Column(CHAR(10), ForeignKey('auth_users.id'), nullable=False)
     active = Column(Boolean, index=True, nullable=False, default=True)
     type = Column(SmallInteger, index=True, nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now())

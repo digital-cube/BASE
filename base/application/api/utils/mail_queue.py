@@ -29,6 +29,7 @@ class MailQueue(Base):
         {'name': 'get_data', 'type': bool, 'required': False,  'doc': 'will retrieve message data'},
     )
     def put(self, sender, sender_name, receiver, receiver_name, subject, message, data, get_data):
+        """Save message to queue"""
 
         log.info('Save message for {} by {}'.format(receiver, sender))
         from base.application.api_hooks import api_hooks
@@ -48,7 +49,8 @@ class MailQueue(Base):
 @authenticated()
 @api(
     URI='/tools/mail/:id_message',
-    PREFIX=False)
+    PREFIX=False,
+    SPECIFICATION_PATH='MailQueue')
 class MailQueueHandle(Base):
 
     @params(
@@ -57,6 +59,7 @@ class MailQueueHandle(Base):
         {'name': 'data', 'type': 'json', 'required': False,  'doc': 'message data to update'},
     )
     def patch(self, id_message, sent, data):
+        """Update message status and data"""
 
         MQ, _session = base.common.orm.get_orm_model('mail_queue')
 
@@ -96,6 +99,7 @@ class MailQueueHandle(Base):
         {'name': 'id_message', 'type': int, 'required': True,  'doc': 'message id'},
     )
     def get(self, id_message):
+        """Get message"""
 
         from base.application.api_hooks import api_hooks
 

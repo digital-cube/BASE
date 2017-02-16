@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, DateTime, Text
+from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, DateTime, Text, CHAR
 from sqlalchemy.orm import relationship
 import base.common.orm
 
@@ -8,7 +8,7 @@ class AuthUser(base.common.orm.sql_base):
 
     __tablename__ = 'auth_users'
 
-    id = Column(String(10), primary_key=True)
+    id = Column(CHAR(10), primary_key=True)
     username = Column(String(64), index=True, nullable=False, unique=True)
     password = Column(String(64), nullable=False)
     role_flags = Column(Integer, index=True, nullable=False)
@@ -30,7 +30,7 @@ class User(base.common.orm.sql_base):
 
     __tablename__ = 'users'
 
-    id = Column(String(10), ForeignKey(AuthUser.id), primary_key=True)
+    id = Column(CHAR(10), ForeignKey(AuthUser.id), primary_key=True)
     first_name = Column(String(64))
     last_name = Column(String(64))
     data = Column(Text)

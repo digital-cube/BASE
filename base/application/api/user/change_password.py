@@ -12,7 +12,8 @@ from base.common.utils import password_match
 
 @api(
     URI='/user/password/change/:hash',
-    PREFIX=False)
+    PREFIX=False,
+    SPECIFICATION_PATH='User')
 class ChangePassword(Base):
 
     @params(
@@ -49,7 +50,8 @@ class ChangePassword(Base):
 @authenticated()
 @api(
     URI='/user/password/change',
-    PREFIX=False)
+    PREFIX=False,
+    SPECIFICATION_PATH='User')
 class UserChangePassword(Base):
 
     @params(

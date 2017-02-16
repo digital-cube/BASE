@@ -22,6 +22,7 @@ class Hash2Params(Base):
         {'name': 'data', 'type': json, 'required': True,  'doc': 'hash data'},
     )
     def put(self, hash_data):
+        """Save data with hash"""
 
         from base.application.api_hooks import api_hooks
         try:
@@ -36,13 +37,15 @@ class Hash2Params(Base):
 @authenticated()
 @api(
     URI='/tools/h2p/:h2p',
-    PREFIX=False)
+    PREFIX=False,
+    SPECIFICATION_PATH='Hash2Params')
 class Hash2ParamsGet(Base):
 
     @params(
         {'name': 'h2p', 'type': str, 'required': True,  'doc': 'hash to get data from'},
     )
     def get(self, h2p):
+        """Get data from hash"""
 
         from base.application.api_hooks import api_hooks
         try:

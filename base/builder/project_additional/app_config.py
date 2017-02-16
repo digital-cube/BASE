@@ -16,15 +16,7 @@ imports = [
     'src.api.hello',
 ]
 db_type = 'mysql'
-db_config = {
-    __DB_PORT_CONFIG__: {
-        'db_name': __APP_DB_NAME__,
-        'db_user': '__db_username__',
-        'db_password': '__db_user_password__',
-        'db_host': '__db_host__',
-        'db_port': '__db_port__',
-    }
-}
+db_config = 'db_config.json'
 api_hooks = 'src.api_hooks.hooks'
 session_storage = 'DB'  # 'DB'|'REDIS'
 response_messages_module = 'src.lookup.response_messages'

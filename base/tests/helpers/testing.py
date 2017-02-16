@@ -31,7 +31,8 @@ class TestBase(AsyncHTTPTestCase):
                 from types import MethodType
                 setattr(self, '_register', MethodType(register, self))
         except ImportError as e:
-            print('There is no tests hook')
+            pass
+            # print('There is no tests hook')
 
     def tearDown(self):
         self.stop()
@@ -57,4 +58,32 @@ class TestBase(AsyncHTTPTestCase):
         self.assertIn('token_type', res)
 
         self.token = res['token']
+
+    def _check_user(self):
+
+        self.assertIsNot(self.token, None)
+
+        _headers = {'Authorization': self.token}
+
+        res = self.fetch('/user/login', method='GET', body=None, headers=_headers)
+
+        self.assertEqual(res.code, 200)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('id', res)
+
+        class User:
+            pass
+
+        for _k in res:
+            setattr(User, _k, res[_k])
+
+        self._user = User()
+
+    def get_user(self, username, password, data=None):
+
+        self._register(username, password, data)
+        self._check_user()
+        return self._user
 

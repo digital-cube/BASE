@@ -11,7 +11,8 @@ from base.common.utils import log
 
 @api(
     URI='/user/forgot',
-    PREFIX=False)
+    PREFIX=False,
+    SPECIFICATION_PATH='User')
 class Forgot(Base):
 
     @params(

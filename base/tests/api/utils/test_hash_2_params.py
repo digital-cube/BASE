@@ -69,8 +69,8 @@ class TestHash2Params(TestBase):
         res = res.body.decode('utf-8')
         res = json.loads(res)
 
-        self.assertIn('message', res)
-        self.assertEqual(res['message'], self._h2p_data)
+        self.assertIn('value', res)
+        self.assertEqual(res['value'], '123')
 
     def test_get_unexisting_hash(self):
 

@@ -1,14 +1,14 @@
 import base.common.orm
-from sqlalchemy import Column, String, SmallInteger, Boolean
+from sqlalchemy import Column, SmallInteger, Boolean, CHAR, String
 
 
 class Sequencer(base.common.orm.sql_base):
     __tablename__ = 'sequencer'
 
     id = Column(String(2), primary_key=True)
-    s_partition = Column(String(2), nullable=False)
+    s_partition = Column(CHAR(2), nullable=False)
     size = Column(SmallInteger, nullable=False)
-    active_stage = Column(String(3), nullable=False)
+    active_stage = Column(CHAR(3), nullable=False)
     check_sum_size = Column(SmallInteger, nullable=False)
     name = Column(String(64), nullable=False, unique=True)
     type = Column(String(16), nullable=False)
@@ -30,10 +30,8 @@ class Sequencer(base.common.orm.sql_base):
 class s_users(base.common.orm.sql_base):
     __tablename__ = 's_users'
 
-    id = Column(String(10), primary_key=True)
-    active_stage = Column(String(3), index=True, nullable=False)
-
-    # __table_args__ = (Index('_s_users_idx0', 'active_stage'),)
+    id = Column(CHAR(10), primary_key=True)
+    active_stage = Column(CHAR(3), index=True, nullable=False)
 
     def __init__(self, _id, active_stage):
         self.id = _id
@@ -43,10 +41,8 @@ class s_users(base.common.orm.sql_base):
 class s_session_token(base.common.orm.sql_base):
     __tablename__ = 's_session_token'
 
-    id = Column(String(64), primary_key=True)
-    active_stage = Column(String(3), index=True, nullable=False)
-
-    # __table_args__ = (Index('_s_session_token_idx0', 'active_stage'),)
+    id = Column(CHAR(64), primary_key=True)
+    active_stage = Column(CHAR(3), index=True, nullable=False)
 
     def __init__(self, _id, active_stage):
         self.id = _id
@@ -56,10 +52,8 @@ class s_session_token(base.common.orm.sql_base):
 class s_hash_2_params(base.common.orm.sql_base):
     __tablename__ = 's_hash_2_params'
 
-    id = Column(String(64), primary_key=True)
-    active_stage = Column(String(3), index=True, nullable=False)
-
-    # __table_args__ = (Index('_s_hash_2_params_idx0', 'active_stage'),)
+    id = Column(CHAR(64), primary_key=True)
+    active_stage = Column(CHAR(3), index=True, nullable=False)
 
     def __init__(self, _id, active_stage):
         self.id = _id

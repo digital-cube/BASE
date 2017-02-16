@@ -1,7 +1,9 @@
 # coding= utf-8
 
-import importlib
+import os
+import json
 import inspect
+import importlib
 from inspect import getmembers, isclass
 
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
@@ -59,8 +61,6 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'models', src.config.app_config.models)
     if hasattr(src.config.app_config, 'db_config'):
         setattr(base.config.application_config, 'db_config', src.config.app_config.db_config)
-    if hasattr(src.config.app_config, 'db_type'):
-        setattr(base.config.application_config, 'db_type', src.config.app_config.db_type)
     if hasattr(src.config.app_config, 'response_messages_module'):
         setattr(base.config.application_config, 'response_messages_module',
                 src.config.app_config.response_messages_module)
@@ -183,22 +183,49 @@ def load_application(entries, svc_port):
     # FINISH LOADING APPLICATION HOOKS
 
 
+def load_database_configuration(app_config, _db_config):
+
+    _dir = os.path.dirname(app_config.__file__)
+    _db_file = '{}/{}'.format(_dir, app_config.db_config)
+
+    if not os.path.isfile(_db_file):
+        return False
+
+    _db_conf = {}
+    with open(_db_file) as _db_cfg:
+        try:
+            _db_conf = json.load(_db_cfg)
+        except json.JSONDecodeError:
+            return False
+
+    for _k in _db_conf:
+        _db_config[_k] = _db_conf[_k]
+
+    return True
+
+
 def load_orm(svc_port):
+
+    try:
+        import src.config.app_config
+    except ImportError:
+        raise MissingApplicationConfiguration('Missing application configuration file "src.config.app_config.py"')
 
     import base.config.application_config
     import base.common.orm
 
-    if not hasattr(base.config.application_config, 'db_config') \
-            or not hasattr(base.config.application_config, 'db_type'):
-        raise MissingApplicationConfiguration('Missing database configuration or type')
+    if not hasattr(base.config.application_config, 'db_config'):
+        raise MissingDatabaseConfigurationForPort('Missing database configuration or type')
 
-    __db_config = base.config.application_config.db_config
-    __db_type = base.config.application_config.db_type
+    __db_config = {}
+    if not load_database_configuration(src.config.app_config, __db_config):
+        raise MissingDatabaseConfigurationForPort('Error loading database configuration from json file')
 
-    svc_port = int(svc_port)
+    svc_port = str(svc_port)
     if svc_port not in __db_config:
         raise MissingDatabaseConfigurationForPort('Missing database configuration for port {}'.format(svc_port))
     __db_config = __db_config[svc_port]
+    __db_type = __db_config['db_type']
 
     __db_url = base.common.orm.make_database_url(__db_type, __db_config['db_name'], __db_config['db_host'],
                                             __db_config['db_port'], __db_config['db_user'], __db_config['db_password'])

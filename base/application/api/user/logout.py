@@ -13,7 +13,8 @@ from base.common.utils import log
 @authenticated()
 @api(
     URI='/user/logout',
-    PREFIX=False)
+    PREFIX=False,
+    SPECIFICATION_PATH='User')
 class Logout(Base):
 
     def post(self, *args):
