@@ -20,7 +20,7 @@ from base.application.helpers.exceptions import MissingDatabaseConfigurationForP
 from base.application.helpers.exceptions import MissingApplicationConfiguration
 from base.application.helpers.exceptions import InvalidAPIHooksModule
 from base.application.helpers.exceptions import MissingRolesLookup
-
+from base.common.orm import load_database_configuration
 
 def _load_app_configuration(svc_port):
 
@@ -181,27 +181,6 @@ def load_application(entries, svc_port):
             _real_hook = getattr(_hooks_module, _hook)
             setattr(base.application.api_hooks.api_hooks, _hook, _real_hook)
     # FINISH LOADING APPLICATION HOOKS
-
-
-def load_database_configuration(app_config, _db_config):
-
-    _dir = os.path.dirname(app_config.__file__)
-    _db_file = '{}/{}'.format(_dir, app_config.db_config)
-
-    if not os.path.isfile(_db_file):
-        return False
-
-    _db_conf = {}
-    with open(_db_file) as _db_cfg:
-        try:
-            _db_conf = json.load(_db_cfg)
-        except json.JSONDecodeError:
-            return False
-
-    for _k in _db_conf:
-        _db_config[_k] = _db_conf[_k]
-
-    return True
 
 
 def load_orm(svc_port):

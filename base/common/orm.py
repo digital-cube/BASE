@@ -1,4 +1,5 @@
 import os
+import json
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -92,3 +93,23 @@ def get_orm_model(model_name):
 
     return OrmModel, _session
 
+
+def load_database_configuration(app_config, _db_config):
+
+    _dir = os.path.dirname(app_config.__file__)
+    _db_file = '{}/{}'.format(_dir, app_config.db_config)
+
+    if not os.path.isfile(_db_file):
+        return False
+
+    _db_conf = {}
+    with open(_db_file) as _db_cfg:
+        try:
+            _db_conf = json.load(_db_cfg)
+        except json.JSONDecodeError:
+            return False
+
+    for _k in _db_conf:
+        _db_config[_k] = _db_conf[_k]
+
+    return True
