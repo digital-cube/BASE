@@ -406,14 +406,14 @@ def params(*arguments):
                 default_arg_value = a['default'] if 'default' in a else None
                 argmnt = a['arg'].strip()
 
-                # _attr = request.request.get_body_argument(argmnt, default=default_arg_value)
-                # print('BODY ARGUMENT', _attr, type(_attr))
+                _header = request.request.headers.get('Content-Type')
                 _body = {}
-                try:
-                    _body = request.request.body.decode('utf-8')
-                    _body = json.loads(_body)
-                except Exception as e:
-                    log.warning('Can not load body: {} with error {}'.format(request.request.body, e))
+                if _header == 'application/json':
+                    try:
+                        _body = request.request.body.decode('utf-8')
+                        _body = json.loads(_body)
+                    except Exception as e:
+                        log.warning('Can not load body: {} with error {}'.format(request.request.body, e))
 
                 atr = _body[argmnt] if argmnt in _body else request.get_argument(argmnt, default=default_arg_value)
 
