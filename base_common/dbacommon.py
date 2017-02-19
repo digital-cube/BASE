@@ -301,7 +301,10 @@ def _convert_args(el, tp, esc):
     if tp == json:
 
         try:
-            el = json.dumps(json.loads(el), ensure_ascii=False)
+            if type(el) == dict:
+                el = json.dumps(el, ensure_ascii=False)
+            else:
+                el = json.dumps(json.loads(el), ensure_ascii=False)
         except json.decoder.JSONDecodeError as e:
             log.critical('Invalid argument: expected json got {} ({}): {}'.format(el, type(el), e))
             return None
@@ -403,7 +406,16 @@ def params(*arguments):
                 default_arg_value = a['default'] if 'default' in a else None
                 argmnt = a['arg'].strip()
 
-                atr = request.get_argument(argmnt, default=default_arg_value)
+                # _attr = request.request.get_body_argument(argmnt, default=default_arg_value)
+                # print('BODY ARGUMENT', _attr, type(_attr))
+                _body = {}
+                try:
+                    _body = request.request.body.decode('utf-8')
+                    _body = json.loads(_body)
+                except Exception as e:
+                    log.warning('Can not load body: {} with error {}'.format(request.request.body, e))
+
+                atr = _body[argmnt] if argmnt in _body else request.get_argument(argmnt, default=default_arg_value)
 
                 required = a['required'] if 'required' in a else True
 
