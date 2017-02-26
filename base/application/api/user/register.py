@@ -78,7 +78,7 @@ class Register(Base):
         response.update(_token)
 
         if hasattr(api_hooks, 'post_register_process'):
-            _post_register_result = api_hooks.post_register_process(id_user, username, password, data)
+            _post_register_result = api_hooks.post_register_process(id_user, username, password, data, _token)
             if not _post_register_result:
                 log.critical('Post register process error for user {} - {}'.format(id_user, username))
                 return self.error(msgs.ERROR_USER_POSTREGISTER)

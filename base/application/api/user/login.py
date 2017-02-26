@@ -63,7 +63,7 @@ class Login(Base):
         _post_login = None
         if hasattr(api_hooks, 'post_login_process'):
             try:
-                _post_login = api_hooks.post_login_process(user, data)
+                _post_login = api_hooks.post_login_process(user, data, _token)
             except PostLoginException as e:
                 log.critical('Post login error: {}'.format(e))
                 return self.error(msgs.POST_LOGIN_ERROR)

@@ -40,7 +40,7 @@ class Logout(Base):
         _post_logout = None
         if hasattr(api_hooks, 'post_logout_process'):
             try:
-                _post_logout = api_hooks.post_logout_process(self.auth_user)
+                _post_logout = api_hooks.post_logout_process(self.auth_user, self.auth_token)
             except PostLogoutException as e:
                 log.critical('Post logout error: {}'.format(e))
                 return self.error(msgs.POST_LOGOUT_ERROR)

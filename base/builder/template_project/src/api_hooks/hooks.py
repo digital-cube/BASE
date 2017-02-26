@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 API hooks, functions that will override default base hooks. Possible hooks are
 listed in the 'hooks' list, just uncomment and define function with the same
@@ -14,7 +15,7 @@ register_user(id_user, username, password, data) -> [dict, str, convertible to s
         - populate auth_users and users tables here
 pre_register_user(username, password, data) -> [None]:
         - process user's data before user registration
-post_register_process(id_user, username, password, data) -> [dict, None]:
+post_register_process(id_user, username, password, data, session_token) -> [dict, None]:
         - process user's data after user registration
 user_exists(username, password, data, handler) -> [User object]
         - check if username exists in the system
@@ -23,7 +24,7 @@ check_username_and_password(username, password, Auth_user) -> [bool]
 pre_login_process(Auth_user, json_data) -> [dict, str, None]
         - pre login data processing
         - on error raise PreLoginError
-post_login_process(Auth_user, json_data) -> [dict, str, None]
+post_login_process(Auth_user, json_data, token) -> [dict, str, None]
         - after login processing
         - on error raise PostLoginError
 save_hash(hash_data) -> [dict, str]
@@ -34,7 +35,7 @@ save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, 
         - save mail queue
 pre_logout_process(Auth_user) -> [dict, None]
         - pre logout data processing
-post_logout_process(Auth_user) -> [dict, None]
+post_logout_process(Auth_user, session_token) -> [dict, None]
         - post logout data processing
 check_user(Auth_user) -> [dict]
         - check user process
