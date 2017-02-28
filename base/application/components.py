@@ -496,18 +496,18 @@ class authenticated(object):
 
                 _auth_token = _origin_self.request.headers.get('Authorization')
                 if not _auth_token:
-                    return _origin_self.error(msgs.UNAUTHORIZED_REQUEST)
+                    return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 _user = get_user_by_token(_auth_token, pack=False)
                 if not _user:
                     log.critical('Can not get user from token {}'.format(_auth_token))
-                    return _origin_self.error(msgs.UNAUTHORIZED_REQUEST)
+                    return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 for _role in self.roles:
                     if not (_role & _user.role_flags):
                         log.critical('User {} with role {} trying anouthorized access on {}'.format(
                             _user.username, _user.role_flags, _origin_self.request.uri))
-                        return _origin_self.error(msgs.UNAUTHORIZED_REQUEST)
+                        return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 _origin_self.set_authorization_token(_auth_token)
                 _origin_self.set_authorized_user(_user)

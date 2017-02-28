@@ -64,7 +64,7 @@ class UserChangePassword(Base):
         if not password_match(self.auth_user.username, old_password, self.auth_user.password):
             log.critical('User {} trying to change password to {} with wrong password {}'.format(
                 self.auth_user.id, new_password, old_password))
-            return self.error(msgs.UNAUTHORIZED_REQUEST)
+            return self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
         import base.common.orm
         AuthUser, _session = base.common.orm.get_orm_model('auth_users')
