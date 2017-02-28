@@ -313,7 +313,7 @@ class params(object):
         if argument_type == datetime.datetime:
             try:
                 return datetime.datetime.strptime(argument_value, "%Y-%m-%d %H:%M:%S")
-            except ValueError as e:
+            except (ValueError, TypeError) as e:
                 log.critical('Invalid argument {} expected datetime, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
                 return None
@@ -321,7 +321,7 @@ class params(object):
         if argument_type == datetime.date:
             try:
                 return datetime.datetime.strptime(argument_value, "%Y-%m-%d").date()
-            except ValueError as e:
+            except (ValueError, TypeError) as e:
                 log.critical('Invalid argument {} expected date, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
                 return None
