@@ -12,6 +12,8 @@ from functools import wraps
 
 import base.application.lookup.responses as msgs
 from base.application.helpers.exceptions import MissingApiRui
+from base.application.helpers.exceptions import InvalidRequestParameter
+from base.application.helpers.exceptions import MissingRequestArgument
 from base.common.utils import get_request_ip
 from base.common.sequencer import sequencer
 from base.common.tokens_services import get_user_by_token
@@ -222,13 +224,20 @@ class params(object):
         return _res[0]
 
     @staticmethod
-    def convert_arguments(argument, argument_value, argument_type):
+    def convert_arguments(argument, argument_value, argument_type, required):
 
         from base.common.utils import log
+        # if argument_value is None:
+        #     log.warning('Argument {} value is None'.format(argument))
+        #     return None
+
         if argument_type == bool:
             try:
                 return argument_value.lower() == 'true'
             except AttributeError:
+                if argument_value is None:
+                    return None
+
                 return isinstance(argument_value, bool) and argument_value
 
         if argument_type == int:
@@ -240,6 +249,12 @@ class params(object):
                 log.critical('Invalid argument {} expected int got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
                 return None
+            except TypeError as e:
+                if argument_value is None:
+                    return None
+                log.critical('Invalid argument {} expected int got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for int')
 
         if argument_type == float:
             try:
@@ -313,7 +328,7 @@ class params(object):
         if argument_type == datetime.datetime:
             try:
                 return datetime.datetime.strptime(argument_value, "%Y-%m-%d %H:%M:%S")
-            except (ValueError, TypeError) as e:
+            except ValueError as e:
                 log.critical('Invalid argument {} expected datetime, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
                 return None
@@ -321,7 +336,7 @@ class params(object):
         if argument_type == datetime.date:
             try:
                 return datetime.datetime.strptime(argument_value, "%Y-%m-%d").date()
-            except (ValueError, TypeError) as e:
+            except ValueError as e:
                 log.critical('Invalid argument {} expected date, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
                 return None
@@ -353,7 +368,10 @@ class params(object):
         return False
 
     @staticmethod
-    def param_is_lower_then_min(_param_type, _param_value, _param_min_value):
+    def param_is_lower_then_min(_param_type, _param_value, _param_min_value, required):
+
+        if _param_value is None and not required:
+            return True
 
         if not params.params_type_for_compare(_param_type):
             return True
@@ -362,7 +380,10 @@ class params(object):
         return True
 
     @staticmethod
-    def param_is_greater_then_max(_param_type, _param_value, _param_max_value):
+    def param_is_greater_then_max(_param_type, _param_value, _param_max_value, required):
+
+        if _param_value is None and not required:
+            return True
 
         if not params.params_type_for_compare(_param_type):
             return True
@@ -440,22 +461,26 @@ class params(object):
                     log.critical('Missing required parameter {}'.format(_argument))
                     return _origin_self.error(msgs.MISSING_REQUEST_ARGUMENT)
 
-                _param_converted = params.convert_arguments(_argument, _param_value, _param_type)
-                if _param_converted is None and _param_required:
+                try:
+                    _param_converted = params.convert_arguments(_argument, _param_value, _param_type, _param_required)
+                except InvalidRequestParameter as e:
                     log.critical('Invalid parameter {}'.format(_argument))
                     return _origin_self.error(msgs.INVALID_REQUEST_ARGUMENT)
+                except MissingRequestArgument as e:
+                    log.critical('Missing required parameter {}'.format(_argument))
+                    return _origin_self.error(msgs.MISSING_REQUEST_ARGUMENT)
 
                 if _param_min_value and not params.param_is_lower_then_min(_param_type, _param_converted,
-                                                                           _param_min_value):
+                                                                           _param_min_value, _param_required):
                     log.warning('{} value {} is lower then required minimum {}'.format(
                         _argument, _param_value, _param_min_value))
                     return _origin_self.error(msgs.ARGUMENT_LOWER_THEN_MINIMUM)
 
                 if _param_max_value and not params.param_is_greater_then_max(_param_type, _param_converted,
-                                                                             _param_max_value):
+                                                                             _param_max_value, _param_required):
                     log.warning('{} value {} is greater then required maximum {}'.format(
                         _argument, _param_value, _param_min_value))
-                    return _origin_self.error(msgs.ARGUMENT_HIGHER_THEN_MINIMUM)
+                    return _origin_self.error(msgs.ARGUMENT_HIGHER_THEN_MAXIMUM)
 
                 _arguments.append(_param_converted)
 

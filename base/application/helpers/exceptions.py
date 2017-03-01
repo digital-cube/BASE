@@ -92,5 +92,17 @@ class CheckUserError(Exception):
 
 
 class MailQueueError(Exception):
-    """Create mail queue error execption"""
+    """Create mail queue error exception"""
     pass
+
+
+class InvalidRequestParameter(Exception):
+    """Invalid request parameter"""
+    pass
+
+
+class MissingRequestArgument(Exception):
+    """Request argument is missing"""
+    pass
+
+

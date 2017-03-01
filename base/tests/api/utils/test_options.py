@@ -32,7 +32,7 @@ class TestOptions(TestBase):
         body = json.dumps(_b)
         res = self.fetch('/tools/option/test_option', method='PUT', body=body)
 
-        self.assertEqual(res.code, 400)
+        self.assertEqual(res.code, 403)
         res = res.body.decode('utf-8')
         res = json.loads(res)
 

@@ -15,7 +15,7 @@ class TestUserLogout(TestBase):
         body = json.dumps({})
         res = self.fetch('/user/logout', method='POST', body=body)
 
-        self.assertEqual(res.code, 400)
+        self.assertEqual(res.code, 403)
         res = res.body.decode('utf-8')
         res = json.loads(res)
         self.assertIn('message', res)
@@ -44,7 +44,7 @@ class TestUserLogout(TestBase):
         self.assertEqual(res.body, b'')
 
         res2 = self.fetch('/user/logout', method='POST', body=body, headers=headers)
-        self.assertEqual(res2.code, 400)
+        self.assertEqual(res2.code, 403)
         res2 = res2.body.decode('utf-8')
         res2 = json.loads(res2)
         self.assertIn('message', res2)

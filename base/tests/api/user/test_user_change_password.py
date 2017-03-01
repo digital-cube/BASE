@@ -155,7 +155,7 @@ class TestUserChangePassword(TestBase):
         headers = {'Authorization': self.token}
         res = self.fetch('/user/password/change', method='POST', body=body, headers=headers)
 
-        self.assertEqual(res.code, 400)
+        self.assertEqual(res.code, 403)
         res = res.body.decode('utf-8')
         res = json.loads(res)
         self.assertIn('message', res)

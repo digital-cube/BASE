@@ -128,7 +128,7 @@ class TestUserLogin(TestBase):
 
         res = self.fetch('/user/login', method='GET', body=None, headers=headers)
 
-        self.assertEqual(res.code, 400)
+        self.assertEqual(res.code, 403)
         res = res.body.decode('utf-8')
         res = json.loads(res)
         self.assertIn('message', res)
