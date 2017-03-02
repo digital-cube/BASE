@@ -248,7 +248,8 @@ class params(object):
             except ValueError as e:
                 log.critical('Invalid argument {} expected int got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                return None
+                raise InvalidRequestParameter('Invalid argument for int')
+                # return None
             except TypeError as e:
                 if argument_value is None:
                     return None
@@ -262,35 +263,76 @@ class params(object):
             except ValueError as e:
                 log.critical('Invalid argument {} expected float got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                return None
+                raise InvalidRequestParameter('Invalid argument for float')
+                # return None
+            except TypeError as e:
+                if argument_value is None:
+                    return None
+
+                log.critical('Invalid argument {} expected float got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for float')
 
         if argument_type == list:
+
+            if type(argument_value) == list:
+                return argument_value
+
             try:
                 el = ast.literal_eval(argument_value)
             except SyntaxError as e:
                 log.critical('Invalid argument {} expected list, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                return None
+                raise InvalidRequestParameter('Invalid argument for float')
+                # return None
+            except ValueError as e:
+                if argument_value is None:
+                    return None
+                log.critical('Invalid argument {} expected list, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for float')
 
             if type(el) != list:
                 log.critical('Invalid argument {} expected list, got {} ({})'.format(
                     argument, argument_value, type(argument_value)))
-                return None
+                raise InvalidRequestParameter('Invalid argument for float')
+                # return None
 
             return el
 
         if argument_type == dict:
+            if type(argument_value) == dict:
+                return argument_value
+
+            if type(argument_value) == str:
+                try:
+                    el = json.loads(argument_value)
+                except json.JSONDecodeError as e:
+                    log.critical('Invalid argument {} expected json, got {} ({}): {}'.format(
+                        argument, argument_value, type(argument_value), e))
+                    raise InvalidRequestParameter('Invalid argument for dict')
+
+                return el
+
             try:
                 el = ast.literal_eval(argument)
             except SyntaxError as e:
                 log.critical('Invalid argument {} expected dict, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                return None
+                raise InvalidRequestParameter('Invalid argument for dict')
+            except ValueError as e:
+                if argument_value is None:
+                    return None
+                log.critical('Invalid argument {} expected list, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for float')
+                # return None
 
             if type(el) != dict:
                 log.critical('Invalid argument {} expected dict, got {} ({})'.format(
                     argument, argument_value, type(argument_value)))
-                return None
+                raise InvalidRequestParameter('Invalid argument for float')
+                # return None
 
             return el
 
@@ -363,7 +405,7 @@ class params(object):
 
     @staticmethod
     def params_type_for_compare(_param_type):
-        if _param_type in [int, float, decimal.Decimal, datetime.date, datetime.datetime]:
+        if _param_type in [int, float, decimal.Decimal, datetime.date, datetime.datetime, list]:
             return True
         return False
 
@@ -375,8 +417,15 @@ class params(object):
 
         if not params.params_type_for_compare(_param_type):
             return True
-        if _param_value < _param_min_value:
+        if _param_type == list:
+            try:
+                if len(_param_value) < _param_min_value:
+                    return False
+            except Exception as e:
+                return False
+        elif _param_value < _param_min_value:
             return False
+
         return True
 
     @staticmethod
@@ -387,7 +436,13 @@ class params(object):
 
         if not params.params_type_for_compare(_param_type):
             return True
-        if _param_value > _param_max_value:
+        if _param_type == list:
+            try:
+                if len(_param_value) > _param_max_value:
+                    return False
+            except Exception as e:
+                return False
+        elif _param_value > _param_max_value:
             return False
         return True
 
