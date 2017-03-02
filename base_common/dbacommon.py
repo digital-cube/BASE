@@ -406,7 +406,7 @@ def params(*arguments):
                 default_arg_value = a['default'] if 'default' in a else None
                 argmnt = a['arg'].strip()
 
-                _header = request.request.headers.get('Content-Type')
+                _header = request.request.headers.get('Content-Type') if hasattr(request, 'request') else ''
                 _body = {}
                 if _header == 'application/json':
                     try:
