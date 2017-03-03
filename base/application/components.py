@@ -221,15 +221,12 @@ class params(object):
             log.warning('Row with id {} not found in {} table'.format(row_id, table))
             return None
 
-        return _res[0]
+        return _res[0].id
 
     @staticmethod
     def convert_arguments(argument, argument_value, argument_type, required):
 
         from base.common.utils import log
-        # if argument_value is None:
-        #     log.warning('Argument {} value is None'.format(argument))
-        #     return None
 
         if argument_type == bool:
             try:
@@ -249,7 +246,6 @@ class params(object):
                 log.critical('Invalid argument {} expected int got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
                 raise InvalidRequestParameter('Invalid argument for int')
-                # return None
             except TypeError as e:
                 if argument_value is None:
                     return None
@@ -264,7 +260,6 @@ class params(object):
                 log.critical('Invalid argument {} expected float got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
                 raise InvalidRequestParameter('Invalid argument for float')
-                # return None
             except TypeError as e:
                 if argument_value is None:
                     return None
@@ -283,20 +278,18 @@ class params(object):
             except SyntaxError as e:
                 log.critical('Invalid argument {} expected list, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                raise InvalidRequestParameter('Invalid argument for float')
-                # return None
+                raise InvalidRequestParameter('Invalid argument for list')
             except ValueError as e:
                 if argument_value is None:
                     return None
                 log.critical('Invalid argument {} expected list, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                raise InvalidRequestParameter('Invalid argument for float')
+                raise InvalidRequestParameter('Invalid argument for list')
 
             if type(el) != list:
                 log.critical('Invalid argument {} expected list, got {} ({})'.format(
                     argument, argument_value, type(argument_value)))
-                raise InvalidRequestParameter('Invalid argument for float')
-                # return None
+                raise InvalidRequestParameter('Invalid argument for list')
 
             return el
 
@@ -325,14 +318,12 @@ class params(object):
                     return None
                 log.critical('Invalid argument {} expected list, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                raise InvalidRequestParameter('Invalid argument for float')
-                # return None
+                raise InvalidRequestParameter('Invalid argument for dict')
 
             if type(el) != dict:
                 log.critical('Invalid argument {} expected dict, got {} ({})'.format(
                     argument, argument_value, type(argument_value)))
-                raise InvalidRequestParameter('Invalid argument for float')
-                # return None
+                raise InvalidRequestParameter('Invalid argument for dict')
 
             return el
 
@@ -342,7 +333,13 @@ class params(object):
             except decimal.InvalidOperation as e:
                 log.critical('Invalid argument {} expected Decimal, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                return None
+                raise InvalidRequestParameter('Invalid argument for Decimal')
+            except TypeError as e:
+                if argument_value is None:
+                    return None
+                log.critical('Invalid argument {} expected Decimal, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for Decimal')
 
         if argument_type == 'json' or argument_type == json:
             try:
@@ -362,10 +359,12 @@ class params(object):
 
         if argument_type == 'e-mail':
 
+            if argument_value is None:
+                return None
             if '@' not in argument_value:
                 log.critical('Invalid argument {} expected email, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), 'not an e-mail'))
-                return None
+                raise InvalidRequestParameter('Invalid argument for E-mail')
 
         if argument_type == datetime.datetime:
             try:
@@ -373,7 +372,13 @@ class params(object):
             except ValueError as e:
                 log.critical('Invalid argument {} expected datetime, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                return None
+                raise InvalidRequestParameter('Invalid argument for Datetime')
+            except TypeError as e:
+                if argument_value is None:
+                    return None
+                log.critical('Invalid argument {} expected datetime, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for Datetime')
 
         if argument_type == datetime.date:
             try:
@@ -381,7 +386,13 @@ class params(object):
             except ValueError as e:
                 log.critical('Invalid argument {} expected date, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                return None
+                raise InvalidRequestParameter('Invalid argument for Date')
+            except TypeError as e:
+                if argument_value is None:
+                    return None
+                log.critical('Invalid argument {} expected date, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for Date')
 
         if type(argument_type) == str and argument_type.startswith('sequencer'):
 
@@ -423,6 +434,18 @@ class params(object):
                     return False
             except Exception as e:
                 return False
+        elif _param_type == datetime.datetime:
+            try:
+                if _param_value < datetime.datetime.strptime(_param_min_value, '%Y-%m-%d %H:%M:%S'):
+                    return False
+            except Exception as e:
+                return False
+        elif _param_type == datetime.date:
+            try:
+                if _param_value < datetime.datetime.strptime(_param_min_value, '%Y-%m-%d').date():
+                    return False
+            except Exception as e:
+                return False
         elif _param_value < _param_min_value:
             return False
 
@@ -439,6 +462,18 @@ class params(object):
         if _param_type == list:
             try:
                 if len(_param_value) > _param_max_value:
+                    return False
+            except Exception as e:
+                return False
+        elif _param_type == datetime.datetime:
+            try:
+                if _param_value > datetime.datetime.strptime(_param_max_value, '%Y-%m-%d %H:%M:%S'):
+                    return False
+            except Exception as e:
+                return False
+        elif _param_type == datetime.date:
+            try:
+                if _param_value > datetime.datetime.strptime(_param_max_value, '%Y-%m-%d').date():
                     return False
             except Exception as e:
                 return False
