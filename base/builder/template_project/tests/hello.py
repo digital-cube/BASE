@@ -127,6 +127,87 @@ class TestHello(TestBase):
         self.assertIn('d_seq', res)
         self.assertEqual(res['d_seq'], _u.id)
 
+    def test_get_with_wrong_list_type(self):
+
+        _u = self.get_user('user@test.loc', '123')
+        headers = {'Authorization': self.token}
+        _params = {
+            'd_bool': False,
+            'd_int': 20,
+            'd_float': 20.01,
+            'd_list': 21,
+            'd_dict': json.dumps({'1': 1, '2': 2, '3': 3, '4': 4}),
+            'd_dec': 25.10,
+            'd_json': json.dumps({'5': 5, '6': 6, '7': 7, '8': 8}),
+            'd_email': 'test@test.loc',
+            'd_datetime': '2017-03-03 22:15:15',
+            'd_date': '2017-03-03',
+            'd_seq': _u.id,
+        }
+        _url = url_concat('/api/hello', _params)
+        res = self.fetch(_url, headers=headers)
+
+        self.assertEqual(res.code, 400)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], responses.lmap[responses.INVALID_REQUEST_ARGUMENT])
+
+    def test_get_with_wrong_date_type(self):
+
+        _u = self.get_user('user@test.loc', '123')
+        headers = {'Authorization': self.token}
+        _params = {
+            'd_bool': False,
+            'd_int': 20,
+            'd_float': 20.01,
+            'd_list': [1, 2, 3, 4],
+            'd_dict': json.dumps({'1': 1, '2': 2, '3': 3, '4': 4}),
+            'd_dec': 25.10,
+            'd_json': json.dumps({'5': 5, '6': 6, '7': 7, '8': 8}),
+            'd_email': 'test@test.loc',
+            'd_datetime': '2017-03-03 22:15:15',
+            'd_date': '2017-13-33',
+            'd_seq': _u.id,
+        }
+        _url = url_concat('/api/hello', _params)
+        res = self.fetch(_url, headers=headers)
+
+        self.assertEqual(res.code, 400)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], responses.lmap[responses.INVALID_REQUEST_ARGUMENT])
+
+    def test_get_with_wrong_datetime_type(self):
+
+        _u = self.get_user('user@test.loc', '123')
+        headers = {'Authorization': self.token}
+        _params = {
+            'd_bool': False,
+            'd_int': 20,
+            'd_float': 20.01,
+            'd_list': [1, 2, 3, 4],
+            'd_dict': json.dumps({'1': 1, '2': 2, '3': 3, '4': 4}),
+            'd_dec': 25.10,
+            'd_json': json.dumps({'5': 5, '6': 6, '7': 7, '8': 8}),
+            'd_email': 'test@test.loc',
+            'd_datetime': '2017-13-33 22:15:15',
+            'd_date': '2017-03-03',
+            'd_seq': _u.id,
+        }
+        _url = url_concat('/api/hello', _params)
+        res = self.fetch(_url, headers=headers)
+
+        self.assertEqual(res.code, 400)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], responses.lmap[responses.INVALID_REQUEST_ARGUMENT])
+
     def test_get_with_int_below_the_min(self):
 
         self._register('user@test.loc', '123')
@@ -568,6 +649,84 @@ class TestHello(TestBase):
         self.assertIn('d_seq', res)
         self.assertEqual(res['d_seq'], _u.id)
 
+    def test_put_with_wrong_list_param(self):
+
+        # for sequencer test
+        _u = self.get_user('user@test.loc', '123')
+        _body = json.dumps({
+            'd_bool': True,
+            'd_int': 30,
+            'd_float': 30.9,
+            'd_list': 20,
+            'd_dict': {'1': 1, '2': 2, '3': 3, '4': 4},
+            'd_dec': 25.10,
+            'd_json': json.dumps({'5': 5, '6': 6, '7': 7, '8': 8}),
+            'd_email': 'test@test.loc',
+            'd_datetime': '2017-03-03 22:15:15',
+            'd_date': '2017-03-03',
+            'd_seq': _u.id,
+        })
+        res = self.fetch('/api/hello', method='PUT', body=_body)
+
+        self.assertEqual(res.code, 400)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], responses.lmap[responses.INVALID_REQUEST_ARGUMENT])
+
+    def test_put_with_wrong_date_param(self):
+
+        # for sequencer test
+        _u = self.get_user('user@test.loc', '123')
+        _body = json.dumps({
+            'd_bool': True,
+            'd_int': 30,
+            'd_float': 30.9,
+            'd_list': [1, 2, 3, 4],
+            'd_dict': {'1': 1, '2': 2, '3': 3, '4': 4},
+            'd_dec': 25.10,
+            'd_json': json.dumps({'5': 5, '6': 6, '7': 7, '8': 8}),
+            'd_email': 'test@test.loc',
+            'd_datetime': '2017-03-03 22:15:15',
+            'd_date': '2017-13-33',
+            'd_seq': _u.id,
+        })
+        res = self.fetch('/api/hello', method='PUT', body=_body)
+
+        self.assertEqual(res.code, 400)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], responses.lmap[responses.INVALID_REQUEST_ARGUMENT])
+
+    def test_put_with_wrong_datetime_param(self):
+
+        # for sequencer test
+        _u = self.get_user('user@test.loc', '123')
+        _body = json.dumps({
+            'd_bool': True,
+            'd_int': 30,
+            'd_float': 30.9,
+            'd_list': [1, 2, 3, 4],
+            'd_dict': {'1': 1, '2': 2, '3': 3, '4': 4},
+            'd_dec': 25.10,
+            'd_json': json.dumps({'5': 5, '6': 6, '7': 7, '8': 8}),
+            'd_email': 'test@test.loc',
+            'd_datetime': '2017-13-33 22:15:15',
+            'd_date': '2017-03-03',
+            'd_seq': _u.id,
+        })
+        res = self.fetch('/api/hello', method='PUT', body=_body)
+
+        self.assertEqual(res.code, 400)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], responses.lmap[responses.INVALID_REQUEST_ARGUMENT])
+
     def test_put_non_required_lower_int(self):
 
         _body = json.dumps({
@@ -888,4 +1047,3 @@ class TestHello(TestBase):
 
         self.assertIn('message', res)
         self.assertEqual(res['message'], 'hello delete')
-
