@@ -119,7 +119,12 @@ if __name__ == '__main__':
                     message.set_subject(subject)
                     message.add_content(Content("text/html", emsg))
                     m_data = message.get()
-                    response = sg.client.mail.send.post(request_body=m_data)
+                    try:
+                        response = sg.client.mail.send.post(request_body=m_data)
+                    except Exception as e:
+                        print('ERROR SENDGRID POST:', e)
+                        print('ERROR WITH MESSAGE:', res)
+                        continue
 
                 print(response, type(response))
                 # except Exception as e:
