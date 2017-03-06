@@ -93,6 +93,10 @@ if __name__ == '__main__':
                 subject = res['subject']
                 emsg = res['message']
 
+                if '@' not in sender or '@' not in receiver:
+                    print('Can not send message: {}'.format(res))
+                    continue
+
                 mdata = res['data']
                 id_msg = res['id']
 
