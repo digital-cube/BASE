@@ -87,7 +87,10 @@ def client_call(url, port, location, method, data, headers=None, force_json=Fals
     if headers:
         _headers.update(headers)
 
-    conn.request(method, location, body, headers=_headers)
+    try:
+        conn.request(method, location, body, headers=_headers)
+    except ConnectionRefusedError as e:
+        return 'Service not available', 503
 
     response = conn.getresponse()
     res = response.read().decode('utf-8'), response.status
