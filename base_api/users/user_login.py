@@ -63,10 +63,14 @@ def do_post(username, password, **kwargs):
 
     if not upwd or upwd != password:
 
-        if not check_password(u_pwd, username, password):
-            msg = 'Username {} wrong password: {}'.format(username, password)
-            log.critical(msg)
-            apphooks.action_log_hook(None, ip, 'login', msg)
+        try:
+            if not check_password(u_pwd, username, password):
+                msg = 'Username {} wrong password: {}'.format(username, password)
+                log.critical(msg)
+                apphooks.action_log_hook(None, ip, 'login', msg)
+                return base_common.msg.error(msgs.USER_NOT_FOUND)
+        except Exception as e:
+            log.warning('Error check password for {} with password {} and password from db {}: {}'.format(username, password, u_pwd, e))
             return base_common.msg.error(msgs.USER_NOT_FOUND)
 
     if hasattr(apphooks, 'login_expansion') and not apphooks.login_expansion(us):
