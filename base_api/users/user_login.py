@@ -69,7 +69,8 @@ def do_post(username, password, **kwargs):
             apphooks.action_log_hook(None, ip, 'login', msg)
             return base_common.msg.error(msgs.USER_NOT_FOUND)
 
-    if hasattr(apphooks, 'login_expansion') and not apphooks.login_expansion(us):
+    print('WTF')
+    if hasattr(apphooks, 'login_expansion') and not apphooks.login_expansion(us, **kwargs):
         return base_common.msg.error(msgs.ERROR_LOGIN_USER)
 
     # ASSIGN TOKEN

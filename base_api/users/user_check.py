@@ -37,7 +37,7 @@ def do_post(**kwargs):
     d['token'] = tk
 
     if hasattr(apphooks, 'extend_user_check'):
-        _extend_res = apphooks.extend_user_check(dbuser)
+        _extend_res = apphooks.extend_user_check(dbuser, **kwargs)
         if _extend_res == False:
             log.critical('Error user check extending')
             return base_common.msg.error(msgs.ERROR_POST_CHECK)
