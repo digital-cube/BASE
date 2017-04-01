@@ -15,11 +15,12 @@
 * enter project directory
 * install it with pip:
 
-
+```bash
     pip3 install .
     cat requirements.txt
     pip3 install [required_database_connector]
-    
+```
+
 ### Initialize project
 
 
