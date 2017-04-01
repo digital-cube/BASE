@@ -32,9 +32,10 @@
 
 * database has to be created before this step
 
-
+```bash
     cd project_name
     basemanager db_init db_username db_password
+```
 
 ### About
 
