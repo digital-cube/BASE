@@ -15,6 +15,8 @@ change_username_hook -- change username modifications (parameters: hash for hash
 change_username_success_hook -- change username modifications (parameters: )
 forgot_password_hook - forgot password (parameters: )
 check_user_registered - check if user with username is already registered
+login_expansion - login secondary tasks (params: db connection, dbuser , **kwargs)
+extend_user_check - user check secondary tasks (params: db connection, dbuser, **kwargs)
 """
 
 import base_config.settings
