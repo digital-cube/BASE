@@ -32,11 +32,17 @@ class Application(tornado.web.Application):
 
         self.entries = entries
 
+        _settings = {}
+        if base.config.application_config.static_path and base.config.application_config.static_uri:
+            self.entries.append((base.config.application_config.static_uri, tornado.web.StaticFileHandler))
+            _settings['static_path'] = base.config.application_config.static_path
+
         super(Application, self).__init__(
             self.entries,
             debug=base.config.application_config.debug,
             cookie_secret=base.config.application_config.secret_cookie,
-            default_handler_class=DefaultRouteHandler
+            default_handler_class=DefaultRouteHandler,
+            **_settings
         )
 
 
