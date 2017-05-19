@@ -69,6 +69,8 @@ def test_base(svc_port, t_stage):
 
     except Exception as e:
         log_failed('Error in test: {}'.format(e), '', None)
+        import tornado.ioloop
+        tornado.ioloop.IOLoop.instance().stop()
         sys.exit(1)
 
 
@@ -107,6 +109,8 @@ def test_app(app_tests_list, svc_port, t_stage, t_db, db_u, db_p):
                 itest[0](svc_port)
             except Exception as e:
                 log_failed('Error in test: {}'.format(e), '', None)
+                import tornado.ioloop
+                tornado.ioloop.IOLoop.instance().stop()
                 sys.exit(1)
 
             last_stage = current_stage

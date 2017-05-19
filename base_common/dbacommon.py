@@ -408,7 +408,7 @@ def params(*arguments):
 
                 _header = request.request.headers.get('Content-Type') if hasattr(request, 'request') else ''
                 _body = {}
-                if _header == 'application/json':
+                if _header and 'application/json' in _header:
                     try:
                         _body = request.request.body.decode('utf-8')
                         _body = json.loads(_body)
