@@ -16,7 +16,7 @@ class SequencerFactory:
 
     _reserved_table_name = 'normalseq'
 
-    def __init__(self, db):
+    def __init__(self, db, seq_orm_table_model=None):
 
         self.max_attempts = 100
 
@@ -40,6 +40,7 @@ class SequencerFactory:
                               53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131]
 
         self.db = db
+        self.seq_orm_table_model = seq_orm_table_model
         self.s_table = {}
         self.load_s_table()
 
@@ -47,7 +48,8 @@ class SequencerFactory:
 
         import base.config.application_config
         import base.common.orm
-        Sequencer = base.config.application_config.orm_models['sequencer']
+        Sequencer = self.seq_orm_table_model if self.seq_orm_table_model is not None \
+            else base.config.application_config.orm_models['sequencer']
 
         _q = self.db.session().query(Sequencer)
         for s in _q.all():
