@@ -15,27 +15,10 @@
 * enter project directory
 * install it with pip:
 
-```bash
-    pip3 install .
-    cat requirements.txt
-    pip3 install [required_database_connector]
-```
-
-### Initialize project
-
-
-    basemanager init project_name
-
-
-### Initialize database
-
-
-* database has to be created before this step
-
-```bash
-    cd project_name
-    basemanager db_init db_username db_password
-```
+    `pip3 install .`
+    `pip3 install -r requirements.txt`
+    `cat requirements.txt`
+    `pip3 install [required_database_connector]`
 
 ### About
 
