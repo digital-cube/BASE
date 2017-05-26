@@ -43,6 +43,6 @@ setup(
     author_email='slobodan@digitalcube.rs',
     description='Base, simple scaling project',
     install_requires=['tornado', 'bcrypt'],
-    data_files=[('/usr/local/bin', ['base/bin/basemanager.py', 'base/bin/basemanager']), ],
+    scripts=['base/bin/basemanager.py', 'base/bin/basemanager'],
     package_data={'base.application.templates': ['*'], 'base.builder.playground': ['*']},
 )

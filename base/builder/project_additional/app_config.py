@@ -36,3 +36,5 @@ If You didn't request password change, please ignore this message.
 
 Best Regards
 '''
+static_path = None
+static_uri = None

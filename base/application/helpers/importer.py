@@ -80,6 +80,10 @@ def _load_app_configuration(svc_port):
                 src.config.app_config.forgot_password_message)
     if hasattr(src.config.app_config, 'forgot_password_lending_address'):
         setattr(base.config.application_config, 'forgot_password_lending_address', src.config.app_config.forgot_password_lending_address)
+    if hasattr(src.config.app_config, 'static_path'):
+        setattr(base.config.application_config, 'static_path', src.config.app_config.static_path)
+    if hasattr(src.config.app_config, 'static_uri'):
+        setattr(base.config.application_config, 'static_uri', src.config.app_config.static_uri)
 
 
 def load_lookups():
