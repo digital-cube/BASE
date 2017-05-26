@@ -89,7 +89,7 @@ class SequencerFactory:
 
         return True
 
-    def new(self, table_id, commit=True):
+    def new(self, table_id, commit=False):
 
         from base.common.utils import log
 
@@ -177,15 +177,15 @@ class SequencerFactory:
 _sequencer = None
 
 
-def sequencer(db=None):
+def sequencer(db=None, seq_orm_table_model=None):
     """Sequencer singleton getter"""
 
     global _sequencer
     if not _sequencer or not _sequencer.check_db():
         if db:
-            _sequencer = SequencerFactory(db)
+            _sequencer = SequencerFactory(db, seq_orm_table_model)
         else:
-            _sequencer = SequencerFactory(base.common.orm.orm)
+            _sequencer = SequencerFactory(base.common.orm.orm, seq_orm_table_model)
 
     return _sequencer
 
