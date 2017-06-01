@@ -73,10 +73,13 @@ def test_db_is_active():
 
 
 def do_test(svc_port, location, method, token, data, expected_status, expected_data, result, result_types,
-            warning_level):
-    _headers = None
+            warning_level, _headers=None):
+
     if token:
-        _headers = {'Authorization': token}
+        if _headers is not None:
+            _headers['Authorization'] = token
+        else:
+            _headers = {'Authorization': token}
 
     res, status = call('localhost', svc_port, location, data, method, call_headers=_headers)
 
@@ -133,7 +136,7 @@ def do_test(svc_port, location, method, token, data, expected_status, expected_d
 
 
 def test(svc_port, location, method, token, data, expected_status={}, expected_data={}, result_types={},
-         warning_level=WarningLevel.STRICT, skip_info_log = False):
+         warning_level=WarningLevel.STRICT, skip_info_log = False, _headers=None):
     __result = {}
 
     if not test_db_is_active():
@@ -141,7 +144,7 @@ def test(svc_port, location, method, token, data, expected_status={}, expected_d
         finish_tests(base_config.settings.S_PID, success=False)
 
     if not do_test(svc_port, location, method, token, data, expected_status, expected_data, __result, result_types,
-                   warning_level):
+                   warning_level, _headers):
         log_failed(location, method, __result)
         finish_tests(base_config.settings.S_PID, success=False)
 
