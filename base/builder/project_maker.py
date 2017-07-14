@@ -279,7 +279,23 @@ def _build_database(args, test=False):
         print('Database {} is missing, please create it'.format(args.database_name))
         sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
 
+    def _get_sequnecer_model_module(_models_modules):
+
+        for m in _models_modules:
+            if 'sequencer' in m.__name__:
+                _models_modules.remove(m)
+                return m
+
+    # PREPARE SEQUENCERS FIRST
+    _seq_module = _get_sequnecer_model_module(_models_modules)
+    if _seq_module:
+        _seq_module.main()
+
+    from base.application.helpers.importer import load_orm
+    load_orm(args.application_port)
+
     # PREPARE DATABASE
+    import pdb; pdb.set_trace()
     for m in _models_modules:
         try:
             m.main()
