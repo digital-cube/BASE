@@ -723,7 +723,10 @@ class PathsWriter(DefaultRouteHandler):
     """List all paths in debug mode"""
 
     def _dummy(self):
-        _paths = [(handler.regex.pattern, handler.handler_class) for handler in self.application.handlers[0][1]]
+        try:
+            _paths = [(handler.regex.pattern, handler.handler_class) for handler in self.application.handlers[0][1]]
+        except AttributeError:
+            _paths = [handler for handler in self.application.default_router.application.entries]
         _paths.sort()
         _table_style = 'border-collapse: collapse;'
         _model = '<table style="{}"><tbody>'.format(_table_style)
