@@ -291,7 +291,7 @@ def _build_database(args, test=False):
     from base.application.helpers.importer import load_orm
     import base.config.application_config
     setattr(base.config.application_config, 'models', src.config.app_config.models)
-    load_orm(args.application_port)
+    load_orm(src.config.app_config.port)
 
     # PREPARE SEQUENCERS FIRST
     _seq_module = _get_sequnecer_model_module(_models_modules)
