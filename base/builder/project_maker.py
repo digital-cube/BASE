@@ -261,6 +261,7 @@ def _build_database(args, test=False):
     __db_url = make_database_url(db_type, _database_name, db_config['db_host'], db_config['db_port'],
                                  db_config['db_user'], db_config['db_password'])
 
+    import base.common.orm
     orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
     setattr(base.common.orm, 'orm', orm_builder.orm())
 
@@ -286,16 +287,18 @@ def _build_database(args, test=False):
                 _models_modules.remove(m)
                 return m
 
+    # LOAD ORM FOR SEQUENCERS IN MODELS
+    from base.application.helpers.importer import load_orm
+    import base.config.application_config
+    setattr(base.config.application_config, 'models', src.config.app_config.models)
+    load_orm(args.application_port)
+
     # PREPARE SEQUENCERS FIRST
     _seq_module = _get_sequnecer_model_module(_models_modules)
     if _seq_module:
         _seq_module.main()
 
-    from base.application.helpers.importer import load_orm
-    load_orm(args.application_port)
-
     # PREPARE DATABASE
-    import pdb; pdb.set_trace()
     for m in _models_modules:
         try:
             m.main()
