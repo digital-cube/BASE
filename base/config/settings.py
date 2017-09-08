@@ -41,8 +41,6 @@ db_init_warning = '''
 '''
 
 
-log_directory = '/var/log/base'
-log_filename = '{}/base_v1.log'.format(log_directory)
 log_logger = 'BASEv1'
 log = None
 

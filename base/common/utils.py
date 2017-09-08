@@ -5,8 +5,6 @@ import bcrypt
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-from base.config.settings import log_filename
-from base.config.settings import log_logger
 
 _logs = {}
 

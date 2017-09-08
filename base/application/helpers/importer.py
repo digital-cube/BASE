@@ -84,6 +84,8 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'static_path', src.config.app_config.static_path)
     if hasattr(src.config.app_config, 'static_uri'):
         setattr(base.config.application_config, 'static_uri', src.config.app_config.static_uri)
+    if hasattr(src.config.app_config, 'log_directory '):
+        setattr(base.config.application_config, 'log_directory', src.config.app_config.log_directory)
 
 
 def load_lookups():
@@ -103,7 +105,7 @@ def _set_log_file():
     import base.common.utils
     import base.config.application_config
 
-    _dir = base.config.settings.log_directory
+    _dir = base.config.application_config.log_directory
     _app = base.config.application_config.app_name
     _port = base.config.application_config.port
     _log_filename = '{}/{}_{}.log'.format(_dir, _app, _port)

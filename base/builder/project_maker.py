@@ -7,6 +7,7 @@ import stat
 import json
 import shutil
 import argparse
+import platform
 import importlib
 import importlib.util
 
@@ -29,6 +30,7 @@ from base.common.orm import make_database_url
 
 
 __project_path = None
+__WINDOWS__ = platform.system() == 'Windows'
 
 
 def pars_command_line_arguments():
@@ -47,9 +49,10 @@ def pars_command_line_arguments():
     init_parser.add_argument('-v', '--version', default=app['version'][0], help=app['version'][1])
     init_parser.add_argument('-x', '--prefix', default=app['prefix'][0], help=app['prefix'][1])
 
+    _splitter = '\\' if __WINDOWS__ else '/'
     db_init_parser = subparsers.add_parser('db_init', help="create base project's database schema")
     db_init_parser.add_argument('-dt', '--database_type', default=app['database_type'][0], help=app['database_type'][1])
-    db_init_parser.add_argument('-dn', '--database_name', default=os.getcwd().split('/')[-1],
+    db_init_parser.add_argument('-dn', '--database_name', default=os.getcwd().split(_splitter)[-1],
                                 help=app['database_name'][1])
     db_init_parser.add_argument('-dh', '--database_host', default=app['database_host'][0], help=app['database_host'][1])
     db_init_parser.add_argument('-dp', '--database_port', help=app['database_port'][1])
@@ -151,8 +154,8 @@ def _build_project(args):
 
     _site_dir = _get_install_directory()
     dir_path = '{}/{}'.format(args.destination, args.name)
-    source_dir = '{}/base/builder/{}'.format(_site_dir[0], template_project_folder)
-    additions_dir = '{}/base/builder/{}'.format(_site_dir[0], project_additional_folder)
+    source_dir = '{}/base/builder/{}'.format(_site_dir[1] if __WINDOWS__ else _site_dir[0], template_project_folder)
+    additions_dir = '{}/base/builder/{}'.format(_site_dir[1] if __WINDOWS__ else _site_dir[0], project_additional_folder)
     _create_directory(dir_path)
 
     copy_template(source_dir, dir_path, args.name)

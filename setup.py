@@ -3,7 +3,17 @@
 # except ImportError:
 #     from distutils.core import setup
 import base
+import platform
 from distutils.core import setup
+
+__WINDOWS__ = platform.system() == 'Windows'
+
+_scripts= [] if __WINDOWS__ else ['base/bin/basemanager.py', 'base/bin/basemanager']
+_entry_points={
+                 'console_scripts': [
+                     'basemanager = base.bin.basemanager:execute_builder_cmd'
+                 ]
+             } if __WINDOWS__ else {}
 
 setup(
     name='base',
@@ -23,6 +33,7 @@ setup(
               'base.builder.playground',
               'base.builder.project_additional',
               'base.builder.template_project',
+              'base.builder.template_project.log',
               'base.builder.template_project.src',
               'base.builder.template_project.src.api',
               'base.builder.template_project.src.api_hooks',
@@ -36,6 +47,7 @@ setup(
               'base.tests.api.utils',
               'base.tests.application',
               'base.tests.helpers',
+              'base.bin',
               ],
     url='https://github.com/digital-cube/BASE',
     license='GNU',
@@ -43,6 +55,7 @@ setup(
     author_email='slobodan@digitalcube.rs',
     description='Base, simple scaling project',
     install_requires=['tornado', 'bcrypt'],
-    scripts=['base/bin/basemanager.py', 'base/bin/basemanager'],
+    entry_points=_entry_points,
+    scripts=_scripts,
     package_data={'base.application.templates': ['*'], 'base.builder.playground': ['*']},
 )

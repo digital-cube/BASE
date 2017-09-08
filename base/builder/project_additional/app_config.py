@@ -38,3 +38,4 @@ Best Regards
 '''
 static_path = None
 static_uri = None
+log_directory = './log'
