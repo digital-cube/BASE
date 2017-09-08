@@ -33,7 +33,6 @@ setup(
               'base.builder.playground',
               'base.builder.project_additional',
               'base.builder.template_project',
-              'base.builder.template_project.log',
               'base.builder.template_project.src',
               'base.builder.template_project.src.api',
               'base.builder.template_project.src.api_hooks',
