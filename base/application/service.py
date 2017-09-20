@@ -17,6 +17,7 @@ def check_arguments():
 
     argparser = argparse.ArgumentParser(description=base.config.application_config.app_description)
     argparser.add_argument('-p', '--port', help='the port on which application will listen')
+    argparser.add_argument('-x', '--prefix', help='prefix for all application routes')
     return argparser.parse_args()
 
 
@@ -46,12 +47,23 @@ class Application(tornado.web.Application):
         )
 
 
+def _add_prefix(entries, prefix):
+    _new_entries = []
+    for e in entries:
+        _new_entries.append(('/{}{}'.format(prefix, e[0]), e[1]))
+
+    return _new_entries
+
+
 def engage():
 
     args = check_arguments()
 
     entries = [(BaseHandler.__URI__, BaseHandler), ]
     load_application(entries, args.port)
+
+    if args.prefix is not None:
+       entries = _add_prefix(entries, args.prefix)
 
     svc_port = _get_svc_port()
     if not svc_port:
@@ -61,10 +73,11 @@ def engage():
 
     app = Application(entries)
 
-    start_message = 'starting {} {} service on {}: http://localhost:{}'.format(
+    start_message = 'starting {} {} service on {}: http://localhost:{}{}'.format(
         base.config.application_config.app_name,
         base.config.application_config.app_version,
-        svc_port, svc_port)
+        svc_port, svc_port,
+        ' with api prefix /{}'.format(args.prefix) if args.prefix is not None else '')
 
     from base.common.utils import log
     print(start_message)
