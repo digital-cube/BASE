@@ -4,6 +4,7 @@ import argparse
 import tornado.web
 import tornado.ioloop
 
+import base.application.components
 from base.application.components import BaseHandler
 from base.application.components import DefaultRouteHandler
 from base.application.helpers.exceptions import MissingApplicationPort
@@ -63,7 +64,8 @@ def engage():
     load_application(entries, args.port)
 
     if args.prefix is not None:
-       entries = _add_prefix(entries, args.prefix)
+        setattr(base.application.components.Base, 'extra_prefix', args.prefix)
+        entries = _add_prefix(entries, args.prefix)
 
     svc_port = _get_svc_port()
     if not svc_port:

@@ -539,8 +539,9 @@ class params(object):
 
                 # GET URL PARAMETERS
                 if _argument in _origin_self.__PATH__PARAMS__:
+                    _uri_param_offset = len(_origin_self.extra_prefix.split('/')) if hasattr(_origin_self, 'extra_prefix') else 0
                     _param_value = _origin_self.request.uri.split('?')[0].split('/')[
-                        _origin_self.__PATH__PARAMS__[_argument]]
+                        _origin_self.__PATH__PARAMS__[_argument] + _uri_param_offset]
                     _param_required = True
                 else:
                     # GET BODY ARGUMENTS
