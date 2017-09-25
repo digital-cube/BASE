@@ -51,7 +51,7 @@ class Application(tornado.web.Application):
 def _add_prefix(entries, prefix, svc_port):
     _new_entries = []
     for e in entries:
-        _new_entries.append(('/{}_{}{}'.format(prefix, svc_port, e[0]), e[1]))
+        _new_entries.append(('/{}{}{}'.format(prefix, svc_port, e[0]), e[1]))
 
     return _new_entries
 
@@ -79,7 +79,7 @@ def engage():
         base.config.application_config.app_name,
         base.config.application_config.app_version,
         svc_port, svc_port,
-        ' with api prefix /{}_{}'.format(args.prefix, svc_port) if args.prefix is not None else '')
+        ' with api prefix /{}{}'.format(args.prefix, svc_port) if args.prefix is not None else '')
 
     from base.common.utils import log
     print(start_message)
