@@ -48,10 +48,10 @@ class Application(tornado.web.Application):
         )
 
 
-def _add_prefix(entries, prefix):
+def _add_prefix(entries, prefix, svc_port):
     _new_entries = []
     for e in entries:
-        _new_entries.append(('/{}{}'.format(prefix, e[0]), e[1]))
+        _new_entries.append(('/{}_{}{}'.format(prefix, svc_port, e[0]), e[1]))
 
     return _new_entries
 
@@ -63,13 +63,13 @@ def engage():
     entries = [(BaseHandler.__URI__, BaseHandler), ]
     load_application(entries, args.port)
 
-    if args.prefix is not None:
-        setattr(base.application.components.Base, 'extra_prefix', args.prefix)
-        entries = _add_prefix(entries, args.prefix)
-
     svc_port = _get_svc_port()
     if not svc_port:
         raise MissingApplicationPort('Application port not configured or missing from command line options')
+
+    if args.prefix is not None:
+        setattr(base.application.components.Base, 'extra_prefix', args.prefix)
+        entries = _add_prefix(entries, args.prefix, svc_port)
 
     load_orm(svc_port)
 
@@ -79,7 +79,7 @@ def engage():
         base.config.application_config.app_name,
         base.config.application_config.app_version,
         svc_port, svc_port,
-        ' with api prefix /{}'.format(args.prefix) if args.prefix is not None else '')
+        ' with api prefix /{}_{}'.format(args.prefix, svc_port) if args.prefix is not None else '')
 
     from base.common.utils import log
     print(start_message)
