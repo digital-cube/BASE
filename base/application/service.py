@@ -74,6 +74,7 @@ def engage():
     load_orm(svc_port)
 
     app = Application(entries)
+    setattr(app, 'svc_port', svc_port)
 
     start_message = 'starting {} {} service on {}: http://localhost:{}{}'.format(
         base.config.application_config.app_name,
