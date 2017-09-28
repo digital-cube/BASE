@@ -48,10 +48,15 @@ class Application(tornado.web.Application):
         )
 
 
+def _make_extra_prefix(prefix, svc_port):
+    return '{}{}'.format(prefix, svc_port)
+
+
 def _add_prefix(entries, prefix, svc_port):
     _new_entries = []
+    _extra_prefix = _make_extra_prefix(prefix, svc_port)
     for e in entries:
-        _new_entries.append(('/{}{}{}'.format(prefix, svc_port, e[0]), e[1]))
+        _new_entries.append(('/{}{}'.format(_extra_prefix, e[0]), e[1]))
 
     return _new_entries
 
@@ -68,7 +73,7 @@ def engage():
         raise MissingApplicationPort('Application port not configured or missing from command line options')
 
     if args.prefix is not None:
-        setattr(base.application.components.Base, 'extra_prefix', args.prefix)
+        setattr(base.application.components.Base, 'extra_prefix', _make_extra_prefix(args.prefix, svc_port))
         entries = _add_prefix(entries, args.prefix, svc_port)
 
     load_orm(svc_port)
