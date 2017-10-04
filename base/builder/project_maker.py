@@ -264,7 +264,8 @@ def _build_database(args, test=False):
 
     _database_name = 'test_{}'.format(db_config['db_name']) if test else db_config['db_name']
     __db_url = make_database_url(db_type, _database_name, db_config['db_host'], db_config['db_port'],
-                                 db_config['db_user'], db_config['db_password'])
+                                 db_config['db_user'], db_config['db_password'],
+                                 db_config['charset'] if 'charset' in db_config else 'utf8')
 
     import base.common.orm
     orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
@@ -340,7 +341,7 @@ def _show_create_table(args):
 
     __dest_dir = os.path.dirname(src.config.app_config.__file__)
     __db_config_file = '{}/{}'.format(__dest_dir, src.config.app_config.db_config)
-    db_config = {}
+
     with open(__db_config_file) as _db_cfg:
         try:
             db_config = json.load(_db_cfg)
@@ -360,7 +361,8 @@ def _show_create_table(args):
     db_type = _db_config['db_type']
 
     __db_url = make_database_url(db_type, _db_config['db_name'], _db_config['db_host'], _db_config['db_port'],
-                                 _db_config['db_user'], _db_config['db_password'])
+                                 _db_config['db_user'], _db_config['db_password'],
+                                 _db_config['charset'] if 'charset' in _db_config else 'utf8')
 
     orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
 
