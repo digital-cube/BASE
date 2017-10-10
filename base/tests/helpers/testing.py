@@ -21,7 +21,10 @@ class TestBase(AsyncHTTPTestCase):
 
         self.load_test_hook()
 
-        return Application(entries)
+        app = Application(entries)
+        setattr(app, 'svc_port', svc_port)
+
+        return app
 
     def load_test_hook(self):
         try:

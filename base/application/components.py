@@ -591,7 +591,14 @@ class authenticated(object):
 
     def __init__(self, *args):
 
-        self.roles = args
+        self.roles = None
+        if len(args) == 1:
+            self.roles = args[0]
+        if len(args) > 1:
+            _roles = args[0]
+            for _arg in args[1:]:
+                _roles |= _arg
+            self.roles = _roles
 
     def __call__(self, _target):
 
@@ -621,8 +628,8 @@ class authenticated(object):
                     log.critical('Can not get user from token {}'.format(_auth_token))
                     return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
-                for _role in self.roles:
-                    if not (_role & _user.role_flags):
+                if self.roles is not None:
+                    if not (self.roles & _user.role_flags):
                         log.critical('User {} with role {} trying anouthorized access on {}'.format(
                             _user.username, _user.role_flags, _origin_self.request.uri))
                         return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
