@@ -124,14 +124,19 @@ def register_user(id_user, username, password, data):
 
     _auth_user = AuthUser(id_user, username, password, role_flags, True)
     _session.add(_auth_user)
-    _session.commit()
 
     first_name = data['first_name'] if 'first_name' in data else None
     last_name = data['last_name'] if 'last_name' in data else None
     _data = json.dumps(data)
     _user = User(id_user, first_name, last_name, _data)
-    _session.add(_user)
-    _session.commit()
+    _auth_user.user = _user
+
+    try:
+        _session.commit()
+    except Exception as e:
+        log.critical('Error create user {}: {}'.format(username, e))
+        _session.rollback()
+        return False
 
     return True
 
