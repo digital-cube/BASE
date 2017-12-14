@@ -173,7 +173,15 @@ class GeneralPostHandler(tornado.web.RequestHandler):
 
         if self.request.method != 'OPTIONS':
             log_a.info('RETURN {} FOR URI {}: {}'.format(res, self.request.method, self.request.uri))
-            log_a.info('RETURN {} RESULT: {}'.format(res, result))
+            try:
+                j_result = json.dumps(result)
+                if csettings.EXCLUDE_CALL_LOG_MAX_CHARS > 0 and len(j_result) < csettings.EXCLUDE_CALL_LOG_MAX_CHARS:
+                    log_a.info('RETURN {} RESULT: {}'.format(res, result))
+                else:
+                    log_a.info('RETURN {} RESULT WHICH IS LONGER THEN {} CHARACTERS ({})'.format(
+                        res, csettings.EXCLUDE_CALL_LOG_MAX_CHARS, len(j_result)))
+            except Exception as e:
+                log_a.error('Can not measure response {} for logging: {}'.format(result, e))
 
     def write_error(self, status_code, **kwargs):
         if not csettings.DEBUG:

@@ -112,8 +112,8 @@ def import_from_settings(imported_modules, app_to_start):
     if hasattr(pm, 'STRONG_PASSWORD'):
         base_config.settings.STRONG_PASSWORD = pm.STRONG_PASSWORD
 
-
-
+    if hasattr(pm, 'EXCLUDE_CALL_LOG_MAX_CHARS'):
+        base_config.settings.EXCLUDE_CALL_LOG_MAX_CHARS = pm.EXCLUDE_CALL_LOG_MAX_CHARS
 
     def _add_to_imports(_mm, _f, _m):
 
