@@ -212,8 +212,9 @@ def load_orm(svc_port):
     __db_config = __db_config[svc_port]
     __db_type = __db_config['db_type']
 
-    __db_url = base.common.orm.make_database_url(__db_type, __db_config['db_name'], __db_config['db_host'],
-                                            __db_config['db_port'], __db_config['db_user'], __db_config['db_password'])
+    __db_url = base.common.orm.make_database_url(
+        __db_type, __db_config['db_name'], __db_config['db_host'], __db_config['db_port'], __db_config['db_user'],
+        __db_config['db_password'], __db_config['charset'] if 'charset' in __db_config else 'utf8')
 
     base.common.orm.activate_orm(__db_url)
 
