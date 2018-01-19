@@ -8,6 +8,8 @@ from base.application.components import api
 from base.application.components import authenticated
 from base.application.components import params
 from base.application.helpers.exceptions import CheckUserError
+from base.application.helpers.exceptions import PreCheckUserError
+from base.application.helpers.exceptions import PostCheckUserError
 from base.application.helpers.exceptions import PostLoginException
 from base.application.helpers.exceptions import PreLoginException
 from base.common.tokens_services import get_token
@@ -25,11 +27,34 @@ class Login(Base):
         """Login user - check user is logged in"""
 
         from base.application.api_hooks import api_hooks
+
+        _pre_check = None
+        if hasattr(api_hooks, 'pre_check_user'):
+            try:
+                _pre_check = api_hooks.pre_check_user(self.auth_user)
+            except PreCheckUserError as e:
+                log.critical('Pre check user {} error: {}'.format(self.auth_user.id, e))
+                return self.error(msgs.PRE_CHECK_USER_ERROR)
+
         try:
-            return self.ok(api_hooks.check_user(self.auth_user))
+            _check_user = api_hooks.check_user(self.auth_user)
         except CheckUserError as e:
             log.critical('Check user {} error {}'.format(self.auth_user.id, e))
             return self.error(msgs.CHECK_USER_ERROR)
+
+        if _pre_check is not None and isinstance(_pre_check, dict):
+            _check_user.update(_pre_check)
+
+        if hasattr(api_hooks, 'post_check_user'):
+            try:
+                _post_check = api_hooks.post_check_user(self.auth_user)
+            except PostCheckUserError as e:
+                log.critical('Post check user {} error: {}'.format(self.auth_user.id, e))
+                return self.error(msgs.POST_CHECK_USER_ERROR)
+            if isinstance(_post_check, dict):
+                _check_user.update(_post_check)
+
+        return self.ok(_check_user)
 
     @params(
         {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': "user's username"},

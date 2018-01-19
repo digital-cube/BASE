@@ -91,6 +91,16 @@ class CheckUserError(Exception):
     pass
 
 
+class PreCheckUserError(Exception):
+    """Pre check user process error exception"""
+    pass
+
+
+class PostCheckUserError(Exception):
+    """Post check user process error exception"""
+    pass
+
+
 class MailQueueError(Exception):
     """Create mail queue error exception"""
     pass

@@ -35,6 +35,12 @@ post_logout_process(Auth_user, session_token) -> [dict, None]
         - post logout data processing
 check_user(Auth_user) -> [dict]
         - check user process
+pre_check_user(Auth_user) -> [dict]
+        - process user before check user process
+        - on exception should rise PreCheckUserError
+post_check_user(Auth_user) -> [dict]
+        - process user after check user process
+        - on exception should rise PostCheckUserError
 get_mail_from_queue(id_message) -> [dict]
         - get mail data
 forgot_password(AuthUser, data) -> [bool]
@@ -138,7 +144,7 @@ def register_user(id_user, username, password, data):
         _session.rollback()
         return False
 
-    return True
+    return pack_user(_auth_user)
 
 
 # END OF THE REGISTER USER PROCESS

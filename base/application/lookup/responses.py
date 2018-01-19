@@ -39,6 +39,8 @@ FORGOT_REQUEST_ERROR = 36
 CHANGE_PASSWORD_ERROR = 37
 NOT_ALLOWED_FROM_REMOTE = 38
 OPTION_MISMATCH = 39
+PRE_CHECK_USER_ERROR = 40
+POST_CHECK_USER_ERROR = 40
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -80,6 +82,8 @@ lmap[FORGOT_REQUEST_ERROR] = 'Forgot request error'
 lmap[CHANGE_PASSWORD_ERROR] = 'Change password error'
 lmap[NOT_ALLOWED_FROM_REMOTE] = 'Not allowed from remote'
 lmap[OPTION_MISMATCH] = 'Option do not exists'
+lmap[PRE_CHECK_USER_ERROR] = 'Pre check user error'
+lmap[POST_CHECK_USER_ERROR] = 'Post check user error'
 
 lrev = {}
 for k in lmap:
