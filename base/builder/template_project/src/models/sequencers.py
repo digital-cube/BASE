@@ -1,3 +1,4 @@
+# coding= utf-8
 import base.common.orm
 from sqlalchemy import Column, SmallInteger, Boolean, CHAR, String
 

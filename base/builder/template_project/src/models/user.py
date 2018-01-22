@@ -1,3 +1,4 @@
+# coding= utf-8
 import datetime
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, DateTime, Text, CHAR
 from sqlalchemy.orm import relationship

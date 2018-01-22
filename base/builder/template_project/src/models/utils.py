@@ -1,3 +1,4 @@
+# coding= utf-8
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, Text, ForeignKey, CHAR
 import datetime
 import base.common.orm
