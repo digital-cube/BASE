@@ -1,6 +1,10 @@
 ## CHANGELOG
 
 
+### 2018 01 21
+
+- all sqlalchemy model files are with default charset
+
 ### 2018 01 19
 
 - pre and post check user hooks
