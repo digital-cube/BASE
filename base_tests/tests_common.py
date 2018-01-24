@@ -154,6 +154,10 @@ def test(svc_port, location, method, token, data, expected_status={}, expected_d
     return __result
 
 
+def exit_test(res: bool = True):
+    finish_tests(base_config.settings.S_PID, success=res)
+
+
 def prepare_test_env():
     from collections import namedtuple
     import base_config.settings
