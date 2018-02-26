@@ -2,6 +2,7 @@
 
 import json
 import urllib
+import uuid
 import tornado.web
 import tornado.ioloop
 import tornado.template
@@ -124,6 +125,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.denied = None
         self.r_ip = None
         self._a_p = None
+        self.request_id = None
         super().__init__(application, request, **kwargs)
 
         if csettings.LB:
@@ -159,12 +161,13 @@ class GeneralPostHandler(tornado.web.RequestHandler):
         self.allowed = allowed
         self.denied = denied
         log.info(self.api_module_name)
+        self.request_id = uuid.uuid4()
         self.log_input()
 
     def log_input(self):
 
         if self.request.method != 'OPTIONS':
-            log_a.info('URI {}: {}'.format(self.request.method, self.request.uri))
+            log_a.info('START WITH REQUEST ID {} {} ON URI: {}'.format(self.request_id, self.request.method, self.request.uri))
             log_a.info('BODY: {}'.format(self.request.body))
             log_a.info('ARGUMENTS: {}'.format(self.request.arguments))
             log_a.info('BODY ARGUMENTS: {}'.format(self.request.body_arguments))
@@ -172,7 +175,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
     def log_output(self, result, res):
 
         if self.request.method != 'OPTIONS':
-            log_a.info('RETURN {} FOR URI {}: {}'.format(res, self.request.method, self.request.uri))
+            log_a.info('RETURN {} FOR {} ON URI : {}'.format(res, self.request.method, self.request.uri))
             try:
                 j_result = json.dumps(result)
                 if csettings.EXCLUDE_CALL_LOG_MAX_CHARS > 0 and len(j_result) < csettings.EXCLUDE_CALL_LOG_MAX_CHARS:
@@ -182,6 +185,7 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                         res, csettings.EXCLUDE_CALL_LOG_MAX_CHARS, len(j_result)))
             except Exception as e:
                 log_a.error('Can not measure response {} for logging: {}'.format(result, e))
+            log_a.info('END FOR REQUEST ID {} WITH {} FOR {} ON URI : {}'.format(self.request_id, res, self.request.method, self.request.uri))
 
     def write_error(self, status_code, **kwargs):
         if not csettings.DEBUG:
@@ -367,8 +371,8 @@ class GeneralPostHandler(tornado.web.RequestHandler):
                         res = 'ERROR'
                     del result['http_status']
 
+                self.log_output(result, res)
                 if result != {}:
-                    self.log_output(result, res)
                     self.write(json.dumps(result, ensure_ascii=False))
 
             else:
