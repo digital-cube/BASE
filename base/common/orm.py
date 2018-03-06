@@ -63,7 +63,11 @@ class orm_builder(object):
 
     def clear_database(self):
         if self.__orm.engine().name == 'sqlite':
-            _db_name = self.__orm.db_url()[len('sqlite:///'):]
+            try:
+                _db_name = self.__orm.db_url()[len('sqlite:///'):]
+            except:
+                _db_name = self.__orm.db_url().database
+
             os.remove(_db_name)
         else:
             __meta = sqlalchemy.MetaData(self.__orm.engine())
