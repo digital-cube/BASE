@@ -14,7 +14,7 @@ class AuthUser(base.common.orm.sql_base):
     password = Column(String(64), nullable=False)
     role_flags = Column(Integer, index=True, nullable=False)
     active = Column(Boolean, index=True, nullable=False, default=False)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     user = relationship('User', uselist=False, back_populates='auth_user')
 
     def __init__(self, _id, username, password, role_flags=1, active=False):

@@ -13,7 +13,7 @@ class SessionTokens(base.common.orm.sql_base):
     id_user = Column(CHAR(10), ForeignKey('auth_users.id'), nullable=False)
     active = Column(Boolean, index=True, nullable=False, default=True)
     type = Column(SmallInteger, index=True, nullable=False)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now())
+    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     expired = Column(DateTime)
 
     def __init__(self, _id, id_user, active=True, type=token_type.SIMPLE, expired=None):

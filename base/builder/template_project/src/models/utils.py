@@ -24,10 +24,10 @@ class Hash2Params(base.common.orm.sql_base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     hash = Column(CHAR(64), index=True, nullable=False, unique=True)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now())
+    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     time_to_live = Column(Integer)
     expire_after_first_access = Column(Boolean, nullable=False, default=False)
-    last_access = Column(DateTime, nullable=False, default=datetime.datetime.now())
+    last_access = Column(DateTime, nullable=False, default=datetime.datetime.now)
     data = Column(Text, nullable=False)
 
     def __init__(self, _hash, data, time_to_live=None, expire_after_first_access=False):
@@ -49,7 +49,7 @@ class Hash2ParamsHistory(base.common.orm.sql_base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_hash_2_params = Column(Integer, ForeignKey('hash_2_params.id'), nullable=False)
-    log_time = Column(DateTime, nullable=False, default=datetime.datetime.now())
+    log_time = Column(DateTime, nullable=False, default=datetime.datetime.now)
     data = Column(Text, nullable=False)
 
     def __init__(self, id_hash, data):

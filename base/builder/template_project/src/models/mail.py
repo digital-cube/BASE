@@ -15,7 +15,7 @@ class MailQueue(base.common.orm.sql_base):
     sender = Column(String(128), index=True, nullable=False)
     receiver_name = Column(String(128), nullable=False)
     receiver = Column(String(128), nullable=False)
-    time_created = Column(DateTime, nullable=False, default=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    time_created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     time_sent = Column(DateTime)
     sent = Column(Boolean, index=True, nullable=False, default=True)
     message = Column(Text, nullable=False)
