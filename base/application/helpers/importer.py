@@ -202,9 +202,15 @@ def load_orm(svc_port):
     if not hasattr(base.config.application_config, 'db_config'):
         raise MissingDatabaseConfigurationForPort('Missing database configuration or type')
 
+    if not hasattr(src.config.app_config, 'db_config'):
+        return
+
     __db_config = {}
     if not load_database_configuration(src.config.app_config, __db_config):
-        raise MissingDatabaseConfigurationForPort('Error loading database configuration from json file')
+        raise MissingDatabaseConfigurationForPort(
+            '''
+            Error loading database configuration from json file, 
+            please initiate database or comment db_config option in the app_config''')
 
     svc_port = str(svc_port)
     if svc_port not in __db_config:

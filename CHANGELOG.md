@@ -6,6 +6,7 @@
 - strip and lower username for register user
 - clear database for sqllite
 - datetime.time as api parameter data type
+- start base service without database configured (still as work in progress)
 
 ### 2018 01 21
 
