@@ -394,6 +394,20 @@ class params(object):
                     argument, argument_value, type(argument_value), e))
                 raise InvalidRequestParameter('Invalid argument for Date')
 
+        if argument_type == datetime.time:
+            try:
+                return datetime.datetime.strptime(argument_value, "%H:%M:%S").time()
+            except ValueError as e:
+                log.critical('Invalid argument {} expected time, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for Time')
+            except TypeError as e:
+                if argument_value is None:
+                    return None
+                log.critical('Invalid argument {} expected time, got {} ({}): {}'.format(
+                    argument, argument_value, type(argument_value), e))
+                raise InvalidRequestParameter('Invalid argument for Time')
+
         if type(argument_type) == str and argument_type.startswith('sequencer'):
 
             s = argument_type.split(':')
