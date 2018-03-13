@@ -29,6 +29,7 @@ class Register(Base):
 
         from base.application.api_hooks import api_hooks
 
+        username = username.strip().lower()
         if hasattr(api_hooks, 'pre_register_user'):
             pre_reg_usr = api_hooks.pre_register_user(username, password, data)
             if pre_reg_usr is False:
