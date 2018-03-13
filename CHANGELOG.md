@@ -1,6 +1,11 @@
 ## CHANGELOG
 
 
+### 2018 03 13
+
+- strip and lower username for register user
+- clear database for sqllite
+
 ### 2018 01 21
 
 - all sqlalchemy model files are with default charset
