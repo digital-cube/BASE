@@ -116,3 +116,7 @@ class MissingRequestArgument(Exception):
     pass
 
 
+class InvalidApplicationConfiguration(Exception):
+    """Application configuration is invalid"""
+    pass
+

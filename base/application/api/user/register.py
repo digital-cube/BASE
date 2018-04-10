@@ -4,6 +4,7 @@ import base.application.lookup.responses as msgs
 from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
+from base.application.components import RequestAuthenticationChecker
 from base.common.utils import get_request_ip
 from base.common.utils import log
 
@@ -20,7 +21,7 @@ def user_exists(username, AuthUser, _session):
 class Register(Base):
 
     @params(
-        {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': 'username to register'},
+        {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': 'username to register', 'lowercase': True},
         {'name': 'password', 'type': str, 'required': True,  'doc': "user's password"},
         {'name': 'data', 'type': 'json', 'required': True,  'doc': "user's additional data"},
     )
@@ -29,7 +30,13 @@ class Register(Base):
 
         from base.application.api_hooks import api_hooks
 
-        username = username.strip().lower()
+        import base.config
+        if base.config.application_config.register_allowed_roles is not None:
+            test_roles, roles_error = self.check_role_flags(data, base.config.application_config.register_allowed_roles)
+            if not test_roles:
+                return self.error(roles_error)
+
+        username = username.strip()
         if hasattr(api_hooks, 'pre_register_user'):
             pre_reg_usr = api_hooks.pre_register_user(username, password, data)
             if pre_reg_usr is False:
@@ -88,4 +95,30 @@ class Register(Base):
                 response.update(_post_register_result)
 
         return self.ok(response)
+
+    def check_role_flags(self, data, allowed_roles):
+
+        # check if role is sent
+        if 'role_flags' not in data:
+            log.error('Missing role flags in data: {}'.format(data))
+            return False, msgs.ERROR_USER_REGISTER
+
+        # check if role flag is valid value
+        if not isinstance(data['role_flags'], int):
+            log.error('Wrong role flags type: {}'.format(data))
+            return False, msgs.WRONG_ROLE_TYPE
+
+        # check if role is allowed
+        if not (data['role_flags'] & allowed_roles):
+
+            import base.config.application_config
+            auth_checker = RequestAuthenticationChecker(self, base.config.application_config.registrators_allowed_roles)
+
+            if not auth_checker.is_authenticated():
+                log.error('Registration is not authenticated')
+            if self.auth_token is None or self.auth_user is None:
+                log.error('Unauthorized user trying to register an account with data: {}'.format(data))
+                return False, msgs.UNAUTHORIZED_REQUEST
+
+        return True, ''
 

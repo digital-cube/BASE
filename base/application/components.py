@@ -550,6 +550,8 @@ class params(object):
                 _param_required = _param['required'] if 'required' in _param else True
                 _param_min_value = _param['min'] if 'min' in _param else None
                 _param_max_value = _param['max'] if 'max' in _param else None
+                _param_lowercase = _param['lowercase'] if 'lowercase' in _param else None
+                _param_uppercase = _param['uppercase'] if 'uppercase' in _param else None
 
                 # GET URL PARAMETERS
                 if _argument in _origin_self.__PATH__PARAMS__:
@@ -588,6 +590,22 @@ class params(object):
                     log.warning('{} value {} is greater then required maximum {}'.format(
                         _argument, _param_value, _param_min_value))
                     return _origin_self.error(msgs.ARGUMENT_HIGHER_THEN_MAXIMUM)
+
+                if _param_lowercase:
+                    try:
+                        _param_converted = _param_converted.lower()
+                    except AttributeError as e:
+                        log.warning('Argument {} of type {} can not be converted to lowercase string'.format(
+                            _param_converted, type(_param_converted)))
+                        return _origin_self.error(msgs.INVALID_REQUEST_ARGUMENT)
+
+                if _param_uppercase:
+                    try:
+                        _param_converted = _param_converted.upper()
+                    except AttributeError as e:
+                        log.warning('Argument {} of type {} can not be converted to uppercase string'.format(
+                            _param_converted, type(_param_converted)))
+                        return _origin_self.error(msgs.INVALID_REQUEST_ARGUMENT)
 
                 _arguments.append(_param_converted)
 
@@ -644,7 +662,7 @@ class authenticated(object):
 
                 if self.roles is not None:
                     if not (self.roles & _user.role_flags):
-                        log.critical('User {} with role {} trying anouthorized access on {}'.format(
+                        log.critical('User {} with role {} trying unauthorized access on {}'.format(
                             _user.username, _user.role_flags, _origin_self.request.uri))
                         return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
@@ -656,6 +674,40 @@ class authenticated(object):
                 return _target(_origin_self, *args, **kwargs)
 
             return wrapper
+
+
+class RequestAuthenticationChecker(object):
+    """
+    Check if tornado handler is authenticated
+    """
+
+    def __init__(self, request_handler, allowed_roles):
+
+        self.request_handler = request_handler
+        self.allowed_roles = allowed_roles
+
+    def is_authenticated(self):
+
+        from base.common.utils import log
+
+        _auth_token = self.request_handler.request.headers.get('Authorization')
+        if not _auth_token:
+            return False
+
+        _user = get_user_by_token(_auth_token, pack=False)
+        if not _user:
+            log.critical('Can not get user from token {}'.format(_auth_token))
+            return False
+
+        if not (self.allowed_roles & _user.role_flags):
+            log.critical('User {} with role {} trying unauthorized access on {}'.format(
+                _user.username, _user.role_flags, self.request_handler.request.uri))
+            return False
+
+        self.request_handler.set_authorization_token(_auth_token)
+        self.request_handler.set_authorized_user(_user)
+
+        return True
 
 
 class local(object):

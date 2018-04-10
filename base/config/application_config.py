@@ -43,3 +43,5 @@ Best Regards
 static_path = None
 static_uri = ''
 log_directory = './log'
+register_allowed_roles = None
+registrators_allowed_roles = None

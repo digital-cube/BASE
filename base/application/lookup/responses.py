@@ -40,7 +40,11 @@ CHANGE_PASSWORD_ERROR = 37
 NOT_ALLOWED_FROM_REMOTE = 38
 OPTION_MISMATCH = 39
 PRE_CHECK_USER_ERROR = 40
-POST_CHECK_USER_ERROR = 40
+POST_CHECK_USER_ERROR = 41
+MISSING_ROLE = 42
+WRONG_ROLE_TYPE = 43
+INVALID_ROLE = 44
+ROLE_NOT_ALLOWED = 45
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -84,6 +88,9 @@ lmap[NOT_ALLOWED_FROM_REMOTE] = 'Not allowed from remote'
 lmap[OPTION_MISMATCH] = 'Option do not exists'
 lmap[PRE_CHECK_USER_ERROR] = 'Pre check user error'
 lmap[POST_CHECK_USER_ERROR] = 'Post check user error'
+lmap[MISSING_ROLE] = 'Role is missing'
+lmap[WRONG_ROLE_TYPE] = 'Role is with wrong type'
+lmap[ROLE_NOT_ALLOWED] = 'Role not allowed'
 
 lrev = {}
 for k in lmap:

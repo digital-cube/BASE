@@ -1,7 +1,5 @@
 # coding= utf-8
 
-import os
-import json
 import inspect
 import importlib
 from inspect import getmembers, isclass
@@ -20,7 +18,9 @@ from base.application.helpers.exceptions import MissingDatabaseConfigurationForP
 from base.application.helpers.exceptions import MissingApplicationConfiguration
 from base.application.helpers.exceptions import InvalidAPIHooksModule
 from base.application.helpers.exceptions import MissingRolesLookup
+from base.application.helpers.exceptions import InvalidApplicationConfiguration
 from base.common.orm import load_database_configuration
+
 
 def _load_app_configuration(svc_port):
 
@@ -79,13 +79,23 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'forgot_password_message',
                 src.config.app_config.forgot_password_message)
     if hasattr(src.config.app_config, 'forgot_password_lending_address'):
-        setattr(base.config.application_config, 'forgot_password_lending_address', src.config.app_config.forgot_password_lending_address)
+        setattr(base.config.application_config, 'forgot_password_lending_address',
+                src.config.app_config.forgot_password_lending_address)
     if hasattr(src.config.app_config, 'static_path'):
         setattr(base.config.application_config, 'static_path', src.config.app_config.static_path)
     if hasattr(src.config.app_config, 'static_uri'):
         setattr(base.config.application_config, 'static_uri', src.config.app_config.static_uri)
     if hasattr(src.config.app_config, 'log_directory '):
         setattr(base.config.application_config, 'log_directory', src.config.app_config.log_directory)
+    if hasattr(src.config.app_config, 'register_allowed_roles') and \
+            isinstance(src.config.app_config.register_allowed_roles, int):
+        if not hasattr(src.config.app_config, 'registrators_allowed_roles') or \
+                src.config.app_config.registrators_allowed_roles is None or \
+                not isinstance(src.config.app_config.registrators_allowed_roles, int):
+            raise InvalidApplicationConfiguration('Missing registrators allowed roles in the configuration file')
+        setattr(base.config.application_config, 'register_allowed_roles', src.config.app_config.register_allowed_roles)
+        setattr(base.config.application_config, 'registrators_allowed_roles',
+                src.config.app_config.registrators_allowed_roles)
 
 
 def load_lookups():
