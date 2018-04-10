@@ -39,8 +39,6 @@ class TestBase(AsyncHTTPTestCase):
 
     def tearDown(self):
         self.stop()
-        self.orm_builder.orm().session().close()
-        self.orm_builder.clear_database()
 
     def _register(self, username, password, data=None):
 

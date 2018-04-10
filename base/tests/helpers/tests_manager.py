@@ -21,11 +21,6 @@ def prepare_test_database():
         print("Missing database configuration, please check you config file")
         sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
 
-    # if not hasattr(app_config, 'db_type'):
-    #     print("Missing database type, please check you config file")
-    #     sys.exit(exit_status.MISSING_DATABASE_TYPE)
-
-    # app_config.db_config['db_name'] = 'test_{}'.format(app_config.db_config['db_name'])
     setattr(src.config.app_config, 'debug', False)
 
     import base.builder.project_maker

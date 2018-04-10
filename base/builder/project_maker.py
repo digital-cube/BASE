@@ -280,6 +280,11 @@ def _build_database(args, test=False):
     _models_modules = []
     _get_orm_models(_models_modules, src.config.app_config.models)
 
+    if test:
+        # teardown database in test mode
+        orm_builder.orm().session().close()
+        orm_builder.clear_database()
+
     try:
         orm_builder.create_db_schema()
     except sqlalchemy.exc.OperationalError:
