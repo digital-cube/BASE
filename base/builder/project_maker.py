@@ -81,6 +81,9 @@ def copy_template(source, destination, project_name):
             shutil.copy2(_f, destination)
 
     os.makedirs('{}/log'.format(destination))
+    open('{}/log/.gitkeep'.format(destination), 'w+')
+    os.makedirs('{}/tests/log'.format(destination))
+    open('{}/tests/log/.gitkeep'.format(destination), 'w+')
 
     git_ignore = '{}/{}'.format(source, '.gitignore')
     if os.path.isfile(git_ignore):
