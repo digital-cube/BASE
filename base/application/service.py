@@ -1,5 +1,6 @@
 # coding= utf-8
 
+import os
 import argparse
 import tornado.web
 import tornado.ioloop
@@ -61,13 +62,14 @@ def _add_prefix(entries, prefix, svc_port):
     return _new_entries
 
 
-def engage():
+def engage(starter_path):
 
     args = check_arguments()
 
     entries = [(BaseHandler.__URI__, BaseHandler), ]
     load_application(entries, args.port)
-    entries.append((r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "/static"}))
+    entries.append((r"/static/(.*)", tornado.web.StaticFileHandler,
+                    {"path": "{}/static".format(os.path.dirname(starter_path))}))
 
     svc_port = _get_svc_port()
     if not svc_port:

@@ -4,5 +4,5 @@
 from base.application.service import engage
 
 if __name__ == '__main__':
-    engage()
+    engage(__file__)
 
