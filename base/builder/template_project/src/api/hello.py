@@ -34,6 +34,7 @@ class Hello(Base):
         {'name': 'd_seq', 'type': 'sequencer:s_users:u', 'doc': 'dummy sequencer', 'required': False},
     )
     def get(self, d_bool, d_int, d_float, d_list, d_dict, d_dec, d_json, d_email, d_datetime, d_date, d_seq):
+        """Hello - get"""
         return self.ok({
             'd_bool': d_bool,
             'd_int': d_int,
@@ -65,6 +66,7 @@ class Hello(Base):
         {'name': 'd_seq', 'type': 'sequencer:s_users:u', 'required': False, 'doc': 'dummy sequencer'},
     )
     def put(self, d_bool, d_int, d_float, d_list, d_dict, d_dec, d_json, d_email, d_datetime, d_date, d_seq):
+        """Hello - put"""
         return self.ok({
             'd_bool': d_bool,
             'd_int': d_int,
@@ -82,14 +84,17 @@ class Hello(Base):
     # @authenticated()  # if post method has to be authenticated
     # TODO url testing
     def post(self):
+        """Hello - post"""
         return self.ok('hello post')
 
     # @authenticated()  # if patch method has to be authenticated
     # TODO default params testing
     def patch(self):
+        """Hello - patch"""
         return self.ok('hello patch')
 
     # @authenticated()  # if delete method has to be authenticated
     def delete(self):
+        """Hello - delete"""
         return self.ok('hello delete')
 

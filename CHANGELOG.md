@@ -2,6 +2,13 @@
 
 ### 2018 05 08
 
+## BASE version 1.0.2
+- default static file handler
+- mockup api descriptions
+
+
+### 2018 05 08
+
 ## BASE version 1.0.1
 
 - remove parts of the system that are connected to database for initial instantiation,

@@ -67,6 +67,7 @@ def engage():
 
     entries = [(BaseHandler.__URI__, BaseHandler), ]
     load_application(entries, args.port)
+    entries.append((r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "/static"}))
 
     svc_port = _get_svc_port()
     if not svc_port:
