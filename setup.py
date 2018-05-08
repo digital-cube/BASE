@@ -2,6 +2,7 @@
 #     from setuptools import setup
 # except ImportError:
 #     from distutils.core import setup
+import os
 import base
 import platform
 from distutils.core import setup
@@ -15,6 +16,8 @@ _entry_points={
                  ]
              } if __WINDOWS__ else {}
 
+_dir = os.path.dirname(__file__)
+print('VOOA JE DIR', _dir)
 setup(
     name='base',
     version=base.__VERSION__,
@@ -26,27 +29,15 @@ setup(
               'base.application.api_hooks',
               'base.application.lookup',
               'base.application.helpers',
-              'base.application.templates',
               'base.common',
               'base.config',
               'base.builder',
-              'base.builder.playground',
-              'base.builder.project_additional',
-              'base.builder.template_project',
-              'base.builder.template_project.src',
-              'base.builder.template_project.src.api',
-              'base.builder.template_project.src.api_hooks',
-              'base.builder.template_project.src.config',
-              'base.builder.template_project.src.lookup',
-              'base.builder.template_project.src.models',
-              'base.builder.template_project.tests',
               'base.tests',
               'base.tests.api',
               'base.tests.api.user',
               'base.tests.api.utils',
               'base.tests.application',
-              'base.tests.helpers',
-              'base.bin',
+              'base.tests.helpers'
               ],
     url='https://github.com/digital-cube/BASE',
     license='GNU',
@@ -56,5 +47,21 @@ setup(
     install_requires=['tornado', 'bcrypt'],
     entry_points=_entry_points,
     scripts=_scripts,
-    package_data={'base.application.templates': ['*'], 'base.builder.playground': ['*']},
+    package_data={
+        'base': [
+            'application/templates/*',
+            'bin/*',
+            'builder/playground/*',
+            'builder/project_additional/*',
+            'builder/project_additional/models/*',
+            'builder/project_additional/api_hooks/*',
+            'builder/template_project/*',
+            'builder/template_project/src/*',
+            'builder/template_project/src/api/*',
+            'builder/template_project/src/config/*',
+            'builder/template_project/src/lookup/*',
+            'builder/template_project/static/img/*',
+            'builder/template_project/tests/*',
+        ],
+    },
 )

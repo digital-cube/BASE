@@ -120,3 +120,7 @@ class InvalidApplicationConfiguration(Exception):
     """Application configuration is invalid"""
     pass
 
+
+class DatabaseIsNotConfigured(Exception):
+    """Application has not database configured"""
+    pass

@@ -205,12 +205,119 @@ def _configure_database(args, app_config, _db_config, test=False):
     return True
 
 
+def _enable_database_in_config(config_file, args, test):
+
+    # f = '/home/bobane/tmp/fuck/src/config/app_config.py'
+
+    # _project_conf_file = '{}/src/config/app_config.py'.format(destination)
+
+    # with open(_project_conf_file, 'w') as _new_config:
+
+    with open(config_file, 'r') as cf:
+        _file = cf.readlines()
+
+    _new_file = []
+    _models = False
+    _max_models_try = 20
+    _forgot = False
+    _max_forgot_try = 20
+
+    for _line in _file:
+        # print(_line)
+
+        if _max_models_try == 0 or _max_forgot_try == 0:
+            print('MAXIMUM TRIES EXCEEDED')
+            # return False
+            break
+
+        if _models and not (_line == '# ]\n'):
+            _new_file.append(_line[2:])
+            _max_models_try -= 1
+            continue
+
+        if _line == '# models = [\n':
+            _new_file.append('models = [\n')
+            _models = True
+            continue
+
+        if _line == '# ]\n' and _models:
+            _new_file.append(']\n')
+            _models = False
+            continue
+
+        if _line[:11] == '# db_config':
+            _new_file.append(_line[2:])
+            continue
+
+        if _line[:11] == '# api_hooks':
+            _new_file.append(_line[2:])
+            continue
+
+        if _line[:17] == '# session_storage':
+            _new_file.append(_line[2:])
+            continue
+
+        if _line[:17] == '# session_storage':
+            _new_file.append(_line[2:])
+            continue
+
+        if _line[:19] == '# user_roles_module':
+            _new_file.append(_line[2:])
+            continue
+
+        if _line[:17] == '# strong_password':
+            _new_file.append(_line[2:])
+            continue
+
+        if _line[:33] == '# forgot_password_lending_address':
+            _new_file.append(_line[2:])
+            continue
+
+        if _line[:33] == '# forgot_password_message_subject':
+            _new_file.append(_line[2:])
+            continue
+
+        if _forgot and _line != "# '''\n":
+            _new_file.append(_line[2:])
+            _max_forgot_try -= 1
+            continue
+
+        if _line == "# forgot_password_message = '''\n":
+            _new_file.append(_line[2:])
+            _forgot = True
+            continue
+
+        if _forgot and _line == "# '''\n":
+            _new_file.append(_line[2:])
+            _forgot = False
+            continue
+
+        _new_file.append(_line)
+
+    with open(config_file, 'w') as cf:
+
+        cf.write(''.join(_new_file))
+
+    return True
+
+
 def __db_is_configured(args, test):
 
     try:
         import src.config.app_config
     except ImportError as e:
         print('Can not find application configuration')
+        return False, False
+
+    if not _enable_database_in_config(src.config.app_config.__file__, args, test):
+        print('Can not configure Database in config file')
+        return False, False
+
+    # reimport configuration file
+    try:
+        importlib.reload(src.config.app_config)
+    except ImportError as e:
+        print('Can not reload application configuration')
         return False, False
 
     if not hasattr(src.config.app_config, 'db_config'):
@@ -254,6 +361,35 @@ def _update_path():
     sys.path.append(_project_path)
 
 
+def _copy_database_components():
+
+    _site_dir = _get_install_directory()
+    models_source_dir = '{}/base/builder/project_additional/models'.format(_site_dir[0])
+    hooks_source_dir = '{}/base/builder/project_additional/api_hooks'.format(_site_dir[0])
+
+    try:
+        shutil.copytree(models_source_dir, 'src/models')
+    except FileExistsError as e:
+        print('Directory "models" already exists, please rename/remove existing one')
+        sys.exit(exit_status.PROJECT_DIRECTORY_ALREADY_EXISTS)
+    except PermissionError as e:
+        print('Can not create directory "models", insufficient permissions')
+        sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
+
+    try:
+        shutil.copytree(hooks_source_dir, 'src/api_hooks')
+    except FileExistsError as e:
+        print('Directory "api_hooks" already exists, please rename/remove existing one')
+        sys.exit(exit_status.PROJECT_DIRECTORY_ALREADY_EXISTS)
+    except PermissionError as e:
+        print('Can not create directory "api_hooks", insufficient permissions')
+        sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
+
+    print('Database models shown')
+
+    return True
+
+
 def _build_database(args, test=False):
 
     _update_path()
@@ -274,6 +410,10 @@ def _build_database(args, test=False):
     import src.config.app_config
     if not hasattr(src.config.app_config, 'models'):
         print('Nothing to be done')
+        return
+
+    if not test and not _copy_database_components():
+        print('Can not initialize database components')
         return
 
     # PRESENT MODELS TO BASE

@@ -1,9 +1,3 @@
 include LICENSE.txt
 include INSTALL.txt
-include base/bin/basemanager
-include base/bin/basemanager.py
-include base/application/templates/introduction.html
-include base/application/templates/specification.html
-include base/builder/playground/index.html
-include base/builder/playground/playground
 

@@ -1,5 +1,14 @@
 ## CHANGELOG
 
+### 2018 04 13
+
+## BASE version 1.0.1
+
+- remove parts of the system that are connected to database for initial instantiation,
+and add them in database initialization process
+- configure registration of allowed role flags
+- move database destroy from teardown in tests to test's setup
+- add project name to main template
 
 ### 2018 03 13
 

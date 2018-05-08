@@ -18,8 +18,9 @@ def prepare_test_database():
         sys.exit(exit_status.MISSING_PROJECT_CONFIGURATION)
 
     if not hasattr(app_config, 'db_config'):
-        print("Missing database configuration, please check you config file")
-        sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
+        return
+        # print("Missing database configuration, please check you config file")
+        # sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
 
     setattr(src.config.app_config, 'debug', False)
 

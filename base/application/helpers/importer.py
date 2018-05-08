@@ -51,51 +51,71 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'secret_cookie', src.config.app_config.secret_cookie)
     if hasattr(src.config.app_config, 'debug'):
         setattr(base.config.application_config, 'debug', src.config.app_config.debug)
+    # todo: vidi sta sa hooks
     if hasattr(src.config.app_config, 'api_hooks'):
         setattr(base.config.application_config, 'api_hooks', src.config.app_config.api_hooks)
-    if hasattr(src.config.app_config, 'session_storage'):
-        setattr(base.config.application_config, 'session_storage', src.config.app_config.session_storage)
-    if hasattr(src.config.app_config, 'imports'):
-        base.config.application_config.imports.extend(src.config.app_config.imports)
-    if hasattr(src.config.app_config, 'models'):
-        setattr(base.config.application_config, 'models', src.config.app_config.models)
     if hasattr(src.config.app_config, 'db_config'):
         setattr(base.config.application_config, 'db_config', src.config.app_config.db_config)
+        setattr(base.config.application_config, 'db_configured', True)
+        _db_is_configured = True
+    else:
+        setattr(base.config.application_config, 'db_configured', False)
+        _db_is_configured = False
     if hasattr(src.config.app_config, 'response_messages_module'):
         setattr(base.config.application_config, 'response_messages_module',
                 src.config.app_config.response_messages_module)
-    if hasattr(src.config.app_config, 'user_roles_module'):
-        setattr(base.config.application_config, 'user_roles_module', src.config.app_config.user_roles_module)
-    if hasattr(src.config.app_config, 'strong_password'):
-        setattr(base.config.application_config, 'strong_password', src.config.app_config.strong_password)
     if hasattr(src.config.app_config, 'support_mail_address'):
         setattr(base.config.application_config, 'support_mail_address', src.config.app_config.support_mail_address)
     if hasattr(src.config.app_config, 'support_name'):
         setattr(base.config.application_config, 'support_name', src.config.app_config.support_name)
-    if hasattr(src.config.app_config, 'forgot_password_message_subject'):
-        setattr(base.config.application_config, 'forgot_password_message_subject',
-                src.config.app_config.forgot_password_message_subject)
-    if hasattr(src.config.app_config, 'forgot_password_message'):
-        setattr(base.config.application_config, 'forgot_password_message',
-                src.config.app_config.forgot_password_message)
-    if hasattr(src.config.app_config, 'forgot_password_lending_address'):
-        setattr(base.config.application_config, 'forgot_password_lending_address',
-                src.config.app_config.forgot_password_lending_address)
     if hasattr(src.config.app_config, 'static_path'):
         setattr(base.config.application_config, 'static_path', src.config.app_config.static_path)
     if hasattr(src.config.app_config, 'static_uri'):
         setattr(base.config.application_config, 'static_uri', src.config.app_config.static_uri)
     if hasattr(src.config.app_config, 'log_directory '):
         setattr(base.config.application_config, 'log_directory', src.config.app_config.log_directory)
-    if hasattr(src.config.app_config, 'register_allowed_roles') and \
-            isinstance(src.config.app_config.register_allowed_roles, int):
-        if not hasattr(src.config.app_config, 'registrators_allowed_roles') or \
-                src.config.app_config.registrators_allowed_roles is None or \
-                not isinstance(src.config.app_config.registrators_allowed_roles, int):
+
+    if _db_is_configured:
+        _load_app_configuration_with_database(src.config.app_config)
+    else:
+        _load_app_configuration_without_database(src.config.app_config)
+
+
+def _load_app_configuration_with_database(config_file):
+    if hasattr(config_file, 'imports'):
+        base.config.application_config.imports.extend(config_file.imports)
+    if hasattr(config_file, 'session_storage'):
+        setattr(base.config.application_config, 'session_storage', config_file.session_storage)
+    if hasattr(config_file, 'models'):
+        setattr(base.config.application_config, 'models', config_file.models)
+    if hasattr(config_file, 'user_roles_module'):
+        setattr(base.config.application_config, 'user_roles_module', config_file.user_roles_module)
+    if hasattr(config_file, 'strong_password'):
+        setattr(base.config.application_config, 'strong_password', config_file.strong_password)
+    if hasattr(config_file, 'forgot_password_message_subject'):
+        setattr(base.config.application_config, 'forgot_password_message_subject',
+                config_file.forgot_password_message_subject)
+    if hasattr(config_file, 'forgot_password_message'):
+        setattr(base.config.application_config, 'forgot_password_message',
+                config_file.forgot_password_message)
+    if hasattr(config_file, 'forgot_password_lending_address'):
+        setattr(base.config.application_config, 'forgot_password_lending_address',
+                config_file.forgot_password_lending_address)
+    if hasattr(config_file, 'register_allowed_roles') and \
+            isinstance(config_file.register_allowed_roles, int):
+        if not hasattr(config_file, 'registrators_allowed_roles') or \
+                config_file.registrators_allowed_roles is None or \
+                not isinstance(config_file.registrators_allowed_roles, int):
             raise InvalidApplicationConfiguration('Missing registrators allowed roles in the configuration file')
-        setattr(base.config.application_config, 'register_allowed_roles', src.config.app_config.register_allowed_roles)
+        setattr(base.config.application_config, 'register_allowed_roles', config_file.register_allowed_roles)
         setattr(base.config.application_config, 'registrators_allowed_roles',
-                src.config.app_config.registrators_allowed_roles)
+                config_file.registrators_allowed_roles)
+
+
+def _load_app_configuration_without_database(config_file):
+    if hasattr(config_file, 'imports'):
+        del base.config.application_config.imports[:]
+        base.config.application_config.imports.extend(config_file.imports)
 
 
 def load_lookups():
@@ -142,6 +162,8 @@ def load_application(entries, svc_port):
     ]
 
     _has_root = False
+    # exclude BASE's database dependent API
+    # if base.config.application_config.db_configured:
     for _m in app_imports:
 
         if base.config.application_config.debug:
@@ -178,6 +200,9 @@ def load_application(entries, svc_port):
     # FINISH LOADING APPLICATION ROUTES
 
     # LOAD APPLICATION HOOKS
+    if base.config.application_config.api_hooks is None:
+        return
+
     try:
         _hooks_module = importlib.import_module(base.config.application_config.api_hooks)
     except ImportError:

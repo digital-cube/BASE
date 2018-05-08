@@ -14,6 +14,7 @@ import base.application.lookup.responses as msgs
 from base.application.helpers.exceptions import MissingApiRui
 from base.application.helpers.exceptions import InvalidRequestParameter
 from base.application.helpers.exceptions import MissingRequestArgument
+from base.application.helpers.exceptions import DatabaseIsNotConfigured
 from base.common.utils import get_request_ip
 from base.common.sequencer import sequencer
 from base.common.tokens_services import get_user_by_token
@@ -410,6 +411,10 @@ class params(object):
 
         if type(argument_type) == str and argument_type.startswith('sequencer'):
 
+            import base.config.application_config
+            if not base.config.application_config.db_configured:
+                return None
+
             s = argument_type.split(':')
             if len(s) != 3:
                 log.critical('Invalid sequence model {} for {} argument'.format(argument_type, argument))
@@ -622,6 +627,11 @@ class authenticated(object):
     """
 
     def __init__(self, *args):
+        
+        import base.config.application_config
+        if not base.config.application_config.db_configured:
+            raise DatabaseIsNotConfigured(
+                "Can not use authenticated decorator, database is not initialized or configured")
 
         self.roles = None
         if len(args) == 1:
@@ -791,7 +801,8 @@ class BaseHandler(DefaultRouteHandler):
     """Base root route handler"""
 
     def _dummy(self):
-        self.render('templates/introduction.html')
+        import base.config.application_config
+        self.render('templates/introduction.html', app_name=base.config.application_config.app_name)
 
 
 @api(URI=r'/all-paths', PREFIX=False)

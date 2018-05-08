@@ -10,6 +10,7 @@ app_description = app['description'][0]
 secret_cookie = 'cookie_secrete'
 debug = True
 db_config = None
+db_configured = False
 db_type = None
 strong_password = False
 api_hooks = None

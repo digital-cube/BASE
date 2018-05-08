@@ -17,20 +17,21 @@ import json
     # PREFIX=False, # if missing or True uri will be /_prefix_/hello
 )
 class Hello(Base):
-    @authenticated()  # if get method has to be authenticated
+    # @authenticated()  # if get method has to be authenticated
     @params(  # if you want to add params
-        {'name': 'd_bool', 'type': bool, 'doc': 'dummy bool'},
-        {'name': 'd_int', 'type': int, 'doc': 'dummy int', 'min': 10, 'max': 100},
-        {'name': 'd_float', 'type': float, 'doc': 'dummy float', 'min': 10.01, 'max': 100.01},
-        {'name': 'd_list', 'type': list, 'doc': 'dummy list', 'min': 3, 'max': 10},
-        {'name': 'd_dict', 'type': dict, 'doc': 'dummy dict'},
-        {'name': 'd_dec', 'type': decimal.Decimal, 'doc': 'dummy dec', 'min': 10.3, 'max': 30.2},
-        {'name': 'd_json', 'type': json, 'doc': 'dummy json'},
-        {'name': 'd_email', 'type': 'e-mail', 'doc': 'dummy e-mail'},
+        {'name': 'd_bool', 'type': bool, 'doc': 'dummy bool', 'required': False},
+        {'name': 'd_int', 'type': int, 'doc': 'dummy int', 'min': 10, 'max': 100, 'required': False},
+        {'name': 'd_float', 'type': float, 'doc': 'dummy float', 'min': 10.01, 'max': 100.01, 'required': False},
+        {'name': 'd_list', 'type': list, 'doc': 'dummy list', 'min': 3, 'max': 10, 'required': False},
+        {'name': 'd_dict', 'type': dict, 'doc': 'dummy dict', 'required': False},
+        {'name': 'd_dec', 'type': decimal.Decimal, 'doc': 'dummy dec', 'min': 10.3, 'max': 30.2, 'required': False},
+        {'name': 'd_json', 'type': json, 'doc': 'dummy json', 'required': False},
+        {'name': 'd_email', 'type': 'e-mail', 'doc': 'dummy e-mail', 'required': False},
         {'name': 'd_datetime', 'type': datetime.datetime, 'doc': 'dummy datetime', 'min': '2017-03-02 17:22:23',
-         'max': '2017-03-10 22:18:23'},
-        {'name': 'd_date', 'type': datetime.date, 'doc': 'dummy date', 'min': '2017-03-02', 'max': '2017-03-10'},
-        {'name': 'd_seq', 'type': 'sequencer:s_users:u', 'doc': 'dummy sequencer'},
+         'max': '2017-03-10 22:18:23', 'required': False},
+        {'name': 'd_date', 'type': datetime.date, 'doc': 'dummy date', 'min': '2017-03-02', 'max': '2017-03-10',
+         'required': False},
+        {'name': 'd_seq', 'type': 'sequencer:s_users:u', 'doc': 'dummy sequencer', 'required': False},
     )
     def get(self, d_bool, d_int, d_float, d_list, d_dict, d_dec, d_json, d_email, d_datetime, d_date, d_seq):
         return self.ok({

@@ -13,30 +13,24 @@ class TestHello(TestBase):
 
         res = self.fetch('/api/hello')
 
-        self.assertEqual(res.code, 403)
+        self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
         res = json.loads(res)
 
-        self.assertIn('message', res)
-        self.assertEqual(res['message'], responses.lmap[responses.UNAUTHORIZED_REQUEST])
-
-    def test_get_without_required_parameter(self):
-
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
-        res = self.fetch('/api/hello', headers=headers)
-
-        self.assertEqual(res.code, 400)
-        res = res.body.decode('utf-8')
-        res = json.loads(res)
-
-        self.assertIn('message', res)
-        self.assertEqual(res['message'], responses.lmap[responses.MISSING_REQUEST_ARGUMENT])
+        self.assertIn('d_bool', res)
+        self.assertIn('d_int', res)
+        self.assertIn('d_float', res)
+        self.assertIn('d_list', res)
+        self.assertIn('d_dict', res)
+        self.assertIn('d_dec', res)
+        self.assertIn('d_json', res)
+        self.assertIn('d_email', res)
+        self.assertIn('d_datetime', res)
+        self.assertIn('d_date', res)
+        self.assertIn('d_seq', res)
 
     def test_get(self):
 
-        _u = self.get_user('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -47,11 +41,10 @@ class TestHello(TestBase):
             'd_json': json.dumps({'5': 5, '6': 6, '7': 7, '8': 8}),
             'd_email': 'test@test.loc',
             'd_datetime': '2017-03-03 22:15:15',
-            'd_date': '2017-03-03',
-            'd_seq': _u.id,
+            'd_date': '2017-03-03'
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -78,12 +71,10 @@ class TestHello(TestBase):
         self.assertIn('d_date', res)
         self.assertEqual(res['d_date'], '2017-03-03')
         self.assertIn('d_seq', res)
-        self.assertEqual(res['d_seq'], _u.id)
+        self.assertEqual(res['d_seq'], None)
 
     def test_get_with_different_params_types(self):
 
-        _u = self.get_user('user2@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': 'test bool',
             'd_int': '20',
@@ -95,10 +86,9 @@ class TestHello(TestBase):
             'd_email': 'test@test',
             'd_datetime': '2017-03-08 02:15:15',
             'd_date': '2017-03-08',
-            'd_seq': _u.id,
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 200)
         res = res.body.decode('utf-8')
@@ -125,12 +115,10 @@ class TestHello(TestBase):
         self.assertIn('d_date', res)
         self.assertEqual(res['d_date'], '2017-03-08')
         self.assertIn('d_seq', res)
-        self.assertEqual(res['d_seq'], _u.id)
+        self.assertEqual(res['d_seq'], None)
 
     def test_get_with_wrong_list_type(self):
 
-        _u = self.get_user('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -142,10 +130,9 @@ class TestHello(TestBase):
             'd_email': 'test@test.loc',
             'd_datetime': '2017-03-03 22:15:15',
             'd_date': '2017-03-03',
-            'd_seq': _u.id,
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -156,8 +143,6 @@ class TestHello(TestBase):
 
     def test_get_with_wrong_date_type(self):
 
-        _u = self.get_user('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -169,10 +154,9 @@ class TestHello(TestBase):
             'd_email': 'test@test.loc',
             'd_datetime': '2017-03-03 22:15:15',
             'd_date': '2017-13-33',
-            'd_seq': _u.id,
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -183,8 +167,6 @@ class TestHello(TestBase):
 
     def test_get_with_wrong_datetime_type(self):
 
-        _u = self.get_user('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -196,10 +178,9 @@ class TestHello(TestBase):
             'd_email': 'test@test.loc',
             'd_datetime': '2017-13-33 22:15:15',
             'd_date': '2017-03-03',
-            'd_seq': _u.id,
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -210,8 +191,6 @@ class TestHello(TestBase):
 
     def test_get_with_int_below_the_min(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 9,
@@ -226,7 +205,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -237,8 +216,6 @@ class TestHello(TestBase):
 
     def test_get_with_float_below_the_min(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 10,
@@ -252,7 +229,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -263,8 +240,6 @@ class TestHello(TestBase):
 
     def test_get_with_list_below_the_minimum(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -274,7 +249,7 @@ class TestHello(TestBase):
             'd_dec': 25.10,
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -285,8 +260,6 @@ class TestHello(TestBase):
 
     def test_get_with_decimal_below_the_minimum(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -301,7 +274,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -312,8 +285,6 @@ class TestHello(TestBase):
 
     def test_get_with_datetime_below_the_minimum(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -328,7 +299,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -339,8 +310,6 @@ class TestHello(TestBase):
 
     def test_get_with_date_below_the_minimum(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -355,7 +324,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -366,8 +335,6 @@ class TestHello(TestBase):
 
     def test_get_with_int_above_the_max(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 900,
@@ -382,7 +349,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -393,8 +360,6 @@ class TestHello(TestBase):
 
     def test_get_with_float_above_the_max(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 100,
@@ -409,7 +374,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -420,8 +385,6 @@ class TestHello(TestBase):
 
     def test_get_with_list_above_the_max(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -436,7 +399,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -447,8 +410,6 @@ class TestHello(TestBase):
 
     def test_get_with_decimal_above_the_max(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -463,7 +424,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -474,8 +435,6 @@ class TestHello(TestBase):
 
     def test_get_with_datetime_above_the_max(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -490,7 +449,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -501,8 +460,6 @@ class TestHello(TestBase):
 
     def test_get_with_date_above_the_minimum(self):
 
-        self._register('user@test.loc', '123')
-        headers = {'Authorization': self.token}
         _params = {
             'd_bool': False,
             'd_int': 20,
@@ -517,7 +474,7 @@ class TestHello(TestBase):
             'd_seq': 'udummyseqid',
         }
         _url = url_concat('/api/hello', _params)
-        res = self.fetch(_url, headers=headers)
+        res = self.fetch(_url)
 
         self.assertEqual(res.code, 400)
         res = res.body.decode('utf-8')
@@ -559,8 +516,6 @@ class TestHello(TestBase):
 
     def test_put(self):
 
-        # for sequencer test
-        _u = self.get_user('user@test.loc', '123')
         _body = json.dumps({
             'd_bool': True,
             'd_int': 30,
@@ -572,7 +527,6 @@ class TestHello(TestBase):
             'd_email': 'test@test.loc',
             'd_datetime': '2017-03-03 22:15:15',
             'd_date': '2017-03-03',
-            'd_seq': _u.id,
         })
         res = self.fetch('/api/hello', method='PUT', body=_body)
 
@@ -601,12 +555,10 @@ class TestHello(TestBase):
         self.assertIn('d_date', res)
         self.assertEqual(res['d_date'], '2017-03-03')
         self.assertIn('d_seq', res)
-        self.assertEqual(res['d_seq'], _u.id)
+        self.assertEqual(res['d_seq'], None)
 
     def test_put_with_different_params_types(self):
 
-        # for sequencer test
-        _u = self.get_user('user2@test.loc', '123')
         _body = json.dumps({
             'd_bool': 'test bool',
             'd_int': '20',
@@ -618,7 +570,6 @@ class TestHello(TestBase):
             'd_email': 'test@test',
             'd_datetime': '2017-03-08 02:15:15',
             'd_date': '2017-03-08',
-            'd_seq': _u.id,
         })
         res = self.fetch('/api/hello', method='PUT', body=_body)
 
@@ -647,12 +598,10 @@ class TestHello(TestBase):
         self.assertIn('d_date', res)
         self.assertEqual(res['d_date'], '2017-03-08')
         self.assertIn('d_seq', res)
-        self.assertEqual(res['d_seq'], _u.id)
+        self.assertEqual(res['d_seq'], None)
 
     def test_put_with_wrong_list_param(self):
 
-        # for sequencer test
-        _u = self.get_user('user@test.loc', '123')
         _body = json.dumps({
             'd_bool': True,
             'd_int': 30,
@@ -664,7 +613,6 @@ class TestHello(TestBase):
             'd_email': 'test@test.loc',
             'd_datetime': '2017-03-03 22:15:15',
             'd_date': '2017-03-03',
-            'd_seq': _u.id,
         })
         res = self.fetch('/api/hello', method='PUT', body=_body)
 
@@ -677,8 +625,6 @@ class TestHello(TestBase):
 
     def test_put_with_wrong_date_param(self):
 
-        # for sequencer test
-        _u = self.get_user('user@test.loc', '123')
         _body = json.dumps({
             'd_bool': True,
             'd_int': 30,
@@ -690,7 +636,6 @@ class TestHello(TestBase):
             'd_email': 'test@test.loc',
             'd_datetime': '2017-03-03 22:15:15',
             'd_date': '2017-13-33',
-            'd_seq': _u.id,
         })
         res = self.fetch('/api/hello', method='PUT', body=_body)
 
@@ -703,8 +648,6 @@ class TestHello(TestBase):
 
     def test_put_with_wrong_datetime_param(self):
 
-        # for sequencer test
-        _u = self.get_user('user@test.loc', '123')
         _body = json.dumps({
             'd_bool': True,
             'd_int': 30,
@@ -716,7 +659,6 @@ class TestHello(TestBase):
             'd_email': 'test@test.loc',
             'd_datetime': '2017-13-33 22:15:15',
             'd_date': '2017-03-03',
-            'd_seq': _u.id,
         })
         res = self.fetch('/api/hello', method='PUT', body=_body)
 
