@@ -54,6 +54,7 @@ setup(
             'builder/playground/*',
             'builder/project_additional/app_config.py',
             'builder/project_additional/models/*',
+            'builder/project_additional/models_additional/*',
             'builder/project_additional/api_hooks/*',
             'builder/template_project/.gitignore',
             'builder/template_project/starter.py',

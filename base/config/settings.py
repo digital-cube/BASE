@@ -25,6 +25,7 @@ app = {
     'database_host': ('localhost', 'database host name'),
     'database_port': ({'mysql': 3306, 'postgresql': 5432, 'sqlite': 5555}, 'database port'),
     'table_name': (None, 'name of the table to create'),
+    'add_action_logs': (False, 'include action logs in database'),
 }
 template_project_folder = 'template_project'
 project_additional_folder = 'project_additional'

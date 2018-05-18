@@ -57,6 +57,7 @@ def pars_command_line_arguments():
     db_init_parser.add_argument('-dh', '--database_host', default=app['database_host'][0], help=app['database_host'][1])
     db_init_parser.add_argument('-dp', '--database_port', help=app['database_port'][1])
     db_init_parser.add_argument('-p', '--application_port', default=str(app['port'][0]), help=app['port'][1], type=str)
+    db_init_parser.add_argument('-a', '--add_action_logs', default=app['add_action_logs'][0], help=app['add_action_logs'][1], type=bool)
     db_init_parser.add_argument('user_name', type=str, help=app['database_username'][1])
     db_init_parser.add_argument('password', type=str, help=app['database_password'][1])
 
@@ -244,6 +245,8 @@ def _enable_database_in_config(config_file, args, test):
             continue
 
         if _line == '# ]\n' and _models:
+            if args.add_action_logs:
+                _new_file.append("    'src.models.activity',\n")
             _new_file.append(']\n')
             _models = False
             continue
@@ -364,10 +367,11 @@ def _update_path():
     sys.path.append(_project_path)
 
 
-def _copy_database_components():
+def _copy_database_components(args):
 
     _site_dir = _get_install_directory()
     models_source_dir = '{}/base/builder/project_additional/models'.format(_site_dir[0])
+    models_additional_source_dir = '{}/base/builder/project_additional/models_additional'.format(_site_dir[0])
     hooks_source_dir = '{}/base/builder/project_additional/api_hooks'.format(_site_dir[0])
 
     try:
@@ -378,6 +382,17 @@ def _copy_database_components():
     except PermissionError as e:
         print('Can not create directory "models", insufficient permissions')
         sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
+
+    if args.add_action_logs:
+
+        try:
+            shutil.copy('{}/activity.py'.format(models_additional_source_dir), 'src/models/activity.py')
+        except FileExistsError as e:
+            print('Model "activity" already exists, please rename/remove existing one')
+            sys.exit(exit_status.FILE_ALREADY_EXISTS)
+        except PermissionError as e:
+            print('Can not create "activity.py", insufficient permissions')
+            sys.exit(exit_status.FILE_PERMISSION_ERROR)
 
     try:
         shutil.copytree(hooks_source_dir, 'src/api_hooks')
@@ -415,7 +430,7 @@ def _build_database(args, test=False):
         print('Nothing to be done')
         return
 
-    if not test and not _copy_database_components():
+    if not test and not _copy_database_components(args):
         print('Can not initialize database components')
         return
 

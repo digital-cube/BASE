@@ -47,6 +47,7 @@ class User(base.common.orm.sql_base):
 def main():
     pass
 
+
 if __name__ == '__main__':
 
     main()

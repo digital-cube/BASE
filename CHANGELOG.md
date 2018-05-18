@@ -1,5 +1,12 @@
 ## CHANGELOG
 
+### 2018 05 18
+
+## BASE version 1.0.3
+- new models Action and ActionSource presented
+- new option in db_init - see db_init -h
+
+
 ### 2018 05 08
 
 ## BASE version 1.0.2
