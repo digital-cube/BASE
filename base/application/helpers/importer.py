@@ -51,8 +51,7 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'secret_cookie', src.config.app_config.secret_cookie)
     if hasattr(src.config.app_config, 'debug'):
         setattr(base.config.application_config, 'debug', src.config.app_config.debug)
-    # todo: vidi sta sa hooks
-    if hasattr(src.config.app_config, 'api_hooks'):
+    if hasattr(src.config.app_config, 'api_hooks'): # todo: check this
         setattr(base.config.application_config, 'api_hooks', src.config.app_config.api_hooks)
     if hasattr(src.config.app_config, 'db_config'):
         setattr(base.config.application_config, 'db_config', src.config.app_config.db_config)
@@ -74,6 +73,10 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'static_uri', src.config.app_config.static_uri)
     if hasattr(src.config.app_config, 'log_directory '):
         setattr(base.config.application_config, 'log_directory', src.config.app_config.log_directory)
+    if hasattr(src.config.app_config, 'pre_app_processes'):
+        setattr(base.config.application_config, 'pre_app_processes', src.config.app_config.pre_app_processes)
+    if hasattr(src.config.app_config, 'post_app_processes'):
+        setattr(base.config.application_config, 'post_app_processes', src.config.app_config.post_app_processes)
 
     if _db_is_configured:
         _load_app_configuration_with_database(src.config.app_config)

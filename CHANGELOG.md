@@ -2,6 +2,13 @@
 
 ### 2018 05 22
 
+## BASE version 1.1.0
+- pre application processes (configure in app_config)
+- post application processes (configure in app_config)
+
+
+### 2018 05 22
+
 ## BASE version 1.0.4
 - data argument for the registration is not required anymore, and not saved to the database
 

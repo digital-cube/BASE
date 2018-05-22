@@ -124,3 +124,13 @@ class InvalidApplicationConfiguration(Exception):
 class DatabaseIsNotConfigured(Exception):
     """Application has not database configured"""
     pass
+
+
+class PreApplicationProcessConfigurationError(Exception):
+    """Pre application processes not configured properly"""
+    pass
+
+
+class PostApplicationProcessConfigurationError(Exception):
+    """Post application processes not configured properly"""
+    pass

@@ -39,3 +39,7 @@ debug = True
 static_path = None
 static_uri = None
 log_directory = './log'
+register_allowed_roles = None
+registrators_allowed_roles = None
+pre_app_processes = None    # [(app_name, app_cmd_for_subprocess, redirect_output)]
+post_app_processes = None   # [(app_name, app_cmd_for_subprocess, redirect_output)]
