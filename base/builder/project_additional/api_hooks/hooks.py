@@ -13,10 +13,10 @@ check_password_is_valid(password) -> bool:
 register_user(id_user, username, password, data) -> [dict, str, convertible to string, None]:
         - register user on system
         - populate auth_users and users tables here
-pre_register_user(username, password, data) -> [None]:
-        - process user's data before user registration
-post_register_process(id_user, username, password, data, session_token) -> [dict, None]:
-        - process user's data after user registration
+pre_register_user(username, password, data) -> [False, not False]:
+        - process user's data before user registration. If False registration is stopped.
+post_register_process(id_user, username, password, data, session_token) -> [dict, None, bool]:
+        - process user's data after user registration. If False or None, registration return error.
 user_exists(username, password, data, handler) -> [User object]
         - check if username exists in the system
 check_username_and_password(username, password, Auth_user) -> [bool]
