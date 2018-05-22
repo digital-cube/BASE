@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 05 22
+
+## BASE version 1.0.4
+- data argument for the registration is not required anymore, and not saved to the database
+
+
 ### 2018 05 18
 
 ## BASE version 1.0.3

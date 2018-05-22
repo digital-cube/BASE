@@ -133,8 +133,8 @@ def register_user(id_user, username, password, data):
 
     first_name = data['first_name'] if 'first_name' in data else None
     last_name = data['last_name'] if 'last_name' in data else None
-    _data = json.dumps(data)
-    _user = User(id_user, first_name, last_name, _data)
+
+    _user = User(id_user, first_name, last_name)
     _auth_user.user = _user
 
     try:

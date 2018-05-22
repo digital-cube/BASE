@@ -23,7 +23,7 @@ class Register(Base):
     @params(
         {'name': 'username', 'type': 'e-mail', 'required': True,  'doc': 'username to register', 'lowercase': True},
         {'name': 'password', 'type': str, 'required': True,  'doc': "user's password"},
-        {'name': 'data', 'type': 'json', 'required': True,  'doc': "user's additional data"},
+        {'name': 'data', 'type': 'json', 'required': False,  'doc': "user's additional data"},
     )
     def post(self, username, password, data):
         """Register user on the system"""

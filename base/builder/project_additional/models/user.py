@@ -33,15 +33,13 @@ class User(base.common.orm.sql_base):
     id = Column(CHAR(10), ForeignKey(AuthUser.id), primary_key=True)
     first_name = Column(String(64))
     last_name = Column(String(64))
-    data = Column(Text)
     auth_user = relationship("AuthUser", back_populates="user")
 
-    def __init__(self, id_user, first_name, last_name, data):
+    def __init__(self, id_user, first_name, last_name):
 
         self.id = id_user
         self.first_name = first_name
         self.last_name = last_name
-        self.data = data
 
 
 def main():
