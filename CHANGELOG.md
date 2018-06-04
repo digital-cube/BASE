@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 06 04
+
+## BASE version 1.1.1
+- pack user hook fix
+
+
 ### 2018 05 22
 
 ## BASE version 1.1.0

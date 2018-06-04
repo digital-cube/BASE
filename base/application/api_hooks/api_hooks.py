@@ -85,7 +85,6 @@ def pack_user(user):
 
         _user['first_name'] = _db_user.first_name
         _user['last_name'] = _db_user.last_name
-        _user['data'] = _db_user.data
 
     return _user
 
