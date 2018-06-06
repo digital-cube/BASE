@@ -374,11 +374,13 @@ def _copy_database_components(args):
     models_additional_source_dir = '{}/base/builder/project_additional/models_additional'.format(_site_dir[0])
     hooks_source_dir = '{}/base/builder/project_additional/api_hooks'.format(_site_dir[0])
 
+    _show_info = True
+
     try:
         shutil.copytree(models_source_dir, 'src/models')
     except FileExistsError as e:
-        print('Directory "models" already exists, please rename/remove existing one')
-        sys.exit(exit_status.PROJECT_DIRECTORY_ALREADY_EXISTS)
+        print('Directory "models" already exists, using existing models')
+        _show_info = False
     except PermissionError as e:
         print('Can not create directory "models", insufficient permissions')
         sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
@@ -388,8 +390,8 @@ def _copy_database_components(args):
         try:
             shutil.copy('{}/activity.py'.format(models_additional_source_dir), 'src/models/activity.py')
         except FileExistsError as e:
-            print('Model "activity" already exists, please rename/remove existing one')
-            sys.exit(exit_status.FILE_ALREADY_EXISTS)
+            print('Model "activity" already exists, using existing one')
+            _show_info = False
         except PermissionError as e:
             print('Can not create "activity.py", insufficient permissions')
             sys.exit(exit_status.FILE_PERMISSION_ERROR)
@@ -397,13 +399,14 @@ def _copy_database_components(args):
     try:
         shutil.copytree(hooks_source_dir, 'src/api_hooks')
     except FileExistsError as e:
-        print('Directory "api_hooks" already exists, please rename/remove existing one')
-        sys.exit(exit_status.PROJECT_DIRECTORY_ALREADY_EXISTS)
+        print('Directory "api_hooks" already exists, using existing one')
+        _show_info = False
     except PermissionError as e:
         print('Can not create directory "api_hooks", insufficient permissions')
         sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
 
-    print('Database models shown')
+    if _show_info:
+        print('Database models shown')
 
     return True
 

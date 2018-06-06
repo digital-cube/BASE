@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 06 06
+
+## BASE version 1.1.2
+- prevent build project over existing models and files
+
+
 ### 2018 06 04
 
 ## BASE version 1.1.1
