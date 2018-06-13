@@ -118,3 +118,23 @@ def load_database_configuration(app_config, _db_config):
         _db_config[_k] = _db_conf[_k]
 
     return True
+
+
+def commit():
+    global orm
+
+    if not orm:
+        raise NameError("DB Error: orm not initialised")
+
+    _session = orm.session()
+    try:
+        _session.commit()
+    except Exception as e:
+        _session.rollback()
+
+        import base.config.application_config as a_cfg
+        if a_cfg.debug:
+            raise NameError("DB Error: {}".format(e))
+        else:
+            raise NameError("DB Error")
+

@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 06 13
+
+## BASE version 1.1.3
+- base orm commit with session rollback on error or exception
+
+
 ### 2018 06 06
 
 ## BASE version 1.1.2
