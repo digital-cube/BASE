@@ -2,6 +2,7 @@ import os
 import json
 import sqlalchemy
 from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
@@ -34,7 +35,8 @@ class _orm(object):
             cls.__db_url = sql_address
             cls.__engine = create_engine(cls.__db_url, echo=False)
             cls.__session_factory = sessionmaker(bind=cls.__engine)
-            cls.__session = cls.__session_factory()
+            cls.__scoped_session = scoped_session(cls.__session_factory)
+            cls.__session = cls.__scoped_session()
             cls.__base = orm_base
 
         return _orm.__instance

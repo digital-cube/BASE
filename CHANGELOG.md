@@ -1,5 +1,12 @@
 ## CHANGELOG
 
+### 2018 07 06
+
+## BASE version 1.1.4
+- orm session as thread local session
+- BASE version with separate numbers
+
+
 ### 2018 06 13
 
 ## BASE version 1.1.3
