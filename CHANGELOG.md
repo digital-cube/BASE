@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 07 27
+
+## BASE version 1.1.5
+- google social login included in the system
+
+
 ### 2018 07 06
 
 ## BASE version 1.1.4

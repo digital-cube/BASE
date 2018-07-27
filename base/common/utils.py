@@ -6,6 +6,11 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 
 
+def user_exists(username, AuthUser, _session, as_bool=True):
+    _q = _session.query(AuthUser).filter(AuthUser.username == username)
+    return _q.count() == 1 if as_bool else _q.one_or_none()
+
+
 _logs = {}
 
 
@@ -96,4 +101,20 @@ def client_call(url, port, location, method, data, headers=None, force_json=Fals
     conn.close()
 
     return res
+
+
+GOOGLE_DISCOVERY_DOCS = None
+
+
+def get_google_discovery_docs():
+
+    global GOOGLE_DISCOVERY_DOCS
+    return GOOGLE_DISCOVERY_DOCS
+
+
+def set_google_discovery_docs(docs):
+
+    global GOOGLE_DISCOVERY_DOCS
+    if GOOGLE_DISCOVERY_DOCS is None:
+        GOOGLE_DISCOVERY_DOCS = docs
 

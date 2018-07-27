@@ -11,6 +11,7 @@ import unittest
 # from base.tests.api.user.test_user_login import TestUserLogin
 # from base.tests.api.user.test_user_logout import TestUserLogout
 # from base.tests.api.user.test_user_register import TestUserRegister
+# from base.tests.api.user.test_user_g_access import TestUserGAccess
 # from base.tests.api.utils.test_hash_2_params import TestHash2Params
 # from base.tests.api.utils.test_mail_queue import TestMailQueue
 # from base.tests.api.utils.test_mail_queue import TestMailQueueSetOptions

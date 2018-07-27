@@ -113,6 +113,12 @@ def _load_app_configuration_with_database(config_file):
         setattr(base.config.application_config, 'register_allowed_roles', config_file.register_allowed_roles)
         setattr(base.config.application_config, 'registrators_allowed_roles',
                 config_file.registrators_allowed_roles)
+    if hasattr(config_file, 'google_client_ID'):
+        setattr(base.config.application_config, 'google_client_ID', config_file.google_client_ID)
+    if hasattr(config_file, 'google_discovery_docs_url'):
+        setattr(base.config.application_config, 'google_discovery_docs_url', config_file.google_discovery_docs_url)
+    if hasattr(config_file, 'google_check_access_token_url'):
+        setattr(base.config.application_config, 'google_check_access_token_url', config_file.google_check_access_token_url)
 
 
 def _load_app_configuration_without_database(config_file):

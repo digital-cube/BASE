@@ -45,6 +45,11 @@ MISSING_ROLE = 42
 WRONG_ROLE_TYPE = 43
 INVALID_ROLE = 44
 ROLE_NOT_ALLOWED = 45
+MISSING_GACCESS_CONFIGURATION = 46
+ERROR_READ_GACCESS_CONFIGURATION = 47
+ERROR_VERIFY_GOOGLE_ACCESS_TOKEN = 48
+ERROR_GET_GOOGLE_USER = 49
+ERROR_AUTHORIZE_GOOGLE_USER = 50
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -91,6 +96,11 @@ lmap[POST_CHECK_USER_ERROR] = 'Post check user error'
 lmap[MISSING_ROLE] = 'Role is missing'
 lmap[WRONG_ROLE_TYPE] = 'Role is with wrong type'
 lmap[ROLE_NOT_ALLOWED] = 'Role not allowed'
+lmap[MISSING_GACCESS_CONFIGURATION] = 'Missing configuration'
+lmap[ERROR_READ_GACCESS_CONFIGURATION] = 'Error get configuration'
+lmap[ERROR_VERIFY_GOOGLE_ACCESS_TOKEN] = 'Verify token error'
+lmap[ERROR_GET_GOOGLE_USER] = 'Error get user info'
+lmap[ERROR_AUTHORIZE_GOOGLE_USER] = 'Error authorize google user'
 
 lrev = {}
 for k in lmap:

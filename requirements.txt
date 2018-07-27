@@ -1,3 +1,6 @@
+requests
+bcrypt
+tornado
 sqlalchemy
 # psycopg2-binary
 # mysqlclient

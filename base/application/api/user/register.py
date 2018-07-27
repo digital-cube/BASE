@@ -7,11 +7,7 @@ from base.application.components import params
 from base.application.components import RequestAuthenticationChecker
 from base.common.utils import get_request_ip
 from base.common.utils import log
-
-
-def user_exists(username, AuthUser, _session):
-    _q = _session.query(AuthUser).filter(AuthUser.username == username)
-    return _q.count() == 1
+from base.common.utils import user_exists
 
 
 @api(

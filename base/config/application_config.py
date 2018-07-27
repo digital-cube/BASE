@@ -22,6 +22,7 @@ imports = [
     'base.application.api.user.logout',
     'base.application.api.user.forgot',
     'base.application.api.user.register',
+    'base.application.api.user.gaccess',
     'base.application.api.utils.options',
     'base.application.api.utils.hash2params',
     'base.application.api.utils.mail_queue',
@@ -48,3 +49,6 @@ register_allowed_roles = None
 registrators_allowed_roles = None
 pre_app_processes = None    # [(app_name, app_cmd_for_subprocess, redirect_output)]
 post_app_processes = None   # [(app_name, app_cmd_for_subprocess, redirect_output)]
+google_client_ID = None
+google_discovery_docs_url = 'https://accounts.google.com/.well-known/openid-configuration'
+google_check_access_token_url = 'https://www.googleapis.com/oauth2/v3/tokeninfo'
