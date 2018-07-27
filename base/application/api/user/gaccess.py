@@ -4,6 +4,7 @@
 Register or login a user with his google account access token
 provided from the client application.
 A client application is responsible for getting an access token.
+An application has to be configured with the google application client id
 """
 
 import json
