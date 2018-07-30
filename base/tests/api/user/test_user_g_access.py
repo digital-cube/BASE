@@ -132,7 +132,7 @@ class TestUserGAccess(TestBase):
     @patch('base.application.api.user.gaccess.GAccess.get_user_info', _user_info)
     @patch('base.application.api.user.gaccess.GAccess.GOOGLE_URLS', GOOGLE_URLS)
     @patch('base.application.api.user.gaccess.GAccess.log_user_in', _log_in_user_error)
-    @patch('base.application.api.user.gaccess.GAccess.google_user', GOOGLE_USER)
+    @patch('base.application.api.user.gaccess.GAccess.social_user', GOOGLE_USER)
     def test_g_access_can_not_register_or_login_user(self, r):
 
         _b = {
@@ -155,7 +155,7 @@ class TestUserGAccess(TestBase):
     @patch('base.application.api.user.gaccess.GAccess.get_user_info', _user_info)
     @patch('base.application.api.user.gaccess.GAccess.GOOGLE_URLS', GOOGLE_URLS)
     @patch('base.application.api.user.gaccess.GAccess.log_user_in', _log_in_user)
-    @patch('base.application.api.user.gaccess.GAccess.google_user', GOOGLE_USER)
+    @patch('base.application.api.user.gaccess.GAccess.social_user', GOOGLE_USER)
     def test_g_access(self, r):
 
         _b = {
@@ -178,7 +178,7 @@ class TestUserGAccess(TestBase):
     @patch('base.application.api.user.gaccess.GAccess.get_user_info', _user_info)
     @patch('base.application.api.user.gaccess.GAccess.GOOGLE_URLS', GOOGLE_URLS)
     @patch('base.application.api.user.gaccess.GAccess.log_user_in', _log_in_user)
-    @patch('base.application.api.user.gaccess.GAccess.google_user', GOOGLE_USER)
+    @patch('base.application.api.user.gaccess.GAccess.social_user', GOOGLE_USER)
     def test_g_access_after_first_register(self, r):
 
         _b = {

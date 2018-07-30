@@ -50,6 +50,10 @@ ERROR_READ_GACCESS_CONFIGURATION = 47
 ERROR_VERIFY_GOOGLE_ACCESS_TOKEN = 48
 ERROR_GET_GOOGLE_USER = 49
 ERROR_AUTHORIZE_GOOGLE_USER = 50
+FACEBOOK_LIBRARY_NOT_INSTALLED = 51
+FACEBOOK_USER_INVALID = 52
+ERROR_GET_FACEBOOK_USER = 53
+ERROR_AUTHORIZE_FACEBOOK_USER = 50
 
 lmap = {}
 lmap[ERROR] = 'Error'
@@ -101,6 +105,10 @@ lmap[ERROR_READ_GACCESS_CONFIGURATION] = 'Error get configuration'
 lmap[ERROR_VERIFY_GOOGLE_ACCESS_TOKEN] = 'Verify token error'
 lmap[ERROR_GET_GOOGLE_USER] = 'Error get user info'
 lmap[ERROR_AUTHORIZE_GOOGLE_USER] = 'Error authorize google user'
+lmap[FACEBOOK_LIBRARY_NOT_INSTALLED] = 'Facebook library error'
+lmap[FACEBOOK_USER_INVALID] = 'Facebook user error'
+lmap[ERROR_GET_FACEBOOK_USER] = 'Error get user info'
+lmap[ERROR_AUTHORIZE_FACEBOOK_USER] = 'Error authorize facebook user'
 
 lrev = {}
 for k in lmap:

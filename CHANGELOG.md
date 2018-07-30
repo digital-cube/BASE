@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 07 30
+
+## BASE version 1.1.6
+- facebook social login included in the system
+
+
 ### 2018 07 27
 
 ## BASE version 1.1.5

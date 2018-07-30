@@ -22,6 +22,7 @@ imports = [
     'base.application.api.user.logout',
     'base.application.api.user.forgot',
     'base.application.api.user.register',
+    'base.application.api.user.faccess',
     'base.application.api.user.gaccess',
     'base.application.api.utils.options',
     'base.application.api.utils.hash2params',

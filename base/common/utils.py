@@ -1,5 +1,6 @@
 # coding= utf-8
 
+import sys
 import json
 import bcrypt
 import logging
@@ -117,4 +118,14 @@ def set_google_discovery_docs(docs):
     global GOOGLE_DISCOVERY_DOCS
     if GOOGLE_DISCOVERY_DOCS is None:
         GOOGLE_DISCOVERY_DOCS = docs
+
+
+def check_facepy_library_installed():
+
+    try:
+        import facepy
+    except ModuleNotFoundError:
+        return False
+
+    return 'facepy' in sys.modules
 

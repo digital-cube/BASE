@@ -26,15 +26,88 @@ from base.common.utils import get_google_discovery_docs
 from base.common.utils import set_google_discovery_docs
 
 
+class SocialAccess(Base):
+
+    social_user = None
+
+    def log_user_in(self):
+        """
+        Register or login user
+        :return:  bool - if something wrong, or dict with the response
+        """
+
+        import base.common.orm
+        from base.common.tokens_services import get_token
+        from base.application.api_hooks import api_hooks
+
+        AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
+        User, _ = base.common.orm.get_orm_model('users')
+
+        response = {}
+        _user = user_exists(self.social_user['email'], AuthUsers, _session, as_bool=False)
+        if _user:
+            # user exists - log in the user
+            log.info('User {} already exists, login the user'.format(self.social_user['email']))
+            _token = get_token(_user.id, {})
+            if not _token:
+                log.critical('Error getting token for user {} - {}'.format(_user.id, _user.username))
+                return False
+
+            response.update(_token)
+
+        else:
+            # user do not exists - register user
+            from base.common.sequencer import sequencer
+            id_user = sequencer().new('u')
+
+            if not id_user:
+                log.error('Can not create id for new user: {}'.format(self.social_user['email']))
+                return False
+
+            _password = uuid.uuid4()
+            _user_registered = api_hooks.register_user(id_user, self.social_user['email'], _password, self.social_user)
+            if _user_registered is None:
+                log.critical('Error register user {} with password {} and data {}'.format(
+                    self.social_user['email'], _password, self.social_user))
+                return False
+
+            if isinstance(_user_registered, dict):
+                response.update(_user_registered)
+            elif _user_registered != True:
+                try:
+                    response['message'] = str(_user_registered)
+                except Exception:
+                    log.error('Can not make string from user register response')
+
+            _token = get_token(id_user, {})
+            if not _token:
+                log.critical('Error getting token for new user {} - {}'.format(id_user, self.social_user['email']))
+                return False
+            response.update(_token)
+
+            if hasattr(api_hooks, 'post_register_process'):
+                _post_register_result = api_hooks.post_register_process(
+                    id_user, self.social_user['email'], _password, self.social_user, _token)
+                if not _post_register_result:
+                    log.critical('Post register process error for user {} - {}'.format(
+                        id_user, self.social_user['email']))
+                    return False
+
+                if isinstance(_post_register_result, dict):
+                    response.update(_post_register_result)
+
+        return response
+
+
 @api(
     URI='/user/g-access',
     PREFIX=False,
     SPECIFICATION_PATH='User')
-class GAccess(Base):
+class GAccess(SocialAccess):
 
     GOOGLE_URLS = None
     access_token = None
-    google_user = None
+    social_user = None
 
     @params(
         {'name': 'token', 'type': str, 'required': True,  'doc': 'access token'},
@@ -93,7 +166,7 @@ class GAccess(Base):
             response = yield th_executor.submit(self.log_user_in)
 
         if not response:
-            log.warning('Error in login/register google user {}'.format(self.google_user['email']))
+            log.warning('Error in login/register google user {}'.format(self.social_user['email']))
             return self.error(msgs.ERROR_AUTHORIZE_GOOGLE_USER)
 
         self.ok(response)
@@ -200,88 +273,17 @@ class GAccess(Base):
         get_user_url = self.GOOGLE_URLS['userinfo_endpoint']
         params = {'access_token': self.access_token}
         response = requests.get(get_user_url, params=params)
-        print('RESPONSE', response)
+
         if response.status_code != 200:
             log.critical('Error fetch google user info: {}'.format(response.text))
             return False
         try:
-            self.google_user = json.loads(response.text)
+            self.social_user = json.loads(response.text)
+            self.social_user['first_name'] = self.social_user['given_name']
+            self.social_user['last_name'] = self.social_user['family_name']
         except json.JSONDecodeError as e:
             log.critical('Error load google user info response: {}'.format(e))
             return False
 
-        print('USER', self.google_user)
-
         return True
-
-    def log_user_in(self):
-        """
-        Register or login user
-        :return:  bool - if something wrong, or dict with the response
-        """
-
-        print('RADDDDDDI')
-        import base.common.orm
-        from base.common.tokens_services import get_token
-        from base.application.api_hooks import api_hooks
-
-        AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
-        User, _ = base.common.orm.get_orm_model('users')
-
-        response = {}
-        _user = user_exists(self.google_user['email'], AuthUsers, _session, as_bool=False)
-        if _user:
-            # user exists - log in the user
-            log.info('User {} already exists, login the user'.format(self.google_user['email']))
-            _token = get_token(_user.id, {})
-            if not _token:
-                log.critical('Error getting token for user {} - {}'.format(_user.id, _user.username))
-                return False
-
-            response.update(_token)
-
-        else:
-            # user do not exists - register user
-            from base.common.sequencer import sequencer
-            id_user = sequencer().new('u')
-
-            if not id_user:
-                log.error('Can not create id for new user: {}'.format(self.google_user['email']))
-                return False
-
-            self.google_user['first_name'] = self.google_user['given_name']
-            self.google_user['last_name'] = self.google_user['family_name']
-            _password = uuid.uuid4()
-            _user_registered = api_hooks.register_user(id_user, self.google_user['email'], _password, self.google_user)
-            if _user_registered is None:
-                log.critical('Error register user {} with password {} and data {}'.format(
-                    self.google_user['email'], _password, self.google_user))
-                return False
-
-            if isinstance(_user_registered, dict):
-                response.update(_user_registered)
-            elif _user_registered != True:
-                try:
-                    response['message'] = str(_user_registered)
-                except Exception:
-                    log.error('Can not make string from user register response')
-
-            _token = get_token(id_user, {})
-            if not _token:
-                log.critical('Error getting token for new user {} - {}'.format(id_user, self.google_user['email']))
-                return False
-            response.update(_token)
-
-            if hasattr(api_hooks, 'post_register_process'):
-                _post_register_result = api_hooks.post_register_process(
-                    id_user, self.google_user['email'], _password, self.google_user, _token)
-                if not _post_register_result:
-                    log.critical('Post register process error for user {} - {}'.format(
-                        id_user, self.google_user['email']))
-                    return False
-
-                if isinstance(_post_register_result, dict):
-                    response.update(_post_register_result)
-
-        return response
 
