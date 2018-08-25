@@ -1,6 +1,5 @@
 # **Base REST API**
-
-* Version 1.0
+* Version 1.1.6
 * [DigitalCube](http://digitalcube.rs/)
 
 ### Requirements
@@ -16,9 +15,22 @@
 * install it with pip:
 
     `pip3 install .`
-    `pip3 install -r requirements.txt`
     `cat requirements.txt`
     `pip3 install [required_database_connector]`
+
+### Initialize project
+
+
+    basemanager init project_name
+
+
+### Initialize database
+
+
+* database has to be created before this step
+
+    `cd project_name`
+    `basemanager db_init db_username db_password`
 
 ### About
 

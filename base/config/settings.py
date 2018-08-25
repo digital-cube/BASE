@@ -26,6 +26,7 @@ app = {
     'database_port': ({'mysql': 3306, 'postgresql': 5432, 'sqlite': 5555}, 'database port'),
     'table_name': (None, 'name of the table to create'),
     'add_action_logs': (False, 'include action logs in database'),
+    'component': (None, 'name of a component'),
 }
 template_project_folder = 'template_project'
 project_additional_folder = 'project_additional'
@@ -59,3 +60,5 @@ playground created...
 #                                               #
 #################################################
 '''
+available_BASE_components = ['blog', 'another one']
+

@@ -15,6 +15,8 @@ import sqlalchemy.exc
 from inspect import getmembers, isclass
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
+import base
+
 from base.config.settings import app
 from base.config.settings import template_project_folder
 from base.config.settings import project_additional_folder
@@ -23,10 +25,13 @@ from base.config.settings import app_subcommands_title
 from base.config.settings import app_subcommands_description
 from base.config.settings import db_init_warning
 from base.config.settings import playground_usage
+from base.config.settings import available_BASE_components
 from base.application.lookup import exit_status
 
 import base.common.orm
 from base.common.orm import make_database_url
+from base.common.orm import make_database_url2
+from base.common.orm import init_orm
 
 
 __project_path = None
@@ -41,7 +46,7 @@ def pars_command_line_arguments():
                                           help='choose from available commands', dest='cmd')
     subparsers.required = True
 
-    init_parser = subparsers.add_parser('init', help='initialize base project')
+    init_parser = subparsers.add_parser('init', help='initialize base project', aliases=['i'])
     init_parser.add_argument('name', type=str, help=app['name'][1])
     init_parser.add_argument('-D', '--destination', default=app['destination'][0], help=app['destination'][1])
     init_parser.add_argument('-d', '--description', default=app['description'][0], help=app['description'][1])
@@ -50,21 +55,31 @@ def pars_command_line_arguments():
     init_parser.add_argument('-x', '--prefix', default=app['prefix'][0], help=app['prefix'][1])
 
     _splitter = '\\' if __WINDOWS__ else '/'
-    db_init_parser = subparsers.add_parser('db_init', help="create base project's database schema")
+    db_init_parser = subparsers.add_parser('db_init', help="create base project's database schema", aliases=['dbi'])
     db_init_parser.add_argument('-dt', '--database_type', default=app['database_type'][0], help=app['database_type'][1])
     db_init_parser.add_argument('-dn', '--database_name', default=os.getcwd().split(_splitter)[-1],
                                 help=app['database_name'][1])
     db_init_parser.add_argument('-dh', '--database_host', default=app['database_host'][0], help=app['database_host'][1])
     db_init_parser.add_argument('-dp', '--database_port', help=app['database_port'][1])
     db_init_parser.add_argument('-p', '--application_port', default=str(app['port'][0]), help=app['port'][1], type=str)
-    db_init_parser.add_argument('-a', '--add_action_logs', default=app['add_action_logs'][0], help=app['add_action_logs'][1], type=bool)
+    db_init_parser.add_argument('-a', '--add_action_logs', default=app['add_action_logs'][0],
+                                help=app['add_action_logs'][1], type=bool)
     db_init_parser.add_argument('user_name', type=str, help=app['database_username'][1])
     db_init_parser.add_argument('password', type=str, help=app['database_password'][1])
 
-    db_init_parser = subparsers.add_parser('db_show_create', help="show sql create table query")
-    db_init_parser.add_argument('table_name', type=str, help=app['table_name'][1])
+    show_create_parser = subparsers.add_parser('db_show_create', help="show sql create table query", aliases=['dbs'])
+    show_create_parser.add_argument('table_name', type=str, help=app['table_name'][1])
 
-    db_init_parser = subparsers.add_parser('playground', help="create api playground frontend with nginx virtual host")
+    playground_parser = subparsers.add_parser('playground',
+                                              help="create api playground frontend with nginx virtual host",
+                                              aliases=['p'])
+
+    add_plugin_parser = subparsers.add_parser('add', help="add a component to the BASE project", aliases=['a'])
+    add_plugin_parser.add_argument('component', type=str, help=app['component'][1])
+
+    list_plugins_parser = subparsers.add_parser('list', help="list available BASE components", aliases=['l'])
+
+    argparser.add_argument('-V', '--version', action='version', help='show BASE version', version='BASE v{}'.format(base.__VERSION__))
 
     return argparser.parse_args()
 
@@ -210,12 +225,6 @@ def _configure_database(args, app_config, _db_config, test=False):
 
 
 def _enable_database_in_config(config_file, args, test):
-
-    # f = '/home/bobane/tmp/fuck/src/config/app_config.py'
-
-    # _project_conf_file = '{}/src/config/app_config.py'.format(destination)
-
-    # with open(_project_conf_file, 'w') as _new_config:
 
     with open(config_file, 'r') as cf:
         _file = cf.readlines()
@@ -367,46 +376,113 @@ def _update_path():
     sys.path.append(_project_path)
 
 
-def _copy_database_components(args):
+def _copy_database_components(args, db_type, db_name, db_config):
 
     _site_dir = _get_install_directory()
+    alembic_dir = '{}/base/builder/project_additional/db'.format(_site_dir[0])
     models_source_dir = '{}/base/builder/project_additional/models'.format(_site_dir[0])
     models_additional_source_dir = '{}/base/builder/project_additional/models_additional'.format(_site_dir[0])
     hooks_source_dir = '{}/base/builder/project_additional/api_hooks'.format(_site_dir[0])
 
     _show_info = True
 
+    # copy alembic environment
+    try:
+        shutil.copytree(alembic_dir, 'db')
+
+        # update alembic configuration
+        new_alembic_ini = ''
+        _write = False
+        with open('db/alembic.ini') as alembic_ini:
+            for _line in alembic_ini:
+                if _line[:14] == 'sqlalchemy.url':
+                    _line = 'sqlalchemy.url = {}://{}:{}@{}/{}\n'.format(
+                        db_type, db_config['db_user'], db_config['db_password'], db_config['db_host'], db_name)
+                    _write = True
+
+                new_alembic_ini += '{}'.format(_line)
+
+        if _write:
+            with open('db/alembic.ini', 'w') as alembic_ini:
+                alembic_ini.write(new_alembic_ini)
+
+    except FileExistsError as e:
+        print('Directory "db" already exists, using existing alembic structure')
+        _show_info = False
+    except PermissionError as e:
+        print('Can not create directory "db", insufficient permissions')
+        sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
+
+    # copy models
     try:
         shutil.copytree(models_source_dir, 'src/models')
     except FileExistsError as e:
-        print('Directory "models" already exists, using existing models')
+        print('Directory "src/models" already exists, using existing models')
         _show_info = False
     except PermissionError as e:
-        print('Can not create directory "models", insufficient permissions')
+        print('Can not create directory "src/models", insufficient permissions')
         sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
 
+    # copy activity model if configured
     if args.add_action_logs:
 
         try:
             shutil.copy('{}/activity.py'.format(models_additional_source_dir), 'src/models/activity.py')
         except FileExistsError as e:
-            print('Model "activity" already exists, using existing one')
+            print('Model "src/models/activity" already exists, using existing one')
             _show_info = False
         except PermissionError as e:
-            print('Can not create "activity.py", insufficient permissions')
+            print('Can not create "src/model/activity.py", insufficient permissions')
             sys.exit(exit_status.FILE_PERMISSION_ERROR)
 
+    # copy hooks
     try:
         shutil.copytree(hooks_source_dir, 'src/api_hooks')
     except FileExistsError as e:
-        print('Directory "api_hooks" already exists, using existing one')
+        print('Directory "src/api_hooks" already exists, using existing one')
         _show_info = False
     except PermissionError as e:
-        print('Can not create directory "api_hooks", insufficient permissions')
+        print('Can not create directory "src/api_hooks", insufficient permissions')
         sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
 
     if _show_info:
         print('Database models shown')
+
+    return True
+
+
+def _create_database(db_name, db_type, db_config, test=False):
+
+    from sqlalchemy import create_engine
+    if db_type == 'sqlite':
+        return True
+    else:
+        # def make_database_url2(db_type, host, port, username, password, charset='utf8'):
+        # _url = '{}://{}:{}@{}:{}'.format(
+        #     db_type, db_config['db_user'], db_config['db_password'], db_config['db_host'], db_config['db_port'])
+        _url = make_database_url2(
+            db_type, db_config['db_host'], db_config['db_port'], db_config['db_user'], db_config['db_password'])
+        eng = create_engine(_url)
+
+    import pdb; pdb.set_trace()
+    if db_type == 'postgresql':
+        existing_databases = eng.execute('select datname from pg_database')
+    else:
+        existing_databases = eng.execute('show databases;')
+
+    existing_databases = [db[0] for db in existing_databases]
+    _db_exists = any([dbn == db_name for dbn in existing_databases])
+
+    if _db_exists:
+        if not test:
+            print('Found database {}'.format(db_name))
+    else:
+        print('Database {} not found, will be created'.format(db_name))
+        conn = eng.connect()
+        conn.execute('commit')
+        conn.execute('create database {}'.format(db_name))
+        conn.close()
+        print('Database {} created'.format(db_name))
 
     return True
 
@@ -428,12 +504,16 @@ def _build_database(args, test=False):
     orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
     setattr(base.common.orm, 'orm', orm_builder.orm())
 
+    if not _create_database(_database_name, db_type, db_config, test):
+        print('Database has not created')
+        return
+
     import src.config.app_config
     if not hasattr(src.config.app_config, 'models'):
         print('Nothing to be done')
         return
 
-    if not test and not _copy_database_components(args):
+    if not test and not _copy_database_components(args, db_type, _database_name, db_config):
         print('Can not initialize database components')
         return
 
@@ -447,7 +527,7 @@ def _build_database(args, test=False):
         orm_builder.clear_database()
 
     try:
-        orm_builder.create_db_schema()
+        orm_builder.create_db_schema(test)
     except sqlalchemy.exc.OperationalError:
         print('Database {} is missing, please create it'.format(args.database_name))
         sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
@@ -468,7 +548,11 @@ def _build_database(args, test=False):
     # PREPARE SEQUENCERS FIRST
     _seq_module = _get_sequnecer_model_module(_models_modules)
     if _seq_module:
-        _seq_module.main()
+        try:
+            _seq_module.main()
+        except sqlalchemy.exc.IntegrityError:
+            orm_builder.orm().session().rollback()
+            print('Sequencer already contains keys, and will not be inserted again, continuing')
 
     # PREPARE DATABASE
     for m in _models_modules:
@@ -478,7 +562,8 @@ def _build_database(args, test=False):
             print(m.__name__, "doesn't have to be prepared")
 
         except sqlalchemy.exc.IntegrityError:
-            print('Database {} already exists, please recreate it'.format(args.database_name))
+            orm_builder.orm().session().rollback()
+            print('Database {} already exists, you can recreate it or leave it this way'.format(args.database_name))
             sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
 
     if not test:
@@ -523,14 +608,15 @@ def _show_create_table(args):
         print('Missing database configuration for port: {}'.format(_port))
         sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
 
-    _db_config = db_config[_port]
-    db_type = _db_config['db_type']
+    # _db_config = db_config[_port]
+    # db_type = _db_config['db_type']
+    #
+    # __db_url = make_database_url(db_type, _db_config['db_name'], _db_config['db_host'], _db_config['db_port'],
+    #                              _db_config['db_user'], _db_config['db_password'],
+    #                              _db_config['charset'] if 'charset' in _db_config else 'utf8')
 
-    __db_url = make_database_url(db_type, _db_config['db_name'], _db_config['db_host'], _db_config['db_port'],
-                                 _db_config['db_user'], _db_config['db_password'],
-                                 _db_config['charset'] if 'charset' in _db_config else 'utf8')
-
-    orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
+    # orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
+    orm_builder = init_orm()
 
     # PREPARE DATABASE
 
@@ -577,18 +663,67 @@ def _create_playground(parsed_args):
     print(playground_usage)
 
 
+def _add_blog():
+
+    _update_path()
+    try:
+        import src.config.app_config
+    except ImportError as e:
+        print('Can not find application configuration')
+        sys.exit(exit_status.MISSING_PROJECT_CONFIGURATION)
+
+    if not hasattr(src.config.app_config, 'db_config'):
+        print('Missing Database configuration in config file')
+        sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
+
+    # check if config file has active models, and update models with blog models
+    # check if models are presented if not copy them
+    # create tables for blog (https://stackoverflow.com/questions/41030566/sqlalchemy-add-a-table-to-an-already-existing-database)
+    #   orm has to bi initialized
+    #   model_name.__table__.create(db_session.bind)
+    # check if api exists, if not copy it from the repo
+    # update app config with api paths
+
+    print('BLOG ADDED')
+
+
+def _add_component(parsed_args):
+
+    if parsed_args.component not in available_BASE_components:
+        print('''
+        Component "{}" not recognized
+        '''.format(parsed_args.component))
+        sys.exit(exit_status.BASE_COMPONENT_NOT_EXISTS)
+
+    if parsed_args.component == 'blog':
+        _add_blog()
+
+
+def _list_components(parsed_args):
+    msg = '''
+    available components: {}
+    '''.format(''.join(['\n\t{}'.format(c) for c in available_BASE_components]))
+    print(msg)
+
+
 def execute_builder_cmd():
 
     parsed_args = pars_command_line_arguments()
 
-    if parsed_args.cmd == 'init':
+    if parsed_args.cmd in ['init', 'i']:
         _build_project(parsed_args)
 
-    if parsed_args.cmd == 'db_init':
+    if parsed_args.cmd in ['db_init', 'dbi']:
         _build_database(parsed_args)
 
-    if parsed_args.cmd == 'db_show_create':
+    if parsed_args.cmd in ['db_show_create', 'dbs']:
         _show_create_table(parsed_args)
 
-    if parsed_args.cmd == 'playground':
+    if parsed_args.cmd in ['playground', 'p']:
         _create_playground(parsed_args)
+
+    if parsed_args.cmd in ['add', 'a']:
+        _add_component(parsed_args)
+
+    if parsed_args.cmd in ['list', 'l']:
+        _list_components(parsed_args)

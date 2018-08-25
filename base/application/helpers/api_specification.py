@@ -66,7 +66,11 @@ def get_api_specification(request_handler):
                                     elif isinstance(_param['type'], ModuleType) and _param['type'].__name__ == 'json':
                                         _type_name = 'json'
                                     else:
-                                        _type_name = _param['type'].__name__
+                                        try:
+                                            _type_name = _param['type'].__name__
+                                        except AttributeError as e:
+                                            print('Error get type for param "{}": {}'.format(_param, e))
+                                            continue
 
                                     _function_specification[_f_name]['params'][_param['name']] = {}
                                     for _p in _param:

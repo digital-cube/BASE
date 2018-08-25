@@ -1,11 +1,7 @@
-# try:
-#     from setuptools import setup
-# except ImportError:
-#     from distutils.core import setup
 import os
 import base
 import platform
-from distutils.core import setup
+from setuptools import setup
 
 __WINDOWS__ = platform.system() == 'Windows'
 
@@ -52,6 +48,7 @@ setup(
             'application/templates/*',
             'bin/*',
             'builder/playground/*',
+            # 'builder/project_additional/api/*',     # for components
             'builder/project_additional/app_config.py',
             'builder/project_additional/models/*',
             'builder/project_additional/models_additional/*',

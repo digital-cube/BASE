@@ -33,7 +33,7 @@ def _get_svc_port():
 
 class Application(tornado.web.Application):
 
-    def __init__(self, entries):
+    def __init__(self, entries, test=False):
 
         self.entries = entries
 
@@ -44,7 +44,7 @@ class Application(tornado.web.Application):
 
         super(Application, self).__init__(
             self.entries,
-            debug=base.config.application_config.debug,
+            debug=base.config.application_config.debug if not test else False,      # turn off debugging mode for tests
             cookie_secret=base.config.application_config.secret_cookie,
             default_handler_class=DefaultRouteHandler,
             **_settings

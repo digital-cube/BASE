@@ -2,6 +2,7 @@ requests
 bcrypt
 tornado
 sqlalchemy
+alembic
 # psycopg2-binary
 # mysqlclient
 # sqlalchemy

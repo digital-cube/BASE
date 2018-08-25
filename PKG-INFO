@@ -1,10 +1,10 @@
-Metadata-Version: 1.0
+Metadata-Version: 1.1
 Name: base
-Version: 1.0.0b1
+Version: 1.1.6
 Summary: Base, simple scaling project
 Home-page: https://github.com/digital-cube/BASE
 Author: DigitalCube doo
 Author-email: slobodan@digitalcube.rs
 License: GNU
 Description: Simple scaling project
-Platform: Linux 4.4.23 x86_64
+Platform: Linux 4.14.62 x86_64

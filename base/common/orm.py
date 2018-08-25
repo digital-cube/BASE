@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -6,6 +7,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
+from base.application.lookup import exit_status
 from base.application.helpers.exceptions import UnknownDatabaseType
 
 
@@ -20,6 +22,18 @@ def make_database_url(db_type, name, host, port, username, password, charset='ut
         return URL(drivername='postgresql+psycopg2', username=username, password=password, host=host, port=port, database=name, query={'client_encoding': charset})
     if db_type == 'sqlite':
         return URL(drivername='sqlite', database='{}.db'.format(name))
+    else:
+        raise UnknownDatabaseType("Unknown database type: {}".format(db_type))
+
+
+def make_database_url2(db_type, host, port, username, password, charset='utf8'):
+
+    if db_type == 'mysql':
+        return URL(drivername='mysql+mysqldb', username=username, password=password, host=host, port=port, query={'charset': charset})
+    if db_type == 'postgresql':
+        return URL(drivername='postgresql+psycopg2', username=username, password=password, host=host, port=port, query={'client_encoding': charset})
+    if db_type == 'sqlite':
+        return URL(drivername='sqlite')
     else:
         raise UnknownDatabaseType("Unknown database type: {}".format(db_type))
 
@@ -59,9 +73,24 @@ class orm_builder(object):
     def __init__(self, sql_address, orm_base):
         self.__orm = _orm(sql_address, orm_base)
 
-    def create_db_schema(self):
-        self.__orm.base().metadata.create_all(self.__orm.engine())
-        self.__orm.session().commit()
+    def create_db_schema(self, test=False):
+        """In test mode use sqlalchemy method, in other cases use alembic"""
+
+        if test:
+            self.__orm.base().metadata.create_all(self.__orm.engine())
+            self.__orm.session().commit()
+            return
+
+        # alembic create all tables;
+        from alembic.config import Config
+        from alembic import command
+        os.chdir('db')
+        alembic_cfg = Config('alembic.ini')
+
+        first_revision = command.show(alembic_cfg, "head")
+        if first_revision is None:
+            command.revision(alembic_cfg, autogenerate=True, message='initial')
+        command.upgrade(alembic_cfg, "head")
 
     def clear_database(self):
         if self.__orm.engine().name == 'sqlite':
@@ -139,4 +168,30 @@ def commit():
             raise NameError("DB Error: {}".format(e))
         else:
             raise NameError("DB Error")
+
+
+def init_orm():
+
+    import src.config.app_config
+
+    __dest_dir = os.path.dirname(src.config.app_config.__file__)
+    __db_config_file = '{}/{}'.format(__dest_dir, src.config.app_config.db_config)
+
+    with open(__db_config_file) as _db_cfg:
+        try:
+            db_config = json.load(_db_cfg)
+        except json.JSONDecodeError:
+            print('Can not load database configuration')
+            sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+
+    _port = str(src.config.app_config.port)
+
+    _db_config = db_config[_port]
+    db_type = _db_config['db_type']
+
+    __db_url = make_database_url(db_type, _db_config['db_name'], _db_config['db_host'], _db_config['db_port'],
+                                 _db_config['db_user'], _db_config['db_password'],
+                                 _db_config['charset'] if 'charset' in _db_config else 'utf8')
+
+    return orm_builder(__db_url, sql_base)
 
