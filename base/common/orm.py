@@ -15,6 +15,7 @@ sql_base = declarative_base()
 
 
 def make_database_url(db_type, name, host, port, username, password, charset='utf8'):
+    """Create database url"""
 
     if db_type == 'mysql':
         return URL(drivername='mysql+mysqldb', username=username, password=password, host=host, port=port, database=name, query={'charset': charset})
@@ -27,11 +28,13 @@ def make_database_url(db_type, name, host, port, username, password, charset='ut
 
 
 def make_database_url2(db_type, host, port, username, password, charset='utf8'):
+    """Create url without the database name to be able to check if the database exists.
+    Postgresql url require database template1 as a name to be able to work"""
 
     if db_type == 'mysql':
         return URL(drivername='mysql+mysqldb', username=username, password=password, host=host, port=port, query={'charset': charset})
     if db_type == 'postgresql':
-        return URL(drivername='postgresql+psycopg2', username=username, password=password, host=host, port=port, query={'client_encoding': charset})
+        return URL(drivername='postgresql+psycopg2', username=username, password=password, host=host, port=port, database='template1', query={'client_encoding': charset})
     if db_type == 'sqlite':
         return URL(drivername='sqlite')
     else:
