@@ -61,7 +61,7 @@ def pars_command_line_arguments():
                                 help=app['database_name'][1])
     db_init_parser.add_argument('-dh', '--database_host', default=app['database_host'][0], help=app['database_host'][1])
     db_init_parser.add_argument('-dp', '--database_port', help=app['database_port'][1])
-    db_init_parser.add_argument('-p', '--application_port', default=str(app['port'][0]), help=app['port'][1], type=str)
+    db_init_parser.add_argument('-p', '--application_port', help=app['port'][1], type=str)
     db_init_parser.add_argument('-a', '--add_action_logs', default=app['add_action_logs'][0],
                                 help=app['add_action_logs'][1], type=bool)
     db_init_parser.add_argument('user_name', type=str, help=app['database_username'][1])
@@ -335,6 +335,10 @@ def __db_is_configured(args, test):
         print('Can not reload application configuration')
         return False, False
 
+    # set application port in args from configuration if not present in args
+    if args.application_port is None:
+        args.application_port = src.config.app_config.port
+
     if not hasattr(src.config.app_config, 'db_config'):
         print('Missing Database configuration in config file')
         return False, False
@@ -464,7 +468,6 @@ def _create_database(db_name, db_type, db_config, test=False):
             db_type, db_config['db_host'], db_config['db_port'], db_config['db_user'], db_config['db_password'])
         eng = create_engine(_url)
 
-    import pdb; pdb.set_trace()
     if db_type == 'postgresql':
         existing_databases = eng.execute('select datname from pg_database')
     else:

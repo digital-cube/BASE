@@ -2,6 +2,12 @@
 
 ### 2018 08 27
 
+## BASE version 1.2.1
+- db_init recognize configured application port if not in arguments
+
+
+### 2018 08 27
+
 ## BASE version 1.2.0
 - alembic as default database migration tool. Database are created with alembic. In tests sqlalchemy is used.
 
