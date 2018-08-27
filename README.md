@@ -1,6 +1,6 @@
 # **Base REST API**
 
-* Version 1.1.6
+* Version 1.2.0
 * [DigitalCube](http://digitalcube.rs/)
 
 ### Requirements

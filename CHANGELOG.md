@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 08 27
+
+## BASE version 1.2.0
+- alembic as default database migration tool. Database are created with alembic. In tests sqlalchemy is used.
+
+
 ### 2018 07 30
 
 ## BASE version 1.1.6
