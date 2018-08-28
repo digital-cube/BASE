@@ -4,6 +4,11 @@ import sys
 from base.application.lookup import exit_status
 
 
+class DummyArgumentParser:
+
+    application_port = None
+
+
 def prepare_test_database():
     """
     Prepare database for testing purposes. Find connection parameters from project's config.
@@ -25,5 +30,5 @@ def prepare_test_database():
     setattr(src.config.app_config, 'debug', False)
 
     import base.builder.project_maker
-    return base.builder.project_maker._build_database({}, test=True)
+    return base.builder.project_maker._build_database(DummyArgumentParser(), test=True)
 

@@ -5,13 +5,7 @@ __APP_DESCRIPTION__
 __PORT__
 __APP_PREFIX__
 __APP_VERSION__
-# models = [
-#     'src.models.mail',
-#     'src.models.sequencers',
-#     'src.models.session',
-#     'src.models.user',
-#     'src.models.utils',
-# ]
+
 imports = [
     'src.api.hello',
 ]

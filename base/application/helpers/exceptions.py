@@ -134,3 +134,8 @@ class PreApplicationProcessConfigurationError(Exception):
 class PostApplicationProcessConfigurationError(Exception):
     """Post application processes not configured properly"""
     pass
+
+
+class MissingModelsConfig(Exception):
+    """Database models json is missing"""
+    pass

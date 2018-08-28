@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 08 28
+
+## BASE version 1.2.2
+- models configuration moved from the application config file to a separate json config file
+
+
 ### 2018 08 27
 
 ## BASE version 1.2.1

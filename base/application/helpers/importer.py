@@ -1,5 +1,7 @@
 # coding= utf-8
 
+import os
+import json
 import inspect
 import importlib
 from inspect import getmembers, isclass
@@ -19,6 +21,7 @@ from base.application.helpers.exceptions import MissingApplicationConfiguration
 from base.application.helpers.exceptions import InvalidAPIHooksModule
 from base.application.helpers.exceptions import MissingRolesLookup
 from base.application.helpers.exceptions import InvalidApplicationConfiguration
+from base.application.helpers.exceptions import MissingModelsConfig
 from base.common.orm import load_database_configuration
 
 
@@ -91,6 +94,16 @@ def _load_app_configuration_with_database(config_file):
         setattr(base.config.application_config, 'session_storage', config_file.session_storage)
     if hasattr(config_file, 'models'):
         setattr(base.config.application_config, 'models', config_file.models)
+    else:
+        try:
+            models_file = '{}/{}'.format(os.path.dirname(config_file.__file__), base.config.settings.models_config_file)
+            with open(models_file) as mf:
+                models = json.load(mf)
+            setattr(base.config.application_config, 'models', models)
+        except Exception as e:
+            print('Can not read models config file "{}": {}'.format(base.config.settings.models_config_file, e))
+            raise MissingModelsConfig('models.json is missing or corrupted')
+
     if hasattr(config_file, 'user_roles_module'):
         setattr(base.config.application_config, 'user_roles_module', config_file.user_roles_module)
     if hasattr(config_file, 'strong_password'):
@@ -119,6 +132,8 @@ def _load_app_configuration_with_database(config_file):
         setattr(base.config.application_config, 'google_discovery_docs_url', config_file.google_discovery_docs_url)
     if hasattr(config_file, 'google_check_access_token_url'):
         setattr(base.config.application_config, 'google_check_access_token_url', config_file.google_check_access_token_url)
+    if hasattr(config_file, 'reload_session'):
+        setattr(base.config.application_config, 'reload_session', config_file.reload_session)
 
 
 def _load_app_configuration_without_database(config_file):

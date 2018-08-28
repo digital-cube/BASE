@@ -61,4 +61,11 @@ playground created...
 #################################################
 '''
 available_BASE_components = ['blog', 'another one']
-
+default_models = [
+    'src.models.mail',
+    'src.models.sequencers',
+    'src.models.session',
+    'src.models.user',
+    'src.models.utils'
+]
+models_config_file = 'models.json'

@@ -77,6 +77,11 @@ class SqlTokenizer(Tokenizer):
         SessionToken, _session = base.common.orm.get_orm_model('session_tokens')
         AuthUser, _session = base.common.orm.get_orm_model('auth_users')
 
+        # reload session if configured - for balancers to be able to get changes from slave database
+        import base.config.application_config as cfg
+        if cfg.reload_session:
+            _session.close()
+
         _qs = _session.query(SessionToken).filter(SessionToken.id == tk)
 
         if _qs.count() != 1:

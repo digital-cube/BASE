@@ -18,6 +18,7 @@ from sqlalchemy.ext.declarative.api import DeclarativeMeta
 import base
 
 from base.config.settings import app
+from base.config.settings import models_config_file
 from base.config.settings import template_project_folder
 from base.config.settings import project_additional_folder
 from base.config.settings import app_builder_description
@@ -26,6 +27,7 @@ from base.config.settings import app_subcommands_description
 from base.config.settings import db_init_warning
 from base.config.settings import playground_usage
 from base.config.settings import available_BASE_components
+from base.config.settings import default_models
 from base.application.lookup import exit_status
 
 import base.common.orm
@@ -226,49 +228,30 @@ def _configure_database(args, app_config, _db_config, test=False):
 
 def _enable_database_in_config(config_file, args, test):
 
+    # create models config file
+    models_file = '{}/{}'.format(os.path.dirname(config_file), models_config_file)
+    with open(models_file, 'w') as mf:
+        json.dump(default_models, mf, indent=4, sort_keys=True, ensure_ascii=False)
+
+    # edit application config file and enable database features
     with open(config_file, 'r') as cf:
         _file = cf.readlines()
 
     _new_file = []
-    _models = False
-    _max_models_try = 20
     _forgot = False
     _max_forgot_try = 20
 
     for _line in _file:
-        # print(_line)
 
-        if _max_models_try == 0 or _max_forgot_try == 0:
+        if _max_forgot_try == 0:
             print('MAXIMUM TRIES EXCEEDED')
-            # return False
             break
-
-        if _models and not (_line == '# ]\n'):
-            _new_file.append(_line[2:])
-            _max_models_try -= 1
-            continue
-
-        if _line == '# models = [\n':
-            _new_file.append('models = [\n')
-            _models = True
-            continue
-
-        if _line == '# ]\n' and _models:
-            if args.add_action_logs:
-                _new_file.append("    'src.models.activity',\n")
-            _new_file.append(']\n')
-            _models = False
-            continue
 
         if _line[:11] == '# db_config':
             _new_file.append(_line[2:])
             continue
 
         if _line[:11] == '# api_hooks':
-            _new_file.append(_line[2:])
-            continue
-
-        if _line[:17] == '# session_storage':
             _new_file.append(_line[2:])
             continue
 
@@ -325,7 +308,7 @@ def __db_is_configured(args, test):
         return False, False
 
     if not _enable_database_in_config(src.config.app_config.__file__, args, test):
-        print('Can not configure Database in config file')
+        print('Can not configure Database in the application')
         return False, False
 
     # reimport configuration file
@@ -365,13 +348,18 @@ def __db_is_configured(args, test):
     return __db_config, __db_type
 
 
-def _get_orm_models(models_list, orm_models):
+def _get_orm_models(models_list, app_config):
+    models_file = '{}/{}'.format(os.path.dirname(app_config.__file__), models_config_file)
+    with open(models_file) as mf:
+        orm_models = json.load(mf)
     for m in orm_models:
         try:
             _m = importlib.import_module(m)
             models_list.append(_m)
         except ImportError:
             print('Error loading model {}'.format(m))
+
+    return orm_models
 
 
 def _update_path():
@@ -512,7 +500,8 @@ def _build_database(args, test=False):
         return
 
     import src.config.app_config
-    if not hasattr(src.config.app_config, 'models'):
+    models_file = '{}/{}'.format(os.path.dirname(src.config.app_config.__file__), models_config_file)
+    if not os.path.isfile(models_file) and not hasattr(src.config.app_config, 'models'):
         print('Nothing to be done')
         return
 
@@ -522,7 +511,7 @@ def _build_database(args, test=False):
 
     # PRESENT MODELS TO BASE
     _models_modules = []
-    _get_orm_models(_models_modules, src.config.app_config.models)
+    _orm_models = _get_orm_models(_models_modules, src.config.app_config)
 
     if test:
         # teardown database in test mode
@@ -545,7 +534,8 @@ def _build_database(args, test=False):
     # LOAD ORM FOR SEQUENCERS IN MODELS
     from base.application.helpers.importer import load_orm
     import base.config.application_config
-    setattr(base.config.application_config, 'models', src.config.app_config.models)
+    # setattr(base.config.application_config, 'models', src.config.app_config.models)
+    setattr(base.config.application_config, 'models', _orm_models)
     load_orm(src.config.app_config.port)
 
     # PREPARE SEQUENCERS FIRST
@@ -604,7 +594,7 @@ def _show_create_table(args):
             sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
 
     _models_modules = []
-    _get_orm_models(_models_modules, src.config.app_config.models)
+    _get_orm_models(_models_modules, src.config.app_config)
 
     _port = str(src.config.app_config.port)
     if _port not in db_config:
@@ -687,14 +677,15 @@ def _add_blog():
     # check if api exists, if not copy it from the repo
     # update app config with api paths
 
-    print('BLOG ADDED')
+    print('blog added to the system')
 
 
 def _add_component(parsed_args):
 
     if parsed_args.component not in available_BASE_components:
         print('''
-        Component "{}" not recognized
+        Component "{}" not recognized,
+        please use 'db_init list' to see available components
         '''.format(parsed_args.component))
         sys.exit(exit_status.BASE_COMPONENT_NOT_EXISTS)
 

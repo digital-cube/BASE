@@ -13,6 +13,7 @@ db_config = None
 db_configured = False
 db_type = None
 strong_password = False
+reload_session = False  # for balancers to be able to get changes from slave database
 api_hooks = None
 models = []
 orm_models = {}
