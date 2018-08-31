@@ -29,6 +29,6 @@ def prepare_test_database():
 
     setattr(src.config.app_config, 'debug', False)
 
-    import base.builder.project_maker
-    return base.builder.project_maker._build_database(DummyArgumentParser(), test=True)
+    import base.builder.maker.database_builder
+    return base.builder.maker.database_builder.build_database(DummyArgumentParser(), test=True)
 

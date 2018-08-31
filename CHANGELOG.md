@@ -2,6 +2,12 @@
 
 ### 2018 08 31
 
+## BASE version 1.2.4
+- project builder separated into maker module
+
+
+### 2018 08 31
+
 ## BASE version 1.2.3
 - facebook and google social login in tornado version > 5.0 process fix. Fix in tests for facebook social login.
 - hooks for login and register accepts request handler as optional parameter
