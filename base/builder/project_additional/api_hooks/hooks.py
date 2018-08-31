@@ -10,21 +10,21 @@ pack_user(AuthUser) -> [dict, None]:
         - return users data as dictionary
 check_password_is_valid(password) -> bool:
         - check for password validation
-register_user(id_user, username, password, data) -> [dict, str, convertible to string, None]:
+register_user(id_user, username, password, data, request_handler=None) -> [dict, str, convertible to string, None]:
         - register user on system
         - populate auth_users and users tables here
-pre_register_user(username, password, data) -> [False, not False]:
+pre_register_user(username, password, data, request_handler=None) -> [False, not False]:
         - process user's data before user registration. If False registration is stopped.
-post_register_process(id_user, username, password, data, session_token) -> [dict, None, bool]:
+post_register_process(id_user, username, password, data, session_token, request_handler=None) -> [dict, None, bool]:
         - process user's data after user registration. If False or None, registration return error.
 user_exists(username, password, data, handler) -> [User object]
         - check if username exists in the system
 check_username_and_password(username, password, Auth_user) -> [bool]
         - check username / password match
-pre_login_process(Auth_user, json_data) -> [dict, str, None]
+pre_login_process(Auth_user, json_data, request_handler=None) -> [dict, str, None]
         - pre login data processing
         - on error raise PreLoginError
-post_login_process(Auth_user, json_data, token) -> [dict, str, None]
+post_login_process(Auth_user, json_data, token, request_handler=None) -> [dict, str, None]
         - after login processing
         - on error raise PostLoginError
 save_hash(hash_data) -> [dict, str]
@@ -37,7 +37,7 @@ pre_logout_process(Auth_user) -> [dict, None]
         - pre logout data processing
 post_logout_process(Auth_user, session_token) -> [dict, None]
         - post logout data processing
-check_user(Auth_user) -> [dict]
+check_user(Auth_user, request_handler=None) -> [dict]
         - check user process
 pre_check_user(Auth_user) -> [dict]
         - process user before check user process

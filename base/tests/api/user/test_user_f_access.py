@@ -33,8 +33,16 @@ def _log_in_user_error(self):
     return False
 
 
+def _log_in_user(self):
+    return True
+
+
 def _missing_module():
     return False
+
+
+def _module_installed():
+    return True
 
 
 _FUSER = {
@@ -50,7 +58,7 @@ _FUSER = {
 class TestUserFAccess(TestBase):
 
     @patch('base.application.api.user.faccess.check_facepy_library_installed', _missing_module)
-    def test_f_login_missing_module(self):
+    def test_f_login_missing_facepy_module(self):
 
         _b = {
             'user': json.dumps(_FUSER, ensure_ascii=False)
@@ -65,6 +73,25 @@ class TestUserFAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.FACEBOOK_LIBRARY_NOT_INSTALLED])
 
+    @patch('base.application.api.user.faccess.FAccess.get_user_info', _user_info)
+    @patch('base.application.api.user.faccess.FAccess.social_user', FACEBOOK_USER)
+    @patch('base.application.api.user.faccess.FAccess.log_user_in', _log_in_user_error)
+    def test_f_login_missing_facepy_module2(self):
+
+        _b = {
+            'user': json.dumps(_FUSER, ensure_ascii=False)
+        }
+
+        body = json.dumps(_b)
+        res = self.fetch('/user/f-access', method='POST', body=body)
+
+        self.assertEqual(res.code, 400)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], msgs.lmap[msgs.FACEBOOK_LIBRARY_NOT_INSTALLED])
+
+    @patch('base.application.api.user.faccess.check_facepy_library_installed', _module_installed)
     def test_f_login_invalid_facebook_user_sent(self):
 
         # missing email
@@ -179,6 +206,10 @@ class TestUserFAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.FACEBOOK_USER_INVALID])
 
+    @patch('base.application.api.user.faccess.check_facepy_library_installed', _module_installed)
+    @patch('base.application.api.user.faccess.FAccess.get_user_info', _user_info_error)
+    @patch('base.application.api.user.faccess.FAccess.social_user', FACEBOOK_USER)
+    @patch('base.application.api.user.faccess.FAccess.log_user_in', _log_in_user_error)
     def test_f_login_can_not_verify_token(self):
 
         _b = {
@@ -194,6 +225,7 @@ class TestUserFAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.ERROR_GET_FACEBOOK_USER])
 
+    @patch('base.application.api.user.faccess.check_facepy_library_installed', _module_installed)
     @patch('base.application.api.user.faccess.FAccess.get_user_info', _user_info)
     @patch('base.application.api.user.faccess.FAccess.social_user', FACEBOOK_USER)
     @patch('base.application.api.user.faccess.FAccess.log_user_in', _log_in_user_error)
@@ -212,6 +244,7 @@ class TestUserFAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.ERROR_AUTHORIZE_FACEBOOK_USER])
 
+    @patch('base.application.api.user.faccess.check_facepy_library_installed', _module_installed)
     @patch('base.application.api.user.faccess.FAccess.get_user_info', _user_info)
     @patch('base.application.api.user.faccess.FAccess.social_user', FACEBOOK_USER)
     def test_f_login(self):
@@ -229,6 +262,7 @@ class TestUserFAccess(TestBase):
         self.assertIn('token', res)
         self.assertIn('token_type', res)
 
+    @patch('base.application.api.user.faccess.check_facepy_library_installed', _module_installed)
     @patch('base.application.api.user.faccess.FAccess.get_user_info', _user_info)
     @patch('base.application.api.user.faccess.FAccess.social_user', FACEBOOK_USER)
     def test_f_login_after_register(self):

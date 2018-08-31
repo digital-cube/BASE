@@ -49,7 +49,7 @@ class FAccess(SocialAccess):
 
         # get data for user
         if tornado.version >= '5.0':
-            user_verified = yield tornado.ioloop.IOLoop.current().run_in_executor(self.get_user_info)
+            user_verified = yield tornado.ioloop.IOLoop.current().run_in_executor(None, self.get_user_info)
         else:
             th_executor = tornado.concurrent.futures.ThreadPoolExecutor(4)
             user_verified = yield th_executor.submit(self.get_user_info)
@@ -62,7 +62,7 @@ class FAccess(SocialAccess):
         # get session token
         # return user's data and session token
         if tornado.version >= '5.0':
-            response = yield tornado.ioloop.IOLoop.current().run_in_executor(self.log_user_in)
+            response = yield tornado.ioloop.IOLoop.current().run_in_executor(None, self.log_user_in)
         else:
             th_executor = tornado.concurrent.futures.ThreadPoolExecutor(4)
             response = yield th_executor.submit(self.log_user_in)

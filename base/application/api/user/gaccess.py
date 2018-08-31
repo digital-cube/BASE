@@ -124,7 +124,7 @@ class GAccess(SocialAccess):
 
         # check that app is configured for google access
         if tornado.version >= '5.0':
-            is_configured = yield tornado.ioloop.IOLoop.current().run_in_executor(self.is_configured)
+            is_configured = yield tornado.ioloop.IOLoop.current().run_in_executor(None, self.is_configured)
         else:
             th_executor = tornado.concurrent.futures.ThreadPoolExecutor(4)
             is_configured = yield th_executor.submit(self.is_configured)
@@ -136,7 +136,7 @@ class GAccess(SocialAccess):
         # check the access token on google's side
         self.access_token = token
         if tornado.version >= '5.0':
-            token_verified = yield tornado.ioloop.IOLoop.current().run_in_executor(self.verify_token)
+            token_verified = yield tornado.ioloop.IOLoop.current().run_in_executor(None, self.verify_token)
         else:
             th_executor = tornado.concurrent.futures.ThreadPoolExecutor(4)
             token_verified = yield th_executor.submit(self.verify_token)
@@ -147,7 +147,7 @@ class GAccess(SocialAccess):
 
         # get data for user
         if tornado.version >= '5.0':
-            user_verified = yield tornado.ioloop.IOLoop.current().run_in_executor(self.get_user_info)
+            user_verified = yield tornado.ioloop.IOLoop.current().run_in_executor(None, self.get_user_info)
         else:
             th_executor = tornado.concurrent.futures.ThreadPoolExecutor(4)
             user_verified = yield th_executor.submit(self.get_user_info)
@@ -160,7 +160,7 @@ class GAccess(SocialAccess):
         # get session token
         # return user's data and session token
         if tornado.version >= '5.0':
-            response = yield tornado.ioloop.IOLoop.current().run_in_executor(self.log_user_in)
+            response = yield tornado.ioloop.IOLoop.current().run_in_executor(None, self.log_user_in)
         else:
             th_executor = tornado.concurrent.futures.ThreadPoolExecutor(4)
             response = yield th_executor.submit(self.log_user_in)
