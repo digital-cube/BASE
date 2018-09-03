@@ -60,7 +60,9 @@ playground created...
 #                                               #
 #################################################
 '''
-available_BASE_components = ['blog', 'another one']
+available_BASE_components = [
+    'blog'
+]
 default_models = [
     'src.models.mail',
     'src.models.sequencers',
