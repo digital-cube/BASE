@@ -2,6 +2,7 @@ import os
 import sys
 import site
 import json
+import shutil
 import importlib
 
 from base.application.lookup import exit_status
@@ -46,4 +47,24 @@ def get_orm_models(models_list, app_config):
 
     return orm_models
 
+
+def copy_dir(source, destination):
+    try:
+        shutil.copytree(source, destination)
+    except FileExistsError as e:
+        print('Directory "{}" already exists, using existing resource'.format(destination))
+    except PermissionError as e:
+        print('Can not create directory "{}", insufficient permissions'.format(destination))
+        sys.exit(exit_status.PROJECT_DIRECTORY_PERMISSION_ERROR)
+
+
+def copy_file(source_file, destination_file):
+
+    try:
+        shutil.copy(source_file, destination_file)
+    except FileExistsError as e:
+        print('File "{}" already exists, using existing one'.format(destination_file))
+    except PermissionError as e:
+        print('Can not create "{}", insufficient permissions'.format(destination_file))
+        sys.exit(exit_status.FILE_PERMISSION_ERROR)
 

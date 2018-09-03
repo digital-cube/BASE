@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 09 03
+
+## BASE version 1.3.0
+- BASE component blog
+
+
 ### 2018 08 31
 
 ## BASE version 1.2.4

@@ -94,6 +94,7 @@ class orm_builder(object):
         if first_revision is None:
             command.revision(alembic_cfg, autogenerate=True, message='initial')
         command.upgrade(alembic_cfg, "head")
+        os.chdir('..')
 
     def clear_database(self):
         if self.__orm.engine().name == 'sqlite':
@@ -110,6 +111,16 @@ class orm_builder(object):
 
     def orm(self):
         return self.__orm
+
+    def add_blog(self):
+        from alembic.config import Config
+        from alembic import command
+        os.chdir('db')
+        alembic_cfg = Config('alembic.ini')
+
+        command.revision(alembic_cfg, autogenerate=True, message='blog')
+        command.upgrade(alembic_cfg, "head")
+        os.chdir('..')
 
 
 orm = None

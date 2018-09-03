@@ -3,6 +3,7 @@
 import sys
 import json
 import bcrypt
+import shutil
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
@@ -128,4 +129,24 @@ def check_facepy_library_installed():
         return False
 
     return 'facepy' in sys.modules
+
+
+def check_slugify_library_installed():
+
+    try:
+        import slugify
+    except ModuleNotFoundError:
+        return False
+
+    return 'slugify' in sys.modules
+
+
+def check_timeago_library_installed():
+
+    try:
+        import timeago
+    except ModuleNotFoundError:
+        return False
+
+    return 'timeago' in sys.modules
 

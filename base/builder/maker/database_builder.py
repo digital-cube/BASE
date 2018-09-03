@@ -17,7 +17,7 @@ from base.config.settings import default_models
 from base.config.settings import models_config_file
 
 
-def _enable_database_in_config(config_file, args, test):
+def _enable_database_in_config(config_file, args):
 
     # create models config file
     models_file = '{}/{}'.format(os.path.dirname(config_file), models_config_file)
@@ -138,7 +138,7 @@ def __db_is_configured(args, test):
         print('Can not find application configuration')
         return False, False
 
-    if not _enable_database_in_config(src.config.app_config.__file__, args, test):
+    if not test and not _enable_database_in_config(src.config.app_config.__file__, args):
         print('Can not configure Database in the application')
         return False, False
 
@@ -335,7 +335,7 @@ def build_database(args, test=False):
         print('Database {} is missing, please create it'.format(args.database_name))
         sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
 
-    def _get_sequnecer_model_module(_models_modules):
+    def _get_sequencer_model_module(_models_modules):
 
         for m in _models_modules:
             if 'sequencer' in m.__name__:
@@ -350,7 +350,7 @@ def build_database(args, test=False):
     load_orm(src.config.app_config.port)
 
     # PREPARE SEQUENCERS FIRST
-    _seq_module = _get_sequnecer_model_module(_models_modules)
+    _seq_module = _get_sequencer_model_module(_models_modules)
     if _seq_module:
         try:
             _seq_module.main()
