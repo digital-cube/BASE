@@ -9,7 +9,8 @@ from src.models.knowledgebase import PostCategory, Tag
 
 @authenticated()
 @api(
-    URI='/wiki/tags'
+    URI='/wiki/tags',
+    SPECIFICATION_PATH='Blog'
 )
 class GetAllTags(Base):
 
@@ -20,7 +21,8 @@ class GetAllTags(Base):
 
 @authenticated()
 @api(
-    URI='/wiki/categories'
+    URI='/wiki/categories',
+    SPECIFICATION_PATH='Blog'
 )
 class GetAllCategories(Base):
 

@@ -17,7 +17,8 @@ import tornado.concurrent as concurrent
 
 @authenticated()
 @api(
-    URI='/wiki/posts/:id/files'
+    URI='/wiki/posts/:id/files',
+    SPECIFICATION_PATH='Blog'
 )
 class Files(Base):
     """Manipulate files for a post"""
@@ -79,7 +80,8 @@ class Files(Base):
 
 
 @api(
-    URI='/posts/files-for-editor'
+    URI='/posts/files-for-editor',
+    SPECIFICATION_PATH='Blog'
 )
 class SaveFilesForEditor(Base):
     """Save file for the post from the ck editor"""
@@ -113,7 +115,8 @@ class SaveFilesForEditor(Base):
 
 @authenticated()
 @api(
-    URI='/posts/files'
+    URI='/posts/files',
+    SPECIFICATION_PATH='Blog'
 )
 class SaveFiles(Base):
     """Save file for the post"""

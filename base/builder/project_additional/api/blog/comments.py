@@ -10,7 +10,8 @@ from src.common.common import get_comments
 
 
 @api(
-    URI='/wiki/posts/:id_post/authorized/comments'
+    URI='/wiki/posts/:id_post/authorized/comments',
+    SPECIFICATION_PATH='Blog'
 )
 @authenticated()
 class AuthorizedComment(Base):
@@ -25,15 +26,16 @@ class AuthorizedComment(Base):
 
 
 @api(
-    URI='/wiki/posts/:id_post/comments'
+    URI='/wiki/posts/:id_post/comments',
+    SPECIFICATION_PATH='Blog'
 )
 class UnauthorizedComment(Base):
 
     @params(
         {'name': 'id_post', 'type': str, 'doc': 'id', 'required': True},
         {'name': 'text', 'type': str, 'doc': 'comment', 'required': False},
-        {'name': 'email', 'type': 'email', 'doc': 'email', 'required': False},
-        {'name': 'display_name', 'type': 'str', 'doc': 'email', 'required': False},
+        {'name': 'email', 'type': 'e-mail', 'doc': 'email', 'required': False},
+        {'name': 'display_name', 'type': str, 'doc': 'email', 'required': False},
         {'name': 'id_parent_comment', 'type': int, 'doc': 'id_parent_comment', 'required': False},
     )
     def put(self, id_post, text, email, display_name, id_parent_comment):

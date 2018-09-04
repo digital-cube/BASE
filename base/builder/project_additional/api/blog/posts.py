@@ -14,7 +14,8 @@ from src.common.common import get_post_files
 
 @authenticated()
 @api(
-    URI='/wiki/posts'
+    URI='/wiki/posts',
+    SPECIFICATION_PATH='Blog'
 )
 class AddPost(Base):
 
@@ -67,7 +68,8 @@ class AddPost(Base):
 
 @authenticated()
 @api(
-    URI='/wiki/posts/tagged_with/:tag'
+    URI='/wiki/posts/tagged_with/:tag',
+    SPECIFICATION_PATH='Blog'
 )
 class PostsByTag(Base):
     @params(
@@ -103,7 +105,8 @@ class PostsByTag(Base):
 
 @authenticated()
 @api(
-    URI='/wiki/posts/:id'
+    URI='/wiki/posts/:id',
+    SPECIFICATION_PATH='Blog'
 )
 class PostById(Base):
 
