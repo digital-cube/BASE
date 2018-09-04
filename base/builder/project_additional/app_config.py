@@ -38,3 +38,4 @@ registrators_allowed_roles = None
 pre_app_processes = None    # [(app_name, app_cmd_for_subprocess, redirect_output)]
 post_app_processes = None   # [(app_name, app_cmd_for_subprocess, redirect_output)]
 google_client_ID = None
+count_calls = False    # count every call to uri and method

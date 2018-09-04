@@ -16,8 +16,53 @@ from base.application.helpers.exceptions import InvalidRequestParameter
 from base.application.helpers.exceptions import MissingRequestArgument
 from base.application.helpers.exceptions import DatabaseIsNotConfigured
 from base.common.utils import get_request_ip
+from base.common.utils import retrieve_log
 from base.common.sequencer import sequencer
 from base.common.tokens_services import get_user_by_token
+
+
+class CallCounter:
+    """Count calls on uri and method"""
+
+    def __init__(self):
+        import base.config.application_config
+        self.log = retrieve_log(base.config.application_config.count_call_log, 'CALL_LOG')
+        self.log.info('Counter started')
+        self.counter = {}
+        self.start_count()
+
+    def start_count(self):
+        import base.config.application_config
+        try:
+            with open(base.config.application_config.count_call_file) as cf:
+                try:
+                    self.counter = json.load(cf)
+                except Exception as e:
+                    self.log.error('Error load counter log: {}'.format(e))
+        except FileNotFoundError:
+            self.log('Counter file not found, will be created')
+
+    def write_logs(self):
+
+        import base.config.application_config
+        with open(base.config.application_config.count_call_file, 'w') as cf:
+            json.dump(self.counter, cf)
+
+    def add_log(self, method, uri):
+        uri = uri.split('?')[0]
+        uri_and_method = self.create_log_key(method, uri)
+        self.counter[uri_and_method] = 1 if uri_and_method not in self.counter else self.counter[uri_and_method] + 1
+
+    def create_log_key(self, method, uri):
+        return '{}_{}'.format(method, uri)
+
+    def get_logs(self, method, uri):
+        uri = uri.split('?')[0]
+        uri_and_method = self.create_log_key(method, uri)
+        return 0 if uri_and_method not in self.counter else self.counter[uri_and_method]
+
+    def __repr__(self):
+        return '{}'.format(self.counter)
 
 
 class Base(tornado.web.RequestHandler):
@@ -29,6 +74,15 @@ class Base(tornado.web.RequestHandler):
         self.auth_token = None
         self.auth_user = None
         super(Base, self).__init__(application, request, **kwargs)
+
+    def prepare(self):
+        # import pdb; pdb.set_trace()
+        print('prepare', self.request.uri, self.request.method, self.application)
+        import base.config.application_config
+        if base.config.application_config.count_calls:
+            self.application.call_counter.add_log(self.request.method, self.request.uri)
+
+        print(self.application.call_counter)
 
     def data_received(self, chunk):
         pass
@@ -78,6 +132,10 @@ class Base(tornado.web.RequestHandler):
         if _status == 204:
             self.finish()
             return
+
+        import base.config.application_config
+        if base.config.application_config.count_calls:
+            response['count_calls'] = self.application.call_counter.get_logs(self.request.method, self.request.uri)
 
         self.write(json.dumps(response, ensure_ascii=False))
 

@@ -1,6 +1,8 @@
 # coding= utf-8
 
 import os
+import time
+import signal
 import argparse
 import tornado.web
 import tornado.ioloop
@@ -64,6 +66,34 @@ def _add_prefix(entries, prefix, svc_port):
     return _new_entries
 
 
+def sig_handler(sig, frame):
+    from base.common.utils import log
+    log.warning('Caught signal: %s', sig)
+    tornado.ioloop.IOLoop.instance().add_callback(shutdown)
+
+
+def shutdown():
+    from base.common.utils import log
+
+    log.info('Will shutdown in %s seconds ...', base.config.application_config.seconds_before_shutdown)
+
+    io_loop = tornado.ioloop.IOLoop.instance()
+    deadline = time.time() + base.config.application_config.seconds_before_shutdown
+
+    print()
+
+    def stop_loop():
+        now = time.time()
+        if now < deadline:
+            io_loop.add_timeout(now + 1, stop_loop)
+            print('Stopping in', int(deadline - now) + 1)
+        else:
+            io_loop.stop()
+            log.info('Shutdown')
+
+    stop_loop()
+
+
 def _engage(args, entries):
 
     svc_port = _get_svc_port()
@@ -78,6 +108,8 @@ def _engage(args, entries):
 
     app = Application(entries)
     setattr(app, 'svc_port', svc_port)
+    if base.config.application_config.count_calls:
+        setattr(app, 'call_counter', base.application.components.CallCounter())
 
     start_message = 'starting {} {} service on {}: http://localhost:{}{}'.format(
         base.config.application_config.app_name,
@@ -89,6 +121,10 @@ def _engage(args, entries):
     print(start_message)
     log.info(start_message)
     app.listen(svc_port)
+
+    signal.signal(signal.SIGTERM, sig_handler)
+    signal.signal(signal.SIGINT, sig_handler)
+
     tornado.ioloop.IOLoop.instance().start()
 
 

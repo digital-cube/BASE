@@ -3,7 +3,6 @@
 import sys
 import json
 import bcrypt
-import shutil
 import logging
 from logging.handlers import TimedRotatingFileHandler
 

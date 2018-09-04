@@ -80,6 +80,14 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'pre_app_processes', src.config.app_config.pre_app_processes)
     if hasattr(src.config.app_config, 'post_app_processes'):
         setattr(base.config.application_config, 'post_app_processes', src.config.app_config.post_app_processes)
+    if hasattr(src.config.app_config, 'seconds_before_shutdown'):
+        setattr(base.config.application_config, 'seconds_before_shutdown', src.config.app_config.seconds_before_shutdown)
+    if hasattr(src.config.app_config, 'count_calls'):
+        setattr(base.config.application_config, 'count_calls', src.config.app_config.count_calls)
+    if hasattr(src.config.app_config, 'count_call_log'):
+        setattr(base.config.application_config, 'count_call_log', src.config.app_config.count_call_log)
+    if hasattr(src.config.app_config, 'count_call_file'):
+        setattr(base.config.application_config, 'count_call_file', src.config.app_config.count_call_file)
 
     if _db_is_configured:
         _load_app_configuration_with_database(src.config.app_config)
