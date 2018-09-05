@@ -37,7 +37,7 @@ class Login(Base):
                 return self.error(msgs.PRE_CHECK_USER_ERROR)
 
         try:
-            _check_user = api_hooks.check_user(self.auth_user)
+            _check_user = api_hooks.check_user(self.auth_user, request_handler=self)
         except CheckUserError as e:
             log.critical('Check user {} error {}'.format(self.auth_user.id, e))
             return self.error(msgs.CHECK_USER_ERROR)
@@ -75,7 +75,7 @@ class Login(Base):
         _pre_login = None
         if hasattr(api_hooks, 'pre_login_process'):
             try:
-                _pre_login = api_hooks.pre_login_process(user, data)
+                _pre_login = api_hooks.pre_login_process(user, data, request_handler=self)
             except PreLoginException as e:
                 log.critical('Pre login error: {}'.format(e))
                 return self.error(msgs.PRE_LOGIN_ERROR)
@@ -88,7 +88,7 @@ class Login(Base):
         _post_login = None
         if hasattr(api_hooks, 'post_login_process'):
             try:
-                _post_login = api_hooks.post_login_process(user, data, _token)
+                _post_login = api_hooks.post_login_process(user, data, _token, request_handler=self)
             except PostLoginException as e:
                 log.critical('Post login error: {}'.format(e))
                 return self.error(msgs.POST_LOGIN_ERROR)
