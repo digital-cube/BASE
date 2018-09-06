@@ -5,11 +5,13 @@ import shutil
 import importlib
 import importlib.util
 import sqlalchemy
+import sqlalchemy.exc
 
 from base.application.lookup import exit_status
 from base.builder.maker.common import update_path
 from base.builder.maker.common import get_install_directory
 from base.builder.maker.common import get_orm_models
+from base.common.orm import init_orm
 from base.common.orm import make_database_url
 from base.common.orm import make_database_url2
 from base.config.settings import app
@@ -289,6 +291,14 @@ def _copy_database_components(args, db_type, db_name, db_config):
     return True
 
 
+def _get_sequencer_model_module(_models_modules):
+
+    for m in _models_modules:
+        if 'sequencer' in m.__name__:
+            _models_modules.remove(m)
+            return m
+
+
 def build_database(args, test=False):
 
     update_path()
@@ -335,13 +345,6 @@ def build_database(args, test=False):
         print('Database {} is missing, please create it'.format(args.database_name))
         sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
 
-    def _get_sequencer_model_module(_models_modules):
-
-        for m in _models_modules:
-            if 'sequencer' in m.__name__:
-                _models_modules.remove(m)
-                return m
-
     # LOAD ORM FOR SEQUENCERS IN MODELS
     from base.application.helpers.importer import load_orm
     import base.config.application_config
@@ -374,4 +377,70 @@ def build_database(args, test=False):
         print('Database {} created successfully'.format(args.database_name))
 
     return orm_builder
+
+
+def _database_is_configured():
+
+    import src.config.app_config
+    _models_file = '{}/{}'.format(os.path.dirname(src.config.app_config.__file__), models_config_file)
+    if not os.path.isfile(_models_file) and not hasattr(src.config.app_config, 'models'):
+        print('Missing models configuration')
+        return False
+    _alembic_dir = 'db'
+    if not os.path.isdir(_alembic_dir):
+        print('Missing alembic structure')
+        return False
+
+    return True
+
+
+def build_database_with_alembic(args):
+
+    update_path()
+
+    if not _database_is_configured():
+        print('Database not configured')
+        sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+
+    orm_builder = init_orm()
+    print('Database initialization finished')
+
+    try:
+        orm_builder.upgrade_db_schema()
+    except sqlalchemy.exc.OperationalError:
+        print('Database {} is missing, please create it'.format(args.database_name))
+        sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
+
+    # PRESENT MODELS TO BASE
+    import src.config.app_config
+    _models_modules = []
+    _orm_models = get_orm_models(_models_modules, src.config.app_config)
+
+    # LOAD ORM FOR SEQUENCERS IN MODELS
+    from base.application.helpers.importer import load_orm
+    import base.config.application_config
+    # setattr(base.config.application_config, 'models', src.config.app_config.models)
+    setattr(base.config.application_config, 'models', _orm_models)
+    load_orm(src.config.app_config.port)
+
+    # PREPARE SEQUENCERS FIRST
+    _seq_module = _get_sequencer_model_module(_models_modules)
+    if _seq_module:
+        try:
+            _seq_module.main()
+        except sqlalchemy.exc.IntegrityError:
+            orm_builder.orm().session().rollback()
+            print('Sequencer already contains keys, and will not be inserted again, continuing')
+
+    # PREPARE DATABASE
+    for m in _models_modules:
+        try:
+            m.main()
+        except AttributeError:
+            print(m.__name__, "doesn't have to be prepared")
+
+        except sqlalchemy.exc.IntegrityError:
+            orm_builder.orm().session().rollback()
+            print('Database {} already exists, you can recreate it or leave it this way'.format(args.database_name))
+            sys.exit(exit_status.DATABASE_INITIALIZATION_ERROR)
 

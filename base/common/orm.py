@@ -96,6 +96,17 @@ class orm_builder(object):
         command.upgrade(alembic_cfg, "head")
         os.chdir('..')
 
+    def upgrade_db_schema(self):
+        """Generate database when alembic config is present"""
+
+        # alembic create all tables;
+        from alembic.config import Config
+        from alembic import command
+        os.chdir('db')
+        alembic_cfg = Config('alembic.ini')
+        command.upgrade(alembic_cfg, "head")
+        os.chdir('..')
+
     def clear_database(self):
         if self.__orm.engine().name == 'sqlite':
             try:

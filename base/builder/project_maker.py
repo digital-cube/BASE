@@ -16,6 +16,7 @@ from base.config.settings import app_subcommands_description
 
 from base.builder.maker.project_builder import build_project
 from base.builder.maker.database_builder import build_database
+from base.builder.maker.database_builder import build_database_with_alembic
 from base.builder.maker.database_helpers import show_create_table
 from base.builder.maker.playground_builder import create_playground
 from base.builder.maker.component_builder import list_components
@@ -57,6 +58,9 @@ def pars_command_line_arguments():
     db_init_parser.add_argument('user_name', type=str, help=app['database_username'][1])
     db_init_parser.add_argument('password', type=str, help=app['database_password'][1])
 
+    db_init_alembic_parser = subparsers.add_parser('db_init_alembic', help="create base project's database schema when alembic structure is present",
+                                                   aliases=['dba'])
+
     show_create_parser = subparsers.add_parser('db_show_create', help="show sql create table query", aliases=['dbs'])
     show_create_parser.add_argument('table_name', type=str, help=app['table_name'][1])
 
@@ -69,7 +73,8 @@ def pars_command_line_arguments():
 
     list_plugins_parser = subparsers.add_parser('list', help="list available BASE components", aliases=['l'])
 
-    argparser.add_argument('-V', '--version', action='version', help='show BASE version', version='BASE v{}'.format(base.__VERSION__))
+    argparser.add_argument('-V', '--version', action='version', help='show BASE version',
+                           version='BASE v{}'.format(base.__VERSION__))
 
     return argparser.parse_args()
 
@@ -83,6 +88,9 @@ def execute_builder_cmd():
 
     if parsed_args.cmd in ['db_init', 'dbi']:
         build_database(parsed_args)
+
+    if parsed_args.cmd in ['db_init_alembic', 'dba']:
+        build_database_with_alembic(parsed_args)
 
     if parsed_args.cmd in ['db_show_create', 'dbs']:
         show_create_table(parsed_args)
