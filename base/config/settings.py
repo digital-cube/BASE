@@ -71,3 +71,4 @@ default_models = [
     'src.models.utils'
 ]
 models_config_file = 'models.json'
+database_configuration_file = 'db_config.json'

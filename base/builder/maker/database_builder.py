@@ -17,6 +17,7 @@ from base.common.orm import make_database_url2
 from base.config.settings import app
 from base.config.settings import default_models
 from base.config.settings import models_config_file
+from base.config.settings import database_configuration_file
 
 
 def _enable_database_in_config(config_file, args):
@@ -390,8 +391,33 @@ def _database_is_configured():
     if not os.path.isdir(_alembic_dir):
         print('Missing alembic structure')
         return False
+    _db_config_file = '{}/{}'.format(os.path.dirname(src.config.app_config.__file__), database_configuration_file)
+    if not os.path.isfile(_db_config_file):
+        print('Missing database configuration')
+        return False
 
     return True
+
+
+def _get_database_configuration():
+
+    import src.config.app_config
+    _db_config_file = '{}/{}'.format(os.path.dirname(src.config.app_config.__file__), database_configuration_file)
+    with open(_db_config_file) as df:
+        try:
+            _db_config_all = json.load(df)
+            if src.config.app_config.port not in _db_config_all and \
+                    str(src.config.app_config.port) not in _db_config_all:
+                print('Configured port {} is not in database configuration'.format(src.config.app_config.port))
+                return False
+
+            _db_config = _db_config_all[src.config.app_config.port] if src.config.app_config.port in _db_config_all else \
+                _db_config_all[str(src.config.app_config.port)]
+        except Exception as e:
+            print('Error load database configuration')
+            return False
+
+    return _db_config
 
 
 def build_database_with_alembic(args):
@@ -401,6 +427,14 @@ def build_database_with_alembic(args):
     if not _database_is_configured():
         print('Database not configured')
         sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+
+    db_config = _get_database_configuration()
+    if not db_config:
+        sys.exit(exit_status.DATABASE_CONFIGURATION_ERROR)
+
+    if not _create_database(db_config['db_name'], db_config['db_type'], db_config, False):
+        print('Database has not created')
+        return
 
     orm_builder = init_orm()
     print('Database initialization finished')
