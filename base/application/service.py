@@ -18,6 +18,8 @@ from base.application.helpers.importer import load_orm
 
 import base.config.application_config
 
+APP = None
+
 
 def check_arguments():
 
@@ -77,6 +79,12 @@ def shutdown():
 
     log.info('Will shutdown in %s seconds ...', base.config.application_config.seconds_before_shutdown)
 
+    if base.config.application_config.count_calls:
+        # if call counter is active, write counters to log
+        global APP
+        if hasattr(APP, 'call_counter'):
+            APP.call_counter.write_logs()
+
     io_loop = tornado.ioloop.IOLoop.instance()
     deadline = time.time() + base.config.application_config.seconds_before_shutdown
 
@@ -110,6 +118,9 @@ def _engage(args, entries):
     setattr(app, 'svc_port', svc_port)
     if base.config.application_config.count_calls:
         setattr(app, 'call_counter', base.application.components.CallCounter())
+
+    global APP
+    APP = app
 
     start_message = 'starting {} {} service on {}: http://localhost:{}{}'.format(
         base.config.application_config.app_name,

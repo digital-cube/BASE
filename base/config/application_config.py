@@ -57,4 +57,4 @@ google_check_access_token_url = 'https://www.googleapis.com/oauth2/v3/tokeninfo'
 seconds_before_shutdown = 0     # seconds before SIGTERM will occur
 count_calls = False    # count every call to uri and method
 count_call_log = 'log/count_call.log'
-count_call_file = 'log/count_call.log'
+count_call_file = 'log/count_call.json'

@@ -40,18 +40,19 @@ class CallCounter:
                 except Exception as e:
                     self.log.error('Error load counter log: {}'.format(e))
         except FileNotFoundError:
-            self.log('Counter file not found, will be created')
+            self.log.info('Counter file not found, will be created')
 
     def write_logs(self):
 
         import base.config.application_config
         with open(base.config.application_config.count_call_file, 'w') as cf:
-            json.dump(self.counter, cf)
+            json.dump(self.counter, cf, indent=4, sort_keys=True, ensure_ascii=False)
 
     def add_log(self, method, uri):
         uri = uri.split('?')[0]
         uri_and_method = self.create_log_key(method, uri)
         self.counter[uri_and_method] = 1 if uri_and_method not in self.counter else self.counter[uri_and_method] + 1
+        return self.counter[uri_and_method]
 
     def create_log_key(self, method, uri):
         return '{}_{}'.format(method, uri)
@@ -76,13 +77,10 @@ class Base(tornado.web.RequestHandler):
         super(Base, self).__init__(application, request, **kwargs)
 
     def prepare(self):
-        # import pdb; pdb.set_trace()
-        print('prepare', self.request.uri, self.request.method, self.application)
         import base.config.application_config
         if base.config.application_config.count_calls:
-            self.application.call_counter.add_log(self.request.method, self.request.uri)
-
-        print(self.application.call_counter)
+            _path = self.__FULL_PATH__ if hasattr(self, '__FULL_PATH__') else self.request.uri
+            self.application.call_counter.add_log(self.request.method, _path)
 
     def data_received(self, chunk):
         pass
@@ -133,9 +131,11 @@ class Base(tornado.web.RequestHandler):
             self.finish()
             return
 
+        # retrieve counters
         import base.config.application_config
         if base.config.application_config.count_calls:
-            response['count_calls'] = self.application.call_counter.get_logs(self.request.method, self.request.uri)
+            _path = self.__FULL_PATH__ if hasattr(self, '__FULL_PATH__') else self.request.uri
+            response['count_calls'] = self.application.call_counter.get_logs(self.request.method, _path)
 
         self.write(json.dumps(response, ensure_ascii=False))
 
@@ -176,6 +176,12 @@ class Base(tornado.web.RequestHandler):
                         _application_responses_module))
 
         response.update(kwargs)
+
+        # retrieve counters
+        import base.config.application_config
+        if base.config.application_config.count_calls:
+            _path = self.__FULL_PATH__ if hasattr(self, '__FULL_PATH__') else self.request.uri
+            response['count_calls'] = self.application.call_counter.get_logs(self.request.method, _path)
 
         self.write(json.dumps(response, ensure_ascii=False))
 

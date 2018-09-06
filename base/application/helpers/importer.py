@@ -212,6 +212,13 @@ def load_application(entries, svc_port):
                     getattr(_handler, '__SET_API_PREFIX__') else '',
                     getattr(_handler, '__URI__'))
 
+                # for counter to work properly
+                _full_path = r'{}{}'.format(
+                    '/{}'.format(base.config.application_config.app_prefix) if
+                    getattr(_handler, '__SET_API_PREFIX__') else '',
+                    getattr(_handler, '__PATH__'))
+                setattr(_handler, '__FULL_PATH__', _full_path)
+
                 if base.config.application_config.debug:
                     log.info('Exposing {} on {}'.format(_name, _uri))
 
