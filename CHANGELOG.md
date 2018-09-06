@@ -1,5 +1,12 @@
 ## CHANGELOG
 
+### 2018 09 06
+
+## BASE version 1.4.0
+- database initialization if alembic structure is present, with new basemanager option
+- API endpoints call counter
+- specification template css correction
+
 ### 2018 09 03
 
 ## BASE version 1.3.0
