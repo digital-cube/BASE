@@ -1,5 +1,12 @@
 ## CHANGELOG
 
+### 2018 09 07
+
+## BASE version 1.5.0
+- the name of the package chagned to "dcbase"
+- setup.py changed so the project can be uploaded to PYPI
+- README.rst
+
 ### 2018 09 06
 
 ## BASE version 1.4.0

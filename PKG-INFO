@@ -1,10 +1,10 @@
 Metadata-Version: 1.1
-Name: base
-Version: 1.4.0
+Name: dcbase
+Version: 1.5.0
 Summary: Base, simple scaling project
 Home-page: https://github.com/digital-cube/BASE
-Author: DigitalCube doo
-Author-email: slobodan@digitalcube.rs
-License: GNU
+Author: Digital Cube doo
+Author-email: info@digitalcube.rs
+License: GPL v3
 Description: Simple scaling project
 Platform: Linux 4.14.62 x86_64

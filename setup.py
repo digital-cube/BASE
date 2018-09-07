@@ -13,9 +13,13 @@ _entry_points={
              } if __WINDOWS__ else {}
 
 _dir = os.path.dirname(__file__)
-print('VOOA JE DIR', _dir)
+
+# read the contents of your README file
+with open('README.rst') as f:
+    long_description = f.read()
+
 setup(
-    name='base',
+    name='dcbase',
     version=base.__VERSION__,
     packages=['base',
               'base.application',
@@ -37,10 +41,11 @@ setup(
               'base.tests.helpers'
               ],
     url='https://github.com/digital-cube/BASE',
-    license='GNU',
+    license='https://www.gnu.org/licenses/gpl-3.0.en.html',
     author='Digital Cube doo',
-    author_email='slobodan@digitalcube.rs',
+    author_email='info@digitalcube.rs',
     description='Base, simple scaling project',
+    long_description=long_description,
     install_requires=['tornado', 'bcrypt'],
     entry_points=_entry_points,
     scripts=_scripts,

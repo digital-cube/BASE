@@ -1,24 +1,18 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Python v3](https://img.shields.io/pypi/pyversions/Django.svg)](https://www.python.org/download/releases/3.0/)
+[![Version 1.5.0](https://img.shields.io/badge/version-1.5.0-blue.svg)]()
+
 # **Base REST API**
 
-* Version 1.4.0
+* Version 1.5.0
 * [DigitalCube](http://digitalcube.rs/)
-
-### Requirements
-
-* Python >= 3.5
-* [PIP](https://bootstrap.pypa.io/get-pip.py)
-* mysql
+* [Wiki](https://github.com/digital-cube/BASE/wiki)
 
 ### Installation
 
-* clone the project with git
-* enter project directory
-* install it with pip:
-
 ```bash
-    pip3 install .
-    cat requirements.txt
-    pip3 install [required_database_connector]
+    pip3 install dcbase
+    pip3 install https://raw.githubusercontent.com/digital-cube/BASE/master/requirements.txt
 ```
 
 ### Initialize project
@@ -27,19 +21,20 @@
     basemanager init project_name
 
 
+### Start project
+
+
+```bash
+    cd project_name
+    ./project_name
+```
+
+
 ### Initialize database
 
-
-* database has to be created before this step
 
 ```bash
     cd project_name
     basemanager db_init db_username db_password
 ```
-
-### About
-
-Easy create REST api for custom application
-
-### [Wiki](https://github.com/digital-cube/BASE/wiki)
 
