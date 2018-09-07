@@ -19,7 +19,7 @@ Installation
 .. code-block:: console
 
     pip3 install dcbase
-    pip3 install https://raw.githubusercontent.com/digital-cube/BASE/master/requirements.txt
+    pip3 install -r https://raw.githubusercontent.com/digital-cube/BASE/master/requirements.txt
 
 ******************
 Initialize project
