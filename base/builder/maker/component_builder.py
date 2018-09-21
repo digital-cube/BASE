@@ -112,7 +112,7 @@ def _add_blog():
     if not check_slugify_library_installed():
         print('''
         Missing slugify library, 
-        please install: pip3 install slugify
+        please install: pip3 install python-slugify
         ''')
         return
 

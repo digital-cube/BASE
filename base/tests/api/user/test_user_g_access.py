@@ -14,6 +14,19 @@ GOOGLE_USER = {
     'email': 'dummy@test.com',
 }
 
+FALSE_CONFIG = {
+    'google_client_ID': None,
+    'count_calls': False
+}
+
+
+def get_mock_app_config(google_client_ID):
+
+    return {
+        'google_client_ID': google_client_ID,
+        'count_calls': False
+    }
+
 
 def _is_configured(self):
     return True
@@ -52,7 +65,7 @@ def _log_in_user_error(self):
 
 class TestUserGAccess(TestBase):
 
-    @patch('base.config.application_config', google_client_ID=None)
+    @patch('base.config.application_config', **get_mock_app_config(None))
     def test_with_missing_config(self, r):
 
         _b = {
@@ -68,7 +81,7 @@ class TestUserGAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.MISSING_GACCESS_CONFIGURATION])
 
-    @patch('base.config.application_config', google_client_ID='xxx')
+    @patch('base.config.application_config', **get_mock_app_config('xxx'))
     @patch('base.application.api.user.gaccess.GAccess.is_configured', _is_not_configured)
     def test_g_access_configured_but_not_getting_addresses(self, r):
 
@@ -86,7 +99,7 @@ class TestUserGAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.ERROR_READ_GACCESS_CONFIGURATION])
 
-    @patch('base.config.application_config', google_client_ID='xxx')
+    @patch('base.config.application_config', **get_mock_app_config('xxx'))
     @patch('base.application.api.user.gaccess.GAccess.is_configured', _is_configured)
     @patch('base.application.api.user.gaccess.GAccess.verify_token', _token_not_verified)
     def test_g_access_token_not_verified(self, r):
@@ -105,7 +118,7 @@ class TestUserGAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.ERROR_VERIFY_GOOGLE_ACCESS_TOKEN])
 
-    @patch('base.config.application_config', google_client_ID='xxx')
+    @patch('base.config.application_config', **get_mock_app_config('xxx'))
     @patch('base.application.api.user.gaccess.GAccess.is_configured', _is_configured)
     @patch('base.application.api.user.gaccess.GAccess.verify_token', _token_verified)
     @patch('base.application.api.user.gaccess.GAccess.get_user_info', _user_info_error)
@@ -126,7 +139,7 @@ class TestUserGAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.ERROR_GET_GOOGLE_USER])
 
-    @patch('base.config.application_config', google_client_ID='xxx')
+    @patch('base.config.application_config', **get_mock_app_config('xxx'))
     @patch('base.application.api.user.gaccess.GAccess.is_configured', _is_configured)
     @patch('base.application.api.user.gaccess.GAccess.verify_token', _token_verified)
     @patch('base.application.api.user.gaccess.GAccess.get_user_info', _user_info)
@@ -149,7 +162,7 @@ class TestUserGAccess(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.ERROR_AUTHORIZE_GOOGLE_USER])
 
-    @patch('base.config.application_config', google_client_ID='xxx')
+    @patch('base.config.application_config', **get_mock_app_config('xxx'))
     @patch('base.application.api.user.gaccess.GAccess.is_configured', _is_configured)
     @patch('base.application.api.user.gaccess.GAccess.verify_token', _token_verified)
     @patch('base.application.api.user.gaccess.GAccess.get_user_info', _user_info)
@@ -172,7 +185,7 @@ class TestUserGAccess(TestBase):
         self.assertIn('token', res)
         self.assertIn('token_type', res)
 
-    @patch('base.config.application_config', google_client_ID='xxx')
+    @patch('base.config.application_config', **get_mock_app_config('xxx'))
     @patch('base.application.api.user.gaccess.GAccess.is_configured', _is_configured)
     @patch('base.application.api.user.gaccess.GAccess.verify_token', _token_verified)
     @patch('base.application.api.user.gaccess.GAccess.get_user_info', _user_info)

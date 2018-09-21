@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 09 20
+
+## BASE version 1.5.1
+- blog component improvement
+- INSTALL.txt changed
+
 ### 2018 09 07
 
 ## BASE version 1.5.0

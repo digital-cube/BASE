@@ -69,4 +69,21 @@ def get_post_files(post):
 
     return files
 
+def change_comment_status(approved, id_post, id_comment, self):
+    import base.common.orm
+    _session = base.common.orm.orm.session()
+
+    comment = _session.query(Comment).filter(Comment.id == id_comment,
+                                                  Comment.id_post == id_post).one_or_none()
+
+    if not comment:
+        return self.error("Comment not found!")
+
+    comment.comment_approved = approved
+
+    _session.commit()
+
+    return self.ok(
+        {"comment": comment.comment_approved, 'id': comment.id})
+
 

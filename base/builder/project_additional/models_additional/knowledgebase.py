@@ -177,6 +177,7 @@ class Post(base.common.orm.sql_base):
     id_user_modified = Column(CHAR(10), ForeignKey(User.id), index=True)
 
     created = Column(DateTime, nullable=False)
+    published_time = Column(DateTime, nullable=True, default=None)
     created_date = Column(Date, nullable=False, index=True)
     last_modified_datetime = Column(DateTime, nullable=False)
 
@@ -190,6 +191,10 @@ class Post(base.common.orm.sql_base):
 
     title = Column(String(255), nullable=False, index=True)
     subtitle = Column(String(255), nullable=True, default=None)
+
+    cover_img = Column(String(255), nullable=True, default=None)
+    tumb_img = Column(String(255), nullable=True, default=None)
+
     body = Column(Text)
 
     comments_enabled = Column(Boolean, nullable=False, default=True)
@@ -209,18 +214,23 @@ class Post(base.common.orm.sql_base):
 
     source = Column(Text, nullable=True, default=None)
 
+    published = Column(Boolean, default=False, nullable=False)
+
     def get_comments(self, canonical=True):
 
         comments = []
 
-        for db_comment in self.comments: #q_comments:
+        for db_comment in self.comments:  # q_comments:
             comments.append({'authorized': db_comment.id_user is not None,
-                             'author': db_comment.user.auth_user.username if db_comment.id_user else db_comment.email_of_unauthorised_user,
+                             'author': db_comment.user.auth_user.username if db_comment.id_user else db_comment.display_name_of_unauthorized_user,
                              'created': str(db_comment.created),
                              'id': db_comment.id,
                              'id_parent_comment': db_comment.id_parent_comment,
-                             'text': db_comment.text
+                             'text': db_comment.text,
+                             'comments_approved': db_comment.comment_approved
                              })
+
+        comments.sort(key=lambda x: x['created'], reverse=False)
 
         if canonical:
             ccomments = {}
@@ -245,11 +255,14 @@ class Post(base.common.orm.sql_base):
 
         return comments
 
+    def get_post_body(self):
+        return json.loads(self.body)
 
     def ago(self):
 
         now = datetime.datetime.now() + datetime.timedelta(seconds=60 * 3.4)
-        return timeago.format(self.created, now)
+        _created = self.created if not self.published_time else self.published_time
+        return timeago.format(_created, now)
 
     def iso_date(self):
         return self.created.strftime("%Y-%m-%d")
@@ -280,18 +293,55 @@ class Post(base.common.orm.sql_base):
 
         return slug
 
-    def update(self, user, title, body, tags):  # , slug):
+    def update(self, user, title, subtitle, body, tags, category, comments_enabled, published):  # , slug):
 
         changed = []
         apr = ArchivedPostRevision(self)
+
+        if title is None:
+            title = self.title
+        if subtitle is None:
+            subtitle = self.subtitle
+        if body is None:
+            body = self.body
+
+        if category is None:
+            pass
+            # if self.category:
+            #     changed.append('category set to none')
+            #     self.category = None
+        else:
+            import base.common.orm
+            _session = base.common.orm.orm.session()
+            pc = _session.query(PostCategory).filter(PostCategory.text == category).one_or_none()
+            if not pc:
+                pc = PostCategory(category)
+                _session.add(pc)
+                changed.append('added category')
+
+            self.category = pc
+            changed.append('category')
 
         if self.title != title:
             self.title = title
             changed.append('title')
 
+        if self.subtitle != subtitle:
+            self.subtitle = subtitle
+            changed.append('subtitle')
+
         if self.body != body:
-            self.body = body
+            self.body = json.dumps(body)
             changed.append('body')
+
+        if self.comments_enabled != comments_enabled:
+            print(self.comments_enabled)
+            self.comments_enabled = comments_enabled
+            changed.append('comments_enabled')
+
+        if self.published != published:
+            self.published = published
+            changed.append('published')
 
         if tags is not None:
 
@@ -338,11 +388,14 @@ class Post(base.common.orm.sql_base):
             self.tags.append(tag)
             self.show_tags.append(show_tag)
 
-    def __init__(self, id, user, title, subtitle, body, slug, tags,
+    def __init__(self, id, user, title, subtitle, body, slug, tags, cover_img, tumb_img,
                  enable_comments=True,
                  only_authorized_comments=False,
                  source=None, forced_datetime=None,
                  str_category=None):
+
+        self.cover_img = cover_img
+        self.tumb_img = tumb_img
 
         self.id = id
         self.user = user
@@ -403,13 +456,15 @@ class Comment(base.common.orm.sql_base):
 
     user_approved = relationship("User", back_populates="approved_comments", foreign_keys=[id_user_approved])
 
+    comment_approved = Column(Boolean, default=False, nullable=False)
+
     def author_display_name(self):
 
         if self.id_user:
             return self.user.author_display_name()
 
         if self.email_of_unauthorised_user:
-            return self.email_of_unauthorised_user
+            return self.email_of_unauthorised_userz
 
         return "n/a"
 
@@ -444,10 +499,8 @@ class Tag(base.common.orm.sql_base):
     def __init__(self, name):
         self.name = Tag.tagify(name)
 
-
     @staticmethod
     def all(_session):
-
         db_tags = _session.query(Tag).all()
         tags = []
         for db_tag in db_tags:

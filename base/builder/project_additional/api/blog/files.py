@@ -183,4 +183,188 @@ class SaveFiles(Base):
 
         return self.ok({'result': attached_files})
 
+@authenticated()
+@api(
+    URI='/posts/cover',
+    SPECIFICATION_PATH='Blog'
+)
+class SaveCover(Base):
+    """Save Cover"""
+
+    @tornado.gen.coroutine
+    def post(self):
+        print('SIGLE SLIKE')
+
+        id_post = self.get_argument('id_post', None)
+        if id_post is None:
+            return self.error('No post found')
+
+        attach_files = self.request.files.get('files[]')
+        if attach_files is None:
+            return self.ok({'result': ''})
+
+        for af in attach_files:
+            print('FILE', af)
+
+        import base.common.orm
+        from src.models.knowledgebase import Post
+        _session = base.common.orm.orm.session()
+
+        p = _session.query(Post).filter(Post.id == id_post).one_or_none()
+        if not p:
+            return False
+
+        attached_image = attach_files[0]
+        cover_directory_for_frontend = '/static/images/blog_img'
+        cover_directory_for_save = '{}{}'.format(os.getcwd(), cover_directory_for_frontend)
+
+        attached_file_name = attached_image['filename']
+        attached_file_ext = attached_file_name.split('.')[-1]
+        fn = '{}_cover.{}'.format(p.slug, attached_file_ext)
+        file_name = '{}/{}'.format(cover_directory_for_save, fn)
+
+        with open(file_name, 'wb') as f:
+            f.write(attached_image['body'])
+
+        print('TRENUTNO', os.getcwd())
+
+        def set_file(file, _id_post):
+
+            import base.common.orm
+            from src.models.knowledgebase import Post
+            _session = base.common.orm.orm.session()
+
+            p = _session.query(Post).filter(Post.id == _id_post).one_or_none()
+            if not p:
+                return False
+
+            p.cover_img = file
+
+            try:
+                _session.commit()
+            except Exception as e:
+                _session.rollback()
+                return False
+
+            return True
+
+        file_name_for_frontend = '{}/{}'.format(cover_directory_for_frontend, fn)
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=20)
+
+        response = yield executor.submit(set_file, file_name_for_frontend, id_post)
+        if not response:
+            return self.error('Error set files to post')
+
+        return self.ok({'result': file_name_for_frontend})
+
+
+@authenticated()
+@api(
+    URI='/posts/thumb',
+    SPECIFICATION_PATH='Blog'
+)
+class SaveThumb(Base):
+    """Save Thumb"""
+
+    @tornado.gen.coroutine
+    def post(self):
+        print('SIGLE SLIKE')
+
+        id_post = self.get_argument('id_post', None)
+        if id_post is None:
+            return self.error('No post found')
+
+        attach_files = self.request.files.get('files[]')
+        if attach_files is None:
+            return self.ok({'result': ''})
+
+        for af in attach_files:
+            print('FILE', af)
+
+        import base.common.orm
+        from src.models.knowledgebase import Post
+        _session = base.common.orm.orm.session()
+
+        p = _session.query(Post).filter(Post.id == id_post).one_or_none()
+        if not p:
+            return False
+
+        attached_image = attach_files[0]
+        cover_directory_for_frontend = '/static/images/blog_img'
+        cover_directory_for_save = '{}{}'.format(os.getcwd(), cover_directory_for_frontend)
+
+        attached_file_name = attached_image['filename']
+        attached_file_ext = attached_file_name.split('.')[-1]
+        fn = '{}_thumb.{}'.format(p.slug, attached_file_ext)
+        file_name = '{}/{}'.format(cover_directory_for_save, fn)
+
+        with open(file_name, 'wb') as f:
+            f.write(attached_image['body'])
+
+        print('TRENUTNO', os.getcwd())
+
+        def set_file(file, _id_post):
+
+            import base.common.orm
+            from src.models.knowledgebase import Post
+            _session = base.common.orm.orm.session()
+
+            p = _session.query(Post).filter(Post.id == _id_post).one_or_none()
+            if not p:
+                return False
+
+            p.tumb_img = file
+
+            try:
+                _session.commit()
+            except Exception as e:
+                _session.rollback()
+                return False
+
+            return True
+
+        file_name_for_frontend = '{}/{}'.format(cover_directory_for_frontend, fn)
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=20)
+
+        response = yield executor.submit(set_file, file_name_for_frontend, id_post)
+        if not response:
+            return self.error('Error set files to post')
+
+        return self.ok({'result': file_name_for_frontend})
+
+@api(
+    URI='/ck',
+)
+class CK(Base):
+    """Dummy API for store/get ckeditor content"""
+
+    @params(
+        {'name': 'content', 'type': json},
+    )
+    def post(self, content):
+
+        # print('STIGAO CONTENT', type(content))
+        # print('STIGAO CONTENT', content)
+
+        import base.common.orm
+        CK, _session = base.common.orm.get_orm_model('ck')
+        content = json.dumps(content, ensure_ascii=False)
+        ck = CK(content)
+        _session.add(ck)
+        _session.commit()
+
+        return self.ok()
+
+    def get(self):
+
+        # print('VRACAJ bre')
+
+        import base.common.orm
+        CK, _session = base.common.orm.get_orm_model('ck')
+        ck = _session.query(CK).order_by(CK.id.desc()).first()
+        # print('NASHAO', ck.id, ck.data)
+        r = {'data': json.loads(ck.data)}
+
+        return self.ok(r)
+
 
