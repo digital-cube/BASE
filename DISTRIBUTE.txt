@@ -1,0 +1,20 @@
+- build for distribution:
+
+  - python3 setup.py sdist bdist_wheel
+
+- check that only the last version is in the dist/ folder
+
+- send the package on the pypi test server for installation testing
+
+  - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+- check the installation from the test pypi:
+
+  - make the new venv and pip install from the test pypi and run tests:
+
+    - pip install --index-url https://test.pypi.org/simple/ dcbase
+
+- if everything goes well, push the package to pypi:
+
+  - twine upload dist/*
+
