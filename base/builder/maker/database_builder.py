@@ -24,8 +24,9 @@ def _enable_database_in_config(config_file, args):
 
     # create models config file
     models_file = '{}/{}'.format(os.path.dirname(config_file), models_config_file)
-    with open(models_file, 'w') as mf:
-        json.dump(default_models, mf, indent=4, sort_keys=True, ensure_ascii=False)
+    if not os.path.isfile(models_file):
+        with open(models_file, 'w') as mf:
+            json.dump(default_models, mf, indent=4, sort_keys=True, ensure_ascii=False)
 
     # edit application config file and enable database features
     with open(config_file, 'r') as cf:
@@ -112,7 +113,8 @@ def _configure_database(args, app_config, _db_config, test=False):
                 pass
 
     if not test:
-        _db_config[args.application_port] = {
+        __port = str(args.application_port)
+        _db_config[__port] = {
             'db_name': args.database_name,
             'db_user': args.user_name,
             'db_password': args.password,
@@ -121,7 +123,7 @@ def _configure_database(args, app_config, _db_config, test=False):
         }
 
         try:
-            _db_config[args.application_port]['db_port'] = args.database_port if args.database_port else \
+            _db_config[__port]['db_port'] = args.database_port if args.database_port else \
                 str(app['database_port'][0][args.database_type])
         except KeyError as e:
             print('Wrong database type configured: {}'.format(args.database_type))
@@ -165,7 +167,7 @@ def __db_is_configured(args, test):
         print('Error configuring database')
         return False, False
 
-    __port = str(src.config.app_config.port) if test else args.application_port
+    __port = str(src.config.app_config.port) if test else str(args.application_port)
 
     if __port not in __db_config:
         print('Missing database configuration for port: {}'.format(__port))
