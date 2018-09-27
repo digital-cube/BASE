@@ -44,6 +44,12 @@ def do_post(**kwargs):
 
     _db.commit()
 
+    if hasattr(apphooks, 'post_logout_digest'):
+        post_d = apphooks.post_logout_digest(_db, dbuser, tk)
+        if post_d == False:
+            log.critical('Error user post logout digest')
+            return base_common.msg.error(msgs.ERROR_POST_LOGIN)
+
     apphooks.action_log_hook(dbuser.id_user, kwargs['r_ip'], 'logout', 'user {} successfuly logged out'.format(dbuser.username))
     return base_common.msg.post_ok()
 

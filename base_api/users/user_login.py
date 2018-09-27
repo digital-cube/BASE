@@ -73,7 +73,6 @@ def do_post(username, password, **kwargs):
             log.warning('Error check password for {} with password {} and password from db {}: {}'.format(username, password, u_pwd, e))
             return base_common.msg.error(msgs.USER_NOT_FOUND)
 
-    print('RADI')
     if hasattr(apphooks, 'login_expansion') and not apphooks.login_expansion(_db, us, **kwargs):
         return base_common.msg.error(msgs.ERROR_LOGIN_USER)
 
