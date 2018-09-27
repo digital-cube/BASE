@@ -989,3 +989,49 @@ class TestHello(TestBase):
 
         self.assertIn('message', res)
         self.assertEqual(res['message'], 'hello delete')
+
+
+class TestHelloWorld(TestBase):
+
+    def test_get(self):
+
+        import src.lookup.languages as languages
+
+        _url = '/api/{}/hello'.format(languages.lmap[languages.EN])
+        res = self.fetch(_url)
+        self.assertEqual(res.code, 200)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+        self.assertIn('hello', res)
+        self.assertEqual(res['hello'], 'hello world')
+
+        _url = '/api/{}/hello'.format(languages.lmap[languages.RS])
+        res = self.fetch(_url)
+        self.assertEqual(res.code, 200)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+        self.assertIn('hello', res)
+        self.assertEqual(res['hello'], 'pozdrav svima')
+
+        _url = '/api/{}/hello'.format(languages.lmap[languages.DE])
+        res = self.fetch(_url)
+        self.assertEqual(res.code, 200)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+        self.assertIn('hello', res)
+        self.assertEqual(res['hello'], 'hallo welt')
+
+    def test_non_existing_language(self):
+
+        import src.lookup.languages as languages
+
+        _dummy_lang = 'dl'
+        self.assertNotIn(_dummy_lang, languages.lrev)
+        _url = '/api/{}/hello'.format(_dummy_lang)
+        res = self.fetch(_url)
+        self.assertEqual(res.code, 400)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], responses.lmap[responses.GET_NOT_FOUND])
+

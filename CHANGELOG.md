@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 09 27
+
+## BASE version 1.5.3
+- language supported in url with __LANG__ url parameter
+- language lookup
+
 ### 2018 09 21
 
 ## BASE version 1.5.2

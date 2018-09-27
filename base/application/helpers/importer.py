@@ -114,6 +114,8 @@ def _load_app_configuration_with_database(config_file):
 
     if hasattr(config_file, 'user_roles_module'):
         setattr(base.config.application_config, 'user_roles_module', config_file.user_roles_module)
+    if hasattr(config_file, 'languages'):
+        setattr(base.config.application_config, 'languages', config_file.languages)
     if hasattr(config_file, 'strong_password'):
         setattr(base.config.application_config, 'strong_password', config_file.strong_password)
     if hasattr(config_file, 'forgot_password_message_subject'):

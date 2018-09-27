@@ -12,6 +12,34 @@ import json
 
 # @authenticated()  # if every http method has to be authenticated
 @api(
+    URI='/:__LANG__/hello',
+    SPECIFICATION_PATH='hello', # optional path for specification list
+    # PREFIX=False, # if missing or True uri will be /_prefix_/hello
+)
+class HelloWorld(Base):
+    # @authenticated()  # if get method has to be authenticated
+    @params(  # if you want to add params
+        {'name': 'language', 'type': str, 'doc': 'dummy sequencer'},
+    )
+    def get(self, language):
+        """HelloWorld - get"""
+
+        from src.lookup import languages
+
+        _message = 'hello world'
+        if language in languages.lrev:
+            if languages.lrev[language] == languages.EN:
+                _message = 'hello world'
+            if languages.lrev[language] == languages.RS:
+                _message = 'pozdrav svima'
+            if languages.lrev[language] == languages.DE:
+                _message = 'hallo welt'
+
+        return self.ok({'hello': _message})
+
+
+# @authenticated()  # if every http method has to be authenticated
+@api(
     URI='/hello',
     # SPECIFICATION_PATH='hello', # optional path for specification list
     # PREFIX=False, # if missing or True uri will be /_prefix_/hello

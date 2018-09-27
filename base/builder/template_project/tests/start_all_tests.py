@@ -27,9 +27,9 @@ if _parent_dir != _current_dir:
 sys.path.append(os.path.abspath(_parent_dir))
 
 try:
-    from hello import TestHello
+    from hello import TestHello, TestHelloWorld
 except ImportError:
-    from tests.hello import TestHello
+    from tests.hello import TestHello, TestHelloWorld
 
 
 # def all():

@@ -31,6 +31,7 @@ imports = [
 ]
 session_storage = 'DB'
 user_roles_module = 'src.lookup.user_roles'
+languages_module = 'src.lookup.languages'
 support_mail_address = 'support@test.loc'
 support_name = 'support@test'
 forgot_password_lending_address = 'http://localhost:8802/user/password/change'

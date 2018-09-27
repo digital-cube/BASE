@@ -7,6 +7,7 @@ import json
 import inspect
 import decimal
 import datetime
+import importlib
 import tornado.web
 from functools import wraps
 
@@ -15,6 +16,8 @@ from base.application.helpers.exceptions import MissingApiRui
 from base.application.helpers.exceptions import InvalidRequestParameter
 from base.application.helpers.exceptions import MissingRequestArgument
 from base.application.helpers.exceptions import DatabaseIsNotConfigured
+from base.application.helpers.exceptions import MissingLanguagesLookup
+from base.application.helpers.exceptions import ErrorLanguagesLookup
 from base.common.utils import get_request_ip
 from base.common.utils import retrieve_log
 from base.common.sequencer import sequencer
@@ -165,7 +168,6 @@ class Base(tornado.web.RequestHandler):
             if s in msgs.lmap:
                 response['message'] = msgs.lmap[s]
             else:
-                import importlib
                 import base.config.application_config
                 _application_responses_module = base.config.application_config.response_messages_module
                 try:
@@ -245,10 +247,46 @@ class api(object):
         _split_url = self.uri.split('/')
         _res = []
         _kw_res = {}
+        _mod = None
         for s in _split_url:
-            _res.append('([^/]+)' if s.startswith(':') else s)
             if s.startswith(':'):
-                _kw_res[s[1:]] = _split_url.index(s) + 1 if self.set_api_prefix else _split_url.index(s)
+                # url param is present
+
+                if s == ':__LANG__':
+                    # url param is a language
+                    from base.common.utils import log
+                    import base.config.application_config
+                    try:
+                        _mod = importlib.import_module(base.config.application_config.languages_module)
+                    except ImportError:
+                        log.warning('Error loading languages module {}'.format(
+                            base.config.application_config.languages_module))
+                        raise MissingLanguagesLookup('Languages lookup file is missing or not configured, can not use __LANG__ variable')
+
+                    try:
+                        _path = '|'.join([lang for lang in _mod.languages_map])
+                        _res.append('({})'.format(_path))
+                    except Exception as e:
+                        log.error('Languages module error: {}'.format(e))
+                        raise ErrorLanguagesLookup('Languages lookup file badly configured')
+
+                else:
+                    # all other url params
+                    _res.append('([^/]+)')
+            else:
+                # a regular part of the url path
+                _res.append(s)
+
+            if s.startswith(':'):
+                # save url parameters indexes
+                if s[1:] == '__LANG__':
+                    if not hasattr(_mod, 'language_url_param_name'):
+                        log.error('Missing language url parameter name in {}'.format(_mod.__file__))
+                        raise ErrorLanguagesLookup('Languages lookup file badly configured')
+                    _key = _mod.language_url_param_name
+                else:
+                    _key = s[1:]
+                _kw_res[_key] = _split_url.index(s) + 1 if self.set_api_prefix else _split_url.index(s)
 
         return '/'.join(_res), _kw_res
 

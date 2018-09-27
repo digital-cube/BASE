@@ -52,7 +52,7 @@ class ErrorSetSessionToken(Exception):
 
 
 class MissingRolesLookup(Exception):
-    """User roles lookup file is missiong or not configured"""
+    """User roles lookup file is missing or not configured"""
     pass
 
 
@@ -138,4 +138,14 @@ class PostApplicationProcessConfigurationError(Exception):
 
 class MissingModelsConfig(Exception):
     """Database models json is missing"""
+    pass
+
+
+class MissingLanguagesLookup(Exception):
+    """Languages lookup file is missing or not configured"""
+    pass
+
+
+class ErrorLanguagesLookup(Exception):
+    """Languages lookup file is badly configured"""
     pass
