@@ -63,6 +63,7 @@ def _add_tests(app_config):
                 _new_file.append("from tests.blog_tests import TestPostTags\n")
                 _new_file.append("from tests.blog_tests import TestFilesUpload\n")
                 _new_file.append("from tests.blog_tests import TestUserGetPosts\n")
+                _new_file.append("from tests.blog_tests import TestPostMeta\n")
 
 
                 continue
@@ -135,7 +136,7 @@ def _add_blog():
         sys.exit(exit_status.MISSING_PROJECT_CONFIGURATION)
 
     if not hasattr(src.config.app_config, 'db_config'):
-        print('Missing Database configuration in config file')
+        print('Missing Database configuration in config file, please initialize database first')
         sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
 
     # check if config file has active models, and update models with blog models

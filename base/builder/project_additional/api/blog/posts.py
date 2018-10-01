@@ -38,10 +38,10 @@ class AddPost(Base):
          'lowercase': True, 'default': 'en'},
         {'name': 'youtube_link', 'type': str, 'doc': 'youtube short code', 'required': False},
         {'name': 'id_group', 'type': int, 'doc': 'group id', 'required': False},
-
+        {'name': 'html_meta', 'type': json, 'doc': 'post html meta tags', 'required': False},
     )
     def put(self, title, subtitle, body, category, tags, slug, enable_comments, only_authorized_comments, source,
-            forced_datetime, cover_img, tumb_img, language, youtube_link, id_group):
+            forced_datetime, cover_img, tumb_img, language, youtube_link, id_group, html_meta):
         import base.common.orm
         _session = base.common.orm.orm.session()
         _slug = Post.mkslug(title) if not slug else Post.mkslug(slug)
@@ -52,6 +52,16 @@ class AddPost(Base):
             if _g is not None:
                 _group = _g
 
+        _html_meta = None
+        if html_meta is not None:
+            try:
+                _html_meta = json.dumps({
+                    'html_meta': html_meta
+                }, ensure_ascii=False)
+            except Exception as e:
+                log.critical('Can not save meta: {}'.format(e))
+                return self.error('Error add post')
+
         import sqlalchemy.exc
         try:
             p = Post(self.auth_user.user, title, subtitle, body, _slug, tags, cover_img, tumb_img, language,
@@ -61,7 +71,8 @@ class AddPost(Base):
                      forced_datetime=forced_datetime,
                      str_category=category,
                      youtube_link=youtube_link,
-                     group=_group)
+                     group=_group,
+                     html_meta=_html_meta)
         except sqlalchemy.exc.IntegrityError as e:
             log.critical('Can not add new post: {}'.format(e))
             if e.orig is not None and e.orig.args is not None:
@@ -165,6 +176,12 @@ class PostById(Base):
         except:
             _body = ''
 
+        try:
+            _html_meta = json.loads(p.html_meta)
+            _html_meta = json.dumps(_html_meta['html_meta'])
+        except:
+            _html_meta = ''
+
         return self.ok({
             'author': {
                 'email': p.user.auth_user.username,
@@ -175,7 +192,8 @@ class PostById(Base):
             'body': _body,
             'tags': [t.name for t in p.show_tags],
             'attached_files': get_post_files(p),
-            'comments': get_comments(p.id, canonical=True)
+            'comments': get_comments(p.id, canonical=True),
+            'html_meta': _html_meta
         })
 
     @params(

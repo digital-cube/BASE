@@ -208,6 +208,7 @@ class Post(base.common.orm.sql_base):
     show_tags = sqlalchemy.orm.relationship('ShowTag', secondary=post2showtag, backref='Post')
 
     source = Column(Text, nullable=True, default=None)
+    html_meta = Column(Text)
 
     __table_args__ = (
         sqlalchemy.UniqueConstraint('id_group', 'language', name='post_id_group_lang_ux_1'),
@@ -393,7 +394,7 @@ class Post(base.common.orm.sql_base):
 
     def __init__(self, user, title, subtitle, body, slug, tags, cover_img, tumb_img, language,
                  enable_comments=True, only_authorized_comments=False, source=None, forced_datetime=None,
-                 str_category=None, group=None, youtube_link=None):
+                 str_category=None, group=None, youtube_link=None, html_meta=None):
 
         self.cover_img = cover_img
         self.tumb_img = tumb_img
@@ -419,6 +420,7 @@ class Post(base.common.orm.sql_base):
         self.comments_enabled = enable_comments
         self.comments_restriction_only_authorized = only_authorized_comments
         self.source = source
+        self.html_meta = html_meta
 
         if youtube_link is not None:
             self.youtube_link = youtube_link

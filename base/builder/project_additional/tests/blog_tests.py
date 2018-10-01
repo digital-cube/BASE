@@ -626,3 +626,46 @@ class TestUserGetPosts(TestBlogBase):
         r = self.api(self.token, 'GET', '/api/wiki/posts', expected_status_code=200)
         self.assertIn('posts', r)
         self.assertEqual(len(r['posts']), 4)
+
+
+class TestPostMeta(TestBlogBase):
+
+    def test_add_post_with_damaged_meta_html(self):
+        id_user, token_user = self.reg('test@knowledge-base.com', '123', {'first_name': 'test',
+                                                                          'last_name': 'user',
+                                                                          'data': '{}',
+                                                                          'role_flags': 1})
+
+        r = self.api(token_user, 'PUT', '/api/wiki/posts', body={'title': 'neki tamo naslov',
+                                                                 'body': '<p>tekst</p>',
+                                                                 'tags': ['telmekom', 'test', 'showTag', 'abc', 'Abc',
+                                                                          'ABc'],
+                                                                 'html_meta': 'dummy'
+                                                                 }, expected_status_code=200)
+        self.assertIn('id', r)
+        _id = r['id']
+
+        r = self.api(token_user, 'GET', '/api/wiki/posts/{}'.format(_id), expected_status_code=200)
+        self.assertIn('html_meta', r)
+        self.assertEqual(r['html_meta'], '')
+
+    def test_add_post_with_meta_html(self):
+        id_user, token_user = self.reg('test@knowledge-base.com', '123', {'first_name': 'test',
+                                                                          'last_name': 'user',
+                                                                          'data': '{}',
+                                                                          'role_flags': 1})
+
+        r = self.api(token_user, 'PUT', '/api/wiki/posts', body={'title': 'neki tamo naslov',
+                                                                 'body': '<p>tekst</p>',
+                                                                 'tags': ['telmekom', 'test', 'showTag', 'abc', 'Abc',
+                                                                          'ABc'],
+                                                                 'html_meta': json.dumps('<h1>test html</h1>')
+                                                                 }, expected_status_code=200)
+        self.assertIn('id', r)
+        _id = r['id']
+
+        r = self.api(token_user, 'GET', '/api/wiki/posts/{}'.format(_id), expected_status_code=200)
+        self.assertIn('html_meta', r)
+        self.assertNotEqual(r['html_meta'], '')
+        self.assertEqual(json.loads(r['html_meta']), '<h1>test html</h1>')
+
