@@ -1,5 +1,19 @@
 ## CHANGELOG
 
+### 2018 10 01
+
+## BASE version 1.6.0
+- param decorator's argument min and max works with string type
+- param decorator's default argument handle changed - bug fix
+- post statuses moved to the lookup file
+- id for post mode changed to integer
+- removed sequencer for post model
+- post group presented, id_group (id of the post) and language is a uniqe combination
+- post upgraded with a youtube link field
+- tags (and show_tags) contains language, tag name and a language is a uniqu combination
+- improved test for blog component
+- timeout for test increased to 300s
+
 ### 2018 09 27
 
 ## BASE version 1.5.3

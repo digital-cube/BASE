@@ -1,6 +1,6 @@
 # coding= utf-8
 
-from src.models.knowledgebase import Comment
+from src.models.blog import Comment
 import src.config.blog_config as bc
 
 
@@ -8,7 +8,7 @@ def get_comments(id_post, canonical=False):
     # returns status, err msg | result
 
     import base.common.orm
-    from src.models.knowledgebase import Post
+    from src.models.blog import Post
     _session = base.common.orm.orm.session()
 
     p = _session.query(Post).filter(Post.id == id_post).one_or_none()
@@ -20,7 +20,7 @@ def get_comments(id_post, canonical=False):
 
 def add_comment(id_post, text, id_parent_comment, user, unauthorized_user_email, unauthorized_display_name, self):
     import base.common.orm
-    from src.models.knowledgebase import Post
+    from src.models.blog import Post
     _session = base.common.orm.orm.session()
 
     p = _session.query(Post).filter(Post.id == id_post).one_or_none()

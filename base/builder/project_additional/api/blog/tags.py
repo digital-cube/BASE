@@ -4,7 +4,7 @@ from base.application.components import Base
 from base.application.components import api
 from base.application.components import authenticated
 
-from src.models.knowledgebase import PostCategory, Tag
+from src.models.blog import PostCategory, Tag, ShowTag
 
 
 @authenticated()
@@ -17,6 +17,18 @@ class GetAllTags(Base):
     def get(self):
         import base.common.orm
         return self.ok({'tags': Tag.all(base.common.orm.orm.session())})
+
+
+@authenticated()
+@api(
+    URI='/wiki/show-tags',
+    SPECIFICATION_PATH='Blog'
+)
+class GetAllShowTags(Base):
+
+    def get(self):
+        import base.common.orm
+        return self.ok({'show_tags': ShowTag.all(base.common.orm.orm.session())})
 
 
 @authenticated()

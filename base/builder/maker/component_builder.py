@@ -58,9 +58,13 @@ def _add_tests(app_config):
 
             if 'tests.hello' in _line:
                 _new_file.append(_line)
-                _new_file.append("from tests.kbtest import TestKB\n")
-                _new_file.append("from tests.kbtest import TestFilesUpload\n")
-                _new_file.append("from tests.kbtest import TestUserGetPosts\n")
+                _new_file.append("from tests.blog_tests import TestBlog\n")
+                _new_file.append("from tests.blog_tests import TestPostGroups\n")
+                _new_file.append("from tests.blog_tests import TestPostTags\n")
+                _new_file.append("from tests.blog_tests import TestFilesUpload\n")
+                _new_file.append("from tests.blog_tests import TestUserGetPosts\n")
+
+
                 continue
 
             _new_file.append(_line)
@@ -69,7 +73,7 @@ def _add_tests(app_config):
 
             tf.write(''.join(_new_file))
     else:
-        print('Please update tests with new kbtest module')
+        print('Please update tests with new blog_tests ')
 
 
 def _update_sequencer_model(app_config):
@@ -145,23 +149,28 @@ def _add_blog():
                 sys.exit(exit_status.MISSING_DATABASE_CONFIGURATION)
 
     if not os.path.isfile(models_file) and hasattr(src.config.app_config, 'models'):
-        print('Models defined in config file, please update models in application config file with new knowledgebase model')
+        print('Models defined in config file, please update models in application config file with new blog model')
     else:
 
         with open(models_file) as mf:
             models = json.load(mf)
-        if any(list(map(lambda m: 'knowledgebase' in m, models))):
-            print('Models should contain knowledgebase module, please check configuration')
+        if any(list(map(lambda m: 'blog' in m, models))):
+            print('Models should contain blog module, please check configuration')
         else:
-            models.append('src.models.knowledgebase')
+            models.append('src.models.blog')
             with open(models_file, 'w') as mf:
                 json.dump(models, mf, indent=4, sort_keys=True, ensure_ascii=False)
 
-    # copy models for blog
+    # copy lookup for post statutes
     _site_dir = get_install_directory()
-    _destination_file = 'src/models/knowledgebase.py'
+    _lookup_source = '{}/base/builder/project_additional/lookup/post_status.py'.format(_site_dir[0])
+    _lookup_dest = 'src/lookup/post_status.py'
+    copy_file(_lookup_source, _lookup_dest)
+
+    # copy models for blog
+    _destination_file = 'src/models/blog.py'
     models_additional_source_dir = '{}/base/builder/project_additional/models_additional'.format(_site_dir[0])
-    models_file = '{}/knowledgebase.py'.format(models_additional_source_dir)
+    models_file = '{}/blog.py'.format(models_additional_source_dir)
     copy_file(models_file, _destination_file)
 
     # update users model with posts
@@ -177,10 +186,10 @@ def _add_blog():
     setattr(base.common.orm, 'orm', orm_builder.orm())
     orm_builder.add_blog()
     try:
-        _m = importlib.import_module('src.models.knowledgebase')
+        _m = importlib.import_module('src.models.blog')
         _m.main()
     except ImportError:
-        print('Error loading model {}, please execute the main manualy'.format(src.models.knowledgebase.__file__))
+        print('Error loading model {}, please execute the main manualy'.format(src.models.blog.__file__))
 
     # check if api exists, if not copy it from the repo
     api_source_dir = '{}/base/builder/project_additional/api/blog'.format(_site_dir[0])
@@ -194,12 +203,12 @@ def _add_blog():
     # update app config with api paths
     _add_modules_to_config(src.config.app_config.__file__)
 
-    # add tests for knowledgebase
-    test_source = '{}/base/builder/project_additional/tests/kbtest.py'.format(_site_dir[0])
+    # add tests for blog
+    test_source = '{}/base/builder/project_additional/tests/blog_tests.py'.format(_site_dir[0])
     test_file1 = '{}/base/builder/project_additional/tests/test_file.png'.format(_site_dir[0])
     test_file2 = '{}/base/builder/project_additional/tests/test_file2.pdf'.format(_site_dir[0])
     test_file3 = '{}/base/builder/project_additional/tests/test_file3.txt'.format(_site_dir[0])
-    copy_file(test_source, 'tests/kbtest.py')
+    copy_file(test_source, 'tests/blog_tests.py')
     copy_file(test_file1, 'tests/test_file.png')
     copy_file(test_file2, 'tests/test_file2.pdf')
     copy_file(test_file3, 'tests/test_file3.txt')

@@ -538,7 +538,7 @@ class params(object):
 
     @staticmethod
     def params_type_for_compare(_param_type):
-        if _param_type in [int, float, decimal.Decimal, datetime.date, datetime.datetime, list]:
+        if _param_type in [int, float, decimal.Decimal, datetime.date, datetime.datetime, list, str]:
             return True
         return False
 
@@ -550,7 +550,7 @@ class params(object):
 
         if not params.params_type_for_compare(_param_type):
             return True
-        if _param_type == list:
+        if _param_type in [list, str]:
             try:
                 if len(_param_value) < _param_min_value:
                     return False
@@ -581,7 +581,7 @@ class params(object):
 
         if not params.params_type_for_compare(_param_type):
             return True
-        if _param_type == list:
+        if _param_type in [list, str]:
             try:
                 if len(_param_value) > _param_max_value:
                     return False
@@ -669,10 +669,10 @@ class params(object):
                     _param_required = True
                 else:
                     # GET BODY ARGUMENTS
-                    _param_value = _origin_self.get_argument(_argument, default=_default_param_value)
+                    _param_value = _origin_self.get_argument(_argument, default=None)
                     if _param_value is None:
-                        _param_value = _default_param_value if _default_param_value else None
-                        _param_value = _body[_argument] if _argument in _body else _param_value
+                        _param_value = _body[_argument] if _argument in _body else \
+                            (_default_param_value if _default_param_value is not None else None)
 
                 if _param_value is None and _param_required:
                     log.critical('Missing required parameter {}'.format(_argument))

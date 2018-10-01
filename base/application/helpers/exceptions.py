@@ -149,3 +149,9 @@ class MissingLanguagesLookup(Exception):
 class ErrorLanguagesLookup(Exception):
     """Languages lookup file is badly configured"""
     pass
+
+
+class ErrorLanguageCodeID(Exception):
+    """Language code id has to be two lowercase characters"""
+    pass
+

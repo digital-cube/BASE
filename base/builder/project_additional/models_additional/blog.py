@@ -1,21 +1,24 @@
 # coding= utf-8
 
 import json
+import string
 import timeago
 import datetime
 import sqlalchemy
 from slugify import slugify
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, DateTime, Text, CHAR, Date
 from sqlalchemy.orm import relationship
+from base.application.helpers.exceptions import ErrorLanguageCodeID
 
 import base.common.orm
 
 from src.models.user import User
+from src.lookup import post_status
 
 # Tags are using for search the posts
 
 post2tag = sqlalchemy.Table('post2tag', base.common.orm.sql_base.metadata,
-                            sqlalchemy.Column('id_post', CHAR(10), sqlalchemy.ForeignKey('posts.id'), index=True),
+                            sqlalchemy.Column('id_post', Integer, sqlalchemy.ForeignKey('posts.id'), index=True),
                             sqlalchemy.Column('id_tag', Integer, sqlalchemy.ForeignKey('tags.id'), index=True),
                             sqlalchemy.UniqueConstraint('id_post', 'id_tag', name='post2tag_uix_1')
                             )
@@ -24,24 +27,11 @@ post2tag = sqlalchemy.Table('post2tag', base.common.orm.sql_base.metadata,
 # taggIt below post we will allow him that.
 
 post2showtag = sqlalchemy.Table('post2showtag', base.common.orm.sql_base.metadata,
-                                sqlalchemy.Column('id_post', CHAR(10), sqlalchemy.ForeignKey('posts.id'), index=True),
+                                sqlalchemy.Column('id_post', Integer, sqlalchemy.ForeignKey('posts.id'), index=True),
                                 sqlalchemy.Column('id_showtag', Integer, sqlalchemy.ForeignKey('show_tags.id'),
                                                   index=True),
                                 sqlalchemy.UniqueConstraint('id_post', 'id_showtag', name='post2showtag_uix_1')
                                 )
-
-
-class PostStatus(base.common.orm.sql_base):
-    """Status of the post, e.g. PUBLISHED, CHECKED...."""
-
-    __tablename__ = 'lookup_post_statuses'
-
-    id = Column(Integer, primary_key=True)
-    text = Column(String(64), unique=True, nullable=False)
-
-    def __init__(self, id, text):
-        self.id = id
-        self.text = text
 
 
 class PostCategory(base.common.orm.sql_base):
@@ -85,7 +75,7 @@ class ArchivedPostRevision(base.common.orm.sql_base):
     __tablename__ = 'archived_post_revisions'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    id_post = Column(CHAR(10), ForeignKey('posts.id'), index=True)
+    id_post = Column(Integer, ForeignKey('posts.id'), index=True)
     post = relationship("Post", uselist=False, back_populates="archived_revisions", foreign_keys=[id_post])
 
     created = Column(DateTime, nullable=False)
@@ -123,7 +113,7 @@ class PostFile(base.common.orm.sql_base):
     __tablename__ = 'post_files'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    id_post = Column(CHAR(10), ForeignKey('posts.id'), index=True)
+    id_post = Column(Integer, ForeignKey('posts.id'), index=True)
     id_user = Column(CHAR(10), ForeignKey(User.id), index=True)
     full_filename = Column(String(255), nullable=False)
     local_filename = Column(String(255), nullable=False)
@@ -168,11 +158,16 @@ class PostFile(base.common.orm.sql_base):
 class Post(base.common.orm.sql_base):
     __tablename__ = 'posts'
 
-    id = Column(CHAR(10), primary_key=True)
+    id = Column(Integer, autoincrement=True, primary_key=True)
 
     slug = Column(String(255), nullable=True, unique=True)
 
     id_user = Column(CHAR(10), ForeignKey(User.id), index=True)
+
+    id_group = Column(Integer, ForeignKey('posts.id'), index=True)
+    group = sqlalchemy.orm.relationship('Post', remote_side=[id], uselist=False, post_update=True)
+
+    language = Column(CHAR(2), nullable=False, index=True)
 
     id_user_modified = Column(CHAR(10), ForeignKey(User.id), index=True)
 
@@ -183,8 +178,7 @@ class Post(base.common.orm.sql_base):
 
     removed = Column(Boolean, index=True, default=False, nullable=False)
 
-    id_status = Column(Integer, ForeignKey(PostStatus.id), index=True)
-    status = sqlalchemy.orm.relationship('PostStatus')
+    id_status = Column(Integer, nullable=False, default=1, index=True)
 
     id_category = Column(Integer, ForeignKey(PostCategory.id), index=True, nullable=True)
     category = sqlalchemy.orm.relationship('PostCategory')
@@ -194,6 +188,7 @@ class Post(base.common.orm.sql_base):
 
     cover_img = Column(String(255), nullable=True, default=None)
     tumb_img = Column(String(255), nullable=True, default=None)
+    youtube_link = Column(String(16), nullable=True, default=None)
 
     body = Column(Text)
 
@@ -214,7 +209,9 @@ class Post(base.common.orm.sql_base):
 
     source = Column(Text, nullable=True, default=None)
 
-    published = Column(Boolean, default=False, nullable=False)
+    __table_args__ = (
+        sqlalchemy.UniqueConstraint('id_group', 'language', name='post_id_group_lang_ux_1'),
+    )
 
     def get_comments(self, canonical=True):
 
@@ -293,7 +290,7 @@ class Post(base.common.orm.sql_base):
 
         return slug
 
-    def update(self, user, title, subtitle, body, tags, category, comments_enabled, published):  # , slug):
+    def update(self, user, title, subtitle, body, tags, category, comments_enabled, id_status):  # , slug):
 
         changed = []
         apr = ArchivedPostRevision(self)
@@ -339,10 +336,6 @@ class Post(base.common.orm.sql_base):
             self.comments_enabled = comments_enabled
             changed.append('comments_enabled')
 
-        if self.published != published:
-            self.published = published
-            changed.append('published')
-
         if tags is not None:
 
             orig_show_tags = set([t for t in self.show_tags])
@@ -353,12 +346,18 @@ class Post(base.common.orm.sql_base):
                 self.tagg_it(tags)
                 changed.append('tags')
 
+        if id_status is not None:
+            self.id_status = id_status
+
         if len(changed) > 0:
             self.archived_revisions.append(apr)
             self.last_modified_by = user
             self.last_modified_datetime = datetime.datetime.now()
 
         return changed
+
+    def published(self):
+        return self.id_status == post_status.PUBLISHED
 
     def clear_tags(self):
 
@@ -377,29 +376,34 @@ class Post(base.common.orm.sql_base):
         for src_str_tag in tags:
             str_tag = Tag.tagify(src_str_tag)
 
-            tag = _session.query(Tag).filter(Tag.name == str_tag).one_or_none()
+            tag = _session.query(Tag).filter(Tag.name == str_tag, Tag.language == self.language).one_or_none()
             if not tag:
-                tag = Tag(str_tag)
+                tag = Tag(str_tag, self.language)
 
-            show_tag = _session.query(ShowTag).filter(ShowTag.name == src_str_tag).one_or_none()
+            show_tag = _session.query(ShowTag).filter(ShowTag.name == src_str_tag, ShowTag.language == self.language).one_or_none()
             if not show_tag:
-                show_tag = ShowTag(src_str_tag)
+                show_tag = ShowTag(src_str_tag, self.language)
 
             self.tags.append(tag)
             self.show_tags.append(show_tag)
 
-    def __init__(self, id, user, title, subtitle, body, slug, tags, cover_img, tumb_img,
-                 enable_comments=True,
-                 only_authorized_comments=False,
-                 source=None, forced_datetime=None,
-                 str_category=None):
+    @staticmethod
+    def language_code_is_all_lowercase(lang):
+        return all([c in string.ascii_lowercase for c in lang])
+
+    def __init__(self, user, title, subtitle, body, slug, tags, cover_img, tumb_img, language,
+                 enable_comments=True, only_authorized_comments=False, source=None, forced_datetime=None,
+                 str_category=None, group=None, youtube_link=None):
 
         self.cover_img = cover_img
         self.tumb_img = tumb_img
 
-        self.id = id
         self.user = user
         self.last_modified_by = user
+        self.group = group if group is not None else self
+        if not Post.language_code_is_all_lowercase(language):
+            raise ErrorLanguageCodeID("Language code id has to be only two lowercase letters")
+        self.language = language
 
         self.created = datetime.datetime.now() if not forced_datetime else forced_datetime
         self.created_date = self.created.date()
@@ -415,6 +419,9 @@ class Post(base.common.orm.sql_base):
         self.comments_enabled = enable_comments
         self.comments_restriction_only_authorized = only_authorized_comments
         self.source = source
+
+        if youtube_link is not None:
+            self.youtube_link = youtube_link
 
         if str_category:
             import base.common.orm
@@ -435,7 +442,7 @@ class Comment(base.common.orm.sql_base):
     __tablename__ = 'comments'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    id_post = Column(CHAR(10), ForeignKey(Post.id), index=True)
+    id_post = Column(Integer, ForeignKey(Post.id), index=True)
     id_user = Column(CHAR(10), ForeignKey(User.id), index=True, nullable=True, default=None)
 
     created = Column(DateTime, nullable=False)
@@ -486,8 +493,13 @@ class Tag(base.common.orm.sql_base):
     __tablename__ = 'tags'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(String(64), unique=True, nullable=False)
+    name = Column(String(64), nullable=False)
     posts = sqlalchemy.orm.relationship('Post', secondary=post2tag, backref='Tag')
+    language = Column(CHAR(2), nullable=False, index=True)
+
+    __table_args__ = (
+        sqlalchemy.UniqueConstraint('name', 'language', name='tag_name_lang_ux_1'),
+    )
 
     @staticmethod
     def tagify(s):
@@ -496,8 +508,11 @@ class Tag(base.common.orm.sql_base):
     def count(self):
         return len(self.posts)
 
-    def __init__(self, name):
+    def __init__(self, name, language):
         self.name = Tag.tagify(name)
+        if not Post.language_code_is_all_lowercase(language):
+            raise ErrorLanguageCodeID("Language code id has to be only two lowercase letters")
+        self.language = language
 
     @staticmethod
     def all(_session):
@@ -517,26 +532,37 @@ class ShowTag(base.common.orm.sql_base):
     __tablename__ = 'show_tags'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(String(64), unique=True, nullable=False)
+    name = Column(String(64), nullable=False)
     posts = sqlalchemy.orm.relationship('Post', secondary=post2showtag, backref='ShowTag')
+    language = Column(CHAR(2), nullable=False, index=True)
+
+    __table_args__ = (
+        sqlalchemy.UniqueConstraint('name', 'language', name='tag_name_lang_ux_2'),
+    )
 
     def count(self):
         return len(self.posts)
 
-    def __init__(self, name):
+    def __init__(self, name, language):
         self.name = name
+        if not Post.language_code_is_all_lowercase(language):
+            raise ErrorLanguageCodeID("Language code id has to be only two lowercase letters")
+        self.language = language
+
+    @staticmethod
+    def all(_session):
+        db_tags = _session.query(ShowTag).all()
+        tags = []
+        for db_tag in db_tags:
+            tags.append({
+                'name': db_tag.name,
+                'count': len(db_tag.posts)
+            })
+        return tags
 
 
 def main():
-    import base.common.orm
-    from src.models.sequencers import Sequencer
-    _session = base.common.orm.orm.session()
-    _session.add(PostStatus(1, 'Draft'))
-    _session.add(PostStatus(2, 'In Review'))
-    _session.add(PostStatus(3, 'Final'))
-    _seq = Sequencer('p', '00', '000', 4, 0, 'posts', 'STR', 's_posts', False)
-    _session.add(_seq)
-    _session.commit()
+    pass
 
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ import tornado.gen
 import tornado.web
 import json
 
-from src.models.knowledgebase import PostFile
+from src.models.blog import PostFile
 
 from src.common.common import get_post_files
 import tornado.concurrent as concurrent
@@ -28,7 +28,7 @@ class Files(Base):
     )
     def get(self, _id):
         import base.common.orm
-        from src.models.knowledgebase import Post
+        from src.models.blog import Post
         _session = base.common.orm.orm.session()
 
         p = _session.query(Post).filter(Post.id == _id).one_or_none()
@@ -44,7 +44,7 @@ class Files(Base):
     )
     def put(self, _id, filename, local_name):
         import base.common.orm
-        from src.models.knowledgebase import Post
+        from src.models.blog import Post
         _session = base.common.orm.orm.session()
 
         p = _session.query(Post).filter(Post.id == _id).one_or_none()
@@ -63,7 +63,7 @@ class Files(Base):
     )
     def patch(self, _id, file_names):
         import base.common.orm
-        from src.models.knowledgebase import Post
+        from src.models.blog import Post
         _session = base.common.orm.orm.session()
 
         p = _session.query(Post).filter(Post.id == _id).one_or_none()
@@ -91,21 +91,20 @@ class SaveFilesForEditor(Base):
 
         import src.config.blog_config as bc
         import uuid
-        print('SAVE FILES')
+
         attach_files = self.request.files.get('upload')
         attached_file = attach_files[0]
         attached_file_name = attached_file['filename']
         attached_file_ext = attached_file_name.split('.')[-1]
-        print('SAVE FILES', attach_files)
+
         fn = uuid.uuid4()
         file_name = '{}/{}.{}'.format(bc.blog_files_directory, fn, attached_file_ext)
         with open(file_name, 'wb') as f:
             f.write(attached_file['body'])
 
 
-        # todo: upisati informacije u bazu
+        # todo: save changes to the database
 
-        # return self.ok({
         yield self.ok({
             'url': '{}/{}.{}'.format(bc.frontend_blog_files_directory, fn, attached_file_ext),
             'uploaded': 1,
@@ -157,7 +156,7 @@ class SaveFiles(Base):
         def set_files(files, _id_post):
         
             import base.common.orm
-            from src.models.knowledgebase import Post
+            from src.models.blog import Post
             _session = base.common.orm.orm.session()
 
             p = _session.query(Post).filter(Post.id == _id_post).one_or_none()
@@ -183,6 +182,7 @@ class SaveFiles(Base):
 
         return self.ok({'result': attached_files})
 
+
 @authenticated()
 @api(
     URI='/posts/cover',
@@ -193,7 +193,6 @@ class SaveCover(Base):
 
     @tornado.gen.coroutine
     def post(self):
-        print('SIGLE SLIKE')
 
         id_post = self.get_argument('id_post', None)
         if id_post is None:
@@ -203,11 +202,8 @@ class SaveCover(Base):
         if attach_files is None:
             return self.ok({'result': ''})
 
-        for af in attach_files:
-            print('FILE', af)
-
         import base.common.orm
-        from src.models.knowledgebase import Post
+        from src.models.blog import Post
         _session = base.common.orm.orm.session()
 
         p = _session.query(Post).filter(Post.id == id_post).one_or_none()
@@ -226,12 +222,10 @@ class SaveCover(Base):
         with open(file_name, 'wb') as f:
             f.write(attached_image['body'])
 
-        print('TRENUTNO', os.getcwd())
-
         def set_file(file, _id_post):
 
             import base.common.orm
-            from src.models.knowledgebase import Post
+            from src.models.blog import Post
             _session = base.common.orm.orm.session()
 
             p = _session.query(Post).filter(Post.id == _id_post).one_or_none()
@@ -268,7 +262,6 @@ class SaveThumb(Base):
 
     @tornado.gen.coroutine
     def post(self):
-        print('SIGLE SLIKE')
 
         id_post = self.get_argument('id_post', None)
         if id_post is None:
@@ -278,11 +271,8 @@ class SaveThumb(Base):
         if attach_files is None:
             return self.ok({'result': ''})
 
-        for af in attach_files:
-            print('FILE', af)
-
         import base.common.orm
-        from src.models.knowledgebase import Post
+        from src.models.blog import Post
         _session = base.common.orm.orm.session()
 
         p = _session.query(Post).filter(Post.id == id_post).one_or_none()
@@ -301,12 +291,10 @@ class SaveThumb(Base):
         with open(file_name, 'wb') as f:
             f.write(attached_image['body'])
 
-        print('TRENUTNO', os.getcwd())
-
         def set_file(file, _id_post):
 
             import base.common.orm
-            from src.models.knowledgebase import Post
+            from src.models.blog import Post
             _session = base.common.orm.orm.session()
 
             p = _session.query(Post).filter(Post.id == _id_post).one_or_none()
@@ -331,40 +319,4 @@ class SaveThumb(Base):
             return self.error('Error set files to post')
 
         return self.ok({'result': file_name_for_frontend})
-
-@api(
-    URI='/ck',
-)
-class CK(Base):
-    """Dummy API for store/get ckeditor content"""
-
-    @params(
-        {'name': 'content', 'type': json},
-    )
-    def post(self, content):
-
-        # print('STIGAO CONTENT', type(content))
-        # print('STIGAO CONTENT', content)
-
-        import base.common.orm
-        CK, _session = base.common.orm.get_orm_model('ck')
-        content = json.dumps(content, ensure_ascii=False)
-        ck = CK(content)
-        _session.add(ck)
-        _session.commit()
-
-        return self.ok()
-
-    def get(self):
-
-        # print('VRACAJ bre')
-
-        import base.common.orm
-        CK, _session = base.common.orm.get_orm_model('ck')
-        ck = _session.query(CK).order_by(CK.id.desc()).first()
-        # print('NASHAO', ck.id, ck.data)
-        r = {'data': json.loads(ck.data)}
-
-        return self.ok(r)
-
 

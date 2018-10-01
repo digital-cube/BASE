@@ -24,6 +24,9 @@ class TestBase(AsyncHTTPTestCase):
         app = Application(entries, test=True)
         setattr(app, 'svc_port', svc_port)
 
+        import os
+        os.environ['ASYNC_TEST_TIMEOUT'] = '300'      # seconds for timeout
+
         return app
 
     def load_test_hook(self):

@@ -1,13 +1,15 @@
 # coding= utf-8
 
 import json
+import datetime
+
+from base.common.utils import log
 from base.application.components import Base
 from base.application.components import api
 from base.application.components import params
 from base.application.components import authenticated
 
-import datetime
-from src.models.knowledgebase import Post, Tag
+from src.models.blog import Post, Tag
 from src.common.common import get_comments
 from src.common.common import get_post_files
 
@@ -32,24 +34,40 @@ class AddPost(Base):
         {'name': 'datetime', 'type': datetime.datetime, 'doc': 'datetime', 'required': False, 'default': None},
         {'name': 'cover_img', 'type': str, 'doc': 'cover0img', 'required': False},
         {'name': 'tumb_img', 'type': str, 'doc': 'cover0img', 'required': False},
+        {'name': 'language', 'type': str, 'doc': 'post language', 'required': False, 'min': 2, 'max': 2,
+         'lowercase': True, 'default': 'en'},
+        {'name': 'youtube_link', 'type': str, 'doc': 'youtube short code', 'required': False},
+        {'name': 'id_group', 'type': int, 'doc': 'group id', 'required': False},
 
     )
     def put(self, title, subtitle, body, category, tags, slug, enable_comments, only_authorized_comments, source,
-            forced_datetime, cover_img, tumb_img):
+            forced_datetime, cover_img, tumb_img, language, youtube_link, id_group):
         import base.common.orm
-        import base.common.sequencer as s
         _session = base.common.orm.orm.session()
         _slug = Post.mkslug(title) if not slug else Post.mkslug(slug)
 
-        _id = s.sequencer().new('p')
+        _group = None
+        if id_group is not None:
+            _g = _session.query(Post).filter(Post.id == id_group).one_or_none()
+            if _g is not None:
+                _group = _g
 
-        p = Post(_id, self.auth_user.user, title, subtitle, body, slug=_slug, tags=tags, cover_img=cover_img,
-                 tumb_img=tumb_img,
-                 enable_comments=enable_comments,
-                 only_authorized_comments=only_authorized_comments,
-                 source=source,
-                 forced_datetime=forced_datetime,
-                 str_category=category)
+        import sqlalchemy.exc
+        try:
+            p = Post(self.auth_user.user, title, subtitle, body, _slug, tags, cover_img, tumb_img, language,
+                     enable_comments=enable_comments,
+                     only_authorized_comments=only_authorized_comments,
+                     source=source,
+                     forced_datetime=forced_datetime,
+                     str_category=category,
+                     youtube_link=youtube_link,
+                     group=_group)
+        except sqlalchemy.exc.IntegrityError as e:
+            log.critical('Can not add new post: {}'.format(e))
+            if e.orig is not None and e.orig.args is not None:
+                if e.orig.args[0] == 1062 and 'post_id_group_lang_ux_1' in e.orig.args[1]:
+                    return self.error('Can not add post with the same group and language')
+            return self.error('Error add post')
 
         _session.add(p)
 
@@ -67,6 +85,7 @@ class AddPost(Base):
             'posts': posts
         })
 
+
 @authenticated()
 @api(
     URI='/wiki/check-slug',
@@ -82,7 +101,6 @@ class CheckSlugPost(Base):
         return self.ok({
             'slug': _slug
         })
-
 
 
 @authenticated()
@@ -130,12 +148,12 @@ class PostsByTag(Base):
 class PostById(Base):
 
     @params(
-        {'name': 'id', 'type': str, 'doc': 'id', 'required': True}
+        {'name': 'id', 'type': int, 'doc': 'id', 'required': True}
     )
     def get(self, _id):
 
         import base.common.orm
-        from src.models.knowledgebase import Post
+        from src.models.blog import Post
         _session = base.common.orm.orm.session()
 
         p = _session.query(Post).filter(Post.id == _id).one_or_none()
@@ -161,7 +179,7 @@ class PostById(Base):
         })
 
     @params(
-        {'name': 'id', 'type': str, 'doc': 'id', 'required': True},
+        {'name': 'id', 'type': int, 'doc': 'id', 'required': True},
         {'name': 'title', 'type': str, 'doc': 'title', 'required': False},
         {'name': 'subtitle', 'type': str, 'doc': 'title', 'required': False},
         {'name': 'body', 'type': str, 'doc': 'body', 'required': False},
@@ -169,12 +187,12 @@ class PostById(Base):
         {'name': 'category', 'type': str, 'doc': 'category', 'required': False},
         {'name': 'comments_enabled', 'type': bool, 'doc': 'comments_enabled status of post', 'required': False,
          'default': True},
-        {'name': 'published', 'type': bool, 'doc': 'publish status of post', 'required': False, 'default': False},
+        {'name': 'status', 'type': int, 'doc': 'status of post', 'required': False},
     )
-    def patch(self, _id, title, subtitle, body, tags, category, comments_enabled, published):
+    def patch(self, _id, title, subtitle, body, tags, category, comments_enabled, status):
 
         import base.common.orm
-        from src.models.knowledgebase import Post
+        from src.models.blog import Post
         _session = base.common.orm.orm.session()
 
         p = _session.query(Post).filter(Post.id == _id).one_or_none()
@@ -183,9 +201,8 @@ class PostById(Base):
 
         if not p.published_time:
             p.published_time = datetime.datetime.now()
-            print('PUBLISHED TIME', p.published_time)
 
-        changed = p.update(self.auth_user.user, title, subtitle, body, tags, category, comments_enabled, published)
+        changed = p.update(self.auth_user.user, title, subtitle, body, tags, category, comments_enabled, status)
 
         if changed:
             base.common.orm.commit()
@@ -193,3 +210,42 @@ class PostById(Base):
         return self.ok({'changed': changed})
 
 
+@authenticated()
+@api(
+    URI='/wiki/posts/group/:id_group',
+    SPECIFICATION_PATH='Blog'
+)
+class PostGroupById(Base):
+
+    @params(
+        {'name': 'id_group', 'type': int, 'doc': 'post group id', 'required': True}
+    )
+    def get(self, _id_group):
+
+        import base.common.orm
+        from src.models.blog import Post
+        _session = base.common.orm.orm.session()
+
+        p = _session.query(Post).filter(Post.id_group == _id_group)
+        _posts = []
+        for _p in p:
+
+            try:
+                _body = json.loads(_p.body)
+            except json.JSONDecodeError:
+                _body = ''
+
+            _posts.append({
+                'author': {
+                    'email': _p.user.auth_user.username,
+                    'first_name': _p.user.first_name,
+                    'last_name': _p.user.last_name
+                },
+                'title': _p.title,
+                'body': _body,
+                'tags': [t.name for t in _p.show_tags],
+                'attached_files': get_post_files(_p),
+                'comments': get_comments(_p.id, canonical=True)
+            })
+
+        return self.ok({'posts': _posts})
