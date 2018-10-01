@@ -63,6 +63,7 @@ setup(
             'builder/project_additional/db/*',
             'builder/project_additional/db/alembic/*',
             'builder/project_additional/db/alembic/versions/.gtkeep*',
+            'builder/project_additional/lookup/*',
             'builder/project_additional/models/*',
             'builder/project_additional/models_additional/*',
             'builder/project_additional/tests/*',
