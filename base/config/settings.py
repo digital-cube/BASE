@@ -61,7 +61,8 @@ playground created...
 #################################################
 '''
 available_BASE_components = [
-    'blog'
+    'blog',
+    'site'
 ]
 default_models = [
     'src.models.mail',

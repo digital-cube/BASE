@@ -291,7 +291,8 @@ class Post(base.common.orm.sql_base):
 
         return slug
 
-    def update(self, user, title, subtitle, body, tags, category, comments_enabled, id_status):  # , slug):
+    def update(self, user, title, subtitle, body, tags, category, comments_enabled, id_status,
+               html_meta=None):
 
         changed = []
         apr = ArchivedPostRevision(self)
@@ -349,6 +350,11 @@ class Post(base.common.orm.sql_base):
 
         if id_status is not None:
             self.id_status = id_status
+            changed.append('status')
+
+        if html_meta is not None and html_meta != html_meta:
+            self.html_meta = html_meta
+            changed.append('html meta')
 
         if len(changed) > 0:
             self.archived_revisions.append(apr)

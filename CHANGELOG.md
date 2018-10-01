@@ -2,6 +2,14 @@
 
 ### 2018 10 01
 
+## BASE version 1.7.0
+- new base component site - simple component contains page with url and meta part
+- component builder improved
+- blog component fixes
+- post blog component has html meta field
+
+### 2018 10 01
+
 ## BASE version 1.6.0
 - param decorator's argument min and max works with string type
 - param decorator's default argument handle changed - bug fix

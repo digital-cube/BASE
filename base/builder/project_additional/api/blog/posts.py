@@ -206,8 +206,9 @@ class PostById(Base):
         {'name': 'comments_enabled', 'type': bool, 'doc': 'comments_enabled status of post', 'required': False,
          'default': True},
         {'name': 'status', 'type': int, 'doc': 'status of post', 'required': False},
+        {'name': 'html_meta', 'type': json, 'doc': 'post html meta tags', 'required': False},
     )
-    def patch(self, _id, title, subtitle, body, tags, category, comments_enabled, status):
+    def patch(self, _id, title, subtitle, body, tags, category, comments_enabled, status, html_meta):
 
         import base.common.orm
         from src.models.blog import Post
@@ -220,7 +221,17 @@ class PostById(Base):
         if not p.published_time:
             p.published_time = datetime.datetime.now()
 
-        changed = p.update(self.auth_user.user, title, subtitle, body, tags, category, comments_enabled, status)
+        _html_meta = None
+        if html_meta is not None:
+            try:
+                _html_meta = json.dumps({
+                    'html_meta': html_meta
+                }, ensure_ascii=False)
+            except Exception as e:
+                log.critical('Can not save meta: {}'.format(e))
+                return self.error('Error update post')
+
+        changed = p.update(self.auth_user.user, title, subtitle, body, tags, category, comments_enabled, status, html_meta=_html_meta)
 
         if changed:
             base.common.orm.commit()
