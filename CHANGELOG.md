@@ -2,6 +2,11 @@
 
 ### 2018 10 03
 
+## BASE version 1.7.2
+- json API argument bug fix
+
+### 2018 10 03
+
 ## BASE version 1.7.1
 - import bug fix, files.py
 

@@ -1,8 +1,9 @@
 # coding: utf-8
 
 import json
-from base.tests.helpers.testing import TestBase
 from urllib.parse import urlencode
+from base.tests.helpers.testing import TestBase
+from base.application.lookup import responses as rmsgs
 
 
 class TestSiteBase(TestBase):
@@ -51,7 +52,7 @@ class TestSite(TestSiteBase):
         r = self.api(token_user, 'GET', '/api/site/page?{}'.format(_params), expected_status_code=200)
         self.assertIn('page_meta', r)
         self.assertEqual(r['page_meta'], '')
-        
+
     def test_save_page_data(self):
         id_user, token_user = self.reg('test@knowledge-base.com', '123', {'first_name': 'test',
                                                                           'last_name': 'user',
@@ -65,10 +66,25 @@ class TestSite(TestSiteBase):
 
         r = self.api(token_user, 'PUT', '/api/site/page?{}'.format(_params), expected_status_code=200)
         self.assertIn('id', r)
- 
+
         _params = urlencode({
             'url': '/some/page'})
         r = self.api(token_user, 'GET', '/api/site/page?{}'.format(_params), expected_status_code=200)
         self.assertIn('page_meta', r)
         self.assertEqual(r['page_meta'], '<meta name="test"/>')
+
+    def test_save_invalid_page_data(self):
+        id_user, token_user = self.reg('test@knowledge-base.com', '123', {'first_name': 'test',
+                                                                          'last_name': 'user',
+                                                                          'data': '{}',
+                                                                          'role_flags': 1})
+
+        _params = urlencode({
+            'url': '/some/page',
+            'html_meta': 'dummy string'
+        })
+
+        r = self.api(token_user, 'PUT', '/api/site/page?{}'.format(_params), expected_status_code=400)
+        self.assertIn('message', r)
+        self.assertEqual(r['message'], rmsgs.lmap[rmsgs.INVALID_REQUEST_ARGUMENT])
 

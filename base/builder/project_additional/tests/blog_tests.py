@@ -641,13 +641,9 @@ class TestPostMeta(TestBlogBase):
                                                                  'tags': ['telmekom', 'test', 'showTag', 'abc', 'Abc',
                                                                           'ABc'],
                                                                  'html_meta': 'dummy'
-                                                                 }, expected_status_code=200)
-        self.assertIn('id', r)
-        _id = r['id']
-
-        r = self.api(token_user, 'GET', '/api/wiki/posts/{}'.format(_id), expected_status_code=200)
-        self.assertIn('html_meta', r)
-        self.assertEqual(r['html_meta'], '')
+                                                                 }, expected_status_code=400)
+        self.assertIn('message', r)
+        self.assertEqual(r['message'], rmsgs.lmap[rmsgs.INVALID_REQUEST_ARGUMENT])
 
     def test_add_post_with_meta_html(self):
         id_user, token_user = self.reg('test@knowledge-base.com', '123', {'first_name': 'test',

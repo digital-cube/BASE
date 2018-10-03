@@ -446,12 +446,14 @@ class params(object):
                 raise InvalidRequestParameter('Invalid argument for Decimal')
 
         if argument_type == 'json' or argument_type == json:
+            if argument_value is None:
+                return None
             try:
                 return json.loads(argument_value)
             except json.JSONDecodeError as e:
                 log.critical('Invalid argument {} expected json, got {} ({}): {}'.format(
                     argument, argument_value, type(argument_value), e))
-                return None
+                raise InvalidRequestParameter('Invalid argument for json')
             except TypeError as e:
                 # IF JSON IS SENT AND REQUEST BODY IS LOADED LIKE JSON THIS WILL BE A DICT
                 if isinstance(argument_value, dict):
@@ -459,7 +461,7 @@ class params(object):
                 else:
                     log.critical('Invalid argument {} expected json, got {} ({}): {}'.format(
                         argument, argument_value, type(argument_value), e))
-                    return None
+                    raise InvalidRequestParameter('Invalid argument for json')
 
         if argument_type == 'e-mail':
 
