@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2018 10 03
+
+## BASE version 1.7.1
+- import bug fix, files.py
+
 ### 2018 10 01
 
 ## BASE version 1.7.0
