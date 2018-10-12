@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 10 12
+
+## BASE version 1.7.3
+- youtube link in posts
+- tag manipulation
+
 ### 2018 10 03
 
 ## BASE version 1.7.2

@@ -291,7 +291,7 @@ class Post(base.common.orm.sql_base):
 
         return slug
 
-    def update(self, user, title, subtitle, body, tags, category, comments_enabled, id_status,
+    def update(self, user, title, subtitle, body, tags, category, comments_enabled, id_status, youtube_link,
                html_meta=None):
 
         changed = []
@@ -352,7 +352,11 @@ class Post(base.common.orm.sql_base):
             self.id_status = id_status
             changed.append('status')
 
-        if html_meta is not None and html_meta != html_meta:
+        if youtube_link is not None and self.youtube_link != youtube_link:
+            self.youtube_link = youtube_link
+            changed.append('youtube_link')
+
+        if html_meta is not None and self.html_meta != html_meta:
             self.html_meta = html_meta
             changed.append('html meta')
 
@@ -380,6 +384,10 @@ class Post(base.common.orm.sql_base):
         import base.common.orm
         _session = base.common.orm.orm.session()
 
+        if not tags:
+            return 0
+
+        added = 0
         for src_str_tag in tags:
             str_tag = Tag.tagify(src_str_tag)
 
@@ -391,8 +399,12 @@ class Post(base.common.orm.sql_base):
             if not show_tag:
                 show_tag = ShowTag(src_str_tag, self.language)
 
-            self.tags.append(tag)
-            self.show_tags.append(show_tag)
+            if tag not in self.tags:
+                added += 1
+                self.tags.append(tag)
+                self.show_tags.append(show_tag)
+
+        return added
 
     @staticmethod
     def language_code_is_all_lowercase(lang):

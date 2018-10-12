@@ -9,7 +9,7 @@ from base.application.components import api
 from base.application.components import params
 from base.application.components import authenticated
 
-from src.models.blog import Post, Tag
+from src.models.blog import Post, Tag, ShowTag
 from src.common.common import get_comments
 from src.common.common import get_post_files
 
@@ -153,11 +153,88 @@ class PostsByTag(Base):
 
 @authenticated()
 @api(
+    URI='/wiki/posts/:id/tags',
+    SPECIFICATION_PATH='Blog'
+)
+class PostTags(Base):
+    @params(
+        {'name': 'id', 'type': int, 'doc': 'id', 'required': True}
+    )
+    def get(self, _id):
+        import base.common.orm
+        from src.models.blog import Post
+        _session = base.common.orm.orm.session()
+
+        p = _session.query(Post).filter(Post.id == _id).one_or_none()
+        if not p:
+            return self.error("Post not found")
+
+        return self.ok({'tags': [t.name for t in p.show_tags]})
+
+    @params(
+        {'name': 'id', 'type': int, 'doc': 'id', 'required': True},
+        {'name': 'tag_name', 'type': str, 'doc': 'id', 'required': True}
+    )
+    def put(self, _id, tag_name):
+        import base.common.orm
+        from src.models.blog import Post
+        _session = base.common.orm.orm.session()
+
+        p = _session.query(Post).filter(Post.id == _id).one_or_none()
+        if not p:
+            return self.error("Post not found")
+
+        added = p.tagg_it([tag_name])
+
+        if added>0:
+            _session.commit()
+
+        if added==0:
+            return self.error('tag already exists')
+
+        return self.ok({'added': added})
+
+
+@authenticated()
+@api(
+    URI='/wiki/posts/:id/tags/:show_tag_name',
+    SPECIFICATION_PATH='Blog'
+)
+class PostTagDeleteHandler(Base):
+    @params(
+        {'name': 'id', 'type': int, 'doc': 'id', 'required': True},
+        {'name': 'show_tag_name', 'type': str, 'doc': 'id', 'required': True}
+    )
+    def delete(self, _id, show_tag_name):
+        import base.common.orm
+        from src.models.blog import Post
+        _session = base.common.orm.orm.session()
+
+        p = _session.query(Post).filter(Post.id == _id).one_or_none()
+        if not p:
+            return self.error("Post not found")
+
+        show_tag = _session.query(ShowTag).filter(ShowTag.name == show_tag_name).one_or_none()
+        if not show_tag:
+            return self.error('tag not found')
+
+        p.show_tags.remove(show_tag)
+
+        tag = _session.query(Tag).filter(Tag.name == Tag.tagify(show_tag_name)).one_or_none()
+        if tag:
+            p.tags.remove(tag)
+
+        _session.commit()
+
+        return self.ok()
+
+
+@authenticated()
+@api(
     URI='/wiki/posts/:id',
     SPECIFICATION_PATH='Blog'
 )
 class PostById(Base):
-
     @params(
         {'name': 'id', 'type': int, 'doc': 'id', 'required': True}
     )
@@ -207,8 +284,10 @@ class PostById(Base):
          'default': True},
         {'name': 'status', 'type': int, 'doc': 'status of post', 'required': False},
         {'name': 'html_meta', 'type': json, 'doc': 'post html meta tags', 'required': False},
+        {'name': 'youtube_link', 'type': str, 'doc': 'youtube link', 'required': False},
+
     )
-    def patch(self, _id, title, subtitle, body, tags, category, comments_enabled, status, html_meta):
+    def patch(self, _id, title, subtitle, body, tags, category, comments_enabled, status, html_meta, youtube_link):
 
         import base.common.orm
         from src.models.blog import Post
@@ -218,7 +297,9 @@ class PostById(Base):
         if not p:
             return self.error("Post not found")
 
-        if not p.published_time:
+        import src.lookup.post_status as post_status
+
+        if not p.published_time and status == post_status.PUBLISHED:
             p.published_time = datetime.datetime.now()
 
         _html_meta = None
@@ -231,7 +312,8 @@ class PostById(Base):
                 log.critical('Can not save meta: {}'.format(e))
                 return self.error('Error update post')
 
-        changed = p.update(self.auth_user.user, title, subtitle, body, tags, category, comments_enabled, status, html_meta=_html_meta)
+        changed = p.update(self.auth_user.user, title, subtitle, body, tags, category, comments_enabled, status, 
+                            youtube_link, html_meta=_html_meta)
 
         if changed:
             base.common.orm.commit()
@@ -245,7 +327,6 @@ class PostById(Base):
     SPECIFICATION_PATH='Blog'
 )
 class PostGroupById(Base):
-
     @params(
         {'name': 'id_group', 'type': int, 'doc': 'post group id', 'required': True}
     )
@@ -276,5 +357,37 @@ class PostGroupById(Base):
                 'attached_files': get_post_files(_p),
                 'comments': get_comments(_p.id, canonical=True)
             })
+
+        return self.ok({'posts': _posts})
+
+
+@authenticated()
+@api(
+    URI='/wiki/diff-lang-posts/:lang',
+    SPECIFICATION_PATH='Blog'
+)
+class PostsOnDifferentLanguage(Base):
+    """
+    Get all group head posts on different languages
+    to be able to connect current working post to some group
+    """
+    @params(
+        {'name': 'lang', 'type': str, 'doc': 'category', 'required': True},
+        {'name': 'category', 'type': str, 'doc': 'category', 'required': False}
+    )
+    def get(self, lang, category):
+
+        import base.common.orm
+        from src.models.blog import Post
+        _session = base.common.orm.orm.session()
+
+        if category is None:
+            posts = _session.query(Post).filter(Post.id_group == Post.id, Post.language != lang).all()
+        else:
+            posts = _session.query(Post).filter(Post.id_group == Post.id, Post.language != lang, Post.category == category).all()
+
+        _posts = []
+        for p in posts:
+            _posts.append({'title': p.title, 'id_group': p.id_group})
 
         return self.ok({'posts': _posts})
