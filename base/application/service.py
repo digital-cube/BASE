@@ -40,7 +40,24 @@ class Application(tornado.web.Application):
 
     def __init__(self, entries, test=False):
 
-        self.entries = entries
+
+        from base.config.application_config import entry_points_extended
+        from base.config.application_config import port, read_only_ports
+
+        is_master = int(port) not in read_only_ports
+
+        if is_master:
+            self.entries = entries
+        else:
+            self.entries = []
+            for entry in entries:
+                if entry[0] in ('/spec','/all-paths','/static/(.*)'):
+                    self.entries.append(entry)
+                    continue
+
+                entry_class = str(entry[1]).split("'")[1]
+                if entry_points_extended[entry_class]['readonly']:
+                    self.entries.append(entry)
 
         _settings = {}
         if base.config.application_config.static_path and base.config.application_config.static_uri:

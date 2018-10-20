@@ -20,11 +20,22 @@ def get_api_specification(request_handler):
     _specification['debug'] = base.config.application_config.debug
     _specification['api'] = {}
 
+    from base.config.application_config import entry_points_extended
+    from base.config.application_config import port, read_only_ports
+
+
+    is_master = int(port) not in read_only_ports
+
     for _m in app_imports:
 
         app_module = importlib.import_module(_m)
         # GET IMPORTED HANDLERS
         for _name, _handler in inspect.getmembers(app_module, inspect.isclass):
+
+            class_name = str(_handler).split("'")[1]
+
+            if not is_master and class_name in entry_points_extended and 'readonly' in entry_points_extended[class_name] and entry_points_extended[class_name]['readonly'] == False:
+                continue
 
             # IF HANDLERS ARE FOR API
             if hasattr(_handler, '__URI__'):
@@ -41,8 +52,13 @@ def get_api_specification(request_handler):
                 if _api_prefix:
                     _api_uri = '/{}{}'.format(base.config.application_config.app_prefix, _api_uri)
 
+                methods_to_process = ('get', 'post', 'put', 'patch', 'delete')
+                if not is_master:
+                    methods_to_process = ('get',)
+
                 for _f_name, _func in inspect.getmembers(_handler, inspect.isfunction):
-                    if _f_name in ('get', 'post', 'put', 'patch', 'delete'):
+                    if _f_name in methods_to_process:
+
                         from base.application.components import Base
                         _base_function = getattr(Base, _f_name)
                         if _func.__code__ != _base_function.__code__:
