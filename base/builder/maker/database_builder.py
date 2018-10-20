@@ -104,13 +104,9 @@ def _configure_database(args, app_config, _db_config, test=False):
     else:
         if not test:
             print('Update database configuration with application port {}'.format(args.application_port))
-        with open(__db_config_file) as _db_cfg:
-            try:
-                _db_conf = json.load(_db_cfg)
-                for _k in _db_conf:
-                    _db_config[_k] = _db_conf[_k]
-            except json.JSONDecodeError:
-                pass
+
+        from base.common.orm import load_database_configuration
+        load_database_configuration(app_config, _db_config)
 
     if not test:
         __port = str(args.application_port)
@@ -129,11 +125,50 @@ def _configure_database(args, app_config, _db_config, test=False):
             print('Wrong database type configured: {}'.format(args.database_type))
             return False
 
+        print('x'*100)
+
+        from src.config.app_config import read_only_ports
+
+        print(read_only_ports)
+        print('-'*100)
+
+        if read_only_ports and len(read_only_ports):
+            for port in read_only_ports:
+                if str(port) not in _db_config:
+                    _db_config[str(port)] = _db_config[__port].copy()
+                    _db_config[str(port)]['db_user'] += "_readonly"
+
         with open(__db_config_file, 'w') as _db_cfg:
-            _db_cfg.write(json.dumps(_db_config, ensure_ascii=False, sort_keys=True, indent=4))
+            _db_cfg.write(json.dumps(to_db_cfg_list(_db_config), ensure_ascii=False, sort_keys=True, indent=4))
 
     return True
 
+#group by the same configuration, and add port to svc_port
+def to_db_cfg_list(db_cfg_map):
+
+    cvt={}
+    for port in db_cfg_map:
+        d = db_cfg_map[port]
+        _key = "{}:{}:{}:{}:{}:{}".format(d['db_host'] if 'db_host' in d else '',
+                                       d['db_name'] if 'db_name' in d else '',
+                                       d['db_password'] if 'db_password' in d else '',
+                                       d['db_port'] if 'db_port' in d else '',
+                                       d['db_type'] if 'db_type' in d else '',
+                                       d['db_user'] if 'db_user' in d else '')
+
+        if _key not in cvt:
+            cvt[_key]={'ports': [int(port)],
+                       'cfg': d.copy()}
+        else:
+            cvt[_key]['ports'].append(int(port))
+
+    res = []
+    for k in cvt:
+        c = cvt[k]['cfg']
+        c['svc_ports']=sorted(cvt[k]['ports'])
+        res.append(c)
+
+    return res
 
 def __db_is_configured(args, test):
 

@@ -154,28 +154,6 @@ def get_orm_model(model_name):
 
     return OrmModel, _session
 
-
-def load_database_configuration(app_config, _db_config):
-
-    _dir = os.path.dirname(app_config.__file__)
-    _db_file = '{}/{}'.format(_dir, app_config.db_config)
-
-    if not os.path.isfile(_db_file):
-        return False
-
-    _db_conf = {}
-    with open(_db_file) as _db_cfg:
-        try:
-            _db_conf = json.load(_db_cfg)
-        except json.JSONDecodeError:
-            return False
-
-    for _k in _db_conf:
-        _db_config[_k] = _db_conf[_k]
-
-    return True
-
-
 def commit():
     global orm
 
@@ -194,6 +172,54 @@ def commit():
         else:
             raise NameError("DB Error")
 
+# def load_database_configuration(app_config, _db_config):
+#
+#     _dir = os.path.dirname(app_config.__file__)
+#     _db_file = '{}/{}'.format(_dir, app_config.db_config)
+#
+#     if not os.path.isfile(_db_file):
+#         return False
+#
+#     _db_conf = {}
+#     with open(_db_file) as _db_cfg:
+#         try:
+#             _db_conf = json.load(_db_cfg)
+#         except json.JSONDecodeError:
+#             return False
+#
+#     for _k in _db_conf:
+#         _db_config[_k] = _db_conf[_k]
+#
+#     return True
+
+def load_database_configuration(app_config, _db_config):
+
+    _dir = os.path.dirname(app_config.__file__)
+    _db_file = '{}/{}'.format(_dir, app_config.db_config)
+
+    if not os.path.isfile(_db_file):
+        return False
+
+    _db_conf = {}
+    with open(_db_file) as _db_cfg:
+        try:
+            _db_conf = json.load(_db_cfg)
+        except json.JSONDecodeError:
+            return False
+
+    if type(_db_conf) == dict:
+        for _k in _db_conf:
+            _db_config[_k] = _db_conf[_k]
+
+    elif type(_db_conf) == list:
+        for pcfg in _db_conf:
+            for _k in pcfg['svc_ports']:
+                c = pcfg.copy()
+                del c['svc_ports']
+                _db_config[str(_k)] = c
+
+    return True
+
 
 def init_orm():
 
@@ -202,12 +228,8 @@ def init_orm():
     __dest_dir = os.path.dirname(src.config.app_config.__file__)
     __db_config_file = '{}/{}'.format(__dest_dir, src.config.app_config.db_config)
 
-    with open(__db_config_file) as _db_cfg:
-        try:
-            db_config = json.load(_db_cfg)
-        except json.JSONDecodeError:
-            print('Can not load database configuration')
-            sys.exit(exit_status.DATABASE_NOT_CONFIGURED)
+    db_config = {}
+    load_database_configuration(src.config.app_config, db_config)
 
     _port = str(src.config.app_config.port)
 
