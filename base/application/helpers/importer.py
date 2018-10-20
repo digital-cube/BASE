@@ -88,8 +88,13 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'count_call_log', src.config.app_config.count_call_log)
     if hasattr(src.config.app_config, 'count_call_file'):
         setattr(base.config.application_config, 'count_call_file', src.config.app_config.count_call_file)
+
     if hasattr(src.config.app_config, 'read_only_ports'):
         setattr(base.config.application_config, 'read_only_ports', src.config.app_config.read_only_ports)
+
+    if hasattr(src.config.app_config, 'ro_ports_length'):
+        setattr(base.config.application_config, 'ro_ports_length', src.config.app_config.ro_ports_length)
+
     if _db_is_configured:
         _load_app_configuration_with_database(src.config.app_config)
     else:

@@ -227,15 +227,15 @@ def engage(starter_path):
 
     args = check_arguments()
 
-    if not args.port or _get_svc_port() == int(args.port):
-        run_read_only_slaves()
-
-
     entries = [(BaseHandler.__URI__, BaseHandler), ]
+
     load_application(entries, args.port)
 
     entries.append((r"/static/(.*)", tornado.web.StaticFileHandler,
                     {"path": "{}/static".format(os.path.dirname(starter_path))}))
+
+    if not args.port or _get_svc_port() == int(args.port):
+        run_read_only_slaves()
 
     _engage_with_process(args, entries)
 

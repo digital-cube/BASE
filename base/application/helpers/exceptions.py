@@ -158,3 +158,7 @@ class ErrorLanguageCodeID(Exception):
 class ReadOnlyAllowedOnlyForGET(Exception):
     """readonly allowed only for get"""
     pass
+
+class ReadOnlyCanWrapOnlyFunction(Exception):
+    """only functions can be wrapped with readonly"""
+    pass

@@ -23,7 +23,9 @@ from base.common.utils import get_request_ip
 from base.common.utils import retrieve_log
 from base.common.sequencer import sequencer
 from base.common.tokens_services import get_user_by_token
-
+import tornado.httpclient
+import tornado.httputil
+import tornado.gen
 
 class CallCounter:
     """Count calls on uri and method"""
@@ -959,13 +961,59 @@ class readonly(object):
 
     def __call__(self, _target, *args, **kwargs):
 
+        from src.config.app_config import port as master_port
+        from src.config.app_config import read_only_ports, ro_ports_length
+
         print("--- readonly")
 
         if _target.__name__ != 'get':
             raise ReadOnlyAllowedOnlyForGET
 
+        if not inspect.isfunction(_target):
+            raise ReadOnlyCanWrapOnlyFunction
+
         import base.config.application_config
         base.config.application_config.balanced_readonly_get.add(_target)
+
+        @wraps(_target)
+        @tornado.gen.coroutine
+        def wrapper(_origin_self, *args, **kwargs):
+
+            #if there is no read replica on system, just return function
+            if len(read_only_ports)==0:
+                return _target(_origin_self, *args, **kwargs)
+
+            async def fetch_from_read_service(idx):
+                http_client = tornado.httpclient.AsyncHTTPClient()
+
+                url = 'http://localhost:{}{}'.format(
+                    read_only_ports[idx % ro_ports_length],
+                    _origin_self.request.uri
+                )
+
+                response = await http_client.fetch(
+                    tornado.httpclient.HTTPRequest(url, headers=_origin_self.request.headers), raise_error=False
+                )
+
+                return response.code, response.body
+
+            #master
+            if _origin_self.application.svc_port == master_port:
+                status, body = yield fetch_from_read_service(readonly.idx)
+                readonly.idx += 1
+                _origin_self.set_status(status)
+                _origin_self.write(body)
+                return None
+
+            #slave
+            import base.common.orm
+            if base.common.orm.orm:
+                base.common.orm.orm.session().close()
+
+            return _target(_origin_self, *args, **kwargs)
+
+        return wrapper
+
 
         # print(base.config.application_config.entry_points_extended)
         # for e in base.config.application_config.entry_points_extended:

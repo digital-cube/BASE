@@ -4,6 +4,7 @@ from base.config.settings import app
 
 port = None
 read_only_ports = None
+ro_ports_length = None
 app_name = app['name'][0]
 app_prefix = app['prefix'][0]
 app_version = app['version'][0]
