@@ -1,6 +1,7 @@
 # coding= utf-8
 
 import os
+import sys
 import time
 import signal
 import argparse
@@ -114,6 +115,10 @@ def _engage(args, entries):
 
     load_orm(svc_port)
 
+    base.config.application_config.update_entry_points(entries)
+
+
+
     app = Application(entries)
     setattr(app, 'svc_port', svc_port)
     if base.config.application_config.count_calls:
@@ -208,13 +213,27 @@ def _engage_with_process(args, entries):
 
     _engage(args, entries)
 
+def run_read_only_slaves():
+
+    if not base.config.application_config.read_only_ports:
+        return
+
+    for port in base.config.application_config.read_only_ports:
+        print("Running @ {}".format(port))
+        _start_app_processes(('read only instance at port {}'.format(port),('python', sys.argv[0],'-p',str(port)),True))
+
 
 def engage(starter_path):
 
     args = check_arguments()
 
+    if not args.port or _get_svc_port() == int(args.port):
+        run_read_only_slaves()
+
+
     entries = [(BaseHandler.__URI__, BaseHandler), ]
     load_application(entries, args.port)
+
     entries.append((r"/static/(.*)", tornado.web.StaticFileHandler,
                     {"path": "{}/static".format(os.path.dirname(starter_path))}))
 

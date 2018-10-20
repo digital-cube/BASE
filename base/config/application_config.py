@@ -3,6 +3,7 @@
 from base.config.settings import app
 
 port = None
+read_only_ports = None
 app_name = app['name'][0]
 app_prefix = app['prefix'][0]
 app_version = app['version'][0]
@@ -59,3 +60,50 @@ seconds_before_shutdown = 0     # seconds before SIGTERM will occur
 count_calls = False    # count every call to uri and method
 count_call_log = 'log/count_call.log'
 count_call_file = 'log/count_call.json'
+
+entry_points_extended = {}
+balanced_readonly_get = set()
+
+def update_entry_points(entries):
+
+    global entry_points_extended
+
+    import inspect
+
+    print("update_entry_points")
+    print("\n\nbalanced gets:")
+
+    import inspect
+
+    classes_with_read_only_methods = set()
+
+    for b in balanced_readonly_get:
+        class_name_and_function = str(b).split(' ')[1]
+        class_name = class_name_and_function.split('.')[0]
+        full_path = '{}.{}'.format(b.__module__,class_name)
+
+        classes_with_read_only_methods.add(full_path)
+
+    # for i in classes_with_read_only_methods:
+    #     print("READONLY", i)
+
+
+    for e in entries:
+        class_name = str(e[1]).split("'")[1]
+        methods = {}
+
+        for member in inspect.getmembers(e[1]):
+            if member[0] in ('get', 'put', 'post', 'delete', 'patch'):
+                methods[member[0]] = {'method': member[1]}
+
+        entry_points_extended[class_name]={
+            'uri': e[0],
+            'class': e[1],
+            'readonly': class_name in classes_with_read_only_methods,
+            'methods': methods
+        }
+
+    # for ep in entry_points_extended:
+    #     print("EP ",ep, entry_points_extended[ep]['readonly'])
+
+

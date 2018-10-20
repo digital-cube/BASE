@@ -18,6 +18,7 @@ from base.application.helpers.exceptions import MissingRequestArgument
 from base.application.helpers.exceptions import DatabaseIsNotConfigured
 from base.application.helpers.exceptions import MissingLanguagesLookup
 from base.application.helpers.exceptions import ErrorLanguagesLookup
+from base.application.helpers.exceptions import ReadOnlyAllowedOnlyForGET
 from base.common.utils import get_request_ip
 from base.common.utils import retrieve_log
 from base.common.sequencer import sequencer
@@ -947,3 +948,26 @@ class SpecificationHandler(DefaultRouteHandler):
         else:
             self.write(json.dumps(_api_specification))
 
+
+class readonly(object):
+
+    idx=0
+    items=[]
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, _target, *args, **kwargs):
+
+        print("--- readonly")
+
+        if _target.__name__ != 'get':
+            raise ReadOnlyAllowedOnlyForGET
+
+        import base.config.application_config
+        base.config.application_config.balanced_readonly_get.add(_target)
+
+        # print(base.config.application_config.entry_points_extended)
+        # for e in base.config.application_config.entry_points_extended:
+        #     print("EEE", e, "\n", base.config.application_config.entry_points_extended[e])
+        # print(_target)

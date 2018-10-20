@@ -155,3 +155,6 @@ class ErrorLanguageCodeID(Exception):
     """Language code id has to be two lowercase characters"""
     pass
 
+class ReadOnlyAllowedOnlyForGET(Exception):
+    """readonly allowed only for get"""
+    pass
