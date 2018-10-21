@@ -44,7 +44,7 @@ class Application(tornado.web.Application):
         from base.config.application_config import entry_points_extended
         from base.config.application_config import port, read_only_ports
 
-        is_master = int(port) not in read_only_ports
+        is_master = int(port) not in read_only_ports if read_only_ports else None
 
         if is_master:
             self.entries = entries
@@ -237,6 +237,10 @@ def run_read_only_slaves():
 
     for port in base.config.application_config.read_only_ports:
         print("Running @ {}".format(port))
+
+        from base.common.utils import log
+        log.info("Running @ {}".format(port), base.config.application_config.seconds_before_shutdown)
+
         _start_app_processes(('read only instance at port {}'.format(port),('python', sys.argv[0],'-p',str(port)),True))
 
 
@@ -251,7 +255,12 @@ def engage(starter_path):
     entries.append((r"/static/(.*)", tornado.web.StaticFileHandler,
                     {"path": "{}/static".format(os.path.dirname(starter_path))}))
 
-    if not args.port or _get_svc_port() == int(args.port):
+    import time
+    time.sleep(1)
+
+    #if not args.port or _get_svc_port() == int(args.port):
+    import sys
+    if '-p' not in sys.argv:
         run_read_only_slaves()
 
     _engage_with_process(args, entries)
