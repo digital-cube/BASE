@@ -40,13 +40,13 @@ class Application(tornado.web.Application):
 
     def __init__(self, entries, test=False):
 
-
+        import base.config.application_config
         from base.config.application_config import entry_points_extended
-        from base.config.application_config import port, read_only_ports
+        from base.config.application_config import master, read_only_ports
 
-        is_master = int(port) not in read_only_ports if read_only_ports else None
+        setattr(base.config.application_config, 'test_mode', test)
 
-        if is_master:
+        if master:
             self.entries = entries
         else:
             self.entries = []

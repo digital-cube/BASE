@@ -998,6 +998,11 @@ class readonly(object):
             #master
 
             if master:
+
+                from base.config.application_config import test_mode
+                if test_mode:
+                    return _target(_origin_self, *args, **kwargs)
+
                 if simulate_balancing:
                     status, body = yield fetch_from_read_service(readonly.idx)
                     readonly.idx += 1
