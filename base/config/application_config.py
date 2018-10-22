@@ -2,9 +2,12 @@
 
 from base.config.settings import app
 
+master = True
 port = None
-read_only_ports = None
-ro_ports_length = None
+read_only_ports = []
+ro_ports_length = len(read_only_ports)
+simulate_balancing = True
+
 app_name = app['name'][0]
 app_prefix = app['prefix'][0]
 app_version = app['version'][0]

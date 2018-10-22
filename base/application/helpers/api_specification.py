@@ -21,10 +21,7 @@ def get_api_specification(request_handler):
     _specification['api'] = {}
 
     from base.config.application_config import entry_points_extended
-    from base.config.application_config import port, read_only_ports
-
-
-    is_master = int(port) not in read_only_ports
+    from base.config.application_config import master
 
     for _m in app_imports:
 
@@ -34,7 +31,7 @@ def get_api_specification(request_handler):
 
             class_name = str(_handler).split("'")[1]
 
-            if not is_master and class_name in entry_points_extended and 'readonly' in entry_points_extended[class_name] and entry_points_extended[class_name]['readonly'] == False:
+            if not master and class_name in entry_points_extended and 'readonly' in entry_points_extended[class_name] and entry_points_extended[class_name]['readonly'] == False:
                 continue
 
             # IF HANDLERS ARE FOR API
@@ -53,7 +50,7 @@ def get_api_specification(request_handler):
                     _api_uri = '/{}{}'.format(base.config.application_config.app_prefix, _api_uri)
 
                 methods_to_process = ('get', 'post', 'put', 'patch', 'delete')
-                if not is_master:
+                if not master:
                     methods_to_process = ('get',)
 
                 for _f_name, _func in inspect.getmembers(_handler, inspect.isfunction):

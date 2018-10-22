@@ -961,8 +961,8 @@ class readonly(object):
 
     def __call__(self, _target, *args, **kwargs):
 
-        from base.config.application_config import port as master_port
-        from base.config.application_config import read_only_ports, ro_ports_length
+        # from base.config.application_config import port as master_port
+        from base.config.application_config import read_only_ports, ro_ports_length, master, simulate_balancing
 
         if _target.__name__ != 'get':
             raise ReadOnlyAllowedOnlyForGET
@@ -996,12 +996,18 @@ class readonly(object):
                 return response.code, response.body
 
             #master
-            if _origin_self.application.svc_port == master_port:
-                status, body = yield fetch_from_read_service(readonly.idx)
-                readonly.idx += 1
-                _origin_self.set_status(status)
-                _origin_self.write(body)
-                return None
+
+            if master:
+                if simulate_balancing:
+                    status, body = yield fetch_from_read_service(readonly.idx)
+                    readonly.idx += 1
+                    _origin_self.set_status(status)
+                    if body:
+                        _origin_self.write(body.decode('utf-8'))
+                    return None
+                else:
+                    _origin_self.set_status(305)
+                    return
 
             #slave
             import base.common.orm

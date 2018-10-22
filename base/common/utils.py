@@ -155,7 +155,8 @@ def update_entry_points(entries):
     Saves classes and method for URI and use it to create entry points in app configuration
     '''
     from base.config.application_config import entry_points_extended
-
+    from base.config.application_config import balanced_readonly_get
+    
     import inspect
 
     classes_with_read_only_methods = set()

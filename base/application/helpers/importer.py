@@ -42,6 +42,13 @@ def _load_app_configuration(svc_port):
     except ImportError:
         raise MissingApplicationConfiguration('Missing application configuration file "src.config.app_config.py"')
 
+    if hasattr(src.config.app_config, 'read_only_ports'):
+        setattr(base.config.application_config, 'read_only_ports', src.config.app_config.read_only_ports)
+    if hasattr(src.config.app_config, 'ro_ports_length'):
+        setattr(base.config.application_config, 'ro_ports_length', src.config.app_config.ro_ports_length)
+
+    setattr(base.config.application_config, 'master', int(svc_port) not in base.config.application_config.read_only_ports)
+
     if hasattr(src.config.app_config, 'app_name'):
         setattr(base.config.application_config, 'app_name', src.config.app_config.app_name)
     if hasattr(src.config.app_config, 'app_prefix'):
@@ -88,12 +95,8 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'count_call_log', src.config.app_config.count_call_log)
     if hasattr(src.config.app_config, 'count_call_file'):
         setattr(base.config.application_config, 'count_call_file', src.config.app_config.count_call_file)
-
-    if hasattr(src.config.app_config, 'read_only_ports'):
-        setattr(base.config.application_config, 'read_only_ports', src.config.app_config.read_only_ports)
-
-    if hasattr(src.config.app_config, 'ro_ports_length'):
-        setattr(base.config.application_config, 'ro_ports_length', src.config.app_config.ro_ports_length)
+    if hasattr(src.config.app_config, 'simulate_balancing'):
+        setattr(base.config.application_config, 'simulate_balancing', src.config.app_config.simulate_balancing)
 
     if _db_is_configured:
         _load_app_configuration_with_database(src.config.app_config)

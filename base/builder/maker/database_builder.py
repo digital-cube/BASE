@@ -125,12 +125,7 @@ def _configure_database(args, app_config, _db_config, test=False):
             print('Wrong database type configured: {}'.format(args.database_type))
             return False
 
-        print('x'*100)
-
         from src.config.app_config import read_only_ports
-
-        print(read_only_ports)
-        print('-'*100)
 
         if read_only_ports and len(read_only_ports):
             for port in read_only_ports:

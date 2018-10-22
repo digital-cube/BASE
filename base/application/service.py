@@ -257,7 +257,6 @@ def engage(starter_path):
     import time
     time.sleep(1)
 
-    #if not args.port or _get_svc_port() == int(args.port):
     import sys
     if '-p' not in sys.argv:
         run_read_only_slaves()

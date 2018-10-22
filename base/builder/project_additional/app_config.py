@@ -6,6 +6,10 @@ __PORT__
 __APP_PREFIX__
 __APP_VERSION__
 
+read_only_ports=[]
+ro_ports_length = len(read_only_ports)
+simulate_balancing = True
+
 imports = [
     'src.api.hello',
 ]
