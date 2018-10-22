@@ -83,3 +83,9 @@ hooks = [
 def check_password_is_valid(password):
     return True
 
+
+# # This post login hook allows cookie setup for websites that requires cookies (for authentication maybe)
+# def post_login_process(Auth_user, json_data, token, request_handler):
+#
+#     request_handler.set_secure_cookie('token', token['token'])
+#     return
