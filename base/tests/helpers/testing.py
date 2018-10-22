@@ -13,6 +13,8 @@ class TestBase(AsyncHTTPTestCase):
 
     def get_app(self):
 
+        self.token = None
+
         entries = [(BaseHandler.__URI__, BaseHandler), ]
         load_application(entries, None)
         self.orm_builder = prepare_test_database()

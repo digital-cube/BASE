@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 10 22
+
+## BASE version 1.7.4
+- default post_login_process hook with cookie setup
+- default test class reset auth token on get_app
+
 ### 2018 10 12
 
 ## BASE version 1.7.3
