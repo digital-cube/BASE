@@ -132,9 +132,8 @@ def _engage(args, entries):
 
     load_orm(svc_port)
 
-    base.config.application_config.update_entry_points(entries)
-
-
+    from base.common.utils import update_entry_points
+    update_entry_points(entries)
 
     app = Application(entries)
     setattr(app, 'svc_port', svc_port)
@@ -239,7 +238,7 @@ def run_read_only_slaves():
         print("Running @ {}".format(port))
 
         from base.common.utils import log
-        log.info("Running @ {}".format(port), base.config.application_config.seconds_before_shutdown)
+        log.info("Running @ {}".format(port))
 
         _start_app_processes(('read only instance at port {}'.format(port),('python', sys.argv[0],'-p',str(port)),True))
 

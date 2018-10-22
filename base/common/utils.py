@@ -149,3 +149,39 @@ def check_timeago_library_installed():
 
     return 'timeago' in sys.modules
 
+
+def update_entry_points(entries):
+    '''
+    Saves classes and method for URI and use it to create entry points in app configuration
+    '''
+    from base.config.application_config import entry_points_extended
+
+    import inspect
+
+    classes_with_read_only_methods = set()
+
+    for b in balanced_readonly_get:
+        class_name_and_function = str(b).split(' ')[1]
+        class_name = class_name_and_function.split('.')[0]
+        full_path = '{}.{}'.format(b.__module__,class_name)
+
+        classes_with_read_only_methods.add(full_path)
+
+
+    for e in entries:
+        class_name = str(e[1]).split("'")[1]
+        methods = {}
+
+        for member in inspect.getmembers(e[1]):
+            if member[0] in ('get', 'put', 'post', 'delete', 'patch'):
+                methods[member[0]] = {'method': member[1]}
+
+        entry_points_extended[class_name]={
+            'uri': e[0],
+            'class': e[1],
+            'readonly': class_name in classes_with_read_only_methods,
+            'methods': methods
+        }
+
+
+

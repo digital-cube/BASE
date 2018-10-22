@@ -9,6 +9,9 @@ import decimal
 import datetime
 import importlib
 import tornado.web
+import tornado.gen
+import tornado.httputil
+import tornado.httpclient
 from functools import wraps
 
 import base.application.lookup.responses as msgs
@@ -23,9 +26,6 @@ from base.common.utils import get_request_ip
 from base.common.utils import retrieve_log
 from base.common.sequencer import sequencer
 from base.common.tokens_services import get_user_by_token
-import tornado.httpclient
-import tornado.httputil
-import tornado.gen
 
 class CallCounter:
     """Count calls on uri and method"""
@@ -961,10 +961,8 @@ class readonly(object):
 
     def __call__(self, _target, *args, **kwargs):
 
-        from src.config.app_config import port as master_port
-        from src.config.app_config import read_only_ports, ro_ports_length
-
-        print("--- readonly")
+        from base.config.application_config import port as master_port
+        from base.config.application_config import read_only_ports, ro_ports_length
 
         if _target.__name__ != 'get':
             raise ReadOnlyAllowedOnlyForGET
@@ -1008,14 +1006,10 @@ class readonly(object):
             #slave
             import base.common.orm
             if base.common.orm.orm:
-                base.common.orm.orm.session().close()
+                base.common.orm.orm.session().expire_all()
 
             return _target(_origin_self, *args, **kwargs)
 
         return wrapper
 
 
-        # print(base.config.application_config.entry_points_extended)
-        # for e in base.config.application_config.entry_points_extended:
-        #     print("EEE", e, "\n", base.config.application_config.entry_points_extended[e])
-        # print(_target)
