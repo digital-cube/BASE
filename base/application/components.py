@@ -22,10 +22,12 @@ from base.application.helpers.exceptions import DatabaseIsNotConfigured
 from base.application.helpers.exceptions import MissingLanguagesLookup
 from base.application.helpers.exceptions import ErrorLanguagesLookup
 from base.application.helpers.exceptions import ReadOnlyAllowedOnlyForGET
+from base.application.helpers.exceptions import ReadOnlyCanWrapOnlyFunction
 from base.common.utils import get_request_ip
 from base.common.utils import retrieve_log
 from base.common.sequencer import sequencer
 from base.common.tokens_services import get_user_by_token
+
 
 class CallCounter:
     """Count calls on uri and method"""
@@ -970,9 +972,6 @@ class readonly(object):
 
     def __call__(self, _target, *args, **kwargs):
 
-        # from base.config.application_config import port as master_port
-        from base.config.application_config import read_only_ports, ro_ports_length, master, simulate_balancing
-
         if _target.__name__ != 'get':
             raise ReadOnlyAllowedOnlyForGET
 
@@ -986,15 +985,16 @@ class readonly(object):
         @tornado.gen.coroutine
         def wrapper(_origin_self, *args, **kwargs):
 
-            #if there is no read replica on system, just return function
-            if len(read_only_ports)==0:
+            import base.config.application_config
+            # if there is no read replica on system, just return function
+            if len(base.config.application_config.read_only_ports)==0:
                 return _target(_origin_self, *args, **kwargs)
 
             async def fetch_from_read_service(idx):
                 http_client = tornado.httpclient.AsyncHTTPClient()
 
                 url = 'http://localhost:{}{}'.format(
-                    read_only_ports[idx % ro_ports_length],
+                    base.config.application_config.read_only_ports[idx % base.config.application_config.ro_ports_length],
                     _origin_self.request.uri
                 )
 
@@ -1004,15 +1004,15 @@ class readonly(object):
 
                 return response.code, response.body
 
-            #master
+            # master
 
-            if master:
+            if base.config.application_config.master:
 
                 from base.config.application_config import test_mode
                 if test_mode:
                     return _target(_origin_self, *args, **kwargs)
 
-                if simulate_balancing:
+                if base.config.application_config.simulate_balancing:
                     status, body = yield fetch_from_read_service(readonly.idx)
                     readonly.idx += 1
                     _origin_self.set_status(status)
@@ -1023,10 +1023,11 @@ class readonly(object):
                     _origin_self.set_status(305)
                     return
 
-            #slave
+            # slave
             import base.common.orm
             if base.common.orm.orm:
-                base.common.orm.orm.session().expire_all()
+                base.common.orm.orm.session().close()
+                # base.common.orm.orm.session().expire_all()    # this was without an effect
 
             return _target(_origin_self, *args, **kwargs)
 
