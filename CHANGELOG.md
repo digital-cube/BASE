@@ -2,6 +2,11 @@
 
 ### 2018 11 28
 
+## BASE version 1.8.2
+- readonly decorator invalidates an database session
+
+### 2018 11 28
+
 ## BASE version 1.8.1
 - secure cookie as an authentication method
 
