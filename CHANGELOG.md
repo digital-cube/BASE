@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2018 11 28
+
+## BASE version 1.8.1
+- secure cookie as an authentication method
+
 ### 2018 10 22
 
 ## BASE version 1.8.0
