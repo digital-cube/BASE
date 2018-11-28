@@ -14,6 +14,7 @@ app_prefix = app['prefix'][0]
 app_version = app['version'][0]
 app_description = app['description'][0]
 secret_cookie = 'cookie_secret'
+secret_cookie_name = 'token'
 debug = True
 db_config = None
 db_configured = False
@@ -68,4 +69,4 @@ count_call_file = 'log/count_call.json'
 
 entry_points_extended = {}
 balanced_readonly_get = set()
-
+authentication_type = 'TOKEN'

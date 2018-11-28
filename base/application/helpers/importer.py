@@ -59,6 +59,8 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'app_version', src.config.app_config.app_version)
     if hasattr(src.config.app_config, 'secret_cookie'):
         setattr(base.config.application_config, 'secret_cookie', src.config.app_config.secret_cookie)
+    if hasattr(src.config.app_config, 'secret_cookie_name'):
+        setattr(base.config.application_config, 'secret_cookie_name', src.config.app_config.secret_cookie_name)
     if hasattr(src.config.app_config, 'debug'):
         setattr(base.config.application_config, 'debug', src.config.app_config.debug)
     if hasattr(src.config.app_config, 'api_hooks'): # todo: check this
@@ -153,6 +155,8 @@ def _load_app_configuration_with_database(config_file):
         setattr(base.config.application_config, 'google_check_access_token_url', config_file.google_check_access_token_url)
     if hasattr(config_file, 'reload_session'):
         setattr(base.config.application_config, 'reload_session', config_file.reload_session)
+    if hasattr(config_file, 'authentication_type'):
+        setattr(base.config.application_config, 'authentication_type', config_file.authentication_type)
 
 
 def _load_app_configuration_without_database(config_file):

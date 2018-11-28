@@ -766,10 +766,19 @@ class authenticated(object):
 
         if inspect.isfunction(_target):
 
+            def get_auth_token(_origin_self):
+                import base.config.application_config
+                import base.application.lookup.authentication_type as authentication_type
+
+                if base.config.application_config.authentication_type == authentication_type.lmap[authentication_type.COOKIE]:
+                    return _origin_self.get_secure_cookie(base.config.application_config.secret_cookie_name)
+
+                return _origin_self.request.headers.get('Authorization')
+
             @wraps(_target)
             def wrapper(_origin_self, *args, **kwargs):
 
-                _auth_token = _origin_self.request.headers.get('Authorization')
+                _auth_token = get_auth_token(_origin_self)
                 if not _auth_token:
                     return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
