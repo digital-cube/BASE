@@ -59,10 +59,8 @@ class Application(tornado.web.Application):
                 if entry_points_extended[entry_class]['readonly']:
                     self.entries.append(entry)
 
-        _settings = {}
-        if base.config.application_config.static_path and base.config.application_config.static_uri:
-            self.entries.append((base.config.application_config.static_uri, tornado.web.StaticFileHandler))
-            _settings['static_path'] = base.config.application_config.static_path
+        _settings = {'static_path': base.config.application_config.static_path} if \
+            base.config.application_config.static_path else {'static_path': 'static'}
 
         super(Application, self).__init__(
             self.entries,
@@ -229,6 +227,7 @@ def _engage_with_process(args, entries):
 
     _engage(args, entries)
 
+
 def run_read_only_slaves():
 
     if not base.config.application_config.read_only_ports:
@@ -250,6 +249,16 @@ def engage(starter_path):
     entries = [(BaseHandler.__URI__, BaseHandler), ]
 
     load_application(entries, args.port)
+
+    import base.config.application_config
+    if base.config.application_config.static_uri:
+        if base.config.application_config.static_path:
+            entries.append((base.config.application_config.static_uri, tornado.web.StaticFileHandler,
+                            {"path": "{}/{}".format(os.path.dirname(starter_path),
+                                                    base.config.application_config.static_path)}))
+        else:
+            entries.append((base.config.application_config.static_uri, tornado.web.StaticFileHandler,
+                            {"path": "{}/static".format(os.path.dirname(starter_path))}))
 
     entries.append((r"/static/(.*)", tornado.web.StaticFileHandler,
                     {"path": "{}/static".format(os.path.dirname(starter_path))}))

@@ -34,8 +34,8 @@ debug = True
 #
 # Best Regards
 # '''
-static_path = None
-static_uri = None
+static_path = None              # relative path from project starter file
+static_uri = None               # uri for static files, have to be with "(.*)" at the end
 log_directory = './log'
 register_allowed_roles = None
 registrators_allowed_roles = None

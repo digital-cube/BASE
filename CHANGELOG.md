@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2018 11 29
+
+## BASE version 1.8.3
+- static uri from the configuration is added to all paths
+- static path from the configuration is set as default static path
+
 ### 2018 11 28
 
 ## BASE version 1.8.2
