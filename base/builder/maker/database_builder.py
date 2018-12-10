@@ -269,8 +269,12 @@ def _copy_database_components(args, db_type, db_name, db_config):
         with open('db/alembic.ini') as alembic_ini:
             for _line in alembic_ini:
                 if _line[:14] == 'sqlalchemy.url':
-                    _line = 'sqlalchemy.url = {}://{}:{}@{}/{}\n'.format(
-                        db_type, db_config['db_user'], db_config['db_password'], db_config['db_host'], db_name)
+                    if db_type == 'sqlite':
+                        _project_directory = os.getcwd()
+                        _line = 'sqlalchemy.url = {}:///{}/{}.db\n'.format(db_type, _project_directory, db_name)
+                    else:
+                        _line = 'sqlalchemy.url = {}://{}:{}@{}/{}\n'.format(
+                            db_type, db_config['db_user'], db_config['db_password'], db_config['db_host'], db_name)
                     _write = True
 
                 new_alembic_ini += '{}'.format(_line)
