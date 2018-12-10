@@ -2,6 +2,11 @@
 
 ### 2018 12 10
 
+## BASE version 1.8.5
+- initialize database with the existing alembic configuration and a new config file type
+
+### 2018 12 10
+
 ## BASE version 1.8.4
 - start read instances with the same executable as master
 

@@ -438,6 +438,17 @@ def _get_database_configuration():
     with open(_db_config_file) as df:
         try:
             _db_config_all = json.load(df)
+
+            if type(_db_config_all) == list:
+                _new_config = {}
+                for _db_config in _db_config_all:
+                    for _port in _db_config['svc_ports']:
+                        cfg = _db_config.copy()
+                        del cfg['svc_ports']
+                        print('CFG', cfg)
+                        _new_config[str(_port)] = cfg
+                _db_config_all = _new_config
+
             if src.config.app_config.port not in _db_config_all and \
                     str(src.config.app_config.port) not in _db_config_all:
                 print('Configured port {} is not in database configuration'.format(src.config.app_config.port))
