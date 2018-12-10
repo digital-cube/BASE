@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2018 12 10
+
+## BASE version 1.8.4
+- start read instances with the same executable as master
+
 ### 2018 11 29
 
 ## BASE version 1.8.3
