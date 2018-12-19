@@ -59,6 +59,7 @@ register_allowed_roles = None
 registrators_allowed_roles = None
 pre_app_processes = None    # [(app_name, app_cmd_for_subprocess, redirect_output)]
 post_app_processes = None   # [(app_name, app_cmd_for_subprocess, redirect_output)]
+service_initialisation_callbacks = None     # [(module, function_from_module)] -> eg: [('src.init', 'start')]
 google_client_ID = None
 google_discovery_docs_url = 'https://accounts.google.com/.well-known/openid-configuration'
 google_check_access_token_url = 'https://www.googleapis.com/oauth2/v3/tokeninfo'

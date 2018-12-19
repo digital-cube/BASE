@@ -99,6 +99,9 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'count_call_file', src.config.app_config.count_call_file)
     if hasattr(src.config.app_config, 'simulate_balancing'):
         setattr(base.config.application_config, 'simulate_balancing', src.config.app_config.simulate_balancing)
+    if hasattr(src.config.app_config, 'service_initialisation_callbacks'):
+        setattr(base.config.application_config, 'service_initialisation_callbacks',
+                src.config.app_config.service_initialisation_callbacks)
 
     if _db_is_configured:
         _load_app_configuration_with_database(src.config.app_config)

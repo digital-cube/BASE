@@ -5,6 +5,7 @@ import sys
 import time
 import signal
 import argparse
+import importlib
 import tornado.web
 import tornado.ioloop
 
@@ -224,6 +225,15 @@ def _engage_with_process(args, entries):
             raise PostApplicationProcessConfigurationError('Post application processes has to be tuples in a list')
 
         tornado.ioloop.IOLoop.current().add_callback(_start_post_app_processes)
+
+    if base.config.application_config.service_initialisation_callbacks is not None and type(
+            base.config.application_config.service_initialisation_callbacks) == list:
+
+        for _callback in base.config.application_config.service_initialisation_callbacks:
+            log.info("Runnig startup function {} from module {}".format(_callback[1], _callback[0]))
+            _module = importlib.import_module(_callback[0])
+            _function = getattr(_module, _callback[1])
+            tornado.ioloop.IOLoop.current().add_callback(_function)
 
     _engage(args, entries)
 

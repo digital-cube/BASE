@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2018 12 19
+
+## BASE version 1.8.7
+- register service callbacks
+
 ### 2018 12 10
 
 ## BASE version 1.8.6
