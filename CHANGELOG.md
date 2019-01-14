@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 01 14
+
+## BASE version 1.8.8
+- service callbacks with app reference
+
 ### 2018 12 19
 
 ## BASE version 1.8.7
