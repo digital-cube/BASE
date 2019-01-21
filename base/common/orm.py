@@ -149,10 +149,10 @@ def get_orm_model(model_name):
     global orm
     import base.config.application_config
     OrmModel = base.config.application_config.orm_models[model_name]
-    # _session = base.common.orm.orm.session()
     _session = orm.session()
 
     return OrmModel, _session
+
 
 def commit():
     global orm

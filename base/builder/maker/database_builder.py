@@ -138,7 +138,8 @@ def _configure_database(args, app_config, _db_config, test=False):
 
     return True
 
-#group by the same configuration, and add port to svc_port
+
+# group by the same configuration, and add port to svc_port
 def to_db_cfg_list(db_cfg_map):
 
     cvt={}
@@ -152,18 +153,19 @@ def to_db_cfg_list(db_cfg_map):
                                        d['db_user'] if 'db_user' in d else '')
 
         if _key not in cvt:
-            cvt[_key]={'ports': [int(port)],
-                       'cfg': d.copy()}
+            cvt[_key] = {'ports': [int(port)],
+                         'cfg': d.copy()}
         else:
             cvt[_key]['ports'].append(int(port))
 
     res = []
     for k in cvt:
         c = cvt[k]['cfg']
-        c['svc_ports']=sorted(cvt[k]['ports'])
+        c['svc_ports'] = sorted(cvt[k]['ports'])
         res.append(c)
 
     return res
+
 
 def __db_is_configured(args, test):
 
@@ -385,7 +387,6 @@ def build_database(args, test=False):
     # LOAD ORM FOR SEQUENCERS IN MODELS
     from base.application.helpers.importer import load_orm
     import base.config.application_config
-    # setattr(base.config.application_config, 'models', src.config.app_config.models)
     setattr(base.config.application_config, 'models', _orm_models)
     load_orm(src.config.app_config.port)
 
