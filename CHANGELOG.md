@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 01 21
+
+## BASE version 1.8.9
+- dump and restore databases in tests
+
 ### 2019 01 14
 
 ## BASE version 1.8.8
