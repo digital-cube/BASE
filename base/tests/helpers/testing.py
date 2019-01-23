@@ -8,7 +8,6 @@ from base.application.service import Application
 from base.application.components import BaseHandler
 from base.application.helpers.importer import load_application
 from base.application.helpers.importer import load_orm
-from base.common.orm import activate_orm
 from base.tests.helpers.tests_manager import prepare_test_database
 
 
@@ -34,7 +33,7 @@ class db_state:
 
     def load_database_from_dump(self, app_config, db_config, _origin_self):
 
-        file_path = 'tests/{}'.format(self.load_from)
+        file_path = '/tmp/{}'.format(self.load_from)
         __port = str(app_config.port)
         if __port not in db_config:
             raise Exception('Missing application port {} in database configuration'.format(__port))
@@ -130,7 +129,7 @@ class db_state:
 
     def load_database_from_state(self, _origin_self):
 
-        file_path = 'tests/{}'.format(self.load_from)
+        file_path = '/tmp/{}'.format(self.load_from)
         if not os.path.isfile(file_path):
             print('Can not find database dump file {} to load data from'.format(file_path))
             raise Exception('Can not find database dump file')
@@ -187,7 +186,7 @@ class TestBase(AsyncHTTPTestCase):
 
     def dump_database_to_file(self, app_config, db_config):
 
-        file_path = 'tests/{}'.format(self.__DB_SAVE_TO__)
+        file_path = '/tmp/{}'.format(self.__DB_SAVE_TO__)
         __port = str(app_config.port)
 
         if __port not in db_config:
@@ -236,7 +235,7 @@ class TestBase(AsyncHTTPTestCase):
         try:
             self.dump_database_to_file(src.config.app_config, _db_config)
         except Exception as e:
-            print('Can not create database dump in file tests/{}'.format(self.__DB_SAVE_TO__))
+            print('Can not create database dump in file /tmp/{}'.format(self.__DB_SAVE_TO__))
             print('Error: {}'.format(e))
 
     def tearDown(self):
