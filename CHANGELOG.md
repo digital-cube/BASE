@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 01 24
+
+## BASE version 1.8.10
+- removed sqlalchemy session close for read instances
+
 ### 2019 01 21
 
 ## BASE version 1.8.9

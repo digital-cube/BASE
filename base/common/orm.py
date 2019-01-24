@@ -58,7 +58,12 @@ class _orm(object):
 
         return _orm.__instance
 
-    def session(self):
+    def session(self, new=False):
+        if new:
+            __session_factory = sessionmaker(bind=self.__engine)
+            __scoped_session = scoped_session(__session_factory)
+            return __scoped_session()
+
         return self.__session
 
     def engine(self):

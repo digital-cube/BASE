@@ -987,16 +987,16 @@ class readonly(object):
 
             import base.config.application_config
             # if there is no read replica on system, just return function
-            if len(base.config.application_config.read_only_ports)==0:
+            if len(base.config.application_config.read_only_ports) == 0:
                 return _target(_origin_self, *args, **kwargs)
 
             async def fetch_from_read_service(idx):
                 http_client = tornado.httpclient.AsyncHTTPClient()
 
                 url = 'http://localhost:{}{}'.format(
-                    base.config.application_config.read_only_ports[idx % base.config.application_config.ro_ports_length],
-                    _origin_self.request.uri
-                )
+                    base.config.application_config.read_only_ports[
+                        idx % base.config.application_config.ro_ports_length
+                    ], _origin_self.request.uri)
 
                 response = await http_client.fetch(
                     tornado.httpclient.HTTPRequest(url, headers=_origin_self.request.headers), raise_error=False
@@ -1005,11 +1005,10 @@ class readonly(object):
                 return response.code, response.body
 
             # master
-
             if base.config.application_config.master:
 
-                from base.config.application_config import test_mode
-                if test_mode:
+                import base.config.application_config
+                if base.config.application_config.test_mode:
                     return _target(_origin_self, *args, **kwargs)
 
                 if base.config.application_config.simulate_balancing:
@@ -1018,16 +1017,10 @@ class readonly(object):
                     _origin_self.set_status(status)
                     if body:
                         _origin_self.write(body.decode('utf-8'))
-                    return None
+                    return
                 else:
                     _origin_self.set_status(305)
                     return
-
-            # slave
-            import base.common.orm
-            if base.common.orm.orm:
-                base.common.orm.orm.session().close()
-                # base.common.orm.orm.session().expire_all()    # this was without an effect
 
             return _target(_origin_self, *args, **kwargs)
 
