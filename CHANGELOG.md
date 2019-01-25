@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 01 25
+
+## BASE version 1.8.11
+- base return options updated
+
 ### 2019 01 24
 
 ## BASE version 1.8.10

@@ -167,11 +167,14 @@ class Base(tornado.web.RequestHandler):
         response = {}
         response['message'] = reason
 
+        if isinstance(s, dict):
+            response.update(s)
         if isinstance(s, str):
             response['message'] = s
         elif isinstance(s, int):
             if s in msgs.lmap:
                 response['message'] = msgs.lmap[s]
+                response['id_error'] = s
             else:
                 import base.config.application_config
                 _application_responses_module = base.config.application_config.response_messages_module
@@ -179,6 +182,7 @@ class Base(tornado.web.RequestHandler):
                     _application_responses = importlib.import_module(_application_responses_module)
                     if s in _application_responses.lmap:
                         response['message'] = _application_responses.lmap[s]
+                        response['id_error'] = s
                 except ImportError:
                     log.warning('Error importing {} application response messages module'.format(
                         _application_responses_module))
