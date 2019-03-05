@@ -804,6 +804,8 @@ class authenticated(object):
             def wrapper(_origin_self, *args, **kwargs):
 
                 _auth_token = get_auth_token(_origin_self)
+                if type(_auth_token) == bytes:
+                    _auth_token = _auth_token.decode('utf-8')
                 if not _auth_token and self.authentication_level == auth_level.STRONG:
                     if self.redirect_url is not None:
                         _origin_self.redirect(self.redirect_url, permanent=False)

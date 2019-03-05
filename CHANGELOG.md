@@ -2,6 +2,11 @@
 
 ### 2019 03 05
 
+## BASE version 1.8.13
+- authentication token from bytes
+
+### 2019 03 05
+
 ## BASE version 1.8.12
 - authentication over cookie
 - login and signup include secure cookie if configuration is present
