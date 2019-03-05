@@ -1,3 +1,4 @@
+# coding= utf-8
 """
 This one is placeholder for users lookup.
 User role flags for access levels.

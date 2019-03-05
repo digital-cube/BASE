@@ -1,3 +1,5 @@
+# coding= utf-8
+
 MYSQL = 1
 POSTGRESQL = 2
 SQLITE = 3

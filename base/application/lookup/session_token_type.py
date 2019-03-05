@@ -1,3 +1,5 @@
+# coding= utf-8
+
 SIMPLE = 1
 EXCLUSIVE = 2
 PARALLEL = 3

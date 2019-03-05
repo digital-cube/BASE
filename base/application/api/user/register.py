@@ -91,6 +91,8 @@ class Register(Base):
             if isinstance(_post_register_result, dict):
                 response.update(_post_register_result)
 
+        self.set_authorized_cookie(_token)
+
         return self.ok(response)
 
     def check_role_flags(self, data, allowed_roles):

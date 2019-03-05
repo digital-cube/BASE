@@ -1,11 +1,11 @@
 # coding= utf-8
 
-TOKEN = 1
-COOKIE = 2
+STRONG = 1
+WEEK = 2
 
 lmap = {}
-lmap[TOKEN] = 'TOKEN'
-lmap[COOKIE] = 'COOKIE'
+lmap[STRONG] = 'STRONG'
+lmap[WEEK] = 'WEEK'
 
 lrev = {}
 for k in lmap:

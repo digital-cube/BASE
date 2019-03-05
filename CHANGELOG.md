@@ -1,5 +1,13 @@
 ## CHANGELOG
 
+### 2019 03 05
+
+## BASE version 1.8.12
+- authentication over cookie
+- login and signup include secure cookie if configuration is present
+- authentication can be week
+- redirect url for not authenticated request
+
 ### 2019 01 25
 
 ## BASE version 1.8.11

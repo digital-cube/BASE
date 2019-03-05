@@ -95,6 +95,7 @@ class Login(Base):
 
         response = {}
         response.update(_token)
+        self.set_authorized_cookie(_token)
 
         self.update_res(_pre_login, response)
         self.update_res(_post_login, response)

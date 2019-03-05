@@ -48,6 +48,7 @@ class Logout(Base):
         if isinstance(_post_logout, dict):
             _res.update(_post_logout)
 
+        self.remove_authorized_cookie()
         if _res:
             return self.ok(_res)
 

@@ -15,6 +15,7 @@ import tornado.httpclient
 from functools import wraps
 
 import base.application.lookup.responses as msgs
+import base.application.lookup.authentication_level as auth_level
 from base.application.helpers.exceptions import MissingApiRui
 from base.application.helpers.exceptions import InvalidRequestParameter
 from base.application.helpers.exceptions import MissingRequestArgument
@@ -23,6 +24,7 @@ from base.application.helpers.exceptions import MissingLanguagesLookup
 from base.application.helpers.exceptions import ErrorLanguagesLookup
 from base.application.helpers.exceptions import ReadOnlyAllowedOnlyForGET
 from base.application.helpers.exceptions import ReadOnlyCanWrapOnlyFunction
+from base.application.helpers.exceptions import WrongAuthenticationLevel
 from base.common.utils import get_request_ip
 from base.common.utils import retrieve_log
 from base.common.sequencer import sequencer
@@ -236,6 +238,18 @@ class Base(tornado.web.RequestHandler):
 
     def set_authorized_user(self, auth_user):
         self.auth_user = auth_user
+
+    def set_authorized_cookie(self, _token):
+        import base.config.application_config
+        import base.application.lookup.authentication_type as authentication_type
+        if base.config.application_config.authentication_type == authentication_type.lmap[authentication_type.COOKIE]:
+            self.set_secure_cookie(base.config.application_config.secret_cookie_name, _token['token'])
+
+    def remove_authorized_cookie(self):
+        import base.config.application_config
+        import base.application.lookup.authentication_type as authentication_type
+        if base.config.application_config.authentication_type == authentication_type.lmap[authentication_type.COOKIE]:
+            self.clear_cookie(base.config.application_config.secret_cookie_name)
 
 
 class api(object):
@@ -740,12 +754,17 @@ class authenticated(object):
     Make request handler methods available only to logged user
     """
 
-    def __init__(self, *args):
-        
+    def __init__(self, *args, authentication_level=auth_level.lmap[auth_level.STRONG], redirect_url=None):
+
         import base.config.application_config
         if not base.config.application_config.db_configured:
             raise DatabaseIsNotConfigured(
                 "Can not use authenticated decorator, database is not initialized or configured")
+        if authentication_level not in auth_level.lrev:
+            raise WrongAuthenticationLevel("Wrong authentication level {} provided".format(authentication_level))
+
+        self.authentication_level = auth_level.lrev[authentication_level]
+        self.redirect_url = redirect_url
 
         self.roles = None
         if len(args) == 1:
@@ -785,18 +804,33 @@ class authenticated(object):
             def wrapper(_origin_self, *args, **kwargs):
 
                 _auth_token = get_auth_token(_origin_self)
-                if not _auth_token:
+                if not _auth_token and self.authentication_level == auth_level.STRONG:
+                    if self.redirect_url is not None:
+                        _origin_self.redirect(self.redirect_url, permanent=False)
+                        return
                     return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
+                elif self.authentication_level == auth_level.WEEK:
+                    # if token not provided and authentication is week set auth user to None and go to the target
+                    _origin_self.set_authorization_token(None)
+                    _origin_self.set_authorized_user(None)
+                    setattr(_target, '__AUTHENTICATED__', True)
+                    return _target(_origin_self, *args, **kwargs)
 
                 _user = get_user_by_token(_auth_token, pack=False)
                 if not _user:
                     log.critical('Can not get user from token {}'.format(_auth_token))
+                    if self.redirect_url is not None:
+                        _origin_self.redirect(self.redirect_url, permanent=False)
+                        return
                     return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 if self.roles is not None:
                     if not (self.roles & _user.role_flags):
                         log.critical('User {} with role {} trying unauthorized access on {}'.format(
                             _user.username, _user.role_flags, _origin_self.request.uri))
+                        if self.redirect_url is not None:
+                            _origin_self.redirect(self.redirect_url, permanent=False)
+                            return
                         return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 _origin_self.set_authorization_token(_auth_token)

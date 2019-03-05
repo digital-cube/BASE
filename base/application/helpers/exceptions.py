@@ -155,10 +155,22 @@ class ErrorLanguageCodeID(Exception):
     """Language code id has to be two lowercase characters"""
     pass
 
+
 class ReadOnlyAllowedOnlyForGET(Exception):
     """readonly allowed only for get"""
     pass
 
+
 class ReadOnlyCanWrapOnlyFunction(Exception):
     """only functions can be wrapped with readonly"""
+    pass
+
+
+class WrongAuthenticationLevel(Exception):
+    """authentication level provided not known"""
+    pass
+
+
+class InvalidRedirectURL(Exception):
+    """invalid redirect URL provided"""
     pass
