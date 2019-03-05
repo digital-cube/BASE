@@ -169,6 +169,7 @@ class GAccess(SocialAccess):
             log.warning('Error in login/register google user {}'.format(self.social_user['email']))
             return self.error(msgs.ERROR_AUTHORIZE_GOOGLE_USER)
 
+        self.set_authorized_cookie(response)
         self.ok(response)
 
     def is_configured(self):

@@ -71,6 +71,7 @@ class FAccess(SocialAccess):
             log.warning('Error in login/register facebook user {}'.format(self.social_user['email']))
             return self.error(msgs.ERROR_AUTHORIZE_FACEBOOK_USER)
 
+        self.set_authorized_cookie(response)
         self.ok(response)
 
     def check_facebook_user(self):

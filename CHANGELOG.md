@@ -2,6 +2,11 @@
 
 ### 2019 03 05
 
+## BASE version 1.8.14
+- cookie authentication after social login
+
+### 2019 03 05
+
 ## BASE version 1.8.13
 - authentication token from bytes
 
