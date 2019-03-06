@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 03 06
+
+## BASE version 1.8.15
+- week authentication bug fix
+
 ### 2019 03 05
 
 ## BASE version 1.8.14

@@ -806,17 +806,18 @@ class authenticated(object):
                 _auth_token = get_auth_token(_origin_self)
                 if type(_auth_token) == bytes:
                     _auth_token = _auth_token.decode('utf-8')
-                if not _auth_token and self.authentication_level == auth_level.STRONG:
-                    if self.redirect_url is not None:
-                        _origin_self.redirect(self.redirect_url, permanent=False)
-                        return
-                    return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
-                elif self.authentication_level == auth_level.WEEK:
-                    # if token not provided and authentication is week set auth user to None and go to the target
-                    _origin_self.set_authorization_token(None)
-                    _origin_self.set_authorized_user(None)
-                    setattr(_target, '__AUTHENTICATED__', True)
-                    return _target(_origin_self, *args, **kwargs)
+                if not _auth_token:
+                    if self.authentication_level == auth_level.WEEK:
+                        # if token not provided and authentication is week set auth user to None and go to the target
+                        _origin_self.set_authorization_token(None)
+                        _origin_self.set_authorized_user(None)
+                        setattr(_target, '__AUTHENTICATED__', True)
+                        return _target(_origin_self, *args, **kwargs)
+                    else:
+                        if self.redirect_url is not None:
+                            _origin_self.redirect(self.redirect_url, permanent=False)
+                            return
+                        return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 _user = get_user_by_token(_auth_token, pack=False)
                 if not _user:
