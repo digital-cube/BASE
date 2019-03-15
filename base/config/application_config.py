@@ -71,3 +71,4 @@ count_call_file = 'log/count_call.json'
 entry_points_extended = {}
 balanced_readonly_get = set()
 authentication_type = 'TOKEN'
+test_mode = False

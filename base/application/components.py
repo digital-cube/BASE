@@ -795,7 +795,8 @@ class authenticated(object):
                 import base.config.application_config
                 import base.application.lookup.authentication_type as authentication_type
 
-                if base.config.application_config.authentication_type == authentication_type.lmap[authentication_type.COOKIE]:
+                if not base.config.application_config.test_mode and \
+                        base.config.application_config.authentication_type == authentication_type.lmap[authentication_type.COOKIE]:
                     return _origin_self.get_secure_cookie(base.config.application_config.secret_cookie_name)
 
                 return _origin_self.request.headers.get('Authorization')

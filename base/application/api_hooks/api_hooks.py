@@ -55,6 +55,7 @@ class RedisTokenizer
 
 import json
 import datetime
+from functools import reduce
 from base.application.helpers.exceptions import SaveHash2ParamsException
 from base.common.utils import log
 from base.common.utils import format_password
@@ -123,7 +124,8 @@ def register_user(id_user, username, password, data, request_handler=None):
     import base.application.lookup.user_roles as user_roles
     role_flags = int(data['role_flags']) if 'role_flags' in data else user_roles.USER
 
-    if role_flags not in user_roles.lmap:
+    _all_roles = reduce(lambda a, b: a|b, list(user_roles.lmap.keys()))
+    if not role_flags & _all_roles:
         log.critical('Wrong role type: {}'.format(role_flags))
         return 'Wrong user role type {}'.format(role_flags)
 

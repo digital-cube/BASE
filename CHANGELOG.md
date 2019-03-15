@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2019 03 15
+
+## BASE version 1.8.16
+- register user check roles bug fix
+- tests with authentication_type COOKIE bug fix
+
 ### 2019 03 06
 
 ## BASE version 1.8.15
