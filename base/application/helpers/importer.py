@@ -197,7 +197,7 @@ def _set_log_file():
     log = _log
 
 
-def load_application(entries, svc_port):
+def load_application(entries, svc_port, test=False):
 
     _load_app_configuration(svc_port)
     _set_log_file()
@@ -224,6 +224,10 @@ def load_application(entries, svc_port):
         for _name, _handler in inspect.getmembers(app_module):
 
             if inspect.isclass(_handler) and hasattr(_handler, '__URI__'):
+
+                # ignore only test API endpoints
+                if getattr(_handler, '__ONLY_IN_TEST_MODE__') and not test and not base.config.application_config.test_mode:
+                    continue
 
                 _uri = r'{}{}'.format(
                     '/{}'.format(base.config.application_config.app_prefix) if

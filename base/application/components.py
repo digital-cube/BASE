@@ -265,6 +265,7 @@ class api(object):
         self.uri = kwargs['URI']
         self.set_api_prefix = False if 'PREFIX' in kwargs and not kwargs['PREFIX'] else True
         self.specification_path = kwargs['SPECIFICATION_PATH'] if 'SPECIFICATION_PATH' in kwargs else None
+        self.test_mode = kwargs['TEST_MODE'] if 'TEST_MODE' in kwargs else None
 
     def replace_uri_arguments(self):
         _split_url = self.uri.split('/')
@@ -318,6 +319,7 @@ class api(object):
         cls.__URI__, cls.__PATH__PARAMS__ = self.replace_uri_arguments()
         cls.__SET_API_PREFIX__ = self.set_api_prefix
         cls.__SPECIFICATION_PATH__ = self.specification_path if self.specification_path is not None else cls.__name__
+        cls.__ONLY_IN_TEST_MODE__ = self.test_mode
 
         return cls
 

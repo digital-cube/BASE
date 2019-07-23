@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2019 07 16
+
+## BASE version 1.9.0
+- API endpoints for tests only
+- Tests helpers for dump/restore test databases user subprocess and wait for action
+
 ### 2019 03 15
 
 ## BASE version 1.8.16

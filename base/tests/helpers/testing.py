@@ -2,6 +2,7 @@
 
 import os
 import json
+import subprocess
 from functools import wraps
 from tornado.testing import AsyncHTTPTestCase
 from base.application.service import Application
@@ -42,31 +43,19 @@ class db_state:
         _db_name = 'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name']
 
         if _db_config['db_type'] == 'mysql':
-            os.system("mysql -u{} -p{} -e 'drop database {}'".format(
-                _db_config['db_user'],
-                _db_config['db_password'],
-                _db_name
-            ))
-            os.system("mysql -u{} -p{} -e 'create database {}'".format(
-                _db_config['db_user'],
-                _db_config['db_password'],
-                _db_name
-            ))
-            os.system('mysql {} -u{} -p{} < {}'.format(
-                _db_name,
-                _db_config['db_user'],
-                _db_config['db_password'],
-                file_path
-            ))
+            subprocess.call(['mysql', '-u{}'.format(_db_config['db_user']), '-p{}'.format(_db_config['db_password']), '-e', "drop database {}".format(_db_name)])
+            subprocess.call(['mysql', '-u{}'.format(_db_config['db_user']), '-p{}'.format(_db_config['db_password']), '-e', "create database {}".format(_db_name)])
+            with open(file_path) as _in:
+                subprocess.call(['mysql', _db_name, '-u{}'.format(_db_config['db_user']), '-p{}'.format(_db_config['db_password'])], stdin=_in)
+
         elif _db_config['db_type'] == 'postgresql':
 
             import base.common.orm
             base.common.orm.orm.engine().dispose()
 
-            os.system('''
-            if [ `PGPASSWORD={} psql -U{} -t -c "select count(*) from pg_stat_activity where datname = '{}'"` != 0 ]; 
-            then echo 1 > /tmp/pgstat ; 
-            else echo 0 > /tmp/pgstat ; fi'''.format( _db_config['db_password'], _db_config['db_user'], _db_name))
+            _pg_check = os.path.join(os.path.dirname(__file__), 'pg_check.sh')
+
+            subprocess.call([_pg_check, _db_config['db_password'], _db_config['db_user'], _db_name])
             with open('/tmp/pgstat') as f:
                 _state = f.read()
                 try:
@@ -81,10 +70,7 @@ class db_state:
                 except Exception as e:
                     pass
 
-            os.system('''
-            if [ `PGPASSWORD={} psql -U{} -t -c "select count(*) from pg_stat_activity where datname = 'template1'"` != 0 ]; 
-            then echo 1 > /tmp/pgstat ; 
-            else echo 0 > /tmp/pgstat ; fi'''.format( _db_config['db_password'], _db_config['db_user']))
+            subprocess.call([_pg_check, _db_config['db_password'], _db_config['db_user'], 'template1'])
             with open('/tmp/pgstat') as f:
                 _state = f.read()
                 try:
@@ -99,30 +85,18 @@ class db_state:
                 except Exception as e:
                     pass
 
-            os.system("PGPASSWORD={} psql -U {} template1 -c 'drop database {}' -q -o /tmp/pdb.log".format(
-                _db_config['db_password'],
-                _db_config['db_user'],
-                _db_name
-            ))
-            os.system("PGPASSWORD={} psql -U {} template1 -c 'create database {}' -q -o /tmp/pdb.log".format(
-                _db_config['db_password'],
-                _db_config['db_user'],
-                _db_name
-            ))
-            os.system('PGPASSWORD={} psql {} -U {} < {} -q -o /tmp/pdb.log'.format(
-                _db_config['db_password'],
-                _db_name,
-                _db_config['db_user'],
-                file_path
-            ))
+            _env = os.environ.copy()
+            _env['PGPASSWORD'] = _db_config['db_password']
+
+            subprocess.call(['psql', '-U', _db_config['db_user'], 'template1', '-c', 'drop database {}'.format(_db_name), '-q', '-o', '/tmp/pdb.log'], env=_env)
+            subprocess.call(['psql', '-U', _db_config['db_user'], 'template1', '-c', 'create database {}'.format(_db_name), '-q', '-o', '/tmp/pdb.log'], env=_env)
+            subprocess.call(['psql', '-U', _db_config['db_user'], _db_name, '-q', '-o', '/tmp/pdb.log', '-f', file_path], env=_env)
             from base.config.application_config import port as svc_port
             load_orm(svc_port)
 
         elif _db_config['db_type'] == 'sqlite':
-            os.system('cp {}.db {}.db'.format(
-                file_path,
-                'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name']
-            ))
+            _db_name = 'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name']
+            subprocess.call(['cp', '{}.db'.format(file_path), '{}.db'.format(_db_name)])
         else:
             print('Unknown database type {}'.format(_db_config['db_type']))
             raise Exception('Unknown database type')
@@ -158,7 +132,7 @@ class TestBase(AsyncHTTPTestCase):
         self.token = None
 
         entries = [(BaseHandler.__URI__, BaseHandler), ]
-        load_application(entries, None)
+        load_application(entries, None, test=True)
         self.orm_builder = prepare_test_database()
         from base.config.application_config import port as svc_port
 
@@ -195,24 +169,18 @@ class TestBase(AsyncHTTPTestCase):
         _db_config = db_config[__port]
 
         if _db_config['db_type'] == 'mysql':
-            os.system('mysqldump {} -u{} -p{} > {}'.format(
-                'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name'],
-                _db_config['db_user'],
-                _db_config['db_password'],
-                file_path
-            ))
+            _db_name = 'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name']
+            with open(file_path, 'w+') as _out:
+                subprocess.call(['mysqldump', _db_name, '-u{}'.format(_db_config['db_user']), '-p{}'.format(_db_config['db_password'])], stdout=_out)
         elif _db_config['db_type'] == 'postgresql':
-            os.system('PGPASSWORD={} pg_dump {} -U {} > {}'.format(
-                _db_config['db_password'],
-                'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name'],
-                _db_config['db_user'],
-                file_path
-            ))
+            _env = os.environ.copy()
+            _env['PGPASSWORD'] = _db_config['db_password']
+            _db_name = 'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name']
+            with open(file_path, 'w+') as _out:
+                subprocess.call(['pg_dump', _db_name, '-U', _db_config['db_user']], stdout=_out)
         elif _db_config['db_type'] == 'sqlite':
-            os.system('cp {}.db {}.db'.format(
-                'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name'],
-                file_path
-            ))
+            _db_name = 'test_{}'.format(_db_config['db_name']) if _db_config['db_name'][:5] != 'test_' else _db_config['db_name']
+            subprocess.call(['cp', '{}.db'.format(_db_name), '{}.db'.format(file_path)])
         else:
             print('Unknown database type {}'.format(_db_config['db_type']))
             raise Exception('Unknown database type')
