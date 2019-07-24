@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__VERSION__ = '0.2.2'
+__VERSION__ = '0.2.3'
 
 APPS = [
      '/project_home_dir/mockupecho',

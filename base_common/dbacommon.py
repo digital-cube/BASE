@@ -27,13 +27,14 @@ __db = None
 __redis = None
 
 
-def get_db(prefix=None):
+def get_db(prefix=None, new_db=False):
     global __db
 
     host = base_config.settings.APP_DB.host
     user = base_config.settings.APP_DB.user
     passwd = base_config.settings.APP_DB.passwd
-    db = '{}{}'.format(prefix, base_config.settings.APP_DB.db) if prefix else base_config.settings.APP_DB.db
+    db = '{}{}'.format(prefix, base_config.settings.APP_DB.db) \
+        if prefix and base_config.settings.APP_DB.db[:len(prefix)] != prefix else base_config.settings.APP_DB.db
     charset = base_config.settings.APP_DB.charset
 
     def conn_to_db():
@@ -55,7 +56,7 @@ def get_db(prefix=None):
             raise ApplicationDbConfig('Operational error occur: {}'.format(e))
         return True
 
-    if __db and __db.open:
+    if __db and __db.open and not new_db:
         if not test_db_conn(__db):
             __db = conn_to_db()
         return __db
@@ -86,7 +87,11 @@ def close_stdout(debug):
 
 
 def qu_esc(query):
-    return MySQLdb.escape_string(query).decode('utf-8')
+    try:
+        _db = get_db()
+        return _db.escape_string(query).decode('utf-8')
+    except:
+        return MySQLdb.escape_string(query).decode('utf-8')
 
 
 def format_password(username, password):
