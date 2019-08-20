@@ -208,7 +208,7 @@ def load_application(entries, svc_port, test=False):
     from base.config.application_config import imports as app_imports
 
     _entries = [
-        (SpecificationHandler.__URI__, SpecificationHandler),
+        (SpecificationHandler.__URI__[0], SpecificationHandler, {'idx': 0}),
     ]
 
     _has_root = False
@@ -229,31 +229,40 @@ def load_application(entries, svc_port, test=False):
                 if getattr(_handler, '__ONLY_IN_TEST_MODE__') and not test and not base.config.application_config.test_mode:
                     continue
 
-                _uri = r'{}{}'.format(
-                    '/{}'.format(base.config.application_config.app_prefix) if
-                    getattr(_handler, '__SET_API_PREFIX__') else '',
-                    getattr(_handler, '__URI__'))
+                _uries = getattr(_handler, '__URI__')
+                _paths = getattr(_handler, '__PATH__')
+                _api_prefix = getattr(_handler, '__SET_API_PREFIX__')
+                _idx = 0
 
-                # for counter to work properly
-                _full_path = r'{}{}'.format(
-                    '/{}'.format(base.config.application_config.app_prefix) if
-                    getattr(_handler, '__SET_API_PREFIX__') else '',
-                    getattr(_handler, '__PATH__'))
-                setattr(_handler, '__FULL_PATH__', _full_path)
+                for _URI in _uries:
 
-                if base.config.application_config.debug:
-                    log.info('Exposing {} on {}'.format(_name, _uri))
+                    _uri = r'{}{}'.format(
+                        '/{}'.format(base.config.application_config.app_prefix) if
+                        _api_prefix else '',
+                        _URI)
 
-                _entries.append((_uri, _handler))
+                    # for counter to work properly
+                    _full_path = r'{}{}'.format(
+                        '/{}'.format(base.config.application_config.app_prefix) if
+                        _api_prefix else '',
+                        _paths[_idx])
+                    setattr(_handler, '__FULL_PATH__', _full_path)
 
-                if _uri == '/':
-                    _has_root = True
+                    if base.config.application_config.debug:
+                        log.info('Exposing {} on {}'.format(_name, _uri))
+
+                    _entries.append((_uri, _handler, {'idx': _idx}))
+
+                    if _uri == '/':
+                        _has_root = True
+
+                    _idx += 1
 
     if not _has_root:
-        _entries.append((BaseHandler.__URI__, BaseHandler))
+        _entries.append((BaseHandler.__URI__[0], BaseHandler, {'idx', 0}))
 
     if base.config.application_config.debug:
-        _entries.append((PathsWriter.__URI__, PathsWriter))
+        _entries.append((PathsWriter.__URI__[0], PathsWriter, {'idx', 0}))
 
     if len(_entries) > 1:
         del entries[:]

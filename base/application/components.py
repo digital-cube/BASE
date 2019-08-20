@@ -84,7 +84,14 @@ class Base(tornado.web.RequestHandler):
     def __init__(self, application, request, **kwargs):
         self.auth_token = None
         self.auth_user = None
+        self.idx = kwargs['idx'] if 'idx' in kwargs else 0
+        if 'idx' not in kwargs:
+            kwargs['idx'] = 0       # for routes that have not idx set
+
         super(Base, self).__init__(application, request, **kwargs)
+
+    def initialize(self, idx):
+        self.idx = idx
 
     def prepare(self):
         import base.config.application_config
@@ -268,54 +275,63 @@ class api(object):
         self.test_mode = kwargs['TEST_MODE'] if 'TEST_MODE' in kwargs else None
 
     def replace_uri_arguments(self):
-        _split_url = self.uri.split('/')
-        _res = []
-        _kw_res = {}
-        _mod = None
-        for s in _split_url:
-            if s.startswith(':'):
-                # url param is present
+        _self_uries = [self.uri] if type(self.uri) == str else self.uri
 
-                if s == ':__LANG__':
-                    # url param is a language
-                    from base.common.utils import log
-                    import base.config.application_config
-                    try:
-                        _mod = importlib.import_module(base.config.application_config.languages_module)
-                    except ImportError:
-                        log.warning('Error loading languages module {}'.format(
-                            base.config.application_config.languages_module))
-                        raise MissingLanguagesLookup('Languages lookup file is missing or not configured, can not use __LANG__ variable')
+        _uries = []
+        _args = []
 
-                    try:
-                        _path = '|'.join([lang for lang in _mod.languages_map])
-                        _res.append('({})'.format(_path))
-                    except Exception as e:
-                        log.error('Languages module error: {}'.format(e))
-                        raise ErrorLanguagesLookup('Languages lookup file badly configured')
+        for _uri in _self_uries:
 
+            _split_url = _uri.split('/')
+            _res = []
+            _kw_res = {}
+            _mod = None
+            for s in _split_url:
+                if s.startswith(':'):
+                    # url param is present
+
+                    if s == ':__LANG__':
+                        # url param is a language
+                        from base.common.utils import log
+                        import base.config.application_config
+                        try:
+                            _mod = importlib.import_module(base.config.application_config.languages_module)
+                        except ImportError:
+                            log.warning('Error loading languages module {}'.format(
+                                base.config.application_config.languages_module))
+                            raise MissingLanguagesLookup('Languages lookup file is missing or not configured, can not use __LANG__ variable')
+
+                        try:
+                            _path = '|'.join([lang for lang in _mod.languages_map])
+                            _res.append('({})'.format(_path))
+                        except Exception as e:
+                            log.error('Languages module error: {}'.format(e))
+                            raise ErrorLanguagesLookup('Languages lookup file badly configured')
+
+                    else:
+                        # all other url params
+                        _res.append('([^/]+)')
                 else:
-                    # all other url params
-                    _res.append('([^/]+)')
-            else:
-                # a regular part of the url path
-                _res.append(s)
+                    # a regular part of the url path
+                    _res.append(s)
 
-            if s.startswith(':'):
-                # save url parameters indexes
-                if s[1:] == '__LANG__':
-                    if not hasattr(_mod, 'language_url_param_name'):
-                        log.error('Missing language url parameter name in {}'.format(_mod.__file__))
-                        raise ErrorLanguagesLookup('Languages lookup file badly configured')
-                    _key = _mod.language_url_param_name
-                else:
-                    _key = s[1:]
-                _kw_res[_key] = _split_url.index(s) + 1 if self.set_api_prefix else _split_url.index(s)
+                if s.startswith(':'):
+                    # save url parameters indexes
+                    if s[1:] == '__LANG__':
+                        if not hasattr(_mod, 'language_url_param_name'):
+                            log.error('Missing language url parameter name in {}'.format(_mod.__file__))
+                            raise ErrorLanguagesLookup('Languages lookup file badly configured')
+                        _key = _mod.language_url_param_name
+                    else:
+                        _key = s[1:]
+                    _kw_res[_key] = _split_url.index(s) + 1 if self.set_api_prefix else _split_url.index(s)
 
-        return '/'.join(_res), _kw_res
+            _uries.append('/'.join(_res))
+            _args.append(_kw_res)
+        return _uries, _args
 
     def __call__(self, cls):
-        cls.__PATH__ = self.uri
+        cls.__PATH__ = [self.uri] if type(self.uri) == str else self.uri
         cls.__URI__, cls.__PATH__PARAMS__ = self.replace_uri_arguments()
         cls.__SET_API_PREFIX__ = self.set_api_prefix
         cls.__SPECIFICATION_PATH__ = self.specification_path if self.specification_path is not None else cls.__name__
@@ -689,10 +705,10 @@ class params(object):
                 _param_uppercase = _param['uppercase'] if 'uppercase' in _param else None
 
                 # GET URL PARAMETERS
-                if _argument in _origin_self.__PATH__PARAMS__:
+                if _argument in _origin_self.__PATH__PARAMS__[_origin_self.idx]:
                     _uri_param_offset = len(_origin_self.extra_prefix.split('/')) if hasattr(_origin_self, 'extra_prefix') else 0
                     _param_value = _origin_self.request.uri.split('?')[0].split('/')[
-                        _origin_self.__PATH__PARAMS__[_argument] + _uri_param_offset]
+                        _origin_self.__PATH__PARAMS__[_origin_self.idx][_argument] + _uri_param_offset]
                     _param_required = True
                 else:
                     # GET BODY ARGUMENTS

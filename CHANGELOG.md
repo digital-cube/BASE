@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 08 20
+
+## BASE version 1.10.0
+- api decorator accepts a list of URIs
+
 ### 2019 07 16
 
 ## BASE version 1.9.0

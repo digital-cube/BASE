@@ -131,7 +131,7 @@ class TestBase(AsyncHTTPTestCase):
 
         self.token = None
 
-        entries = [(BaseHandler.__URI__, BaseHandler), ]
+        entries = [(BaseHandler.__URI__, BaseHandler, {'idx': 0}), ]
         load_application(entries, None, test=True)
         self.orm_builder = prepare_test_database()
         from base.config.application_config import port as svc_port

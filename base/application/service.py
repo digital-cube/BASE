@@ -256,7 +256,7 @@ def engage(starter_path):
 
     args = check_arguments()
 
-    entries = [(BaseHandler.__URI__, BaseHandler), ]
+    entries = [(BaseHandler.__URI__, BaseHandler, {'idx': 0}), ]
 
     load_application(entries, args.port)
 
