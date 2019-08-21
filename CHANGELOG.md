@@ -2,6 +2,10 @@
 
 ### 2019 08 21
 
+## BASE version 1.11.0
+- send mail over sendgrid
+- forgot password will send email directly
+
 ## BASE version 1.10.2
 - fix base handler and paths writer handler indexes
 

@@ -21,7 +21,7 @@ class MailQueue(base.common.orm.sql_base):
     message = Column(Text, nullable=False)
     data = Column(Text)
 
-    def __init__(self, sender, sender_name, receiver, receiver_name, subject, message, data=None):
+    def __init__(self, sender, sender_name, receiver, receiver_name, subject, message, data=None, sent=True):
 
         self.sender = sender
         self.sender_name = sender_name
@@ -34,10 +34,12 @@ class MailQueue(base.common.orm.sql_base):
         self.subject = subject
         self.message = message
         self.data = data
+        self.sent = sent
 
 
 def main():
     pass
+
 
 if __name__ == '__main__':
 

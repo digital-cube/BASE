@@ -31,8 +31,12 @@ save_hash(hash_data) -> [dict, str]
         - save hash data
 get_hash_data(hash) -> [dict, None]
         - retrieve data from hash
-save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, get_data) -> [dict, None]
+save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, get_data, sent=True) -> [dict, None]
         - save mail queue
+send_mail_from_queue(sender, sender_name, receiver, receiver_name, subject, message, data, id_mail_queue) -> [dict, bool]
+        - send mail
+update_mail_status(id_mail_queue, sent_mail_response) -> [bool]
+        - update mail in the database
 pre_logout_process(Auth_user) -> [dict, None]
         - pre logout data processing
 post_logout_process(Auth_user, session_token) -> [dict, None]
@@ -69,6 +73,8 @@ hooks = [
     # 'save_hash',
     # 'get_hash_data',
     # 'save_mail_queue',
+    # 'send_mail_from_queue',
+    # 'update_mail_status',
     # 'pre_logout_process',
     # 'post_logout_process',
     # 'check_user',

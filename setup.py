@@ -47,7 +47,7 @@ setup(
     author_email='info@digitalcube.rs',
     description='Base, simple scaling project',
     long_description=long_description,
-    install_requires=['tornado', 'bcrypt'],
+    install_requires=['tornado', 'bcrypt', 'sendgrid'],
     entry_points=_entry_points,
     scripts=_scripts,
     package_data={

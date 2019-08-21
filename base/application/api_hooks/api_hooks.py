@@ -27,8 +27,12 @@ save_hash(hash_data) -> [dict, str]
         - save hash data
 get_hash_data(hash) -> [dict, None]
         - retrieve data from hash
-save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, get_data) -> [dict, None]
+save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, get_data, sent=True) -> [dict, None]
         - save mail queue
+send_mail_from_queue(sender, sender_name, receiver, receiver_name, subject, message, data, id_mail_queue) -> [dict, bool]
+        - send mail
+update_mail_status(id_mail_queue, sent_mail_response) -> [bool]
+        - update mail in the database
 pre_logout_process(Auth_user) -> [dict, None]
         - pre logout data processing
 post_logout_process(Auth_user, session_token) -> [dict, None]
@@ -275,7 +279,7 @@ def get_hash_data(h2p):
 
 # E-MAIL QUEUE
 
-def save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data):
+def save_mail_queue(sender, sender_name, receiver, receiver_name, subject, message, data, sent=True):
     """
     Save mail to database
     :param sender: email address of the sender
@@ -286,14 +290,15 @@ def save_mail_queue(sender, sender_name, receiver, receiver_name, subject, messa
     :param message: body of the message
     :param data: additional message data in json form
     :param get_data: weather to retrieve data in response
-    :return: None, dict
+    :param sent: should new mail have status sent or not
+    :return: int
     """
 
     import base.common.orm
     MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
 
     data = json.dumps(data) if data else data
-    mail_queue = MailQueue(sender, sender_name, receiver, receiver_name, subject, message, data)
+    mail_queue = MailQueue(sender, sender_name, receiver, receiver_name, subject, message, data, sent)
     _session.add(mail_queue)
     _session.commit()
 
@@ -335,11 +340,118 @@ def get_mail_from_queue(id_message):
     return res
 
 
+import tornado.gen
+@tornado.gen.coroutine
+def send_mail_from_queue(sender, sender_name, receiver, receiver_name, subject, message, data, id_mail_queue):
+    """
+    Send mail over with Sendgrid SDK
+    :param sender: str - email address of the sender
+    :param sender_name: str - display name of the sender
+    :param receiver:  str - email address of the receiver
+    :param receiver_name: str - display name of the receiver
+    :param subject: str - subject of the message
+    :param message: str - body of the message
+    :param data: dict - additional message data in json form
+    :param id_mail_queue: int - id of the saved mail in mail_queue
+    :return: dict - response from the Sendgrid SDK
+    """
+
+    import os
+    import sendgrid
+
+    if not os.environ.get('SENDGRID_API_KEY'):
+        log.critical('The SENDGRID_API_KEY is not set, can not continue')
+        return {'status': False}
+
+    sg = sendgrid.SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+
+    mail = {
+        'personalizations': [
+            {
+                'to': [
+                    {
+                        'email': receiver,
+                        'name': receiver_name
+                    }
+                ],
+                'subject': subject
+            }
+        ],
+        'from': {
+            'email': sender,
+            'name': sender_name
+        },
+        'content': [
+            {
+                'type': 'text/html',
+                'value': message
+            }
+        ]
+    }
+
+    try:
+        response = sg.send(mail)
+    except Exception as e:
+        log.critical('Error sending email over sendgrid: {}'.format(e))
+        return {'status': False}
+
+    if response.status_code < 300:
+        log.info('Mail sent')
+        res = {'status': True, 'time_sent': datetime.datetime.now()}
+    else:
+        log.info('Mail not sent')
+        res = {'status': False}
+
+    return res
+
+
+def update_mail_status(id_mail_queue, sent_mail_response):
+
+    import base.common.orm
+    MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
+    _mail = _session.query(MailQueue).filter(MailQueue.id == id_mail_queue).one_or_none()
+    if _mail is None:
+        log.error('Can not find email with id {}'.format(id_mail_queue))
+        return False
+
+    log.info('UPDATE MAIL {} WITH {}'.format(id_mail_queue, sent_mail_response))
+    _mail.sent = sent_mail_response['status'] if 'status' in sent_mail_response else True
+    _mail.time_sent = sent_mail_response['time_sent'] if 'time_sent' in sent_mail_response else datetime.datetime.now()
+    _session.commit()
+
+    return True
+
+
+def get_email_by_id(id_mail_queue):
+
+    import base.common.orm
+    MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
+
+    _mail = _session.query(MailQueue).filter(MailQueue.id == id_mail_queue).one_or_none()
+    if _mail is None:
+        log.error('Can not find email with id {}'.format(id_mail_queue))
+        return False
+
+    return {
+        'id': id_mail_queue,
+        'subject': _mail.subject,
+        'sender_name': _mail.sender_name,
+        'sender': _mail.sender,
+        'receiver_name': _mail.receiver_name,
+        'receiver': _mail.receiver,
+        'time_created': _mail.time_created,
+        'time_sent': _mail.time_sent,
+        'sent': _mail.sent,
+        'message': _mail.message,
+        'data': _mail.data
+    }
+
 # END OF E-MAIL QUEUE
 
 # FORGOT PASSWORD
 
-def forgot_password(auth_user, data):
+
+def forgot_password(auth_user, data, sent=True):
     _data = {
         'cmd': 'forgot_password',
         'username': auth_user.username,
@@ -367,16 +479,29 @@ def forgot_password(auth_user, data):
     _forgot_address = '{}/{}'.format(forgot_password_lending_address, _hash)
     _message = forgot_password_message.format(_forgot_address)
 
-    save_mail_queue(
+    return save_mail_queue(
         support_mail_address,
         support_name,
         auth_user.username,
         _receiver_name,
         forgot_password_message_subject,
         _message,
-        None)
+        None,
+        sent)
 
-    return True
+
+def find_user_and_forgot_password(username, data):
+
+    import base.common.orm
+    AuthUser, _session = base.common.orm.get_orm_model('auth_users')
+
+    _user = _session.query(AuthUser).filter(AuthUser.username == username).one_or_none()
+
+    if _user is None:
+        log.warning('Non existing user {} request forgot password'.format(username))
+        return False
+
+    return forgot_password(_user, data, False)
 
 
 # END OF FORGOT PASSWORD
