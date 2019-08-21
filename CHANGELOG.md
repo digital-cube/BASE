@@ -2,6 +2,9 @@
 
 ### 2019 08 21
 
+## BASE version 1.10.2
+- fix base handler and paths writer handler indexes
+
 ## BASE version 1.10.1
 - fix type for authentication type WEAK
 - handle bad secure cookie if authentication type is WEAK

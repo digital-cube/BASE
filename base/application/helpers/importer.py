@@ -259,10 +259,10 @@ def load_application(entries, svc_port, test=False):
                     _idx += 1
 
     if not _has_root:
-        _entries.append((BaseHandler.__URI__[0], BaseHandler, {'idx', 0}))
+        _entries.append((BaseHandler.__URI__[0], BaseHandler, {'idx': 0}))
 
     if base.config.application_config.debug:
-        _entries.append((PathsWriter.__URI__[0], PathsWriter, {'idx', 0}))
+        _entries.append((PathsWriter.__URI__[0], PathsWriter, {'idx': 0}))
 
     if len(_entries) > 1:
         del entries[:]
