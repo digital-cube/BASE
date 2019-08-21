@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### 2019 08 21
+
+## BASE version 1.10.1
+- fix type for authentication type WEAK
+- handle bad secure cookie if authentication type is WEAK
+
 ### 2019 08 20
 
 ## BASE version 1.10.0

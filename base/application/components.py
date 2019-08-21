@@ -826,7 +826,7 @@ class authenticated(object):
                 if type(_auth_token) == bytes:
                     _auth_token = _auth_token.decode('utf-8')
                 if not _auth_token:
-                    if self.authentication_level == auth_level.WEEK:
+                    if self.authentication_level == auth_level.WEAK:
                         # if token not provided and authentication is week set auth user to None and go to the target
                         _origin_self.set_authorization_token(None)
                         _origin_self.set_authorized_user(None)
@@ -840,11 +840,26 @@ class authenticated(object):
 
                 _user = get_user_by_token(_auth_token, pack=False)
                 if not _user:
-                    log.critical('Can not get user from token {}'.format(_auth_token))
-                    if self.redirect_url is not None:
-                        _origin_self.redirect(self.redirect_url, permanent=False)
-                        return
-                    return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
+                    if self.authentication_level == auth_level.WEAK:
+                        # if token not provided and authentication is week set auth user to None and go to the target
+                        _origin_self.set_authorization_token(None)
+                        _origin_self.set_authorized_user(None)
+                        setattr(_target, '__AUTHENTICATED__', True)
+
+                        import base.config.application_config
+                        try:
+                            # remove secure cookie if exists, because is not valid
+                            _origin_self.clear_cookie(base.config.application_config.secret_cookie_name)
+                        except:
+                            pass
+
+                        return _target(_origin_self, *args, **kwargs)
+                    else:
+                        log.critical('Can not get user from token {}'.format(_auth_token))
+                        if self.redirect_url is not None:
+                            _origin_self.redirect(self.redirect_url, permanent=False)
+                            return
+                        return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 if self.roles is not None:
                     if not (self.roles & _user.role_flags):

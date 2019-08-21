@@ -1,11 +1,11 @@
 # coding= utf-8
 
 STRONG = 1
-WEEK = 2
+WEAK = 2
 
 lmap = {}
 lmap[STRONG] = 'STRONG'
-lmap[WEEK] = 'WEEK'
+lmap[WEAK] = 'WEAK'
 
 lrev = {}
 for k in lmap:
