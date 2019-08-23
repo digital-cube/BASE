@@ -2,6 +2,7 @@
 
 import os
 import json
+import time
 import subprocess
 from functools import wraps
 from tornado.testing import AsyncHTTPTestCase
@@ -55,35 +56,43 @@ class db_state:
 
             _pg_check = os.path.join(os.path.dirname(__file__), 'pg_check.sh')
 
-            subprocess.call([_pg_check, _db_config['db_password'], _db_config['db_user'], _db_name])
-            with open('/tmp/pgstat') as f:
-                _state = f.read()
-                try:
-                    _state = int(_state)
-                    if _state == 1:
-                        print('''
-***** THERE IS AN ACTIVE CONNECTION ON {} DATABASE, PLEASE DISCONNECT AND TRY AGAIN
-                        '''.format(_db_name))
-                        import sys
-                        sys.exit(1)
+            while True:
+                subprocess.call([_pg_check, _db_config['db_password'], _db_config['db_user'], _db_name])
+                with open('/tmp/pgstat') as f:
+                    _state = f.read()
+                    try:
+                        _state = int(_state)
+                        if _state == 1:
+                            print('''
+    ***** THERE IS AN ACTIVE CONNECTION ON {} DATABASE, PLEASE DISCONNECT AND TRY AGAIN
+                            '''.format(_db_name))
+                            time.sleep(1)
+                            continue
 
-                except Exception as e:
-                    pass
+                    except Exception as e:
+                        time.sleep(1)
+                        continue
 
-            subprocess.call([_pg_check, _db_config['db_password'], _db_config['db_user'], 'template1'])
-            with open('/tmp/pgstat') as f:
-                _state = f.read()
-                try:
-                    _state = int(_state)
-                    if _state == 1:
-                        print('''
-***** THERE IS AN ACTIVE CONNECTION ON template1 DATABASE, PLEASE DISCONNECT AND TRY AGAIN
-                        '''.format(_db_name))
-                        import sys
-                        sys.exit(1)
+                break
 
-                except Exception as e:
-                    pass
+            while True:
+                subprocess.call([_pg_check, _db_config['db_password'], _db_config['db_user'], 'template1'])
+                with open('/tmp/pgstat') as f:
+                    _state = f.read()
+                    try:
+                        _state = int(_state)
+                        if _state == 1:
+                            print('''
+    ***** THERE IS AN ACTIVE CONNECTION ON template1 DATABASE, PLEASE DISCONNECT AND TRY AGAIN
+                            '''.format(_db_name))
+                            time.sleep(1)
+                            continue
+
+                    except Exception as e:
+                        time.sleep(1)
+                        continue
+
+                break
 
             _env = os.environ.copy()
             _env['PGPASSWORD'] = _db_config['db_password']

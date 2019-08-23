@@ -2,6 +2,9 @@
 
 ### 2019 08 23
 
+## BASE version 1.11.3
+- fix for tests with postgresql
+
 ## BASE version 1.11.2
 - fix for tests with postgresql
 
