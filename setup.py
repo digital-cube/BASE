@@ -77,6 +77,7 @@ setup(
             'builder/template_project/src/lookup/*',
             'builder/template_project/static/img/*',
             'builder/template_project/tests/*',
+            'builder/template_project/tests/helpers/*',
         ],
     },
 )

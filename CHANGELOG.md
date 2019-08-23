@@ -2,8 +2,8 @@
 
 ### 2019 08 23
 
-## BASE version 1.11.1
-- fix for api specification builder
+## BASE version 1.11.2
+- fix for tests with postgresql
 
 ### 2019 08 21
 
