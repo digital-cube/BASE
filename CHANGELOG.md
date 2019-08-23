@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 08 23
+
+## BASE version 1.11.1
+- fix for api specification builder
+
 ### 2019 08 21
 
 ## BASE version 1.11.0
