@@ -84,6 +84,7 @@ class Base(tornado.web.RequestHandler):
     def __init__(self, application, request, **kwargs):
         self.auth_token = None
         self.auth_user = None
+        self.orm_session = None
         self.idx = kwargs['idx'] if 'idx' in kwargs else 0
         if 'idx' not in kwargs:
             kwargs['idx'] = 0       # for routes that have not idx set
@@ -876,6 +877,53 @@ class authenticated(object):
                 setattr(_target, '__AUTHENTICATED__', True)
 
                 return _target(_origin_self, *args, **kwargs)
+
+            return wrapper
+
+
+class db(object):
+    """
+    Make database session available through a request handler
+    """
+
+    def __init__(self, new_session=True):
+
+        import base.config.application_config
+        if not base.config.application_config.db_configured:
+            raise DatabaseIsNotConfigured(
+                "Can not use db decorator, database is not initialized or configured")
+
+        self.new_session = new_session
+
+    def __call__(self, _target):
+
+        if inspect.isclass(_target):
+
+            from base.common.utils import is_implemented
+            for _f_name, _func in inspect.getmembers(_target, inspect.isfunction):
+                if is_implemented(_target, _f_name, _func):
+                    setattr(_target, _f_name, self.__call__(_func))
+
+            return _target
+
+        if inspect.isfunction(_target):
+
+            @wraps(_target)
+            def wrapper(_origin_self, *args, **kwargs):
+
+                import base.common.orm
+
+                _session = base.common.orm.orm.session(new=self.new_session)
+                try:
+                    _origin_self.orm_session = _session
+                    res = _target(_origin_self, *args, **kwargs)
+                except:
+                    _session.rollback()
+                    raise
+                finally:
+                    _session.close()
+
+                return res
 
             return wrapper
 

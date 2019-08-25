@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 08 25
+
+## BASE version 1.12.0
+- sqlalchemy database session is available through a request handler
+
 ### 2019 08 23
 
 ## BASE version 1.11.3
