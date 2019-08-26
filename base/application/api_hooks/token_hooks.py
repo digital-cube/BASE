@@ -64,18 +64,20 @@ class SqlTokenizer(Tokenizer):
 
         return {'token_type': session_token_type.lmap[_session_token.type], 'token': _tk}
 
-    def get_user_by_token(self, tk, pack=True):
+    def get_user_by_token(self, tk, pack=True, orm_session=None):
         """
         retrieve user by given token
         :param tk: session token
         :param pack: whether to return packed or orm user
+        :param orm_session: sqlalchemy session
         :return: packed user if pack else AuthUser
         """
 
         import base.application.api_hooks.api_hooks
         import base.common.orm
-        SessionToken, _session = base.common.orm.get_orm_model('session_tokens')
-        AuthUser, _session = base.common.orm.get_orm_model('auth_users')
+        SessionToken, __session = base.common.orm.get_orm_model('session_tokens')
+        AuthUser, __session = base.common.orm.get_orm_model('auth_users')
+        _session = orm_session if orm_session else __session
 
         # reload session if configured - for balancers to be able to get changes from slave database
         import base.config.application_config as cfg
@@ -157,7 +159,7 @@ class RedisTokenizer(Tokenizer):
         """
         print('SET', )
 
-    def get_user_by_token(self, tk, pack=True):
+    def get_user_by_token(self, tk, pack=True, orm_session=None):
         """
         retrieve user by given token
         :param tk: session token

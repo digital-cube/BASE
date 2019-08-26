@@ -839,7 +839,11 @@ class authenticated(object):
                             return
                         return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
-                _user = get_user_by_token(_auth_token, pack=False)
+                if _origin_self.orm_session is None:
+                    import base.common.orm
+                    _origin_self.orm_session = base.common.orm.orm.session(new=True)
+
+                _user = get_user_by_token(_auth_token, pack=False, orm_session=_origin_self.orm_session)
                 if not _user:
                     if self.authentication_level == auth_level.WEAK:
                         # if token not provided and authentication is week set auth user to None and go to the target
@@ -854,12 +858,16 @@ class authenticated(object):
                         except:
                             pass
 
-                        return _target(_origin_self, *args, **kwargs)
+                        res = _target(_origin_self, *args, **kwargs)
+                        _origin_self.orm_session.close()
+                        return res
                     else:
                         log.critical('Can not get user from token {}'.format(_auth_token))
                         if self.redirect_url is not None:
                             _origin_self.redirect(self.redirect_url, permanent=False)
+                            _origin_self.orm_session.close()
                             return
+                        _origin_self.orm_session.close()
                         return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 if self.roles is not None:
@@ -868,7 +876,9 @@ class authenticated(object):
                             _user.username, _user.role_flags, _origin_self.request.uri))
                         if self.redirect_url is not None:
                             _origin_self.redirect(self.redirect_url, permanent=False)
+                            _origin_self.orm_session.close()
                             return
+                        _origin_self.orm_session.close()
                         return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
                 _origin_self.set_authorization_token(_auth_token)
@@ -876,7 +886,9 @@ class authenticated(object):
 
                 setattr(_target, '__AUTHENTICATED__', True)
 
-                return _target(_origin_self, *args, **kwargs)
+                res = _target(_origin_self, *args, **kwargs)
+                _origin_self.orm_session.close()
+                return res
 
             return wrapper
 
@@ -912,10 +924,10 @@ class db(object):
             def wrapper(_origin_self, *args, **kwargs):
 
                 import base.common.orm
-
                 _session = base.common.orm.orm.session(new=self.new_session)
                 try:
-                    _origin_self.orm_session = _session
+                    if _origin_self.orm_session is None:
+                        _origin_self.orm_session = _session
                     res = _target(_origin_self, *args, **kwargs)
                 except:
                     _session.rollback()

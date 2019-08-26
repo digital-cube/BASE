@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 08 26
+
+## BASE version 1.12.1
+- authorization decorator inject database session also
+
 ### 2019 08 25
 
 ## BASE version 1.12.0
