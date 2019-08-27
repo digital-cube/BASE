@@ -66,11 +66,8 @@ class UserChangePassword(Base):
                 self.auth_user.id, new_password, old_password))
             return self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
-        import base.common.orm
-        AuthUser, _session = base.common.orm.get_orm_model('auth_users')
-
         _password = format_password(self.auth_user.username, new_password)
         self.auth_user.password = _password
-        _session.commit()
+        self.orm_session.commit()
 
         return self.ok()

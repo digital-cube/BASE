@@ -2,6 +2,11 @@
 
 ### 2019 08 26
 
+## BASE version 1.12.2
+- user change password bug fix
+
+### 2019 08 26
+
 ## BASE version 1.12.1
 - authorization decorator inject database session also
 
