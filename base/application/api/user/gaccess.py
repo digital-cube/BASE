@@ -96,6 +96,16 @@ class SocialAccess(Base):
                 if isinstance(_post_register_result, dict):
                     response.update(_post_register_result)
 
+        if hasattr(api_hooks, 'post_social_login_process'):
+            _post_social_login_result = api_hooks.post_social_login_process(id_user, self.social_user)
+            if not _post_social_login_result:
+                log.critical('Post social login process error for user {} - {}'.format(
+                    id_user, self.social_user['email']))
+                return False
+
+            if isinstance(_post_social_login_result, dict):
+                response.update(_post_social_login_result)
+
         return response
 
 

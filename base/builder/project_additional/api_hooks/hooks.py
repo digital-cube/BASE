@@ -59,6 +59,7 @@ class SqlTokenizer
         - tokenizer for sql token storage
 class RedisTokenizer
         - tokenizer for redis token storage
+post_social_login_process(id_user, social_user_data) -> [dict, bool]
 """
 
 hooks = [
@@ -80,6 +81,7 @@ hooks = [
     # 'check_user',
     # 'get_mail_from_queue',
     # 'forgot_password',
+    # 'post_social_login_process',
     # 'Tokenizer',
     # 'SqlTokenizer',
     # 'RedisTokenizer',

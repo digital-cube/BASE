@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2019 09 24
+
+## BASE version 1.12.3
+- social login post process hook
+
 ### 2019 08 26
 
 ## BASE version 1.12.2
