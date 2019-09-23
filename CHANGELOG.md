@@ -2,6 +2,11 @@
 
 ### 2019 09 24
 
+## BASE version 1.12.4
+- fix social login
+
+### 2019 09 24
+
 ## BASE version 1.12.3
 - social login post process hook
 

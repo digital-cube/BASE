@@ -47,6 +47,7 @@ class SocialAccess(Base):
         _user = user_exists(self.social_user['email'], AuthUsers, _session, as_bool=False)
         if _user:
             # user exists - log in the user
+            id_user = _user.id
             log.info('User {} already exists, login the user'.format(self.social_user['email']))
             _token = get_token(_user.id, {})
             if not _token:
