@@ -119,12 +119,14 @@ class GAccess(SocialAccess):
     GOOGLE_URLS = None
     access_token = None
     social_user = None
+    auth_data = None
 
     @params(
         {'name': 'token', 'type': str, 'required': True,  'doc': 'access token'},
+        {'name': 'auth_data', 'type': json, 'required': False, 'doc': 'additional data'},
     )
     @tornado.gen.coroutine
-    def post(self, token):
+    def post(self, token, auth_data):
         """Register/login user with google access token"""
 
         import base.config.application_config
@@ -146,6 +148,7 @@ class GAccess(SocialAccess):
 
         # check the access token on google's side
         self.access_token = token
+        self.auth_data = auth_data
         if tornado.version >= '5.0':
             token_verified = yield tornado.ioloop.IOLoop.current().run_in_executor(None, self.verify_token)
         else:
@@ -225,6 +228,7 @@ class GAccess(SocialAccess):
         """
 
         # self.GOOGLE_URLS['token_endpoint'] should be used for token verification, but there is a code that is missing
+        from base.application.api_hooks import api_hooks
         import base.config.application_config
         params = {'access_token': self.access_token}
         response = requests.get(base.config.application_config.google_check_access_token_url, params=params)
@@ -241,7 +245,7 @@ class GAccess(SocialAccess):
         if 'aud' not in response:
             log.critical('Missing audience for google access token: {}: {}'.format(self.access_token, response))
             return False
-        if response['aud'] != base.config.application_config.google_client_ID:
+        if response['aud'] != api_hooks.get_google_authorized_client_id(self.auth_data):
             log.critical('Google access token audience is not valid: {}'.format(response))
             return False
         if 'exp' not in response:

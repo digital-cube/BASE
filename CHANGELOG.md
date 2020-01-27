@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2020 01 27
+
+## BASE version 1.12.5
+- google authorization client id from hooks
+
 ### 2019 09 24
 
 ## BASE version 1.12.4

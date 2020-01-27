@@ -60,6 +60,8 @@ class SqlTokenizer
 class RedisTokenizer
         - tokenizer for redis token storage
 post_social_login_process(id_user, social_user_data) -> [dict, bool]
+get_google_authorized_client_id(auth_data) -> str
+        - return google client id based on provided data
 """
 
 hooks = [
@@ -82,6 +84,7 @@ hooks = [
     # 'get_mail_from_queue',
     # 'forgot_password',
     # 'post_social_login_process',
+    # 'get_google_authorized_client_id',
     # 'Tokenizer',
     # 'SqlTokenizer',
     # 'RedisTokenizer',

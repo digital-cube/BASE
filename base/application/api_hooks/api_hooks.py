@@ -56,6 +56,8 @@ class SqlTokenizer
 class RedisTokenizer
         - tokenizer for redis token storage
 post_social_login_process(id_user, social_user_data) -> [dict, bool]
+get_google_authorized_client_id(auth_data) -> str
+        - return google client id based on provided data
 """
 
 import json
@@ -506,3 +508,9 @@ def find_user_and_forgot_password(username, data):
 
 
 # END OF FORGOT PASSWORD
+
+def get_google_authorized_client_id(auth_data):
+
+    import base.config.application_config
+    return base.config.application_config.google_client_ID
+
