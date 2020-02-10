@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2020 02 10
+
+## BASE version 1.12.6
+- fix same response message code bug
+
 ### 2020 01 27
 
 ## BASE version 1.12.5

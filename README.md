@@ -1,10 +1,10 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python v3](https://img.shields.io/pypi/pyversions/Django.svg)](https://www.python.org/download/releases/3.0/)
-[![Version 1.12.5](https://img.shields.io/badge/version-1.12.5-blue.svg)]()
+[![Version 1.12.6](https://img.shields.io/badge/version-1.12.6-blue.svg)]()
 
 # **Base REST API**
 
-* Version 1.12.5
+* Version 1.12.6
 * [DigitalCube](http://digitalcube.rs/)
 * [Wiki](https://github.com/digital-cube/BASE/wiki)
 
