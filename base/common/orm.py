@@ -45,12 +45,13 @@ class _orm(object):
 
     __instance = None
 
-    def __new__(cls, sql_address, orm_base):
+    def __new__(cls, sql_address, orm_base, **kwargs):
 
         if _orm.__instance is None:
             _orm.__instance = object.__new__(cls)
             cls.__db_url = sql_address
-            cls.__engine = create_engine(cls.__db_url, echo=False)
+            _create_engine_args = {}
+            cls.__engine = create_engine(cls.__db_url, echo=False, **kwargs)
             cls.__session_factory = sessionmaker(bind=cls.__engine)
             cls.__scoped_session = scoped_session(cls.__session_factory)
             cls.__session = cls.__scoped_session()
@@ -78,8 +79,8 @@ class _orm(object):
 
 class orm_builder(object):
 
-    def __init__(self, sql_address, orm_base):
-        self.__orm = _orm(sql_address, orm_base)
+    def __init__(self, sql_address, orm_base, **kwargs):
+        self.__orm = _orm(sql_address, orm_base, **kwargs)
 
     def create_db_schema(self, test=False):
         """In test mode use sqlalchemy method, in other cases use alembic"""
@@ -225,6 +226,15 @@ def init_orm():
     __db_url = make_database_url(db_type, _db_config['db_name'], _db_config['db_host'], _db_config['db_port'],
                                  _db_config['db_user'], _db_config['db_password'],
                                  _db_config['charset'] if 'charset' in _db_config else 'utf8')
+
+    _orm_build_args = {}
+    if hasattr(src.config.app_config, 'db_pool_size'):
+        _orm_build_args['pool_size'] = src.config.app_config.db_pool_size
+    if hasattr(src.config.app_config, 'db_max_overflow'):
+        _orm_build_args['max_overflow'] = src.config.app_config.db_max_overflow
+
+    if len(_orm_build_args.keys()):
+        return orm_builder(__db_url, sql_base, **_orm_build_args)
 
     return orm_builder(__db_url, sql_base)
 

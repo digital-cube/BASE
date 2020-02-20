@@ -3,13 +3,13 @@
     :target: https://www.gnu.org/licenses/gpl-3.0
 .. image:: https://img.shields.io/pypi/pyversions/Django.svg
    :target: https://pypi.python.org/pypi/ansicolortags/
-.. image:: https://img.shields.io/badge/version-1.12.6-blue.svg
-   :alt: Version 1.12.6
+.. image:: https://img.shields.io/badge/version-1.12.7-blue.svg
+   :alt: Version 1.12.7
 
 =============
 Base REST API
 =============
-* Version 1.12.6
+* Version 1.12.7
 * `DigitalCube <http://digitalcube.rs/>`_
 * `WIKI <https://github.com/digital-cube/BASE/wiki>`_
 

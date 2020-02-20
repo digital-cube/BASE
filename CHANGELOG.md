@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2020 02 20
+
+## BASE version 1.12.7
+- additional settings for orm create engine trough the init_orm
+
 ### 2020 02 10
 
 ## BASE version 1.12.6
