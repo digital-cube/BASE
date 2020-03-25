@@ -12,12 +12,14 @@ from tornado import httpclient
 import base_common.msg
 import base_config.settings as csettings
 import base_lookup.api_messages as amsgs
+from base_lookup import authorization_type
 from base_lookup.http_methods import GET, POST, PUT, DELETE, PATCH
 from base_lookup.http_methods import rev as http_rev_map
 from base_lookup.http_methods import map as http_map
 from base_api.apisvc.apisvc import get_api_specification
 from base_config.service import log
 from base_config.service import log_a
+from base_common.dbaexc import InvalidSettings
 
 _c = 0
 
@@ -264,11 +266,19 @@ class GeneralPostHandler(tornado.web.RequestHandler):
             ip = self.request.headers['X-Forwarded-For']
 
         tk = None
-        if 'Authorization' in self.request.headers:
-            tka = self.request.headers.get('Authorization')
-            tka = tka.split(' ')
-            if len(tka) == 1:
-                tk = tka[0].strip()
+        if csettings.AUTHORIZATION_TYPE == authorization_type.rev[authorization_type.TOKEN]:
+
+            if 'Authorization' in self.request.headers:
+                tka = self.request.headers.get('Authorization')
+                tka = tka.split(' ')
+                if len(tka) == 1:
+                    tk = tka[0].strip()
+        elif csettings.AUTHORIZATION_TYPE == authorization_type.rev[authorization_type.COOKIE]:
+            tk = self.get_secure_cookie(csettings.SECURE_COOKIE)
+            if tk:
+                tk = tk.decode('utf-8')
+        else:
+            raise InvalidSettings('Unknown authorization type')
 
         import base_common.app_hooks as apphooks
         if hasattr(apphooks, 'process_custom_header'):

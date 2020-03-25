@@ -6,8 +6,9 @@ from inspect import getmembers, isfunction
 from base_config.settings import APPS, BASE_APPS, TEST_PORT
 import base_config.settings
 import base_lookup.api_messages
+from base_lookup import authorization_type
 import base_lookup.http_methods as _hm
-from base_common.dbaexc import ApplicationNameUsed, ApiMethodError
+from base_common.dbaexc import ApplicationNameUsed, ApiMethodError, InvalidSettings
 
 __INSTALLED_APPS = {}
 __STARTED_APP = None
@@ -114,6 +115,17 @@ def import_from_settings(imported_modules, app_to_start):
 
     if hasattr(pm, 'EXCLUDE_CALL_LOG_MAX_CHARS'):
         base_config.settings.EXCLUDE_CALL_LOG_MAX_CHARS = pm.EXCLUDE_CALL_LOG_MAX_CHARS
+
+    if hasattr(pm, 'AUTHORIZATION_TYPE'):
+        if pm.AUTHORIZATION_TYPE not in authorization_type.map:
+            raise InvalidSettings('Incorect authorization type: {}'.format(pm.AUTHORIZATION_TYPE))
+        base_config.settings.AUTHORIZATION_TYPE = pm.AUTHORIZATION_TYPE
+        if pm.AUTHORIZATION_TYPE == authorization_type.rev[authorization_type.COOKIE] and not hasattr(pm, 'SECURE_COOKIE'):
+            import pdb; pdb.set_trace()
+            raise InvalidSettings('Missing secure cookie in settings')
+
+    if hasattr(pm, 'SECURE_COOKIE'):
+        base_config.settings.SECURE_COOKIE = pm.SECURE_COOKIE
 
     def _add_to_imports(_mm, _f, _m):
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__VERSION__ = '0.2.3'
+__VERSION__ = '0.2.4'
 
 APPS = [
      '/project_home_dir/mockupecho',
@@ -32,9 +32,10 @@ SESSION_STORAGE = 'DB' # 'DB' | 'REDIS'
 REDIS_SERVER = 'localhost'
 REDIS_PORT = 6379
 CHANGE_EMAIL_ADDRESS = 'http://localhost:8778/change'
-MASTER=False    # IP address of the master server
+MherherASTER=False    # IP address of the master server
 MAIL_API_KEY = 'mandrillapikey'
 MAIL_CHANNEL = 'BSM'
 MAIL_CHANNEL_TIMEOUT = 2
 STRONG_PASSWORD = False
-
+AUTHORIZATION_TYPE = 'TOKEN'
+SECURE_COOKIE = 'token'

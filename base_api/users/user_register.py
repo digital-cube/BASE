@@ -17,7 +17,8 @@ from base_common.dbatokens import get_token
 from base_common.seq import sequencer
 from base_lookup import api_messages as msgs
 from base_config.service import log
-# from base_common.dbacommon import check_user_registered
+from base_lookup import authorization_type
+import base_config.settings as csettings
 
 
 name = "Registration"
@@ -74,6 +75,9 @@ def do_post(username, password, users_data, **kwargs):
     _db.commit()
 
     response = {'token': tk}
+
+    if csettings.AUTHORIZATION_TYPE == authorization_type.rev[authorization_type.COOKIE]:
+        kwargs['request_handler'].set_secure_cookie(csettings.SECURE_COOKIE, tk)
 
     if users_data and hasattr(apphooks, 'post_register_digest'):
         post_d = apphooks.post_register_digest(u_id, username, password, users_data, **kwargs)

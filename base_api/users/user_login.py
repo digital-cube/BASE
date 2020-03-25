@@ -12,7 +12,9 @@ from base_common.dbacommon import params
 from base_common.dbacommon import app_api_method
 from base_common.dbacommon import check_password
 from base_lookup import api_messages as msgs
+from base_lookup import authorization_type
 from base_config.service import log
+import base_config.settings as csettings
 
 
 name = "Login"
@@ -84,6 +86,9 @@ def do_post(username, password, **kwargs):
     _db.commit()
 
     res = {'token': tk}
+
+    if csettings.AUTHORIZATION_TYPE == authorization_type.rev[authorization_type.COOKIE]:
+        kwargs['request_handler'].set_secure_cookie(csettings.SECURE_COOKIE, tk)
 
     if hasattr(apphooks, 'post_login_digest'):
         post_d = apphooks.post_login_digest(_db, u_id, username, password, tk)

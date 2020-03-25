@@ -1,5 +1,7 @@
 # local settings
 *settings.py
+.venv
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
