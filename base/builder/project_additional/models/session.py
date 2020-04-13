@@ -15,6 +15,7 @@ class SessionTokens(base.common.orm.sql_base):
     type = Column(SmallInteger, index=True, nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     expired = Column(DateTime)
+    last_used = Column(DateTime, nullable=False, default=datetime.datetime.now)
 
     def __init__(self, _id, id_user, active=True, type=token_type.SIMPLE, expired=None):
 

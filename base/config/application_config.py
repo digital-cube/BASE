@@ -72,3 +72,6 @@ entry_points_extended = {}
 balanced_readonly_get = set()
 authentication_type = 'TOKEN'
 test_mode = False
+session_expiration_timeout = None   # seconds for session's token timeout
+disable_spec = False                # disable spec URI
+disable_all_paths = False           # disable all paths URI

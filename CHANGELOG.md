@@ -1,5 +1,12 @@
 ## CHANGELOG
 
+### 2020 04 13
+
+## BASE version 1.12.9
+- session token last used time
+- session token can have timeout
+- configuration for disabling spec and all-paths APIs
+
 ### 2020 02 20
 
 ## BASE version 1.12.7

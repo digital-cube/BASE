@@ -1,5 +1,6 @@
 # coding= utf-8
 
+import datetime
 from sqlalchemy import desc
 
 import base.application.lookup.session_token_type as session_token_type
@@ -36,6 +37,16 @@ class SqlTokenizer(Tokenizer):
         if _session_token is None:
             self.log.info('No active session for user {} found'.format(uid))
             return _session_token
+        
+        import base.config.application_config as cfg
+
+        if hasattr(cfg, 'session_expiration_timeout') and cfg.session_expiration_timeout is not None:
+            _session_life_time_in_seconds = (datetime.datetime.now() - _session_token.last_used).seconds
+            if _session_life_time_in_seconds > cfg.session_expiration_timeout:
+                self.log.warning('Session {} expired, last used {}, closing session'.format(_session_token.id, _session_token.last_used))
+                _session_token.active = False
+                _session.commit()
+                return None
 
         return {"token_type": session_token_type.lmap[_session_token.type], "token": _session_token.id}
 
@@ -95,6 +106,14 @@ class SqlTokenizer(Tokenizer):
         if not _db_session.active:
             self.log.critical('Session {} is not active'.format(tk))
             return None
+        
+        if hasattr(cfg, 'session_expiration_timeout') and cfg.session_expiration_timeout is not None:
+            _session_life_time_in_seconds = (datetime.datetime.now() - _db_session.last_used).seconds
+            if _session_life_time_in_seconds > cfg.session_expiration_timeout:
+                self.log.warning('Session {} expired, last used {}, closing session'.format(tk, _db_session.last_used))
+                _db_session.active = False
+                _session.commit()
+                return None
 
         _q = _session.query(AuthUser).filter(AuthUser.id == _db_session.id_user)
         if _q.count() != 1:
@@ -106,6 +125,9 @@ class SqlTokenizer(Tokenizer):
         if not _user.active:
             self.log.critical('User {} -> {} is not active'.format(_user.id, _user.username))
             return None
+        
+        _db_session.last_used = datetime.datetime.now()
+        _session.commit()
 
         return base.application.api_hooks.api_hooks.pack_user(_user) if pack else _user
 

@@ -102,6 +102,10 @@ def _load_app_configuration(svc_port):
     if hasattr(src.config.app_config, 'service_initialisation_callbacks'):
         setattr(base.config.application_config, 'service_initialisation_callbacks',
                 src.config.app_config.service_initialisation_callbacks)
+    if hasattr(src.config.app_config, 'disable_spec'):
+        setattr(base.config.application_config, 'disable_spec', src.config.app_config.disable_spec)
+    if hasattr(src.config.app_config, 'disable_all_paths'):
+        setattr(base.config.application_config, 'disable_all_paths', src.config.app_config.disable_all_paths)
 
     if _db_is_configured:
         _load_app_configuration_with_database(src.config.app_config)
@@ -160,6 +164,8 @@ def _load_app_configuration_with_database(config_file):
         setattr(base.config.application_config, 'reload_session', config_file.reload_session)
     if hasattr(config_file, 'authentication_type'):
         setattr(base.config.application_config, 'authentication_type', config_file.authentication_type)
+    if hasattr(config_file, 'session_expiration_timeout'):
+        setattr(base.config.application_config, 'session_expiration_timeout', config_file.session_expiration_timeout)
 
 
 def _load_app_configuration_without_database(config_file):
@@ -209,7 +215,7 @@ def load_application(entries, svc_port, test=False):
 
     _entries = [
         (SpecificationHandler.__URI__[0], SpecificationHandler, {'idx': 0}),
-    ]
+    ] if not base.config.application_config.disable_spec  else []
 
     _has_root = False
     # exclude BASE's database dependent API
@@ -262,7 +268,8 @@ def load_application(entries, svc_port, test=False):
         _entries.append((BaseHandler.__URI__[0], BaseHandler, {'idx': 0}))
 
     if base.config.application_config.debug:
-        _entries.append((PathsWriter.__URI__[0], PathsWriter, {'idx': 0}))
+        if not base.config.application_config.disable_all_paths:
+            _entries.append((PathsWriter.__URI__[0], PathsWriter, {'idx': 0}))
 
     if len(_entries) > 1:
         del entries[:]
