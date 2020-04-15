@@ -12,6 +12,8 @@ from base_common.dbacommon import app_api_method
 from base_config.service import log
 import base_common.app_hooks as apphooks
 from base_common.dbatokens import get_user_by_token
+import base_config.settings as csettings
+from base_lookup import authorization_type
 
 
 name = "Logout"
@@ -49,6 +51,9 @@ def do_post(**kwargs):
         if post_d == False:
             log.critical('Error user post logout digest')
             return base_common.msg.error(msgs.ERROR_POST_LOGIN)
+
+    if csettings.AUTHORIZATION_TYPE == authorization_type.rev[authorization_type.COOKIE]:
+        kwargs['request_handler'].clear_cookie(csettings.SECURE_COOKIE, tk)
 
     apphooks.action_log_hook(dbuser.id_user, kwargs['r_ip'], 'logout', 'user {} successfuly logged out'.format(dbuser.username))
     return base_common.msg.post_ok()
