@@ -51,7 +51,9 @@ class SequencerFactory:
         Sequencer = self.seq_orm_table_model if self.seq_orm_table_model is not None \
             else base.config.application_config.orm_models['sequencer']
 
-        _q = self.db.session().query(Sequencer)
+        _session = base.common.orm.orm.session()
+        _q = _session.query(Sequencer)
+        # _q = self.db.session().query(Sequencer)
         for s in _q.all():
             self.s_table[s.id] = {
                 'table_id': s.id,
@@ -64,6 +66,8 @@ class SequencerFactory:
                 's_table': s.s_table,
                 'ordered': bool(s.ordered)
             }
+
+        _session.close()
 
     def create_random_id(self, size, id_type):
 
@@ -109,11 +113,15 @@ class SequencerFactory:
                                     self.s_table[table_id]['partition_id'],
                                     self.s_table[table_id]['active_stage'])
 
+        import base.common.orm
+        print('OOOOOORM', base.common.orm.orm)
+        _sesssion = base.common.orm.orm.session()
         attempt = 1
         while True:
 
             if self.s_table[table_id]['ordered']:
                 log.warning('Orderd table')
+                _sesssion.close()
                 return False
 
             else:
@@ -123,16 +131,20 @@ class SequencerFactory:
             _s_id += self.checksum(_s_id, self.s_table[table_id]['check_sum_size'], self.s_table[table_id]['type'])
 
             _s = _orm_model(_s_id, self.s_table[table_id]['active_stage'])
-            self.db.session().add(_s)
+            _sesssion.add(_s)
+            # self.db.session().add(_s)
 
             if commit:
                 try:
-                    self.db.session().commit()
+                    _sesssion.commit()
+                    # self.db.session().commit()
                 except sqlalchemy.exc.IntegrityError as e:
-                    self.db.session().rollback()
+                    _sesssion.rollback()
+                    # self.db.session().rollback()
                     if attempt >= self.max_attempts:
                         log.critical('To many attempts to create id for {} table'.format(
                             self.s_table[table_id]['s_table']))
+                        _sesssion.close()
                         raise ToManyAttemptsException('creating id for {} table'.format(
                             self.s_table[table_id]['s_table']))
                     attempt += 1
@@ -140,11 +152,14 @@ class SequencerFactory:
 
             break
 
+        _sesssion.close()
+
         return _s_id
 
     def get_sequence(self, sequence_id, sequence):
 
         from base.common.utils import log
+        import base.common.orm
 
         if sequence_id not in self.s_table:
             log.critical('Sequence id {} is not in the system'.format(sequence_id))
@@ -165,12 +180,16 @@ class SequencerFactory:
                 db_sequence['s_table'], src.models.sequencers.__file__ ))
             return False
 
-        _q = self.db.session().query(_sequencer_model).filter(_sequencer_model.id==sequence).all()
+        _session = base.common.orm.orm.session()
+        _q = _session.query(_sequencer_model).filter(_sequencer_model.id==sequence).all()
+        # _q = self.db.session().query(_sequencer_model).filter(_sequencer_model.id==sequence).all()
 
         if len(_q) != 1:
             log.critical('Sequence id {} is not in {} table'.format(sequence_id, db_sequence['s_table']))
+            _session.close()
             return False
 
+        _session.close()
         return True
 
 

@@ -44,3 +44,8 @@ post_app_processes = None   # [(app_name, app_cmd_for_subprocess, redirect_outpu
 service_initialisation_callbacks = None     # [(module, function_from_module)] -> eg: [('src.init', 'start')]
 google_client_ID = None
 count_calls = False    # count every call to uri and method
+
+session_expiration_timeout = None   # seconds for session's token timeout
+disable_spec = False                # disable spec URI
+disable_all_paths = False           # disable all paths URI
+cached_session = True               # use cached session from orm, or always create a new session

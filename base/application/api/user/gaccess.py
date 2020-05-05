@@ -40,8 +40,10 @@ class SocialAccess(Base):
         from base.common.tokens_services import get_token
         from base.application.api_hooks import api_hooks
 
-        AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
-        User, _ = base.common.orm.get_orm_model('users')
+        _session = base.common.orm.orm.session()
+        from src.models.user import AuthUser as AuthUsers, User
+        # AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
+        # User, _ = base.common.orm.get_orm_model('users')
 
         response = {}
         _user = user_exists(self.social_user['email'], AuthUsers, _session, as_bool=False)
@@ -52,6 +54,7 @@ class SocialAccess(Base):
             _token = get_token(_user.id, {})
             if not _token:
                 log.critical('Error getting token for user {} - {}'.format(_user.id, _user.username))
+                _session.close()
                 return False
 
             response.update(_token)
@@ -63,6 +66,7 @@ class SocialAccess(Base):
 
             if not id_user:
                 log.error('Can not create id for new user: {}'.format(self.social_user['email']))
+                _session.close()
                 return False
 
             _password = uuid.uuid4()
@@ -70,6 +74,7 @@ class SocialAccess(Base):
             if _user_registered is None:
                 log.critical('Error register user {} with password {} and data {}'.format(
                     self.social_user['email'], _password, self.social_user))
+                _session.close()
                 return False
 
             if isinstance(_user_registered, dict):
@@ -83,6 +88,7 @@ class SocialAccess(Base):
             _token = get_token(id_user, {})
             if not _token:
                 log.critical('Error getting token for new user {} - {}'.format(id_user, self.social_user['email']))
+                _session.close()
                 return False
             response.update(_token)
 
@@ -92,6 +98,7 @@ class SocialAccess(Base):
                 if not _post_register_result:
                     log.critical('Post register process error for user {} - {}'.format(
                         id_user, self.social_user['email']))
+                    _session.close()
                     return False
 
                 if isinstance(_post_register_result, dict):
@@ -102,11 +109,13 @@ class SocialAccess(Base):
             if not _post_social_login_result:
                 log.critical('Post social login process error for user {} - {}'.format(
                     id_user, self.social_user['email']))
+                _session.close()
                 return False
 
             if isinstance(_post_social_login_result, dict):
                 response.update(_post_social_login_result)
 
+        _session.close()
         return response
 
 

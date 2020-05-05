@@ -102,9 +102,9 @@ class MailQueueHandle(Base):
     def patch(self, id_message, sent, data):
         """Update message status and data"""
 
-        MQ, _session = base.common.orm.get_orm_model('mail_queue')
+        MQ, _ = base.common.orm.get_orm_model('mail_queue')
 
-        q = _session.query(MQ).filter(MQ.id == id_message)
+        q = self.orm_session.query(MQ).filter(MQ.id == id_message)
 
         if q.count() == 0:
             log.warning('No message with id {} found'.format(id_message))
@@ -132,7 +132,7 @@ class MailQueueHandle(Base):
             _commit = True
 
         if _commit:
-            _session.commit()
+            self.orm_session.commit()
 
         return self.ok()
 

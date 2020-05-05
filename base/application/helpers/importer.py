@@ -166,6 +166,8 @@ def _load_app_configuration_with_database(config_file):
         setattr(base.config.application_config, 'authentication_type', config_file.authentication_type)
     if hasattr(config_file, 'session_expiration_timeout'):
         setattr(base.config.application_config, 'session_expiration_timeout', config_file.session_expiration_timeout)
+    if hasattr(config_file, 'cached_session'):
+        setattr(base.config.application_config, 'cached_session', config_file.cached_session)
 
 
 def _load_app_configuration_without_database(config_file):
@@ -301,8 +303,9 @@ def load_application(entries, svc_port, test=False):
     # FINISH LOADING APPLICATION HOOKS
 
 
-def load_orm(svc_port):
+def load_orm(svc_port, test=False, createdb=False):
 
+    print('LOAD ORM')
     try:
         import src.config.app_config
     except ImportError:
@@ -330,11 +333,17 @@ def load_orm(svc_port):
     __db_config = __db_config[svc_port]
     __db_type = __db_config['db_type']
 
+    _database_name = 'test_{}'.format(__db_config['db_name']) if test else __db_config['db_name']
     __db_url = base.common.orm.make_database_url(
-        __db_type, __db_config['db_name'], __db_config['db_host'], __db_config['db_port'], __db_config['db_user'],
+        __db_type, _database_name, __db_config['db_host'], __db_config['db_port'], __db_config['db_user'],
         __db_config['db_password'], __db_config['charset'] if 'charset' in __db_config else 'utf8')
 
+    from base.builder.maker.database_builder import _create_database
+    if createdb and not _create_database(_database_name, __db_type, __db_config, test):
+        print('Database has not created')
+
     base.common.orm.activate_orm(__db_url)
+    print('ORM ACTIVATED IN LOAD ORM')
 
     # REMEMBER DATABASE MODELS
     for m in base.config.application_config.models:

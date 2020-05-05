@@ -222,9 +222,6 @@ def _create_database(db_name, db_type, db_config, test=False):
     if db_type == 'sqlite':
         return True
     else:
-        # def make_database_url2(db_type, host, port, username, password, charset='utf8'):
-        # _url = '{}://{}:{}@{}:{}'.format(
-        #     db_type, db_config['db_user'], db_config['db_password'], db_config['db_host'], db_config['db_port'])
         _url = make_database_url2(
             db_type, db_config['db_host'], db_config['db_port'], db_config['db_user'], db_config['db_password'])
         eng = create_engine(_url)
@@ -352,8 +349,13 @@ def build_database(args, test=False):
                                  db_config['charset'] if 'charset' in db_config else 'utf8')
 
     import base.common.orm
-    orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
-    setattr(base.common.orm, 'orm', orm_builder.orm())
+    if base.common.orm.orm is None:
+        print('BUILD ORM IN BUILD DATABASE BUILDER')
+        orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
+        setattr(base.common.orm, 'orm', orm_builder.orm())
+    else:
+        print('BUILD ORM IN BUILD DATABASE BUILDER ALREADY CREATED')
+        orm_builder = base.common.orm.orm.orm_builder
 
     if not _create_database(_database_name, db_type, db_config, test):
         print('Database has not created')

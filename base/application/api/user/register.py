@@ -40,12 +40,15 @@ class Register(Base):
                 return self.error(msgs.ERROR_USER_REGISTER)
 
         import base.common.orm
-        AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
-        User, _ = base.common.orm.get_orm_model('users')
+        _session = base.common.orm.orm.session()
+        # AuthUsers, _ = base.common.orm.get_orm_model('auth_users')
+        # User, _ = base.common.orm.get_orm_model('users')
+        from src.models.user import AuthUser as AuthUsers, User
 
         if user_exists(username, AuthUsers, _session):
             log.warning('Username {} already taken, requested from {}'.format(username, get_request_ip(self)))
             return self.error(msgs.USERNAME_ALREADY_TAKEN)
+        _session.close()
 
         if base.config.application_config.strong_password and hasattr(api_hooks, 'check_password_is_valid'):
             if not api_hooks.check_password_is_valid(password):

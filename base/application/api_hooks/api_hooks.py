@@ -84,7 +84,9 @@ def pack_user(user):
     _user['username'] = user.username
 
     import base.common.orm
-    User, _session = base.common.orm.get_orm_model('users')
+    _session = base.common.orm.orm.session()
+    from src.models.user import User
+    # User, _session = base.common.orm.get_orm_model('users')
 
     _q = _session.query(User).filter(User.id == user.id)
 
@@ -93,6 +95,8 @@ def pack_user(user):
 
         _user['first_name'] = _db_user.first_name
         _user['last_name'] = _db_user.last_name
+
+    _session.close()
 
     return _user
 
@@ -123,8 +127,10 @@ def register_user(id_user, username, password, data, request_handler=None):
     """
     import base.common.orm
     from base.common.utils import log
-    AuthUser, _session = base.common.orm.get_orm_model('auth_users')
-    User, _ = base.common.orm.get_orm_model('users')
+    _session = base.common.orm.orm.session()
+    # AuthUser, _ = base.common.orm.get_orm_model('auth_users')
+    # User, _ = base.common.orm.get_orm_model('users')
+    from src.models.user import AuthUser, User
 
     password = format_password(username, password)
 
@@ -134,6 +140,7 @@ def register_user(id_user, username, password, data, request_handler=None):
     _all_roles = reduce(lambda a, b: a|b, list(user_roles.lmap.keys()))
     if not role_flags & _all_roles:
         log.critical('Wrong role type: {}'.format(role_flags))
+        _session.close()
         return 'Wrong user role type {}'.format(role_flags)
 
     _auth_user = AuthUser(id_user, username, password, role_flags, True)
@@ -150,9 +157,12 @@ def register_user(id_user, username, password, data, request_handler=None):
     except Exception as e:
         log.critical('Error create user {}: {}'.format(username, e))
         _session.rollback()
+        _session.close()
         return False
-
-    return pack_user(_auth_user)
+    
+    _packed_user = pack_user(_auth_user)
+    _session.close()
+    return _packed_user
 
 
 # END OF THE REGISTER USER PROCESS
@@ -166,14 +176,19 @@ def user_exists(username, password, data, handler):
     :return: bool used
     """
     import base.common.orm
-    AuthUser, _session = base.common.orm.get_orm_model('auth_users')
+    _session = base.common.orm.orm.session()
+    from src.models.user import AuthUser
+    # AuthUser, _session = base.common.orm.get_orm_model('auth_users')
 
     _q = _session.query(AuthUser).filter(AuthUser.username == username)
     if _q.count() != 1:
         log.warning('User {} not found'.format(username))
+        _session.close()
         return None
 
-    return _q.one()
+    _res = _q.one()
+    _session.close()
+    return _res
 
 
 def check_username_and_password(username, password, user):
@@ -221,14 +236,17 @@ def save_hash(hash_data):
     :return: hash
     """
     import base.common.orm
-    Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
-    Hash2ParamsHistory, _session = base.common.orm.get_orm_model('hash_2_params_history_log')
+    _session = base.common.orm.orm.session()
+    from src.models.utils import Hash2Params, Hash2ParamsHistory
+    # Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
+    # Hash2ParamsHistory, _session = base.common.orm.get_orm_model('hash_2_params_history_log')
 
     from base.common.sequencer import sequencer
     _hash = sequencer().new('h')
 
     if not _hash:
         log.critical('Error getting new hash')
+        _session.close()
         raise SaveHash2ParamsException('Error get new hash for data')
 
     hash_data = json.dumps(hash_data)
@@ -241,6 +259,7 @@ def save_hash(hash_data):
     _session.add(h2p_history)
     _session.commit()
 
+    _session.close()
     return {'h2p': _hash}
 
 
@@ -251,12 +270,15 @@ def get_hash_data(h2p):
     :return: dict
     """
     import base.common.orm
-    Hash2Params, _session = base.common.orm.get_orm_model('hash_2_params')
-    Hash2ParamsHistory, _session = base.common.orm.get_orm_model('hash_2_params_history_log')
+    _session = base.common.orm.orm.session()
+    # from src.models.utils import Hash2Params, Hash2ParamsHistory
+    Hash2Params, _ = base.common.orm.get_orm_model('hash_2_params')
+    Hash2ParamsHistory, _ = base.common.orm.get_orm_model('hash_2_params_history_log')
 
     _q = _session.query(Hash2Params).filter(Hash2Params.hash == h2p)
     if _q.count() == 0:
         log.warning('Data for hash {} not found'.format(h2p))
+        _session.close()
         return {}
 
     res = {}
@@ -274,6 +296,7 @@ def get_hash_data(h2p):
     _session.add(h2p_history)
 
     _session.commit()
+    _session.close()
 
     return res
 
@@ -298,14 +321,18 @@ def save_mail_queue(sender, sender_name, receiver, receiver_name, subject, messa
     """
 
     import base.common.orm
-    MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
+    _session = base.common.orm.orm.session()
+    from src.models.mail import MailQueue
+    # MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
 
     data = json.dumps(data) if data else data
     mail_queue = MailQueue(sender, sender_name, receiver, receiver_name, subject, message, data, sent)
     _session.add(mail_queue)
     _session.commit()
 
-    return mail_queue.id
+    _id = mail_queue.id
+    _session.close()
+    return _id
 
 
 def get_mail_from_queue(id_message):
@@ -316,7 +343,9 @@ def get_mail_from_queue(id_message):
     """
 
     import base.common.orm
-    MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
+    _session = base.common.orm.orm.session()
+    from src.models.mail import MailQueue
+    # MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
 
     q = _session.query(MailQueue).filter(MailQueue.id == id_message)
 
@@ -324,6 +353,7 @@ def get_mail_from_queue(id_message):
 
     if q.count() == 0:
         log.info('No message with id {} found'.format(id_message))
+        _session.close()
         return False
 
     msg = q.one()
@@ -340,6 +370,7 @@ def get_mail_from_queue(id_message):
         res['time_sent'] = str(msg.time_sent)
     res['data'] = msg.data
 
+    _session.close()
     return res
 
 
@@ -411,10 +442,13 @@ def send_mail_from_queue(sender, sender_name, receiver, receiver_name, subject, 
 def update_mail_status(id_mail_queue, sent_mail_response):
 
     import base.common.orm
-    MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
+    _session = base.common.orm.orm.session()
+    from src.models.mail import MailQueue
+    # MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
     _mail = _session.query(MailQueue).filter(MailQueue.id == id_mail_queue).one_or_none()
     if _mail is None:
         log.error('Can not find email with id {}'.format(id_mail_queue))
+        _session.close()
         return False
 
     log.info('UPDATE MAIL {} WITH {}'.format(id_mail_queue, sent_mail_response))
@@ -422,20 +456,24 @@ def update_mail_status(id_mail_queue, sent_mail_response):
     _mail.time_sent = sent_mail_response['time_sent'] if 'time_sent' in sent_mail_response else datetime.datetime.now()
     _session.commit()
 
+    _session.close()
     return True
 
 
 def get_email_by_id(id_mail_queue):
 
     import base.common.orm
-    MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
+    _session = base.common.orm.orm.session()
+    from src.models.mail import MailQueue
+    # MailQueue, _session = base.common.orm.get_orm_model('mail_queue')
 
     _mail = _session.query(MailQueue).filter(MailQueue.id == id_mail_queue).one_or_none()
     if _mail is None:
         log.error('Can not find email with id {}'.format(id_mail_queue))
+        _session.close()
         return False
 
-    return {
+    res = {
         'id': id_mail_queue,
         'subject': _mail.subject,
         'sender_name': _mail.sender_name,
@@ -448,13 +486,15 @@ def get_email_by_id(id_mail_queue):
         'message': _mail.message,
         'data': _mail.data
     }
+    _session.close()
+    return res
 
 # END OF E-MAIL QUEUE
 
 # FORGOT PASSWORD
 
 
-def forgot_password(auth_user, data, sent=True):
+def forgot_password(auth_user, data, sent=True, orm_session=None):
     _data = {
         'cmd': 'forgot_password',
         'username': auth_user.username,
@@ -468,6 +508,8 @@ def forgot_password(auth_user, data, sent=True):
         _hash = save_hash(_data)
     except SaveHash2ParamsException as e:
         log.critical('Error save hash for forgot password with data: {}; error: {}'.format(_data, e))
+        if orm_session:
+            orm_session.close()
         return False
 
     _hash = _hash['h2p']
@@ -482,7 +524,7 @@ def forgot_password(auth_user, data, sent=True):
     _forgot_address = '{}/{}'.format(forgot_password_lending_address, _hash)
     _message = forgot_password_message.format(_forgot_address)
 
-    return save_mail_queue(
+    res = save_mail_queue(
         support_mail_address,
         support_name,
         auth_user.username,
@@ -491,20 +533,26 @@ def forgot_password(auth_user, data, sent=True):
         _message,
         None,
         sent)
+    if orm_session:
+        orm_session.close()
+    
+    return res
 
 
 def find_user_and_forgot_password(username, data):
 
     import base.common.orm
-    AuthUser, _session = base.common.orm.get_orm_model('auth_users')
+    _session = base.common.orm.orm.session()
+    AuthUser, _ = base.common.orm.get_orm_model('auth_users')
 
     _user = _session.query(AuthUser).filter(AuthUser.username == username).one_or_none()
 
     if _user is None:
         log.warning('Non existing user {} request forgot password'.format(username))
+        _session.close()
         return False
 
-    return forgot_password(_user, data, False)
+    return forgot_password(_user, data, False, _session)
 
 
 # END OF FORGOT PASSWORD

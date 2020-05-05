@@ -75,3 +75,4 @@ test_mode = False
 session_expiration_timeout = None   # seconds for session's token timeout
 disable_spec = False                # disable spec URI
 disable_all_paths = False           # disable all paths URI
+cached_session = True               # use cached session from orm, or always create a new session
