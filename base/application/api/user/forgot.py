@@ -25,24 +25,21 @@ class Forgot(Base):
         """Start user forgot password process"""
 
         import base.common.orm
-        _session = base.common.orm.orm.session()
         AuthUser, _ = base.common.orm.get_orm_model('auth_users')
+        with base.common.orm.orm_session() as _session:
 
-        _q = _session.query(AuthUser).filter(AuthUser.username == username)
+            _q = _session.query(AuthUser).filter(AuthUser.username == username)
 
-        if _q.count() == 0:
-            log.warning('Non existing user {} request forgot password'.format(username))
-            _session.close()
-            return self.error(msgs.USER_NOT_FOUND)
+            if _q.count() == 0:
+                log.warning('Non existing user {} request forgot password'.format(username))
+                return self.error(msgs.USER_NOT_FOUND)
 
-        user = _q.one()
+            user = _q.one()
 
-        from base.application.api_hooks import api_hooks
-        if not api_hooks.forgot_password(user, data):
-            _session.close()
-            return self.error(msgs.FORGOT_REQUEST_ERROR)
+            from base.application.api_hooks import api_hooks
+            if not api_hooks.forgot_password(user, data):
+                return self.error(msgs.FORGOT_REQUEST_ERROR)
 
-        _session.close()
         return self.ok()
 
     @params(

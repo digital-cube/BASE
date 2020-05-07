@@ -63,17 +63,17 @@ class s_hash_2_params(base.common.orm.sql_base):
 
 def main():
     import base.common.orm
-    _session = base.common.orm.orm.session()
+    with base.common.orm.orm_session() as _session:
 
-    for _s in [
-        ('u', '00', '000', 4, 0, 'users', 'STR', 's_users', False),
-        ('s', '00', '000', 58, 0, 'session_token', 'STR', 's_session_token', False),
-        ('h', '00', '000', 58, 0, 'hash_2_params', 'STR', 's_hash_2_params', False)]:
-        _seq = Sequencer(*_s)
+        for _s in [
+            ('u', '00', '000', 4, 0, 'users', 'STR', 's_users', False),
+            ('s', '00', '000', 58, 0, 'session_token', 'STR', 's_session_token', False),
+            ('h', '00', '000', 58, 0, 'hash_2_params', 'STR', 's_hash_2_params', False)]:
+            _seq = Sequencer(*_s)
 
-        _session.add(_seq)
+            _session.add(_seq)
 
-    _session.commit()
+        _session.commit()
 
 
 if __name__ == '__main__':

@@ -3,8 +3,8 @@
 import os
 import sys
 import unittest
-# import tornado.testing
-# from unittest import TestSuite
+import tornado.testing
+from unittest import TestSuite
 
 # from base.tests.api.user.test_user_change_password import TestUserChangePassword
 # from base.tests.api.user.test_user_forgot_password import TestUserForgot
@@ -19,32 +19,26 @@ import unittest
 # from base.tests.api.utils.test_mail_queue import TestMailQueueGet
 # from base.tests.api.utils.test_options import TestOptions
 
-_current_dir = os.getcwd()
-_current_dir_from_file = os.path.dirname(os.path.abspath(__file__))
-_parent_dir = '/'.join(_current_dir_from_file.split('/')[:-1])
-if _parent_dir != _current_dir:
-    os.chdir(_parent_dir)
-sys.path.append(os.path.abspath(_parent_dir))
 
-try:
-    from hello import TestHello, TestHelloWorld
-except ImportError:
-    from tests.hello import TestHello, TestHelloWorld
+_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
+sys.path.append(_root_dir)
 
+from tests.test_hello import TestHello, TestHelloWorld
 
-# def all():
-#     _all = TestSuite()
-#     _all.addTest(TestUserRegister('test_register'))
-#     _all.addTest(TestUserRegister('test_register_with_same_username'))
-#     return _all
+def all():
+    # _tests = [TestUserChangePassword, TestUserForgot, TestUserLogin, TestUserLogout, TestUserRegister, TestUserGAccess, TestUserFAccess, TestHash2Params, TestMailQueue, TestMailQueueSetOptions, TestMailQueueGet, TestOptions, TestHello, TestHelloWorld]
+    _tests = [TestHello, TestHelloWorld]
+
+    _loader = unittest.TestLoader()
+    _tests = [_loader.loadTestsFromTestCase(t) for t in _tests]
+    _all = TestSuite(_tests)
+    return _all
+    
 
 if __name__ == '__main__':
     """
-    Run all tests.
-    Make sure the test database is created. For postgresql and mysql create database test_[configured database name]
+    Run all tests in a suite.
     """
 
-    unittest.main()
-    # all()
-    # tornado.testing.main()
+    tornado.testing.main()
 

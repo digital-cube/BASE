@@ -40,82 +40,74 @@ class SocialAccess(Base):
         from base.common.tokens_services import get_token
         from base.application.api_hooks import api_hooks
 
-        _session = base.common.orm.orm.session()
-        from src.models.user import AuthUser as AuthUsers, User
-        # AuthUsers, _session = base.common.orm.get_orm_model('auth_users')
-        # User, _ = base.common.orm.get_orm_model('users')
+        AuthUsers, _ = base.common.orm.get_orm_model('auth_users')
+        User, _ = base.common.orm.get_orm_model('users')
+        with base.common.orm.orm_session() as _session:
 
-        response = {}
-        _user = user_exists(self.social_user['email'], AuthUsers, _session, as_bool=False)
-        if _user:
-            # user exists - log in the user
-            id_user = _user.id
-            log.info('User {} already exists, login the user'.format(self.social_user['email']))
-            _token = get_token(_user.id, {})
-            if not _token:
-                log.critical('Error getting token for user {} - {}'.format(_user.id, _user.username))
-                _session.close()
-                return False
-
-            response.update(_token)
-
-        else:
-            # user do not exists - register user
-            from base.common.sequencer import sequencer
-            id_user = sequencer().new('u')
-
-            if not id_user:
-                log.error('Can not create id for new user: {}'.format(self.social_user['email']))
-                _session.close()
-                return False
-
-            _password = uuid.uuid4()
-            _user_registered = api_hooks.register_user(id_user, self.social_user['email'], _password, self.social_user)
-            if _user_registered is None:
-                log.critical('Error register user {} with password {} and data {}'.format(
-                    self.social_user['email'], _password, self.social_user))
-                _session.close()
-                return False
-
-            if isinstance(_user_registered, dict):
-                response.update(_user_registered)
-            elif _user_registered != True:
-                try:
-                    response['message'] = str(_user_registered)
-                except Exception:
-                    log.error('Can not make string from user register response')
-
-            _token = get_token(id_user, {})
-            if not _token:
-                log.critical('Error getting token for new user {} - {}'.format(id_user, self.social_user['email']))
-                _session.close()
-                return False
-            response.update(_token)
-
-            if hasattr(api_hooks, 'post_register_process'):
-                _post_register_result = api_hooks.post_register_process(
-                    id_user, self.social_user['email'], _password, self.social_user, _token)
-                if not _post_register_result:
-                    log.critical('Post register process error for user {} - {}'.format(
-                        id_user, self.social_user['email']))
-                    _session.close()
+            response = {}
+            _user = user_exists(self.social_user['email'], AuthUsers, _session, as_bool=False)
+            if _user:
+                # user exists - log in the user
+                id_user = _user.id
+                log.info('User {} already exists, login the user'.format(self.social_user['email']))
+                _token = get_token(_user.id, {})
+                if not _token:
+                    log.critical('Error getting token for user {} - {}'.format(_user.id, _user.username))
                     return False
 
-                if isinstance(_post_register_result, dict):
-                    response.update(_post_register_result)
+                response.update(_token)
 
-        if hasattr(api_hooks, 'post_social_login_process'):
-            _post_social_login_result = api_hooks.post_social_login_process(id_user, self.social_user)
-            if not _post_social_login_result:
-                log.critical('Post social login process error for user {} - {}'.format(
-                    id_user, self.social_user['email']))
-                _session.close()
-                return False
+            else:
+                # user do not exists - register user
+                from base.common.sequencer import sequencer
+                id_user = sequencer().new('u')
 
-            if isinstance(_post_social_login_result, dict):
-                response.update(_post_social_login_result)
+                if not id_user:
+                    log.error('Can not create id for new user: {}'.format(self.social_user['email']))
+                    return False
 
-        _session.close()
+                _password = uuid.uuid4()
+                _user_registered = api_hooks.register_user(id_user, self.social_user['email'], _password, self.social_user)
+                if _user_registered is None:
+                    log.critical('Error register user {} with password {} and data {}'.format(
+                        self.social_user['email'], _password, self.social_user))
+                    return False
+
+                if isinstance(_user_registered, dict):
+                    response.update(_user_registered)
+                elif _user_registered != True:
+                    try:
+                        response['message'] = str(_user_registered)
+                    except Exception:
+                        log.error('Can not make string from user register response')
+
+                _token = get_token(id_user, {})
+                if not _token:
+                    log.critical('Error getting token for new user {} - {}'.format(id_user, self.social_user['email']))
+                    return False
+                response.update(_token)
+
+                if hasattr(api_hooks, 'post_register_process'):
+                    _post_register_result = api_hooks.post_register_process(
+                        id_user, self.social_user['email'], _password, self.social_user, _token)
+                    if not _post_register_result:
+                        log.critical('Post register process error for user {} - {}'.format(
+                            id_user, self.social_user['email']))
+                        return False
+
+                    if isinstance(_post_register_result, dict):
+                        response.update(_post_register_result)
+
+            if hasattr(api_hooks, 'post_social_login_process'):
+                _post_social_login_result = api_hooks.post_social_login_process(id_user, self.social_user)
+                if not _post_social_login_result:
+                    log.critical('Post social login process error for user {} - {}'.format(
+                        id_user, self.social_user['email']))
+                    return False
+
+                if isinstance(_post_social_login_result, dict):
+                    response.update(_post_social_login_result)
+
         return response
 
 

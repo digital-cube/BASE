@@ -839,56 +839,52 @@ class authenticated(object):
                             return
                         return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
-                if _origin_self.orm_session is None:
-                    import base.common.orm
-                    _origin_self.orm_session = base.common.orm.orm.session(new=True)
+                import base.common.orm
+                with base.common.orm.orm_session() as _session:
+                    if _origin_self.orm_session is None:
+                        # import base.common.orm
+                        _origin_self.orm_session = _session
 
-                _user = get_user_by_token(_auth_token, pack=False, orm_session=_origin_self.orm_session)
-                if not _user:
-                    if self.authentication_level == auth_level.WEAK:
-                        # if token not provided and authentication is week set auth user to None and go to the target
-                        _origin_self.set_authorization_token(None)
-                        _origin_self.set_authorized_user(None)
-                        setattr(_target, '__AUTHENTICATED__', True)
+                    _user = get_user_by_token(_auth_token, pack=False, orm_session=_origin_self.orm_session)
+                    if not _user:
+                        if self.authentication_level == auth_level.WEAK:
+                            # if token not provided and authentication is week set auth user to None and go to the target
+                            _origin_self.set_authorization_token(None)
+                            _origin_self.set_authorized_user(None)
+                            setattr(_target, '__AUTHENTICATED__', True)
 
-                        import base.config.application_config
-                        try:
-                            # remove secure cookie if exists, because is not valid
-                            _origin_self.clear_cookie(base.config.application_config.secret_cookie_name)
-                        except:
-                            pass
+                            import base.config.application_config
+                            try:
+                                # remove secure cookie if exists, because is not valid
+                                _origin_self.clear_cookie(base.config.application_config.secret_cookie_name)
+                            except:
+                                pass
 
-                        res = _target(_origin_self, *args, **kwargs)
-                        _origin_self.orm_session.close()
-                        return res
-                    else:
-                        log.critical('Can not get user from token {}'.format(_auth_token))
-                        if self.redirect_url is not None:
-                            _origin_self.redirect(self.redirect_url, permanent=False)
-                            _origin_self.orm_session.close()
-                            return
-                        _origin_self.orm_session.close()
-                        return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
+                            return _target(_origin_self, *args, **kwargs)
+                        else:
+                            log.critical('Can not get user from token {}'.format(_auth_token))
+                            if self.redirect_url is not None:
+                                _origin_self.redirect(self.redirect_url, permanent=False)
+                                return
 
-                if self.roles is not None:
-                    if not (self.roles & _user.role_flags):
-                        log.critical('User {} with role {} trying unauthorized access on {}'.format(
-                            _user.username, _user.role_flags, _origin_self.request.uri))
-                        if self.redirect_url is not None:
-                            _origin_self.redirect(self.redirect_url, permanent=False)
-                            _origin_self.orm_session.close()
-                            return
-                        _origin_self.orm_session.close()
-                        return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
+                            return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
-                _origin_self.set_authorization_token(_auth_token)
-                _origin_self.set_authorized_user(_user)
+                    if self.roles is not None:
+                        if not (self.roles & _user.role_flags):
+                            log.critical('User {} with role {} trying unauthorized access on {}'.format(
+                                _user.username, _user.role_flags, _origin_self.request.uri))
+                            if self.redirect_url is not None:
+                                _origin_self.redirect(self.redirect_url, permanent=False)
+                                return
 
-                setattr(_target, '__AUTHENTICATED__', True)
+                            return _origin_self.error(msgs.UNAUTHORIZED_REQUEST, http_status=403)
 
-                res = _target(_origin_self, *args, **kwargs)
-                _origin_self.orm_session.close()
-                return res
+                    _origin_self.set_authorization_token(_auth_token)
+                    _origin_self.set_authorized_user(_user)
+
+                    setattr(_target, '__AUTHENTICATED__', True)
+
+                    return _target(_origin_self, *args, **kwargs)
 
             return wrapper
 
@@ -924,18 +920,11 @@ class db(object):
             def wrapper(_origin_self, *args, **kwargs):
 
                 import base.common.orm
-                _session = base.common.orm.orm.session(new=self.new_session)
-                try:
+                with base.common.orm.orm_session() as _session:
+
                     if _origin_self.orm_session is None:
                         _origin_self.orm_session = _session
-                    res = _target(_origin_self, *args, **kwargs)
-                except:
-                    _session.rollback()
-                    raise
-                finally:
-                    _session.close()
-
-                return res
+                    return _target(_origin_self, *args, **kwargs)
 
             return wrapper
 

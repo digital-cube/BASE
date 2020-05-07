@@ -84,7 +84,7 @@ class db_state:
                         if _state == 1:
                             print('''
     ***** THERE IS AN ACTIVE CONNECTION ON template1 DATABASE, PLEASE DISCONNECT AND TRY AGAIN
-                            '''.format(_db_name))
+                            ''')
                             time.sleep(1)
                             continue
 
@@ -136,9 +136,11 @@ class db_state:
 
 class TestBase(AsyncHTTPTestCase):
 
+    __DB_SAVE_TO__ = None
+
     def get_app(self):
 
-        print('GET APP')
+        # print('GET APP')
         self.token = None
 
         entries = [(BaseHandler.__URI__, BaseHandler, {'idx': 0}), ]
@@ -150,18 +152,18 @@ class TestBase(AsyncHTTPTestCase):
         from base.config.application_config import port as svc_port
 
         import base.common.orm
-        print('TESTING GET APP LOAD ORM', base.common.orm.orm is None)
+        # print('TESTING GET APP LOAD ORM', base.common.orm.orm is None)
         if base.common.orm.orm is None:
             load_orm(svc_port, test=True, createdb=True)
         # print('ORM LOADED')
 
-        print('CLEAR DATABASE')
+        # print('CLEAR DATABASE')
         # breakpoint()
         # try:
         base.common.orm.orm.clear_database()
         # except:
         #     print('DATABASE CAN NOT BE DROPPED, DOESNT EXISTS') 
-        print('CREATE DATABASE')
+        # print('CREATE DATABASE')
         base.common.orm.orm.create_db_schema(test=True)
 
 
@@ -206,7 +208,7 @@ class TestBase(AsyncHTTPTestCase):
                 from tests_hooks.hook import register
                 from types import MethodType
                 setattr(self, '_register', MethodType(register, self))
-        except ImportError as e:
+        except ImportError:
             pass
             # print('There is no tests hook')
 
@@ -259,7 +261,7 @@ class TestBase(AsyncHTTPTestCase):
             print('Error: {}'.format(e))
 
     def tearDown(self):
-        print('TEAR DOWN')
+        # print('TEAR DOWN')
         # breakpoint()
         if hasattr(self, '__DB_SAVE_TO__') and self.__DB_SAVE_TO__ is not None:
             self.save_database_state()

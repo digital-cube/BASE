@@ -13,27 +13,27 @@ import base.application.lookup.responses as msgs
 def save_option(key, value, orm_session=None):
 
     import base.common.orm
-    from base.common.utils import log
-    _session = base.common.orm.orm.session() if orm_session is None else orm_session
     OrmOptions, _ = base.common.orm.get_orm_model('options')
-    _q = _session.query(OrmOptions).filter(OrmOptions.key == key)
+    from base.common.utils import log
+    with base.common.orm.orm_session() as _session:
 
-    if _q.count() == 1:
-        _option = _q.one()
-        _option.value = value
+        if orm_session:
+            _session = orm_session
 
-    elif _q.count() == 0:
-        _option = OrmOptions(key, value)
-        _session.add(_option)
+        _q = _session.query(OrmOptions).filter(OrmOptions.key == key)
 
-    else:
-        log.warning('Found {} occurrences for {}'.format(_q.count(), key))
-        if not orm_session:
-            _session.close()
-        return False
+        if _q.count() == 1:
+            _option = _q.one()
+            _option.value = value
 
-    if not orm_session:
-        _session.close()
+        elif _q.count() == 0:
+            _option = OrmOptions(key, value)
+            _session.add(_option)
+
+        else:
+            log.warning('Found {} occurrences for {}'.format(_q.count(), key))
+            return False
+
     return _option
 
 
@@ -49,7 +49,6 @@ class Options(Base):
     def get(self, _key):
         """Get option"""
 
-        # import base.common.orm
         from base.common.utils import log
         OrmOptions, _ = base.common.orm.get_orm_model('options')
 
@@ -72,7 +71,6 @@ class Options(Base):
         """Save option"""
 
         from base.common.utils import log
-        OrmOptions, _ = base.common.orm.get_orm_model('options')
         _option = save_option(_key, _value, orm_session=self.orm_session)
         if not _option:
             return self.error(msgs.OPTION_MISMATCH, option=_key)

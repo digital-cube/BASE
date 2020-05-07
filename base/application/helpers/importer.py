@@ -305,7 +305,7 @@ def load_application(entries, svc_port, test=False):
 
 def load_orm(svc_port, test=False, createdb=False):
 
-    print('LOAD ORM')
+    # print('LOAD ORM')
     try:
         import src.config.app_config
     except ImportError:
@@ -343,7 +343,7 @@ def load_orm(svc_port, test=False, createdb=False):
         print('Database has not created')
 
     base.common.orm.activate_orm(__db_url)
-    print('ORM ACTIVATED IN LOAD ORM')
+    # print('ORM ACTIVATED IN LOAD ORM')
 
     # REMEMBER DATABASE MODELS
     for m in base.config.application_config.models:

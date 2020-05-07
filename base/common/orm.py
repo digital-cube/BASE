@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import sqlalchemy
+import contextlib
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
@@ -59,6 +60,7 @@ class _orm(object):
         return _orm.__instance
 
     def session(self, new=False):
+        # breakpoint()
         if new:
             __session_factory = sessionmaker(bind=self.__engine)
             __scoped_session = scoped_session(__session_factory)
@@ -93,99 +95,18 @@ class _orm(object):
 
         if test:
             self.__base.metadata.create_all(self.__engine)
-            self.session().commit()
+            with orm_session() as _session:
+                _session.commit()
             return
-
-        # # alembic create all tables;
-        # from alembic.config import Config
-        # from alembic import command
-        # os.chdir('db')
-        # alembic_cfg = Config('alembic.ini')
-
-        # first_revision = command.show(alembic_cfg, "head")
-        # if first_revision is None:
-        #     command.revision(alembic_cfg, autogenerate=True, message='initial')
-        # command.upgrade(alembic_cfg, "head")
-        # os.chdir('..')
-
-
-class _orm_fresh:
-    """Always return new session"""
-
-    __instance = None
-
-    def __new__(cls, sql_address, orm_base, **kwargs):
-
-        if _orm_fresh.__instance is None:
-            _orm_fresh.__instance = object.__new__(cls)
-            cls.__db_url = sql_address
-            cls.__engine = create_engine(cls.__db_url, echo=False, **kwargs)
-            cls.__session_factory = sessionmaker(bind=cls.__engine)
-            cls.__scoped_session = scoped_session(cls.__session_factory)
-            cls.__session = cls.__scoped_session()
-            cls.__base = orm_base
-
-        return _orm_fresh.__instance
-
-    def session(self, new=True):
-        if new:
-            __session_factory = sessionmaker(bind=self.__engine)
-            __scoped_session = scoped_session(__session_factory)
-            return __scoped_session()
-
-        return self.__session
-
-    def engine(self):
-        return self.__engine
-
-    def db_url(self):
-        return self.__db_url
-
-    def base(self):
-        return self.__base
-
-    def clear_database(self):
-        if self.__engine.name == 'sqlite':
-            try:
-                _db_name = self.__db_url[len('sqlite:///'):]
-            except:
-                _db_name = self.__db_url.database
-
-            os.remove(_db_name)
-        else:
-            __meta = sqlalchemy.MetaData(self.__engine)
-            __meta.reflect()
-            __meta.drop_all()
-
-    def create_db_schema(self, test=False):
-        """In test mode use sqlalchemy method, in other cases use alembic"""
-
-        if test:
-            print('CREATE DB SCHEMA base', self.__base)
-            print('CREATE DB SCHEMA engine', self.__engine)
-            self.__base.metadata.create_all(self.__engine)
-            self.__session.commit()
-            return
-
-        # # alembic create all tables;
-        # from alembic.config import Config
-        # from alembic import command
-        # os.chdir('db')
-        # alembic_cfg = Config('alembic.ini')
-
-        # first_revision = command.show(alembic_cfg, "head")
-        # if first_revision is None:
-        #     command.revision(alembic_cfg, autogenerate=True, message='initial')
-        # command.upgrade(alembic_cfg, "head")
-        # os.chdir('..')
 
 
 class orm_builder(object):
 
     def __init__(self, sql_address, orm_base, **kwargs):
         import base.config.application_config
-        print('BUILD ORM IN ORM BUILDER')
-        self.__orm = _orm(sql_address, orm_base, **kwargs) if base.config.application_config.cached_session else _orm_fresh(sql_address, orm_base, **kwargs)
+        # print('BUILD ORM IN ORM BUILDER')
+        self.__orm = _orm(sql_address, orm_base, **kwargs)
+        # self.__orm = _orm(sql_address, orm_base, **kwargs) if base.config.application_config.cached_session else _orm_fresh(sql_address, orm_base, **kwargs)
         setattr(self.__orm, 'orm_build', self)
 
     def create_db_schema(self, test=False):
@@ -233,7 +154,7 @@ class orm_builder(object):
             __meta.drop_all()
 
     def orm(self):
-        print('ORM BUILDER ORM', self.__orm)
+        # print('ORM BUILDER ORM', self.__orm)
         # breakpoint()
         return self.__orm
 
@@ -253,12 +174,28 @@ orm = None
 
 def activate_orm(db_url):
 
-    print('BUILD ORM IN ACTIVATE ORM')
+    # print('BUILD ORM IN ACTIVATE ORM')
     # breakpoint()
     global orm
     global sql_base
+    # import base.config.application_config
+    orm = _orm(db_url, sql_base)
+    # orm = _orm(db_url, sql_base) if base.config.application_config.cached_session else _orm_fresh(db_url, sql_base)
+
+
+@contextlib.contextmanager
+def orm_session():
+    global orm
     import base.config.application_config
-    orm = _orm(db_url, sql_base) if base.config.application_config.cached_session else _orm_fresh(db_url, sql_base)
+    _session = orm.session(new=not base.config.application_config.cached_session)
+    try:
+        yield _session
+    except:
+        _session.rollback()
+        raise
+    finally:
+        if not base.config.application_config.cached_session:
+            _session.close()
 
 
 def get_orm_model(model_name):
