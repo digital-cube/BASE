@@ -85,7 +85,7 @@ def pack_user(user):
 
     import base.common.orm
     with base.common.orm.orm_session() as _session:
-        User, _ = base.common.orm.get_orm_model('users')
+        User = base.common.orm.get_orm_model('users')
 
         _q = _session.query(User).filter(User.id == user.id)
 
@@ -126,8 +126,8 @@ def register_user(id_user, username, password, data, request_handler=None):
     from base.common.utils import log
     with base.common.orm.orm_session() as _session:
 
-        AuthUser, _ = base.common.orm.get_orm_model('auth_users')
-        User, _ = base.common.orm.get_orm_model('users')
+        AuthUser = base.common.orm.get_orm_model('auth_users')
+        User = base.common.orm.get_orm_model('users')
 
         password = format_password(username, password)
 
@@ -169,7 +169,7 @@ def user_exists(username, password, data, handler):
     :return: bool used
     """
     import base.common.orm
-    AuthUser, _ = base.common.orm.get_orm_model('auth_users')
+    AuthUser = base.common.orm.get_orm_model('auth_users')
     with base.common.orm.orm_session() as _session:
 
         _q = _session.query(AuthUser).filter(AuthUser.username == username)
@@ -225,8 +225,8 @@ def save_hash(hash_data):
     :return: hash
     """
     import base.common.orm
-    Hash2Params, _ = base.common.orm.get_orm_model('hash_2_params')
-    Hash2ParamsHistory, _ = base.common.orm.get_orm_model('hash_2_params_history_log')
+    Hash2Params = base.common.orm.get_orm_model('hash_2_params')
+    Hash2ParamsHistory = base.common.orm.get_orm_model('hash_2_params_history_log')
     with base.common.orm.orm_session() as _session:
 
         from base.common.sequencer import sequencer
@@ -257,8 +257,8 @@ def get_hash_data(h2p):
     """
 
     import base.common.orm
-    Hash2Params, _ = base.common.orm.get_orm_model('hash_2_params')
-    Hash2ParamsHistory, _ = base.common.orm.get_orm_model('hash_2_params_history_log')
+    Hash2Params = base.common.orm.get_orm_model('hash_2_params')
+    Hash2ParamsHistory = base.common.orm.get_orm_model('hash_2_params_history_log')
 
     with base.common.orm.orm_session() as _session:
         
@@ -306,7 +306,7 @@ def save_mail_queue(sender, sender_name, receiver, receiver_name, subject, messa
     """
 
     import base.common.orm
-    MailQueue, _ = base.common.orm.get_orm_model('mail_queue')
+    MailQueue = base.common.orm.get_orm_model('mail_queue')
     with base.common.orm.orm_session() as _session:
 
         data = json.dumps(data) if data else data
@@ -325,7 +325,7 @@ def get_mail_from_queue(id_message):
     """
 
     import base.common.orm
-    MailQueue, _ = base.common.orm.get_orm_model('mail_queue')
+    MailQueue = base.common.orm.get_orm_model('mail_queue')
     with base.common.orm.orm_session() as _session:
 
         q = _session.query(MailQueue).filter(MailQueue.id == id_message)
@@ -421,7 +421,7 @@ def send_mail_from_queue(sender, sender_name, receiver, receiver_name, subject, 
 def update_mail_status(id_mail_queue, sent_mail_response):
 
     import base.common.orm
-    MailQueue, _ = base.common.orm.get_orm_model('mail_queue')
+    MailQueue = base.common.orm.get_orm_model('mail_queue')
     with base.common.orm.orm_session() as _session:
 
         _mail = _session.query(MailQueue).filter(MailQueue.id == id_mail_queue).one_or_none()
@@ -440,7 +440,7 @@ def update_mail_status(id_mail_queue, sent_mail_response):
 def get_email_by_id(id_mail_queue):
 
     import base.common.orm
-    MailQueue, _ = base.common.orm.get_orm_model('mail_queue')
+    MailQueue = base.common.orm.get_orm_model('mail_queue')
     with base.common.orm.orm_session() as _session:
 
         _mail = _session.query(MailQueue).filter(MailQueue.id == id_mail_queue).one_or_none()
@@ -511,7 +511,7 @@ def forgot_password(auth_user, data, sent=True):
 def find_user_and_forgot_password(username, data):
 
     import base.common.orm
-    AuthUser, _ = base.common.orm.get_orm_model('auth_users')
+    AuthUser = base.common.orm.get_orm_model('auth_users')
     with base.common.orm.orm_session() as _session:
 
         _user = _session.query(AuthUser).filter(AuthUser.username == username).one_or_none()

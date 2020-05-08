@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import logging
 import sqlalchemy
 import contextlib
 from sqlalchemy import create_engine
@@ -11,6 +12,7 @@ from sqlalchemy.engine.url import URL
 from base.application.lookup import exit_status
 from base.application.helpers.exceptions import UnknownDatabaseType
 
+log = logging.getLogger('BASE')
 
 sql_base = declarative_base()
 
@@ -61,6 +63,7 @@ class _orm(object):
 
     def session(self, new=False):
         # breakpoint()
+        print('KREIRAM SESIJU - NEW', new)
         if new:
             __session_factory = sessionmaker(bind=self.__engine)
             __scoped_session = scoped_session(__session_factory)
@@ -103,7 +106,7 @@ class _orm(object):
 class orm_builder(object):
 
     def __init__(self, sql_address, orm_base, **kwargs):
-        import base.config.application_config
+        # import base.config.application_config
         # print('BUILD ORM IN ORM BUILDER')
         self.__orm = _orm(sql_address, orm_base, **kwargs)
         # self.__orm = _orm(sql_address, orm_base, **kwargs) if base.config.application_config.cached_session else _orm_fresh(sql_address, orm_base, **kwargs)
@@ -172,21 +175,76 @@ class orm_builder(object):
 orm = None
 
 
-def activate_orm(db_url):
+from sqlalchemy import event
 
-    # print('BUILD ORM IN ACTIVATE ORM')
-    # breakpoint()
+
+def activate_orm(db_url):
     global orm
     global sql_base
-    # import base.config.application_config
     orm = _orm(db_url, sql_base)
-    # orm = _orm(db_url, sql_base) if base.config.application_config.cached_session else _orm_fresh(db_url, sql_base)
 
+    @event.listens_for(orm.engine(), 'connect')
+    def sql_tarce_engine_or_pool_connect(dbapi_connection, connection_record):
+        print('TRACE ENGINE OR POOL CONNECT on', dbapi_connection.info.dbname)
+        try:
+            log.info('Engine connected to {}'.format(dbapi_connection.info.dbname))
+        except Exception as e:
+            log.warning('Faild to extract databse name from database connection info: {}'.format(e))
+
+    @event.listens_for(orm.engine(), 'detach')
+    def sql_trace_engine_or_pool_detach(dbapi_connection, connection_record):
+        "listen for the 'detach' event"
+        print('TRACE ENGINE OR POOL DETACH', dbapi_connection, connection_record)
+
+    @event.listens_for(orm.engine(), 'invalidate')
+    def sql_trace_engine_or_pool_invalidate(dbapi_connection, connection_record, exception):
+        "listen for the 'invalidate' event"
+        print('TRACE ENGINE OR POOL INVALIDATE', dbapi_connection, connection_record, exception)
+
+    @event.listens_for(orm.engine(), 'reset')
+    def sql_trace_enigne_or_pool_reset(dbapi_connection, connection_record):
+        "listen for the 'reset' event"
+        print('TRACE ENGINE OR POOL RESET', dbapi_connection, connection_record)
+        print('/'*100)
+
+    @event.listens_for(orm.engine(), 'engine_connect')
+    def sql_trace_engine_connect(conn, branch):
+        # breakpoint()
+        print('TRACE ENGINE CONNECT', conn, branch)
+        pass
+
+    @event.listens_for(orm.engine(), 'engine_disposed')
+    def sql_trace_engine_disposed(engine):
+        "listen for the 'engine_disposed' event"
+        print('TRACE ENGINE DISPOSE', engine, '+'*100)
+
+    @event.listens_for(orm.engine(), 'rollback')
+    def sql_trace_rollback(conn):
+        "listen for the 'rollback' event"
+        print('TRACE ROLLBACK', conn)
+    
+    @event.listens_for(orm.engine(), 'checkout')
+    def sql_trace_engine_connection_checkout(dbapi_connection, connection_record, connection_proxy):
+        print('TRACE ENGINE OR POOL CONNECT CHECKOUT', dbapi_connection, connection_record, connection_proxy)
+        pass
+    
+    @event.listens_for(orm.engine(), 'close')
+    def sql_trace_close(dbapi_connection, connection_record):
+        "listen for the 'close' event"
+        print('TRACE ENGINE OR POOL CLOSE', dbapi_connection, connection_record)
+        print('_' * 100)
+    
+    @event.listens_for(orm.engine(), 'close_detached')
+    def sql_trace_close_detached(dbapi_connection):
+        "listen for the 'close_detached' event"
+        print('TRACE ENGINE OR POOL CLOSE DETACHED', dbapi_connection)
+        print('+' * 100)
 
 @contextlib.contextmanager
 def orm_session():
     global orm
     import base.config.application_config
+    print('CONTEXT SESIJU - NEW', not base.config.application_config.cached_session)
     _session = orm.session(new=not base.config.application_config.cached_session)
     try:
         yield _session
@@ -199,16 +257,21 @@ def orm_session():
 
 
 def get_orm_model(model_name):
-
-    global orm
+    # global orm
     import base.config.application_config
-    OrmModel = base.config.application_config.orm_models[model_name]
-    _session = orm.session()
+    return base.config.application_config.orm_models[model_name]
+    # OrmModel = base.config.application_config.orm_models[model_name]
+    # _session = orm.session()
 
-    return OrmModel, _session
+    # return OrmModel, _session
 
 
 def commit():
+
+    import base.config.application_config
+    if not base.config.application_config.cached_session:
+        raise ValueError('DB session has to be cached for this commit, use orm_session')
+
     global orm
 
     if not orm:
@@ -285,4 +348,3 @@ def init_orm():
         return orm_builder(__db_url, sql_base, **_orm_build_args)
 
     return orm_builder(__db_url, sql_base)
-

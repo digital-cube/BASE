@@ -102,7 +102,7 @@ class MailQueueHandle(Base):
     def patch(self, id_message, sent, data):
         """Update message status and data"""
 
-        MQ, _ = base.common.orm.get_orm_model('mail_queue')
+        MQ = base.common.orm.get_orm_model('mail_queue')
 
         q = self.orm_session.query(MQ).filter(MQ.id == id_message)
 

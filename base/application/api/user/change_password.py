@@ -32,20 +32,19 @@ class ChangePassword(Base):
         _id = hash_data['id_user']
 
         import base.common.orm
-        _session = base.common.orm.orm.session()
-        AuthUser, _ = base.common.orm.get_orm_model('auth_users')
-        _q = _session.query(AuthUser).filter(AuthUser.id == _id)
-        if _q.count() == 0:
-            log.critical('User {} not found for change password'.format(_id))
-            _session.close()
-            return self.error(msgs.USER_NOT_FOUND)
+        AuthUser = base.common.orm.get_orm_model('auth_users')
+        with base.common.orm.orm_session() as _session:
+            _q = _session.query(AuthUser).filter(AuthUser.id == _id)
+            if _q.count() == 0:
+                log.critical('User {} not found for change password'.format(_id))
+                _session.close()
+                return self.error(msgs.USER_NOT_FOUND)
 
-        user = _q.one()
+            user = _q.one()
 
-        _password = format_password(user.username, new_password)
-        user.password = _password
-        _session.commit()
-        _session.close()
+            _password = format_password(user.username, new_password)
+            user.password = _password
+            _session.commit()
 
         return self.ok()
 

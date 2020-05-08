@@ -42,8 +42,7 @@ class Register(Base):
         import base.common.orm
         with base.common.orm.orm_session() as _session:
             
-            AuthUsers, _ = base.common.orm.get_orm_model('auth_users')
-            User, _ = base.common.orm.get_orm_model('users')
+            AuthUsers = base.common.orm.get_orm_model('auth_users')
 
             if user_exists(username, AuthUsers, _session):
                 log.warning('Username {} already taken, requested from {}'.format(username, get_request_ip(self)))

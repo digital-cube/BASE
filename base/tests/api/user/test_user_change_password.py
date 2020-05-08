@@ -83,11 +83,11 @@ class TestUserChangePassword(TestBase):
         self._forgot()
 
         import base.common.orm
-        H2P, _session = base.common.orm.get_orm_model('hash_2_params')
-
-        _q = _session.query(H2P)
-        self.assertEqual(1, _q.count())
-        _h2p = _q.one()
+        H2P = base.common.orm.get_orm_model('hash_2_params')
+        with base.common.orm.orm_session() as _session:
+            _q = _session.query(H2P)
+            self.assertEqual(1, _q.count())
+            _h2p = _q.one()
 
         _url ='/user/password/change/{}'.format(_h2p.hash)
         body = json.dumps({'new_password': '321'})

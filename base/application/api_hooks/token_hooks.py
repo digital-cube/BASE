@@ -28,7 +28,7 @@ class SqlTokenizer(Tokenizer):
         """
 
         import base.common.orm
-        SessionToken, _ = base.common.orm.get_orm_model('session_tokens')
+        SessionToken = base.common.orm.get_orm_model('session_tokens')
         with base.common.orm.orm_session() as _session:
             
             _q = _session.query(SessionToken).filter(
@@ -68,7 +68,7 @@ class SqlTokenizer(Tokenizer):
             raise ErrorSetSessionToken('Error setting token')
 
         import base.common.orm
-        SessionToken, _ = base.common.orm.get_orm_model('session_tokens')
+        SessionToken = base.common.orm.get_orm_model('session_tokens')
         with base.common.orm.orm_session() as _session:
         
             _session_token = SessionToken(_tk, uid, type=token_type)
@@ -87,8 +87,8 @@ class SqlTokenizer(Tokenizer):
         """
 
         import base.common.orm
-        SessionToken, _ = base.common.orm.get_orm_model('session_tokens')
-        AuthUser, _ = base.common.orm.get_orm_model('auth_users')
+        SessionToken = base.common.orm.get_orm_model('session_tokens')
+        AuthUser = base.common.orm.get_orm_model('auth_users')
 
         import base.application.api_hooks.api_hooks
         import base.config.application_config as cfg
@@ -142,7 +142,7 @@ class SqlTokenizer(Tokenizer):
         """
 
         import base.common.orm
-        SessionToken, _ = base.common.orm.get_orm_model('session_tokens')
+        SessionToken = base.common.orm.get_orm_model('session_tokens')
         with base.common.orm.orm_session() as _session:
 
             _q = _session.query(SessionToken).filter(SessionToken.id == tk)

@@ -25,7 +25,7 @@ class Forgot(Base):
         """Start user forgot password process"""
 
         import base.common.orm
-        AuthUser, _ = base.common.orm.get_orm_model('auth_users')
+        AuthUser = base.common.orm.get_orm_model('auth_users')
         with base.common.orm.orm_session() as _session:
 
             _q = _session.query(AuthUser).filter(AuthUser.username == username)

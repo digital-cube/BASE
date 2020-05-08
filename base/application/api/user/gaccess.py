@@ -40,8 +40,7 @@ class SocialAccess(Base):
         from base.common.tokens_services import get_token
         from base.application.api_hooks import api_hooks
 
-        AuthUsers, _ = base.common.orm.get_orm_model('auth_users')
-        User, _ = base.common.orm.get_orm_model('users')
+        AuthUsers = base.common.orm.get_orm_model('auth_users')
         with base.common.orm.orm_session() as _session:
 
             response = {}

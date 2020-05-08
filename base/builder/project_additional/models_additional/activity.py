@@ -42,21 +42,12 @@ class Action(base.common.orm.sql_base):
     id_source = Column(Integer, ForeignKey(ActionSource.id), index=True)
     source = relationship(ActionSource, back_populates='action')
 
-    def __init__(self, action, description, controller):
+    def __init__(self, action, description, controller, source):
         ua = controller.request.headers['User-Agent'] if 'User-Agent' in controller.request.headers else 'User-Agent N/A'
         ip = get_request_ip(controller)
         self.action = action
         self.description = description
-
-        _, _session = base.common.orm.get_orm_model('action_source')
-
-        ass = ActionSource(ip, ua)
-
-        ase = _session.query(ActionSource).filter(ActionSource.ip_browser_checksum == ass.ip_browser_checksum).all()
-        if not ase:
-            self.source = ass
-        else:
-            self.source = ase[-1]
+        self.source = source
 
 
 def main():

@@ -13,7 +13,7 @@ import base.application.lookup.responses as msgs
 def save_option(key, value, orm_session=None):
 
     import base.common.orm
-    OrmOptions, _ = base.common.orm.get_orm_model('options')
+    OrmOptions = base.common.orm.get_orm_model('options')
     from base.common.utils import log
     with base.common.orm.orm_session() as _session:
 
@@ -50,7 +50,7 @@ class Options(Base):
         """Get option"""
 
         from base.common.utils import log
-        OrmOptions, _ = base.common.orm.get_orm_model('options')
+        OrmOptions = base.common.orm.get_orm_model('options')
 
         _q = self.orm_session.query(OrmOptions).filter(OrmOptions.key == _key)
 
