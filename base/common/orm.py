@@ -89,9 +89,11 @@ class _orm(object):
 
             os.remove(_db_name)
         else:
+            self.__session_factory.close_all()
             __meta = sqlalchemy.MetaData(self.__engine)
             __meta.reflect()
             __meta.drop_all()
+            print('======ALL TABLES DROPPED')
 
     def create_db_schema(self, test=False):
         """In test mode use sqlalchemy method, in other cases use alembic"""
@@ -183,62 +185,62 @@ def activate_orm(db_url):
     global sql_base
     orm = _orm(db_url, sql_base)
 
-    @event.listens_for(orm.engine(), 'connect')
-    def sql_tarce_engine_or_pool_connect(dbapi_connection, connection_record):
-        print('TRACE ENGINE OR POOL CONNECT on', dbapi_connection.info.dbname)
-        try:
-            log.info('Engine connected to {}'.format(dbapi_connection.info.dbname))
-        except Exception as e:
-            log.warning('Faild to extract databse name from database connection info: {}'.format(e))
+    # @event.listens_for(orm.engine(), 'connect')
+    # def sql_tarce_engine_or_pool_connect(dbapi_connection, connection_record):
+    #     print('TRACE ENGINE OR POOL CONNECT on', dbapi_connection.info.dbname)
+    #     try:
+    #         log.info('Engine connected to {}'.format(dbapi_connection.info.dbname))
+    #     except Exception as e:
+    #         log.warning('Faild to extract databse name from database connection info: {}'.format(e))
 
-    @event.listens_for(orm.engine(), 'detach')
-    def sql_trace_engine_or_pool_detach(dbapi_connection, connection_record):
-        "listen for the 'detach' event"
-        print('TRACE ENGINE OR POOL DETACH', dbapi_connection, connection_record)
+    # @event.listens_for(orm.engine(), 'detach')
+    # def sql_trace_engine_or_pool_detach(dbapi_connection, connection_record):
+    #     "listen for the 'detach' event"
+    #     print('TRACE ENGINE OR POOL DETACH', dbapi_connection, connection_record)
 
-    @event.listens_for(orm.engine(), 'invalidate')
-    def sql_trace_engine_or_pool_invalidate(dbapi_connection, connection_record, exception):
-        "listen for the 'invalidate' event"
-        print('TRACE ENGINE OR POOL INVALIDATE', dbapi_connection, connection_record, exception)
+    # @event.listens_for(orm.engine(), 'invalidate')
+    # def sql_trace_engine_or_pool_invalidate(dbapi_connection, connection_record, exception):
+    #     "listen for the 'invalidate' event"
+    #     print('TRACE ENGINE OR POOL INVALIDATE', dbapi_connection, connection_record, exception)
 
-    @event.listens_for(orm.engine(), 'reset')
-    def sql_trace_enigne_or_pool_reset(dbapi_connection, connection_record):
-        "listen for the 'reset' event"
-        print('TRACE ENGINE OR POOL RESET', dbapi_connection, connection_record)
-        print('/'*100)
+    # @event.listens_for(orm.engine(), 'reset')
+    # def sql_trace_enigne_or_pool_reset(dbapi_connection, connection_record):
+    #     "listen for the 'reset' event"
+    #     print('TRACE ENGINE OR POOL RESET', dbapi_connection, connection_record)
+    #     print('/'*100)
 
-    @event.listens_for(orm.engine(), 'engine_connect')
-    def sql_trace_engine_connect(conn, branch):
-        # breakpoint()
-        print('TRACE ENGINE CONNECT', conn, branch)
-        pass
+    # @event.listens_for(orm.engine(), 'engine_connect')
+    # def sql_trace_engine_connect(conn, branch):
+    #     # breakpoint()
+    #     print('TRACE ENGINE CONNECT', conn, branch)
+    #     pass
 
-    @event.listens_for(orm.engine(), 'engine_disposed')
-    def sql_trace_engine_disposed(engine):
-        "listen for the 'engine_disposed' event"
-        print('TRACE ENGINE DISPOSE', engine, '+'*100)
+    # @event.listens_for(orm.engine(), 'engine_disposed')
+    # def sql_trace_engine_disposed(engine):
+    #     "listen for the 'engine_disposed' event"
+    #     print('TRACE ENGINE DISPOSE', engine, '+'*100)
 
-    @event.listens_for(orm.engine(), 'rollback')
-    def sql_trace_rollback(conn):
-        "listen for the 'rollback' event"
-        print('TRACE ROLLBACK', conn)
+    # @event.listens_for(orm.engine(), 'rollback')
+    # def sql_trace_rollback(conn):
+    #     "listen for the 'rollback' event"
+    #     print('TRACE ROLLBACK', conn)
     
-    @event.listens_for(orm.engine(), 'checkout')
-    def sql_trace_engine_connection_checkout(dbapi_connection, connection_record, connection_proxy):
-        print('TRACE ENGINE OR POOL CONNECT CHECKOUT', dbapi_connection, connection_record, connection_proxy)
-        pass
+    # @event.listens_for(orm.engine(), 'checkout')
+    # def sql_trace_engine_connection_checkout(dbapi_connection, connection_record, connection_proxy):
+    #     print('TRACE ENGINE OR POOL CONNECT CHECKOUT', dbapi_connection, connection_record, connection_proxy)
+    #     pass
     
-    @event.listens_for(orm.engine(), 'close')
-    def sql_trace_close(dbapi_connection, connection_record):
-        "listen for the 'close' event"
-        print('TRACE ENGINE OR POOL CLOSE', dbapi_connection, connection_record)
-        print('_' * 100)
+    # @event.listens_for(orm.engine(), 'close')
+    # def sql_trace_close(dbapi_connection, connection_record):
+    #     "listen for the 'close' event"
+    #     print('TRACE ENGINE OR POOL CLOSE', dbapi_connection, connection_record)
+    #     print('_' * 100)
     
-    @event.listens_for(orm.engine(), 'close_detached')
-    def sql_trace_close_detached(dbapi_connection):
-        "listen for the 'close_detached' event"
-        print('TRACE ENGINE OR POOL CLOSE DETACHED', dbapi_connection)
-        print('+' * 100)
+    # @event.listens_for(orm.engine(), 'close_detached')
+    # def sql_trace_close_detached(dbapi_connection):
+    #     "listen for the 'close_detached' event"
+    #     print('TRACE ENGINE OR POOL CLOSE DETACHED', dbapi_connection)
+    #     print('+' * 100)
 
 @contextlib.contextmanager
 def orm_session():

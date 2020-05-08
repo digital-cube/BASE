@@ -140,43 +140,38 @@ class TestBase(AsyncHTTPTestCase):
 
     def get_app(self):
 
-        # print('GET APP')
+        # print('+++GET APP')
         self.token = None
 
         entries = [(BaseHandler.__URI__, BaseHandler, {'idx': 0}), ]
         load_application(entries, None, test=True)
         # print('APPLICATION LOADED')
-        # print('PREPARE TEST DATABASE')
-        # self.orm_builder = prepare_test_database()
-        # print('BUILDER PREPARED')
         from base.config.application_config import port as svc_port
 
         import base.common.orm
-        # print('TESTING GET APP LOAD ORM', base.common.orm.orm is None)
+        # print('+++TESTING GET APP LOAD ORM', base.common.orm.orm is None)
         if base.common.orm.orm is None:
             load_orm(svc_port, test=True, createdb=True)
-        # print('ORM LOADED')
+        # print('+++ORM LOADED')
 
-        # print('CLEAR DATABASE')
+        # print('+++CLEAR DATABASE')
         # breakpoint()
         # try:
         base.common.orm.orm.clear_database()
         # except:
         #     print('DATABASE CAN NOT BE DROPPED, DOESNT EXISTS') 
-        # print('CREATE DATABASE')
+        # print('+++CREATE DATABASE')
         base.common.orm.orm.create_db_schema(test=True)
 
 
-        # from base.builder.maker.database_builder import _create_database
-        # if not _create_database(_database_name, db_type, db_config, test):
-        #     print('Database has not created')
-        #     return
+        # print('+++GET ORM MODULES')
         import src.config.app_config
         from base.builder.maker.common import get_orm_models
         # PRESENT MODELS TO BASE
         _models_modules = []
         _orm_models = get_orm_models(_models_modules, src.config.app_config)
 
+        # print('+++INITIALIZE SEQUENCER')
         # PREPARE SEQUENCERS FIRST
         from base.builder.maker.database_builder import _get_sequencer_model_module
         import sqlalchemy.exc
@@ -189,6 +184,7 @@ class TestBase(AsyncHTTPTestCase):
 
 
 
+        # print('+++LOAD TEST HOOKS')
         self.load_test_hook()
         # print('TEST HOOK LOADED')
 
@@ -197,7 +193,7 @@ class TestBase(AsyncHTTPTestCase):
 
         os.environ['ASYNC_TEST_TIMEOUT'] = '300'  # seconds for timeout
 
-        # print('GET APP', '-'*80)
+        # print('+++GET APP', '-'*80)
         return app
 
     def load_test_hook(self):

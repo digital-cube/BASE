@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2020 05 08
+
+## BASE version 1.13.0
+- sqlalchemy session from context
+
 ### 2020 04 13
 
 ## BASE version 1.12.9

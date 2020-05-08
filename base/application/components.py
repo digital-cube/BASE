@@ -98,7 +98,6 @@ class Base(tornado.web.RequestHandler):
         import base.config.application_config
         if base.config.application_config.count_calls:
             _path = self.__FULL_PATH__ if hasattr(self, '__FULL_PATH__') else self.request.uri
-            import pdb; pdb.set_trace()
             self.application.call_counter.add_log(self.request.method, _path)
 
     def data_received(self, chunk):
