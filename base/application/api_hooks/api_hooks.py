@@ -124,11 +124,11 @@ def register_user(id_user, username, password, data, request_handler=None):
     """
     import base.common.orm
     from base.common.utils import log
+
+    AuthUser = base.common.orm.get_orm_model('auth_users')
+    User = base.common.orm.get_orm_model('users')
+
     with base.common.orm.orm_session() as _session:
-
-        AuthUser = base.common.orm.get_orm_model('auth_users')
-        User = base.common.orm.get_orm_model('users')
-
         password = format_password(username, password)
 
         import base.application.lookup.user_roles as user_roles
@@ -283,7 +283,7 @@ def get_hash_data(h2p):
 
         _session.commit()
 
-    return res
+        return res
 
 
 # END OF HASH_2_PARAMS
