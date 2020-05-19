@@ -841,7 +841,6 @@ class authenticated(object):
                 import base.common.orm
                 with base.common.orm.orm_session() as _session:
                     if _origin_self.orm_session is None:
-                        # import base.common.orm
                         _origin_self.orm_session = _session
 
                     _user = get_user_by_token(_auth_token, pack=False, orm_session=_origin_self.orm_session)

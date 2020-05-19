@@ -4,7 +4,6 @@ import string
 import random
 import base.common.orm
 import sqlalchemy.exc
-# from src.models.sequencers import Sequencer
 from base.application.helpers.exceptions import ToManyAttemptsException
 from base.application.helpers.exceptions import SequencerTypeError
 
@@ -54,7 +53,6 @@ class SequencerFactory:
         with base.common.orm.orm_session() as _session:
             
             _q = _session.query(Sequencer)
-            # _q = self.db.session().query(Sequencer)
             for s in _q.all():
                 self.s_table[s.id] = {
                     'table_id': s.id,
@@ -113,7 +111,6 @@ class SequencerFactory:
                                     self.s_table[table_id]['active_stage'])
 
         import base.common.orm
-        # print('OOOOOORM', base.common.orm.orm)
         with base.common.orm.orm_session() as _sesssion:
             attempt = 1
             while True:
@@ -130,15 +127,12 @@ class SequencerFactory:
 
                 _s = _orm_model(_s_id, self.s_table[table_id]['active_stage'])
                 _sesssion.add(_s)
-                # self.db.session().add(_s)
 
                 if commit:
                     try:
                         _sesssion.commit()
-                        # self.db.session().commit()
                     except sqlalchemy.exc.IntegrityError as e:
                         _sesssion.rollback()
-                        # self.db.session().rollback()
                         if attempt >= self.max_attempts:
                             log.critical('To many attempts to create id for {} table'.format(
                                 self.s_table[table_id]['s_table']))
@@ -177,7 +171,6 @@ class SequencerFactory:
 
         with base.common.orm.orm_session() as _session:
             _q = _session.query(_sequencer_model).filter(_sequencer_model.id==sequence).all()
-            # _q = self.db.session().query(_sequencer_model).filter(_sequencer_model.id==sequence).all()
 
             if len(_q) != 1:
                 log.critical('Sequence id {} is not in {} table'.format(sequence_id, db_sequence['s_table']))

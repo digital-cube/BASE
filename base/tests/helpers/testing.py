@@ -140,38 +140,25 @@ class TestBase(AsyncHTTPTestCase):
 
     def get_app(self):
 
-        # print('+++GET APP')
         self.token = None
 
         entries = [(BaseHandler.__URI__, BaseHandler, {'idx': 0}), ]
         load_application(entries, None, test=True)
-        # print('APPLICATION LOADED')
         from base.config.application_config import port as svc_port
 
         import base.common.orm
-        # print('+++TESTING GET APP LOAD ORM', base.common.orm.orm is None)
         if base.common.orm.orm is None:
             load_orm(svc_port, test=True, createdb=True)
-        # print('+++ORM LOADED')
 
-        # print('+++CLEAR DATABASE')
-        # breakpoint()
-        # try:
         base.common.orm.orm.clear_database()
-        # except:
-        #     print('DATABASE CAN NOT BE DROPPED, DOESNT EXISTS') 
-        # print('+++CREATE DATABASE')
         base.common.orm.orm.create_db_schema(test=True)
 
-
-        # print('+++GET ORM MODULES')
         import src.config.app_config
         from base.builder.maker.common import get_orm_models
         # PRESENT MODELS TO BASE
         _models_modules = []
         _orm_models = get_orm_models(_models_modules, src.config.app_config)
 
-        # print('+++INITIALIZE SEQUENCER')
         # PREPARE SEQUENCERS FIRST
         from base.builder.maker.database_builder import _get_sequencer_model_module
         import sqlalchemy.exc
@@ -182,22 +169,16 @@ class TestBase(AsyncHTTPTestCase):
             except sqlalchemy.exc.IntegrityError:
                 print('Sequencer already contains keys, and will not be inserted again, continuing')
 
-
-
-        # print('+++LOAD TEST HOOKS')
         self.load_test_hook()
-        # print('TEST HOOK LOADED')
 
         app = Application(entries, test=True)
         setattr(app, 'svc_port', svc_port)
 
         os.environ['ASYNC_TEST_TIMEOUT'] = '300'  # seconds for timeout
 
-        # print('+++GET APP', '-'*80)
         return app
 
     def load_test_hook(self):
-        # print('LOAD TEST HOOK')
         try:
             import tests_hooks.hook
             if hasattr(tests_hooks.hook, 'register'):
@@ -206,7 +187,6 @@ class TestBase(AsyncHTTPTestCase):
                 setattr(self, '_register', MethodType(register, self))
         except ImportError:
             pass
-            # print('There is no tests hook')
 
     def dump_database_to_file(self, app_config, db_config):
 
@@ -257,15 +237,9 @@ class TestBase(AsyncHTTPTestCase):
             print('Error: {}'.format(e))
 
     def tearDown(self):
-        # print('TEAR DOWN')
-        # breakpoint()
         if hasattr(self, '__DB_SAVE_TO__') and self.__DB_SAVE_TO__ is not None:
             self.save_database_state()
 
-        # import base.common.orm
-        # if base.common.orm.orm:
-        #     base.common.orm.orm.engine().dispose()
-        # setattr(base.common.orm, 'orm', None)
         self.stop()
 
     def _register(self, username, password, data=None):

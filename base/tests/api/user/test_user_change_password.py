@@ -54,28 +54,29 @@ class TestUserChangePassword(TestBase):
         self.assertIn('message', res)
         self.assertEqual(res['message'], msgs.lmap[msgs.WRONG_USERNAME_OR_PASSWORD])
 
-    # def test_change_password_from_forgot_password_flow(self):
+    def test_change_password_from_forgot_password_flow(self):
 
-    #     self._register('user@test.loc', '123')
-    #     self._forgot()
+        self._register('user@test.loc', '123')
+        self._forgot()
 
-    #     import base.common.orm
-    #     H2P, _session = base.common.orm.get_orm_model('hash_2_params')
+        import base.common.orm
+        H2P = base.common.orm.get_orm_model('hash_2_params')
 
-    #     _q = _session.query(H2P)
-    #     self.assertEqual(1, _q.count())
-    #     _h2p = _q.one()
+        with base.common.orm.orm_session() as _session:
+            _q = _session.query(H2P)
+            self.assertEqual(1, _q.count())
+            _h2p = _q.one()
 
-    #     _url ='/user/password/change/{}'.format(_h2p.hash)
-    #     body = json.dumps({'new_password': '321'})
-    #     res = self.fetch(_url, method='POST', body=body)
+        _url ='/user/password/change/{}'.format(_h2p.hash)
+        body = json.dumps({'new_password': '321'})
+        res = self.fetch(_url, method='POST', body=body)
 
-    #     self.assertEqual(res.code, 204)
-    #     res = res.body.decode('utf-8')
-    #     self.assertEqual(res, '')
+        self.assertEqual(res.code, 204)
+        res = res.body.decode('utf-8')
+        self.assertEqual(res, '')
 
-    #     self._login_success('321')
-    #     self._login_error('123')
+        self._login_success('321')
+        self._login_error('123')
 
     def test_change_password_with_forgot_twice(self):
 
@@ -124,43 +125,43 @@ class TestUserChangePassword(TestBase):
         self._login_success('123')
         self._login_error('321')
 
-    # def test_user_change_password(self):
+    def test_user_change_password(self):
 
-    #     self._register('user@test.loc', '123')
+        self._register('user@test.loc', '123')
 
-    #     body = json.dumps({
-    #         'new_password': '321',
-    #         'old_password': '123',
-    #     })
+        body = json.dumps({
+            'new_password': '321',
+            'old_password': '123',
+        })
 
-    #     headers = {'Authorization': self.token}
-    #     res = self.fetch('/user/password/change', method='POST', body=body, headers=headers)
+        headers = {'Authorization': self.token}
+        res = self.fetch('/user/password/change', method='POST', body=body, headers=headers)
 
-    #     self.assertEqual(res.code, 204)
-    #     res = res.body.decode('utf-8')
-    #     self.assertEqual(res, '')
+        self.assertEqual(res.code, 204)
+        res = res.body.decode('utf-8')
+        self.assertEqual(res, '')
 
-    #     self._login_success('321')
-    #     self._login_error('123')
+        self._login_success('321')
+        self._login_error('123')
 
-    # def test_user_change_password_with_wrong_old_password(self):
+    def test_user_change_password_with_wrong_old_password(self):
 
-    #     self._register('user@test.loc', '123')
+        self._register('user@test.loc', '123')
 
-    #     body = json.dumps({
-    #         'new_password': '321',
-    #         'old_password': '124',
-    #     })
+        body = json.dumps({
+            'new_password': '321',
+            'old_password': '124',
+        })
 
-    #     headers = {'Authorization': self.token}
-    #     res = self.fetch('/user/password/change', method='POST', body=body, headers=headers)
+        headers = {'Authorization': self.token}
+        res = self.fetch('/user/password/change', method='POST', body=body, headers=headers)
 
-    #     self.assertEqual(res.code, 403)
-    #     res = res.body.decode('utf-8')
-    #     res = json.loads(res)
-    #     self.assertIn('message', res)
-    #     self.assertEqual(res['message'], msgs.lmap[msgs.UNAUTHORIZED_REQUEST])
+        self.assertEqual(res.code, 403)
+        res = res.body.decode('utf-8')
+        res = json.loads(res)
+        self.assertIn('message', res)
+        self.assertEqual(res['message'], msgs.lmap[msgs.UNAUTHORIZED_REQUEST])
 
-    #     self._login_success('123')
-    #     self._login_error('321')
+        self._login_success('123')
+        self._login_error('321')
 

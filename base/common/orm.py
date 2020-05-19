@@ -62,8 +62,6 @@ class _orm(object):
         return _orm.__instance
 
     def session(self, new=False):
-        # breakpoint()
-        print('KREIRAM SESIJU - NEW', new)
         if new:
             __session_factory = sessionmaker(bind=self.__engine)
             __scoped_session = scoped_session(__session_factory)
@@ -93,7 +91,6 @@ class _orm(object):
             __meta = sqlalchemy.MetaData(self.__engine)
             __meta.reflect()
             __meta.drop_all()
-            print('======ALL TABLES DROPPED')
 
     def create_db_schema(self, test=False):
         """In test mode use sqlalchemy method, in other cases use alembic"""
@@ -108,10 +105,7 @@ class _orm(object):
 class orm_builder(object):
 
     def __init__(self, sql_address, orm_base, **kwargs):
-        # import base.config.application_config
-        # print('BUILD ORM IN ORM BUILDER')
         self.__orm = _orm(sql_address, orm_base, **kwargs)
-        # self.__orm = _orm(sql_address, orm_base, **kwargs) if base.config.application_config.cached_session else _orm_fresh(sql_address, orm_base, **kwargs)
         setattr(self.__orm, 'orm_build', self)
 
     def create_db_schema(self, test=False):
@@ -159,8 +153,6 @@ class orm_builder(object):
             __meta.drop_all()
 
     def orm(self):
-        # print('ORM BUILDER ORM', self.__orm)
-        # breakpoint()
         return self.__orm
 
     def add_blog(self):
@@ -246,7 +238,6 @@ def activate_orm(db_url):
 def orm_session():
     global orm
     import base.config.application_config
-    print('CONTEXT SESIJU - NEW', not base.config.application_config.cached_session)
     _session = orm.session(new=not base.config.application_config.cached_session)
     try:
         yield _session
@@ -259,13 +250,8 @@ def orm_session():
 
 
 def get_orm_model(model_name):
-    # global orm
     import base.config.application_config
     return base.config.application_config.orm_models[model_name]
-    # OrmModel = base.config.application_config.orm_models[model_name]
-    # _session = orm.session()
-
-    # return OrmModel, _session
 
 
 def commit():

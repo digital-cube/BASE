@@ -350,11 +350,9 @@ def build_database(args, test=False):
 
     import base.common.orm
     if base.common.orm.orm is None:
-        print('BUILD ORM IN BUILD DATABASE BUILDER')
         orm_builder = base.common.orm.orm_builder(__db_url, base.common.orm.sql_base)
         setattr(base.common.orm, 'orm', orm_builder.orm())
     else:
-        print('BUILD ORM IN BUILD DATABASE BUILDER ALREADY CREATED')
         orm_builder = base.common.orm.orm.orm_builder
 
     if not _create_database(_database_name, db_type, db_config, test):
