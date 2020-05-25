@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2020 05 25
+
+## BASE version 1.13.1
+- tests executes main from models
+
 ### 2020 05 08
 
 ## BASE version 1.13.0

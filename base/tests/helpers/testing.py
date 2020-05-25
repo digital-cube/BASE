@@ -169,6 +169,11 @@ class TestBase(AsyncHTTPTestCase):
             except sqlalchemy.exc.IntegrityError:
                 print('Sequencer already contains keys, and will not be inserted again, continuing')
 
+        # PREPARE SEQUENCERS FIRST
+        for _module in _models_modules:
+            if hasattr(_module, 'main'):
+                _module.main()
+
         self.load_test_hook()
 
         app = Application(entries, test=True)
