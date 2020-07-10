@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2020 07 10
+
+## BASE version 1.13.2
+- sequencers handled with non caches session
+
 ### 2020 05 25
 
 ## BASE version 1.13.1

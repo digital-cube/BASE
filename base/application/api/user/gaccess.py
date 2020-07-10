@@ -59,7 +59,7 @@ class SocialAccess(Base):
             else:
                 # user do not exists - register user
                 from base.common.sequencer import sequencer
-                id_user = sequencer().new('u')
+                id_user = sequencer().new('u', session=_session)
 
                 if not id_user:
                     log.error('Can not create id for new user: {}'.format(self.social_user['email']))

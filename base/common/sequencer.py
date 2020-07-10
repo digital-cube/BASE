@@ -90,7 +90,7 @@ class SequencerFactory:
 
         return True
 
-    def new(self, table_id, commit=False):
+    def new(self, table_id, session=None, commit=False):
 
         from base.common.utils import log
 
@@ -111,7 +111,8 @@ class SequencerFactory:
                                     self.s_table[table_id]['active_stage'])
 
         import base.common.orm
-        with base.common.orm.orm_session() as _sesssion:
+        with base.common.orm.orm_session() as _session:
+            __session = session if session else _session
             attempt = 1
             while True:
 
@@ -126,13 +127,13 @@ class SequencerFactory:
                 _s_id += self.checksum(_s_id, self.s_table[table_id]['check_sum_size'], self.s_table[table_id]['type'])
 
                 _s = _orm_model(_s_id, self.s_table[table_id]['active_stage'])
-                _sesssion.add(_s)
+                __session.add(_s)
 
                 if commit:
                     try:
-                        _sesssion.commit()
+                        __session.commit()
                     except sqlalchemy.exc.IntegrityError as e:
-                        _sesssion.rollback()
+                        __session.rollback()
                         if attempt >= self.max_attempts:
                             log.critical('To many attempts to create id for {} table'.format(
                                 self.s_table[table_id]['s_table']))

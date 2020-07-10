@@ -54,7 +54,9 @@ class Register(Base):
                 return self.error(msgs.INVALID_PASSWORD)
 
         from base.common.sequencer import sequencer
-        id_user = sequencer().new('u')
+        with base.common.orm.orm_session() as _s_session:
+            id_user = sequencer().new('u', session=_s_session)
+            _s_session.commit()
 
         if not id_user:
             return self.error(msgs.ERROR_USER_SEQUENCE)

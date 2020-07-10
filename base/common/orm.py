@@ -4,6 +4,7 @@ import json
 import logging
 import sqlalchemy
 import contextlib
+import sqlalchemy.orm.session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
@@ -87,7 +88,7 @@ class _orm(object):
 
             os.remove(_db_name)
         else:
-            self.__session_factory.close_all()
+            sqlalchemy.orm.session.close_all_sessions()
             __meta = sqlalchemy.MetaData(self.__engine)
             __meta.reflect()
             __meta.drop_all()

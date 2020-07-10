@@ -60,17 +60,16 @@ class SqlTokenizer(Tokenizer):
         :return: new token and it's type
         """
 
-        # MAKE NEW TOKEN
-        _tk = sequencer().new('s')
-
-        if not _tk:
-            self.log.critical('Can not set users {} session token'.format(uid))
-            raise ErrorSetSessionToken('Error setting token')
-
         import base.common.orm
         SessionToken = base.common.orm.get_orm_model('session_tokens')
         with base.common.orm.orm_session() as _session:
-        
+            # MAKE NEW TOKEN
+            _tk = sequencer().new('s', session=_session)
+
+            if not _tk:
+                self.log.critical('Can not set users {} session token'.format(uid))
+                raise ErrorSetSessionToken('Error setting token')
+
             _session_token = SessionToken(_tk, uid, type=token_type)
             _session.add(_session_token)
             _session.commit()

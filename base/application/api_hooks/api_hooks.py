@@ -230,7 +230,7 @@ def save_hash(hash_data):
     with base.common.orm.orm_session() as _session:
 
         from base.common.sequencer import sequencer
-        _hash = sequencer().new('h')
+        _hash = sequencer().new('h', session=_session)
 
         if not _hash:
             log.critical('Error getting new hash')
