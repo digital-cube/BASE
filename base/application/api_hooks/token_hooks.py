@@ -76,12 +76,13 @@ class SqlTokenizer(Tokenizer):
 
             return {'token_type': session_token_type.lmap[_session_token.type], 'token': _tk}
 
-    def get_user_by_token(self, tk, pack=True, orm_session=None):
+    def get_user_by_token(self, tk, pack=True, orm_session=None, request_handler=None):
         """
         retrieve user by given token
         :param tk: session token
         :param pack: whether to return packed or orm user
-        :param orm_session: sqlalchemy session
+        :param orm_session: SQLAlchemy session
+        :param request_handler: the request handler which called the method
         :return: packed user if pack else AuthUser
         """
 
@@ -184,11 +185,13 @@ class RedisTokenizer(Tokenizer):
         """
         print('SET', )
 
-    def get_user_by_token(self, tk, pack=True, orm_session=None):
+    def get_user_by_token(self, tk, pack=True, orm_session=None, request_handler=None):
         """
         retrieve user by given token
         :param tk: session token
         :param pack: whether to return packed or orm user
+        :param orm_session: orm session to be used
+        :param request_handler: the request handler which initialized the request
         :return: packed user if pack else AuthUser
         """
         print('GET USER')

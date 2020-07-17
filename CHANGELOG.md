@@ -4,6 +4,8 @@
 
 ## BASE version 1.13.3
 - BASE application version print
+- BASE application version shown on the base handler
+- get use by token accepts current request handler for domain specific credentials handling
 
 ### 2020 07 10
 

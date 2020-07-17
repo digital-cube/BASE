@@ -34,10 +34,10 @@ def get_token(uid, data, token_type=session_token_type.SIMPLE):
         return None
 
 
-def get_user_by_token(_token, pack=True, orm_session=None):
+def get_user_by_token(_token, pack=True, orm_session=None, request_handler=None):
 
     _tokenizer = get_tokenizer()
-    return _tokenizer.get_user_by_token(_token, pack, orm_session)
+    return _tokenizer.get_user_by_token(_token, pack, orm_session, request_handler)
 
 
 def close_session(_token):

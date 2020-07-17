@@ -843,7 +843,7 @@ class authenticated(object):
                     if _origin_self.orm_session is None:
                         _origin_self.orm_session = _session
 
-                    _user = get_user_by_token(_auth_token, pack=False, orm_session=_origin_self.orm_session)
+                    _user = get_user_by_token(_auth_token, pack=False, orm_session=_origin_self.orm_session, request_handler=_origin_self)
                     if not _user:
                         if self.authentication_level == auth_level.WEAK:
                             # if token not provided and authentication is week set auth user to None and go to the target
@@ -1043,7 +1043,12 @@ class BaseHandler(DefaultRouteHandler):
 
     def _dummy(self):
         import base.config.application_config
-        self.render('templates/introduction.html', app_name=base.config.application_config.app_name)
+        self.render(
+            'templates/introduction.html',
+            app_name=base.config.application_config.app_name,
+            app_version=base.config.application_config.app_version,
+            base_version=base.__VERSION__
+        )
 
 
 @api(URI=r'/all-paths', PREFIX=False)
