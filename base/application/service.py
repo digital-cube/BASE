@@ -28,6 +28,7 @@ def check_arguments():
     argparser = argparse.ArgumentParser(description=base.config.application_config.app_description)
     argparser.add_argument('-p', '--port', help='the port on which application will listen')
     argparser.add_argument('-x', '--prefix', help='prefix for all application routes')
+    argparser.add_argument('-v', '--version', help='show application version', action='store_true')
     return argparser.parse_args()
 
 
@@ -261,6 +262,11 @@ def engage(starter_path):
     load_application(entries, args.port)
 
     import base.config.application_config
+    if args.version:
+        import sys
+        print(base.config.application_config.app_name, 'v{}'.format(base.config.application_config.app_version))
+        sys.exit()
+
     if base.config.application_config.static_uri:
         if base.config.application_config.static_path:
             entries.append((base.config.application_config.static_uri, tornado.web.StaticFileHandler,
