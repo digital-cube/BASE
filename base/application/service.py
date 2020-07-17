@@ -264,7 +264,8 @@ def engage(starter_path):
     import base.config.application_config
     if args.version:
         import sys
-        print(base.config.application_config.app_name, 'v{}'.format(base.config.application_config.app_version))
+        print(base.config.application_config.app_name, 'v{}'.format(base.config.application_config.app_version),
+              '(BASE v{})'.format(base.__VERSION__))
         sys.exit()
 
     if base.config.application_config.static_uri:
