@@ -21,6 +21,7 @@ from base import http, token
 
 import base.utils.log as logutils
 from base.orm import sql_base
+import config.services
 
 LOGGER_NAME = 'microsvc-base-test'
 
@@ -28,7 +29,6 @@ LOGGER_NAME = 'microsvc-base-test'
 class BASE(tornado.web.RequestHandler):
 
     def prepare(self):
-
         self.req_id = str(uuid.uuid4()) if 'req_id' not in self.request.headers else self.request.headers['req_id']
 
         logutils.set_log_context(
@@ -66,7 +66,7 @@ class develgen:
 
 class api:
 
-    #TODO: WEAK:boolean = False
+    # TODO: WEAK:boolean = False
 
     def __init__(self, *args, **kwargs):
         self.skip_db = True if 'db' in kwargs and kwargs['db'] == False else False
@@ -75,7 +75,7 @@ class api:
 
     def __call__(self, funct):
 
-        #TODO; ili u wrapperu ili u call-u ispitas self (a ne _oriigin.self) ako je true onda znas sta radis :) pustas ga i ako je None
+        # TODO; ili u wrapperu ili u call-u ispitas self (a ne _oriigin.self) ako je true onda znas sta radis :) pustas ga i ako je None
 
         __local_orm_module = None
 
@@ -94,7 +94,8 @@ class api:
             try:
 
                 _origin_self.set_header("Access-Control-Allow-Origin", "*")
-                _origin_self.set_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+                _origin_self.set_header("Access-Control-Allow-Headers",
+                                        "Origin, X-Requested-With, Content-Type, Accept")
                 _origin_self.set_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH OPTIONS')
 
                 sig = signature(funct)
@@ -148,7 +149,6 @@ class api:
                             passed = True
                             value = body[pp.name]
 
-
                         if passed:
 
                             # TODO: izbaciti kao izuzetak a ne ovako !
@@ -195,7 +195,6 @@ class api:
 
                             elif isinstance(pp.annotation, type(Any)):
 
-
                                 pass
 
                             # slucaj kada je paramar sama kalsa, koja se konstrujise iz json-a
@@ -205,10 +204,9 @@ class api:
                                     kwa[pp.name] = model_class.build_from_json(value)
                                 except Exception as e:
                                     _origin_self.write(
-                                        json.dumps({"message": f"Invalid datatype {pp.annotation} error builiding object"}))
+                                        json.dumps(
+                                            {"message": f"Invalid datatype {pp.annotation} error builiding object"}))
                                     _origin_self.set_status(http.code.HTTPStatus.BAD_REQUEST)
-
-
 
                         # TODO: ovo sada radi, jer su defaultni argumenti int, str, float, ...
                         # medjutim napravice problem kad defaultni argumenti budu klase, tako da bi trebalo
@@ -241,7 +239,6 @@ class api:
                     # print("KWA",kwa)
 
                 _args = []
-
 
                 res = await funct(_origin_self, *_args, **kwa)
 
@@ -293,7 +290,7 @@ class auth:
         @wraps(funct)
         async def wrapper(_self_origin, *args, **kwargs):
 
-            #_args = []
+            # _args = []
 
             # ISTI PROBLEM KAO DOLE
             #
@@ -317,7 +314,6 @@ class auth:
                     await funct(_self_origin, *args, **kwargs)
                     return
 
-
             _self_origin.set_status(http.code.HTTPStatus.UNAUTHORIZED)
             _self_origin.write('{"message":"unauthorized"}')
 
@@ -325,16 +321,18 @@ class auth:
 
 
 class route:
-
     uri = []
 
     @staticmethod
     def register_handler(uri, handler):
 
-        #TODO: handler moze da bude string ili niz stringova
+        # TODO: handler moze da bude string ili niz stringova
 
         if not hasattr(route, '_handlers'):
             route._handlers = []
+
+        if not hasattr(route, '_handler_names'):
+            route._handler_names = set()
 
         for _uri, _ in route._handlers:
             if _uri == uri:
@@ -348,6 +346,17 @@ class route:
             return route._handlers
 
         return []
+
+    @staticmethod
+    def handler_names():
+        if hasattr(route, '_handler_names'):
+            return route._handler_names
+
+        return set()
+
+    @staticmethod
+    def set_handler_names(hn):
+        route._handler_names = hn
 
     def __init__(self, *args, **kwargs):
 
@@ -378,8 +387,33 @@ class route:
         # print(self.uri, self.uri_args)
 
     def __call__(self, cls):
+
+        scls = str(cls).replace("<class '", "").replace("'>", "")
+        svc = scls.split('.')
+
+        self.handler_name = svc[-1]
+
+        route_handler_names = route.handler_names()
+
+        if self.handler_name in route_handler_names:
+            raise NameError(f"Handler with class {self.handler_name} already defined in project, use unique class name")
+
+        route_handler_names.add(self.handler_name)
+        route.set_handler_names(route_handler_names)
+
+        prefix = config.services.prefix if hasattr(config.services, 'prefix') else ''
+
+        if svc[0] == 'services' and len(svc) > 2:
+            svc_name = svc[1]
+
+            scfg = config.services.svc(svc_name)
+            if 'api' in scfg and 'prefix' in scfg['api']:
+                prefix += scfg['api']['prefix']
+
         for uri in self.uri:
-            route.register_handler(uri, cls)
+            furi = prefix + ('/' if uri[0] != '/' else '') + uri
+            print("URI:", furi)
+            route.register_handler(furi, cls)
         return cls
 
 
@@ -420,7 +454,7 @@ def make_app():
         sys.exit()
 
     return tornado.web.Application(route.handlers(),
-                                   debug=True,                  #TODO: debug= iz yaml.deebug
+                                   debug=True,  # TODO: debug= iz yaml.deebug
                                    log_function=log_function)
 
 
