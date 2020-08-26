@@ -411,7 +411,7 @@ class route:
                 prefix += scfg['api']['prefix']
 
         for uri in self.uri:
-            furi = prefix + ('/' if uri[0] != '/' else '') + uri
+            furi = prefix + ('/' if len(uri)>0 and uri[0] != '/' else '') + uri
             print("URI:", furi)
             route.register_handler(furi, cls)
         return cls
