@@ -21,7 +21,8 @@ from base import http, token
 
 import base.utils.log as logutils
 from base.orm import sql_base
-import config.services
+
+# import config.services
 
 LOGGER_NAME = 'microsvc-base-test'
 
@@ -336,7 +337,7 @@ class route:
 
         for _uri, _ in route._handlers:
             if _uri == uri:
-                raise NameError("Error creating api, endopoint already exists")
+                raise NameError(f"Error creating api, endopoint '{_uri}'  already exists")
 
         route._handlers.append((uri, handler))
 
@@ -401,17 +402,20 @@ class route:
         route_handler_names.add(self.handler_name)
         route.set_handler_names(route_handler_names)
 
-        prefix = config.services.prefix if hasattr(config.services, 'prefix') else ''
+        # prefix = config.services.prefix if hasattr(config.services, 'prefix') else ''
+        #
+        # if svc[0] == 'services' and len(svc) > 2:
+        #     svc_name = svc[1]
+        #
+        #     scfg = config.services.svc(svc_name)
+        #     if 'api' in scfg and 'prefix' in scfg['api']:
+        #         prefix += scfg['api']['prefix']
 
-        if svc[0] == 'services' and len(svc) > 2:
-            svc_name = svc[1]
-
-            scfg = config.services.svc(svc_name)
-            if 'api' in scfg and 'prefix' in scfg['api']:
-                prefix += scfg['api']['prefix']
+        from base import registry
+        prefix = registry.prefix()
 
         for uri in self.uri:
-            furi = prefix + ('/' if len(uri)>0 and uri[0] != '/' else '') + uri
+            furi = prefix + ('/' if len(uri) > 0 and uri[0] != '/' else '') + uri
             print("URI:", furi)
             route.register_handler(furi, cls)
         return cls
