@@ -78,14 +78,17 @@ class api:
 
         # TODO; ili u wrapperu ili u call-u ispitas self (a ne _oriigin.self) ako je true onda znas sta radis :) pustas ga i ako je None
 
-        __local_orm_module = None
+        self.__local_orm_module = None
 
         if not self.skip_db:
-            __function_module = inspect.getmodule(funct).__name__
-            __local_orm_module_name = '.'.join(__function_module.split('.')[:-1]) + '.orm'
+            # __function_module = inspect.getmodule(funct).__name__
+            # __local_orm_module_name = '.'.join(__function_module.split('.')[:-1]) + '.orm'
+
+            # __local_orm_module_name = 'orm.orm'
+            # a = 'orm.orm'
 
             try:
-                __local_orm_module = importlib.import_module(__local_orm_module_name)
+                self.__local_orm_module = importlib.import_module('orm.orm')
             except:
                 pass
 
@@ -107,8 +110,8 @@ class api:
 
                 _origin_self.orm_session = None
 
-                if __local_orm_module:
-                    _origin_self.orm_session = __local_orm_module.session()
+                if self.__local_orm_module:
+                    _origin_self.orm_session = self.__local_orm_module.session()
 
                 if str(sig) != '(self)':
 
