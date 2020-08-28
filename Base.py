@@ -197,20 +197,20 @@ class api:
 
                                     kwa[pp.name] = res
 
-                            elif isinstance(pp.annotation, type(Any)):
-
-                                pass
-
                             # slucaj kada je paramar sama kalsa, koja se konstrujise iz json-a
                             elif issubclass(pp.annotation, sql_base):
                                 model_class = pp.annotation
                                 try:
-                                    kwa[pp.name] = model_class.build_from_json(value)
+                                    kwa[pp.name] = model_class(**value)
                                 except Exception as e:
                                     _origin_self.write(
                                         json.dumps(
                                             {"message": f"Invalid datatype {pp.annotation} error builiding object"}))
                                     _origin_self.set_status(http.code.HTTPStatus.BAD_REQUEST)
+
+                            elif isinstance(pp.annotation, type(Any)):
+
+                                pass
 
                         # TODO: ovo sada radi, jer su defaultni argumenti int, str, float, ...
                         # medjutim napravice problem kad defaultni argumenti budu klase, tako da bi trebalo

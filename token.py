@@ -3,16 +3,13 @@ import jwt
 import redis
 import datetime
 
-current_file_folder = os.path.dirname(os.path.realpath(__file__))
-with open(current_file_folder + '/../config/id_rsa.pub', 'rb') as f:
-    public_key = f.read()
+from base.registry import public_key
 
 
 def token2user(token):
-
     try:
-        decoded = jwt.decode(token, public_key, algorithms='RS256')
-    except:
+        decoded = jwt.decode(token, public_key(), algorithms='RS256')
+    except Exception:
         return False, None, None
 
     r = redis.Redis()
