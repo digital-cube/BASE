@@ -261,10 +261,6 @@ class api:
 
                 res = await funct(_origin_self, *_args, **kwa)
 
-                if _origin_self.orm_session:
-                    print('closing session')
-                    _origin_self.orm_session.close()
-
                 status_code = http.code.HTTPStatus.OK
 
                 response = None
@@ -293,7 +289,6 @@ class api:
             except http.HttpInvalidParam as e:
                 self.write(json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
-
             except Exception as e:
                 # print("-" * 100)
                 # import traceback
@@ -301,6 +296,12 @@ class api:
                 # print("-" * 100)
                 _origin_self.write(json.dumps({"message": str(e)}))
                 _origin_self.set_status(http.code.HTTPStatus.INTERNAL_SERVER_ERROR)
+
+            finally:
+                if _origin_self.orm_session:
+                    _origin_self.orm_session.close()
+
+
 
         return wrapper
 
@@ -438,7 +439,6 @@ class route:
 
         for uri in self.uri:
             furi = prefix + ('/' if len(uri) > 0 and uri[0] != '/' else '') + uri
-            print("URI:", furi)
             route.register_handler(furi, cls)
         return cls
 
