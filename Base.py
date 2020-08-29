@@ -200,6 +200,21 @@ class api:
                             # slucaj kada je paramar sama kalsa, koja se konstrujise iz json-a
                             elif issubclass(pp.annotation, sql_base):
                                 model_class = pp.annotation
+
+                                # print("#-"*10)
+                                # print("V", value)
+                                # print("AUTH", hasattr(_origin_self,'id_user'))
+                                #
+                                # print("MC", )
+
+                                # ukoliko id_user postoji u modelu, i ukoliko se radi u auth useru, znaci
+                                # da je user ulogovan, ako neko pokusava da upise id_usera, radi se o upravo ulogovanom
+                                # korisniku, ovo nije dobro jer se time id_user, rezervise za ovu akciju, sto moze
+                                # da zezne nekog ko to nema u vidu, takod a treba smisliti nesto bolje
+
+                                if hasattr(model_class, 'id_user') and hasattr(_origin_self, 'id_user'):
+                                    value['id_user'] = _origin_self.id_user
+
                                 try:
                                     kwa[pp.name] = model_class(**value)
                                 except Exception as e:
@@ -245,6 +260,10 @@ class api:
                 _args = []
 
                 res = await funct(_origin_self, *_args, **kwa)
+
+                if _origin_self.orm_session:
+                    print('closing session')
+                    _origin_self.orm_session.close()
 
                 status_code = http.code.HTTPStatus.OK
 
