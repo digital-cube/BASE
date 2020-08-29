@@ -246,6 +246,10 @@ class api:
 
                 res = await funct(_origin_self, *_args, **kwa)
 
+                if _origin_self.orm_session:
+                    print('closing session')
+                    _origin_self.orm_session.close()
+
                 status_code = http.code.HTTPStatus.OK
 
                 response = None
