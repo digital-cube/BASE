@@ -1,5 +1,6 @@
 import redis
 import json
+from os.path import expanduser
 
 _services = {}
 _last = None
@@ -9,6 +10,9 @@ test_port = None
 
 
 def register(svc_name, service):
+    if 'storage' in service and "~" in service['storage']:
+        service['storage'] = service['storage'].replace('~', expanduser("~"))
+
     global _services, _last
     _services[svc_name] = service
     _last = svc_name
@@ -24,60 +28,40 @@ def address(svc_name):
     return f"http://localhost:{test_port}"
 
 
+def service(svc_name=None):
+    global _services, _last
+
+    if not svc_name:
+        svc_name = _last
+    else:
+        if svc_name not in _services:
+            r = redis.Redis()
+            _s = r.get('base_svc_' + svc_name)
+            if _s:
+                _services[svc_name] = json.loads(_s.decode('utf-8'))
+
+    if svc_name in _services:
+        return _services[svc_name]
+
+    return None
+
+
 def port(svc_name=None):
     if test:
         return test_port
 
-    global _services, _last
-
-    if not svc_name:
-        svc_name = _last
-    else:
-        if svc_name not in _services:
-            r = redis.Redis()
-            _s = r.get('base_svc_' + svc_name)
-            if _s:
-                _services[svc_name] = json.loads(_s.decode('utf-8'))
-
-    if svc_name in _services and 'port' in _services[svc_name]:
-        return _services[svc_name]['port']
-    return None
+    s = service(svc_name)
+    return s['port'] if s and 'port' in s else None
 
 
 def prefix(svc_name=None):
-    global _services, _last
-
-    if not svc_name:
-        svc_name = _last
-
-    else:
-        if svc_name not in _services:
-            r = redis.Redis()
-            _s = r.get('base_svc_' + svc_name)
-            if _s:
-                _services[svc_name] = json.loads(_s.decode('utf-8'))
-
-    if svc_name in _services and 'prefix' in _services[svc_name]:
-        return _services[svc_name]['prefix']
-    return None
+    s = service(svc_name)
+    return s['prefix'] if s and 'prefix' in s else None
 
 
 def db(svc_name=None):
-    global _services, _last
-
-    if not svc_name:
-        svc_name = _last
-
-    else:
-        if svc_name not in _services:
-            r = redis.Redis()
-            _s = r.get('base_svc_' + svc_name)
-            if _s:
-                _services[svc_name] = json.loads(_s.decode('utf-8'))
-
-    if svc_name in _services and 'db' in _services[svc_name]:
-        return _services[svc_name]['db']
-    return None
+    s = service(svc_name)
+    return s['db'] if s and 'db' in s else None
 
 
 def private_key():

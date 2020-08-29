@@ -4,7 +4,7 @@ import json
 
 from uuid import uuid4 as UUIDUUID4
 
-def b64photo(fn):
+def b64file(fn):
     import base64
     with open(fn, 'rb') as f:
         content = f.read()
