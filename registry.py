@@ -12,6 +12,14 @@ test_port = None
 def register(svc_name, service):
     if 'storage' in service and "~" in service['storage']:
         service['storage'] = service['storage'].replace('~', expanduser("~"))
+        service['storage'] = service['storage'].strip()
+        if service['storage'][-1] != '/':
+            service['storage'] = service['storage'] + '/'
+
+    if 'static' in service:
+        if service['static'][-1] != '/':
+            service['static'] = service['static'] + '/'
+
 
     global _services, _last
     _services[svc_name] = service

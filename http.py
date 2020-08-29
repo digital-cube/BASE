@@ -28,7 +28,7 @@ class HttpErrorNotFound(General4xx):
 class HttpInvalidParam(General4xx):
     status = code.HTTPStatus.BAD_REQUEST
 
-    def __init__(self, message):
+    def __init__(self, message=''):
         self.message = message
 
     def __str__(self):
@@ -37,3 +37,9 @@ class HttpInvalidParam(General4xx):
 
 class HttpInternalServerError(BaseException):
     status = code.HTTPStatus.INTERNAL_SERVER_ERROR
+
+    def __init__(self, message=''):
+        self.message = message
+
+    def __str__(self):
+        return "Internal server error " + self.message
