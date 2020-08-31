@@ -358,10 +358,12 @@ class route:
         if not hasattr(route, '_handler_names'):
             route._handler_names = set()
 
+        # print("URL_HANDLERS", route._handlers)
         for _uri, _ in route._handlers:
             if _uri == uri:
                 raise NameError(f"Error creating api, endopoint '{_uri}'  already exists")
 
+        # print("URI",uri)
         route._handlers.append((uri, handler))
 
     @staticmethod

@@ -52,7 +52,16 @@ class BaseTest(AsyncHTTPTestCase):
         if expected_code:
             self.assertEqual(expected_code, response.code)
 
-        res = json.loads(resp_txt) if resp_txt else {}
+#        print("RESP_TXT",resp_txt)
+
+        try:
+            res = json.loads(resp_txt) if resp_txt else {}
+        except:
+            print("Error decoding following response")
+            print(resp_txt)
+            print("-"*100)
+            self.assertTrue(False)
+            
         if expected_result:
             self.assertEqual(res, expected_result)
 
