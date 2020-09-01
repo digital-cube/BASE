@@ -130,11 +130,12 @@ class BaseSql():
             if column.key == 'id':
                 continue
 
-            if column.key in source.__dict__:
-                if self.__dict__[column.key] != source.__dict__[column.key]:
+            if column.key in source:
+                # if column.key in source.__dict__:
+                if self.__dict__[column.key] != source[column.key]:
                     updated.append(column.key)
 
-                self.__setattr__(column.key, source.__dict__[column.key])
+                self.__setattr__(column.key, source[column.key])
 
         return updated
 
