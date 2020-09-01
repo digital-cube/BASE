@@ -301,8 +301,6 @@ class api:
                 if _origin_self.orm_session:
                     _origin_self.orm_session.close()
 
-
-
         return wrapper
 
 
@@ -350,20 +348,16 @@ class route:
     @staticmethod
     def register_handler(uri, handler):
 
-        # TODO: handler moze da bude string ili niz stringova
-
         if not hasattr(route, '_handlers'):
             route._handlers = []
 
         if not hasattr(route, '_handler_names'):
             route._handler_names = set()
 
-        # print("URL_HANDLERS", route._handlers)
         for _uri, _ in route._handlers:
             if _uri == uri:
                 raise NameError(f"Error creating api, endopoint '{_uri}'  already exists")
 
-        # print("URI",uri)
         route._handlers.append((uri, handler))
 
     @staticmethod
@@ -393,24 +387,20 @@ class route:
             caller_frame = inspect.stack()[1]
             raise NameError("Missing URI in API class from module {}".format(caller_frame[1]))
 
-        # self.uri_args = []
-
         if type(kwargs['URI']) == str:
             uris = [kwargs['URI']]
         else:
             uris = kwargs['URI']
+
+        specified_prefix = kwargs['PREFIX'] if 'PREFIX' in kwargs else None
 
         for uri in uris:
             parts = uri.split('/')
             rparts = []
             for p in parts:
                 rparts.append("(.*)" if len(p) and p[0] == ':' else p)
-                # if len(p) and p[0] == ':':
-                #     self.uri_args.append(p[1:])
 
-            self.uri.append('/'.join(rparts))
-
-        # print(self.uri, self.uri_args)
+            self.uri.append({'specified_prefix': specified_prefix, 'route': '/'.join(rparts)})
 
     def __call__(self, cls):
 
@@ -439,8 +429,18 @@ class route:
         from base import registry
         prefix = registry.prefix()
 
-        for uri in self.uri:
-            furi = prefix + ('/' if len(uri) > 0 and uri[0] != '/' else '') + uri
+        for duri in self.uri:
+            uri = duri['route']
+            default_prefix = prefix + ('/' if len(uri) > 0 and uri[0] != '/' else '')
+            if duri['specified_prefix'] is not None:
+                default_prefix = duri['specified_prefix'].strip()
+                # if len(default_prefix) and default_prefix[-1] != '/':
+                #     default_prefix += '/'
+
+            furi = default_prefix + uri
+
+            # print("FURI",furi)
+
             route.register_handler(furi, cls)
         return cls
 
