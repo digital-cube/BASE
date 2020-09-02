@@ -212,7 +212,10 @@ class api:
                                 # korisniku, ovo nije dobro jer se time id_user, rezervise za ovu akciju, sto moze
                                 # da zezne nekog ko to nema u vidu, takod a treba smisliti nesto bolje
 
-                                if hasattr(model_class, 'id_user') and hasattr(_origin_self, 'id_user'):
+                                if hasattr(model_class, 'id_user') and \
+                                        'id_user' not in value and \
+                                        hasattr(_origin_self, 'id_user'):
+
                                     value['id_user'] = _origin_self.id_user
 
                                 try:
