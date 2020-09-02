@@ -398,7 +398,7 @@ class route:
             parts = uri.split('/')
             rparts = []
             for p in parts:
-                rparts.append("(.*)" if len(p) and p[0] == ':' else p)
+                rparts.append("([^/]*)" if len(p) and p[0] == ':' else p)
 
             self.uri.append({'specified_prefix': specified_prefix, 'route': '/'.join(rparts)})
 
@@ -490,3 +490,5 @@ def run(port):
     app = make_app()
     app.listen(port)
     tornado.ioloop.IOLoop.current().start()
+
+
