@@ -84,6 +84,7 @@ class SessionsHandler(Base.BASE):
             s.closed = datetime.datetime.now()
             r = redis.Redis()
             r.set(self.id_session, 0)
+            _orm_session.commit()
 
         return None
 

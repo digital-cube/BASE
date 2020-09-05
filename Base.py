@@ -21,10 +21,24 @@ from base import http, token
 
 import base.utils.log as logutils
 from base.orm import sql_base
+from inspect import isclass
 
 # import config.services
 
 LOGGER_NAME = 'microsvc-base-test'
+
+ModelUser = None
+try:
+    _models = importlib.import_module('orm.models')
+    ModelUser = getattr(_models, 'User')
+except:
+    pass
+
+LocalOrmModule = None
+try:
+    LocalOrmModule = importlib.import_module('orm.orm')
+except:
+    pass
 
 
 class BASE(tornado.web.RequestHandler):
@@ -81,14 +95,8 @@ class api:
         self.__local_orm_module = None
 
         if not self.skip_db:
-            # __function_module = inspect.getmodule(funct).__name__
-            # __local_orm_module_name = '.'.join(__function_module.split('.')[:-1]) + '.orm'
-
-            # __local_orm_module_name = 'orm.orm'
-            # a = 'orm.orm'
-
             try:
-                self.__local_orm_module = importlib.import_module('orm.orm')
+                self.__local_orm_module = LocalOrmModule
             except:
                 pass
 
@@ -106,12 +114,12 @@ class api:
 
                 kwa = {}
 
-                from inspect import isclass
 
-                _origin_self.orm_session = None
+                if not hasattr(_origin_self, 'orm_session'):
+                    _origin_self.orm_session = None
 
-                if self.__local_orm_module:
-                    _origin_self.orm_session = self.__local_orm_module.session()
+                    if self.__local_orm_module:
+                        _origin_self.orm_session = self.__local_orm_module.session()
 
                 if str(sig) != '(self)':
 
@@ -215,7 +223,6 @@ class api:
                                 if hasattr(model_class, 'id_user') and \
                                         'id_user' not in value and \
                                         hasattr(_origin_self, 'id_user'):
-
                                     value['id_user'] = _origin_self.id_user
 
                                 try:
@@ -312,6 +319,12 @@ class auth:
         pass
 
     def __call__(self, funct):
+
+        try:
+            self.__local_orm_module = LocalOrmModule
+        except:
+            pass
+
         @wraps(funct)
         async def wrapper(_self_origin, *args, **kwargs):
 
@@ -322,18 +335,31 @@ class auth:
             # if 'Authorization' not in _self_origin.request.headers:
             #     raise http.HttpErrorUnauthorized
 
+            if not hasattr(_self_origin, 'orm_session'):
+                _self_origin.orm_session = None
+
+                if self.__local_orm_module:
+                    _self_origin.orm_session = self.__local_orm_module.session()
+
             if 'Authorization' in _self_origin.request.headers:
 
                 res, id_user, id_session = token.token2user(_self_origin.request.headers['Authorization'])
 
                 # ?!? iz nekog razloga je prestalo da sljaka
-                #
                 # ERROR : Exception after Future was cancelled
 
                 # if not res:
                 #     raise http.HttpErrorUnauthorized
 
                 if res:
+                    # on user service try to assign user
+                    try:
+                        usermodule = importlib.import_module('orm.models')
+                        _self_origin.user = _self_origin.orm_session.query(usermodule.User).filter(
+                            usermodule.User.id == id_user).one_or_none()
+                    except Exception as e:
+                        _self_origin.user = None
+
                     _self_origin.id_user = id_user
                     _self_origin.id_session = id_session
                     await funct(_self_origin, *args, **kwargs)
@@ -493,5 +519,3 @@ def run(port):
     app = make_app()
     app.listen(port)
     tornado.ioloop.IOLoop.current().start()
-
-
