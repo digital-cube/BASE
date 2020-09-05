@@ -2,7 +2,7 @@ import contextlib
 import base.orm
 import base.registry
 
-db_config = base.registry.db()
+db_config = base.registry.db('users')
 
 
 def session():

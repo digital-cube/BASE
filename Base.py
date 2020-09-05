@@ -300,10 +300,10 @@ class api:
                 self.write(json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except Exception as e:
-                # print("-" * 100)
-                # import traceback
-                # print(e)
-                # print("-" * 100)
+                print("-" * 100)
+                import traceback
+                print(e)
+                print("-" * 100)
                 _origin_self.write(json.dumps({"message": str(e)}))
                 _origin_self.set_status(http.code.HTTPStatus.INTERNAL_SERVER_ERROR)
 
