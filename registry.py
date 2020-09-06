@@ -28,6 +28,8 @@ def register(svc_name, service):
     r = redis.Redis()
     r.set('base_svc_' + svc_name, json.dumps(service))
 
+    print("REGISTROVANO", svc_name)
+
 
 def address(svc_name):
     if not test:

@@ -35,10 +35,6 @@ except:
     pass
 
 LocalOrmModule = None
-try:
-    LocalOrmModule = importlib.import_module('orm.orm')
-except:
-    pass
 
 
 class BASE(tornado.web.RequestHandler):
@@ -95,6 +91,14 @@ class api:
         self.__local_orm_module = None
 
         if not self.skip_db:
+
+            try:
+                global LocalOrmModule
+                if not LocalOrmModule:
+                    LocalOrmModule = importlib.import_module('orm.orm')
+            except:
+                pass
+
             try:
                 self.__local_orm_module = LocalOrmModule
             except:
