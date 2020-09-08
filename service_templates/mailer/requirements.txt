@@ -1,0 +1,9 @@
+aiotask-context==0.6.1
+logfmt==0.4
+psycopg2-binary==2.8.5
+PyJWT==1.7.1
+PyYAML==5.3.1
+redis==3.5.3
+SQLAlchemy==1.3.19
+tornado==6.0.4
+tornadoweb==0.0.21
