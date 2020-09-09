@@ -25,7 +25,7 @@ class UnitTestMailerBase(test.BaseTest):
         r.flushall()
 
         base.registry.register("mailer", {'prefix': '/api/mailer', 'port': None,
-                                          'sendgrid_api_key': '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',
+                                          'sendgrid_api_key': '--sendgridapikey--',
                                           "db":
                                               {
                                                   "type": "postgresql",
