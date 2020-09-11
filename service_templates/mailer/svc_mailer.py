@@ -3,7 +3,7 @@ import base.registry
 
 base.registry.register("users", {"port": 9102,
                                  "prefix": "/api/mailer",
-                                 'sendgrid_api_key': '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',
+                                 'sendgrid_api_key': '--sendgridapikey--',
                                  "db":
                                      {
                                          "type": "postgresql",
