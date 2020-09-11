@@ -306,8 +306,16 @@ class api:
             except Exception as e:
                 print("-" * 100)
                 import traceback
+                exc_type, exc_value, exc_traceback = sys.exc_info()
                 print(e)
+                print(exc_type)
+                print(exc_value)
+                print(exc_traceback)
                 print("-" * 100)
+                traceback.print_exception(exc_type, exc_value, exc_traceback,
+                                          limit=2, file=sys.stdout)
+                print("-" * 100)
+                "*** print_exc:"
                 _origin_self.write(json.dumps({"message": str(e)}))
                 _origin_self.set_status(http.code.HTTPStatus.INTERNAL_SERVER_ERROR)
 

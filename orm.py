@@ -139,6 +139,15 @@ class BaseSql():
 
         return updated
 
+    def keys(self, skip: set = {}):
+        res = []
+        for key in self.__dict__:
+            if key == '_sa_instance_state' or key in skip:
+                continue
+            res.append(key)
+
+        return res
+
     def serialize(self, keys=None):
 
         def _serialize(s):

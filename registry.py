@@ -20,14 +20,12 @@ def register(svc_name, service):
         if service['static'][-1] != '/':
             service['static'] = service['static'] + '/'
 
-
     global _services, _last
     _services[svc_name] = service
     _last = svc_name
 
     r = redis.Redis()
     r.set('base_svc_' + svc_name, json.dumps(service))
-
 
 
 def address(svc_name):
