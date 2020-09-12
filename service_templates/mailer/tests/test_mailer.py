@@ -20,7 +20,7 @@ def token2user(_):
 class UnitTestMailerBase(test.BaseTest):
 
     def setUp(self):
-        import redis
+        import base.base_redis as redis
         r = redis.Redis()
         r.flushall()
 

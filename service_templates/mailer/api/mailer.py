@@ -1,7 +1,7 @@
 import json
 import base.registry
 from base import http
-import redis
+import base.base_redis as redis
 import datetime
 from tornado import gen
 from tornado.concurrent import run_on_executor

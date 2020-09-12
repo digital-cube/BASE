@@ -1,7 +1,7 @@
 import json
 import base.registry
 from base import http
-import redis
+import base.base_redis as redis
 import datetime
 
 from base import Base

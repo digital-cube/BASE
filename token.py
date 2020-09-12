@@ -1,6 +1,6 @@
 import os
 import jwt
-import redis
+import base.base_redis as redis
 import datetime
 
 from base.registry import public_key

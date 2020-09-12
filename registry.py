@@ -1,4 +1,4 @@
-import redis
+import base.base_redis as redis
 import json
 from os.path import expanduser
 
