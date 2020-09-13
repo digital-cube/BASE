@@ -10,6 +10,8 @@ class Redis(redis.Redis):
                 raise NameError("REDIS_PASSWORD environment variable is required")
 
             kwargs['password'] = self.redis_password
+        else:
+            self.redis_password = kwargs['password']
         
         if 'port' not in kwargs:
             self.redis_port = os.getenv('REDIS_PORT')
