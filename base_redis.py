@@ -15,13 +15,13 @@ class Redis(redis.Redis):
         
         if 'port' not in kwargs:
             self.redis_port = os.getenv('REDIS_PORT')
-            
-            kwargs['port']=self.redis_port
+            if self.redis_port:
+                kwargs['port']=self.redis_port
         
         if 'host' not in kwargs:
             self.redis_host = os.getenv('REDIS_HOST')
-            
-            kwargs['host']=self.redis_host
+            if self.redis_host:
+                kwargs['host']=self.redis_host
 
         super().__init__(*args, **kwargs)
 

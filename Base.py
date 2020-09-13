@@ -297,11 +297,13 @@ class api:
 
 
             except http.HttpErrorUnauthorized as e:
+                _origin_self.write(json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except http.General4xx as e:
+                _origin_self.write(json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except http.HttpInvalidParam as e:
-                self.write(json.dumps({"message": e.message}))
+                _origin_self.write(json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except Exception as e:
                 print("-" * 100)
