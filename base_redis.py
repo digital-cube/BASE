@@ -10,6 +10,16 @@ class Redis(redis.Redis):
                 raise NameError("REDIS_PASSWORD environment variable is required")
 
             kwargs['password'] = self.redis_password
+        
+        if 'port' not in kwargs:
+            self.redis_port = os.getenv('REDIS_PORT')
+            
+            kwargs['port']=self.redis_port
+        
+        if 'host' not in kwargs:
+            self.redis_host = os.getenv('REDIS_HOST')
+            
+            kwargs['host']=self.redis_host
 
         super().__init__(*args, **kwargs)
 
