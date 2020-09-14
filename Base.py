@@ -118,7 +118,6 @@ class api:
 
                 kwa = {}
 
-
                 if not hasattr(_origin_self, 'orm_session'):
                     _origin_self.orm_session = None
 
@@ -305,6 +304,9 @@ class api:
             except http.HttpInvalidParam as e:
                 _origin_self.write(json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
+            except http.HttpInternalServerError as e:
+                _origin_self.write(json.dumps({"message": e.message}))
+                _origin_self.set_status(e.status)
             except Exception as e:
                 print("-" * 100)
                 import traceback
@@ -330,6 +332,9 @@ class api:
 
 class auth:
     def __init__(self, *args, **kwargs):
+
+        self.allowed_flags = kwargs['permissions'] if 'permissions' in kwargs else None
+
         pass
 
     def __call__(self, funct):
@@ -357,7 +362,10 @@ class auth:
 
             if 'Authorization' in _self_origin.request.headers:
 
-                res, id_user, id_session = token.token2user(_self_origin.request.headers['Authorization'])
+                res = token.token2user(_self_origin.request.headers['Authorization'])
+
+                id_user = res['id_user'] if res and 'id_user' in res else None
+                id_session = res['id'] if res and 'id' in res else None
 
                 # ?!? iz nekog razloga je prestalo da sljaka
                 # ERROR : Exception after Future was cancelled
@@ -365,7 +373,22 @@ class auth:
                 # if not res:
                 #     raise http.HttpErrorUnauthorized
 
+                permissions = res['permissions'] if res and 'permissions' in res else None
+
+                _self_origin.permissions = permissions
+
+                if self.allowed_flags is not None:
+                    if permissions is not None:
+                        # print("PROVERAVAM PERMISSIONS", "permissions:", permissions, "self.allowed_flags:",
+                        #       self.allowed_flags, "|:", permissions | self.allowed_flags, "&:",
+                        #       permissions & self.allowed_flags)
+                        if permissions & self.allowed_flags == 0:
+                            _self_origin.set_status(http.code.HTTPStatus.UNAUTHORIZED)
+                            _self_origin.write('{"message":"unauthorized"}')
+                            return
+
                 if res:
+                    # print("RES",res)
                     # on user service try to assign user
                     try:
                         usermodule = importlib.import_module('orm.models')
