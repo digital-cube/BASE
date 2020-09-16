@@ -37,7 +37,7 @@ class BaseTest(AsyncHTTPTestCase):
     def get_app(self):
         return self.my_app
 
-    def api(self, token, method, url, body=None, expected_code=None, expected_result=None):
+    def api(self, token, method, url, body=None, expected_code=None, expected_result=None, raw_response=False):
 
         if not body:
             if method in ('PUT', 'POST', 'PATCH'):
@@ -47,10 +47,14 @@ class BaseTest(AsyncHTTPTestCase):
 
         response = self.fetch(url, method=method, body=json.dumps(body) if body is not None else None, headers=headers)
 
-        resp_txt = response.body.decode('utf-8')
 
         if expected_code:
             self.assertEqual(expected_code, response.code)
+
+        if raw_response:
+            return response.body
+
+        resp_txt = response.body.decode('utf-8')
 
 #        print("RESP_TXT",resp_txt)
 

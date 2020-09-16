@@ -282,17 +282,25 @@ class api:
                     response = res[0]
                     status_code = res[1]
 
-                if type(res) in (dict, list):
+                elif type(res) in (dict, list):
                     response = res
 
-                if isinstance(res, type(None)):
+                elif isinstance(res, type(None)):
                     response = None
                     status_code = http.code.HTTPStatus.NO_CONTENT
+
+                else:
+                    response = res
+
 
                 _origin_self.set_status(status_code)
 
                 if response is not None:
-                    _origin_self.write(json.dumps(response))
+                    try:
+                        prepared_response = json.dumps(response, indent=4)
+                        _origin_self.write(prepared_response)
+                    except:
+                        _origin_self.write(response)
 
 
             except http.HttpErrorUnauthorized as e:
