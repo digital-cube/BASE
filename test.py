@@ -56,7 +56,7 @@ class BaseTest(AsyncHTTPTestCase):
 
         resp_txt = response.body.decode('utf-8')
 
-#        print("RESP_TXT",resp_txt)
+        # print("RESP_TXT",resp_txt)
 
         try:
             res = json.loads(resp_txt) if resp_txt else {}
