@@ -153,7 +153,7 @@ class BaseSql():
         def _serialize(s):
             if type(s) in (int, float, str):
                 return s
-            return str(s)
+            return str(s) if s is not None else None
 
         result = {}
 

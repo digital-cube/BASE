@@ -230,7 +230,12 @@ class api:
 
                                 try:
                                     kwa[pp.name] = model_class(**value)
-                                except Exception as e:
+                                except TypeError as te:
+                                    if 'missing' in str(te) and 'required' in str(te) and 'argument' in str(te):
+                                        kwa[pp.name] = None
+                                    else:
+                                        raise http.HttpInvalidParam(str(te))
+                                except Exception:
                                     kwa[pp.name] = None
                                     # _origin_self.write(
                                     #     json.dumps(
