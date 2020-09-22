@@ -6,10 +6,11 @@ class Redis(redis.Redis):
     def __init__(self, *args, **kwargs):
         if 'password' not in kwargs:
             self.redis_password = os.getenv('REDIS_PASSWORD')
-            if not self.redis_password:
-                raise NameError("REDIS_PASSWORD environment variable is required")
+ #           if not self.redis_password:
+ #               raise NameError("REDIS_PASSWORD environment variable is required")
 
-            kwargs['password'] = self.redis_password
+            if self.redis_password:
+                kwargs['password'] = self.redis_password
         else:
             self.redis_password = kwargs['password']
         
