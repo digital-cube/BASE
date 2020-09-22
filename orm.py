@@ -52,7 +52,7 @@ class Orm(object):
             Orm.__instance[sql_address].__db_url = sql_address
             Orm.__instance[sql_address].__engine = create_engine(Orm.__instance[sql_address].__db_url, echo=False,
                                                                  **kwargs)
-            Orm.__instance[sql_address].__session_factory = sessionmaker(bind=Orm.__instance[sql_address].__engine)
+            Orm.__instance[sql_address].__session_factory = sessionmaker(bind=Orm.__instance[sql_address].__engine) #, autoflush=False, autocommit=False)
             Orm.__instance[sql_address].__scoped_session = scoped_session(Orm.__instance[sql_address].__session_factory)
             Orm.__instance[sql_address].__session = Orm.__instance[sql_address].__scoped_session()
             Orm.__instance[sql_address].__base = orm_base
