@@ -37,7 +37,10 @@ class BaseTest(AsyncHTTPTestCase):
     def get_app(self):
         return self.my_app
 
-    def api(self, token, method, url, body=None, expected_code=None, expected_result=None, raw_response=False):
+    def api(self, token, method, url, body=None,
+            expected_code=None, expected_result=None, expected_result_subset=None,
+            expected_result_contain_keys=None,
+            raw_response=False):
 
         if not body:
             if method in ('PUT', 'POST', 'PATCH'):
@@ -68,5 +71,14 @@ class BaseTest(AsyncHTTPTestCase):
             
         if expected_result:
             self.assertEqual(res, expected_result)
+
+        if expected_result_contain_keys:
+            for key in expected_result_contain_keys:
+                self.assertTrue(key in res)
+
+        if expected_result_subset:
+            for key in expected_result_subset:
+                self.assertTrue(key in res)
+                self.assertEqual(res[key], expected_result_subset[key])
 
         return res

@@ -229,13 +229,18 @@ class api:
                                     value['id_user'] = _origin_self.id_user
 
                                 try:
-                                    kwa[pp.name] = model_class(**value)
+
+                                    if hasattr(model_class, 'build'):
+                                        kwa[pp.name] = model_class.build(value)
+                                    else:
+                                        # there is no builder, try to construct class
+                                        kwa[pp.name] = model_class(**value)
                                 except TypeError as te:
                                     if 'missing' in str(te) and 'required' in str(te) and 'argument' in str(te):
                                         kwa[pp.name] = None
                                     else:
                                         raise http.HttpInvalidParam(str(te))
-                                except Exception:
+                                except Exception as e:
                                     kwa[pp.name] = None
                                     # _origin_self.write(
                                     #     json.dumps(

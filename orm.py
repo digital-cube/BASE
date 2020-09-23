@@ -52,7 +52,8 @@ class Orm(object):
             Orm.__instance[sql_address].__db_url = sql_address
             Orm.__instance[sql_address].__engine = create_engine(Orm.__instance[sql_address].__db_url, echo=False,
                                                                  **kwargs)
-            Orm.__instance[sql_address].__session_factory = sessionmaker(bind=Orm.__instance[sql_address].__engine) #, autoflush=False, autocommit=False)
+            Orm.__instance[sql_address].__session_factory = sessionmaker(
+                bind=Orm.__instance[sql_address].__engine)  # , autoflush=False, autocommit=False)
             Orm.__instance[sql_address].__scoped_session = scoped_session(Orm.__instance[sql_address].__session_factory)
             Orm.__instance[sql_address].__session = Orm.__instance[sql_address].__scoped_session()
             Orm.__instance[sql_address].__base = orm_base
@@ -106,6 +107,46 @@ def init_orm(db_config):
 
 class BaseSql():
     created = Column(DateTime, index=True)
+    #
+    # @staticmethod
+    # def _build(model, data, mandatory_fields, optional_fields, relations):
+    #
+    #     mfkeys = set(mandatory_fields.keys()) if mandatory_fields else {}
+    #     okeys = set(optional_fields.keys()) if optional_fields else {}
+    #
+    #     if mfkeys.intersection((okeys)):
+    #         raise NameError("keys {mfkeys.intersection((okeys))} can't be mandatory and optional")
+    #
+    #     # add_fk_relations = {}
+    #     # to_remove = []
+    #     for f in mandatory_fields:
+    #         if f not in data:
+    #             raise NameError(f"mandatory field {f} not presented in input")
+    #         # if f in relations:
+    #     #         to_remove.append(f)
+    #     #         add_fk_relations[f] = data[f]
+    #     #
+    #     # try:
+    #
+    #     for f in data:
+    #         if f not in mandatory_fields and f not in optional_fields:
+    #             raise NameError(f"field {f} is not valid field for constructing Product")
+    #
+    #     #         if f in relations:
+    #     #             to_remove.append(f)
+    #     #             if f in data:
+    #     #                 add_fk_relations[f] = data[f]
+    #     # except Exception as e:
+    #     #     print('pass')
+    #     #
+    #     # for k in to_remove:
+    #     #     del data[k]
+    #
+    #     m = model(**data)
+    #     # for id_fk in add_fk_relations:
+    #     #     setattr(m, id_fk, add_fk_relations[id_fk])
+    #
+    #     return m
 
     def __init__(self, **kwa):
 

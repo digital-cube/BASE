@@ -1,5 +1,6 @@
 import http as code
 
+from http import HTTPStatus as status
 
 class General4xx(BaseException):
     status = code.HTTPStatus.BAD_REQUEST
