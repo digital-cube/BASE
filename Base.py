@@ -208,7 +208,7 @@ class api:
 
                                     kwa[pp.name] = res
 
-                            # slucaj kada je paramar sama kalsa, koja se konstrujise iz json-a
+                            # slucaj kada je param sama kalsa, koja se konstruise iz json-a
                             elif issubclass(pp.annotation, sql_base):
                                 model_class = pp.annotation
 
@@ -315,16 +315,16 @@ class api:
 
 
             except http.HttpErrorUnauthorized as e:
-                _origin_self.write(json.dumps({"message": e.message}))
+                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except http.General4xx as e:
-                _origin_self.write(json.dumps({"message": e.message}))
+                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except http.HttpInvalidParam as e:
-                _origin_self.write(json.dumps({"message": e.message}))
+                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except http.HttpInternalServerError as e:
-                _origin_self.write(json.dumps({"message": e.message}))
+                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except Exception as e:
                 print("-" * 100)
