@@ -303,7 +303,6 @@ class api:
                 else:
                     response = res
 
-
                 _origin_self.set_status(status_code)
 
                 if response is not None:
@@ -314,18 +313,26 @@ class api:
                         _origin_self.write(response)
 
 
-            except http.HttpErrorUnauthorized as e:
-                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
-                _origin_self.set_status(e.status)
             except http.General4xx as e:
-                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
+
+                #TODO: Dodati Log
+
+                _origin_self.write(
+                    json.dumps(e.message) if type(e.message) == dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
-            except http.HttpInvalidParam as e:
-                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
-                _origin_self.set_status(e.status)
-            except http.HttpInternalServerError as e:
-                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
-                _origin_self.set_status(e.status)
+
+            # except http.General4xx as e:
+            #     _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
+            #     _origin_self.set_status(e.status)
+            # except http.HttpInvalidParam as e:
+            #     _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
+            #     _origin_self.set_status(e.status)
+            #
+            #
+            # except http.HttpInternalServerError as e:
+            #     _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
+            #     _origin_self.set_status(e.status)
+
             except Exception as e:
                 print("-" * 100)
                 import traceback

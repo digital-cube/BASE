@@ -7,11 +7,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from sqlalchemy import Column, DateTime
+from sqlalchemy import Column, DateTime, TIMESTAMP
 import datetime
 
 from sqlalchemy.engine.url import URL
 from sqlalchemy import inspect
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 
 sql_base = declarative_base()
 _orm = {}
@@ -105,54 +106,11 @@ def init_orm(db_config):
     return orm_builder(__db_url, sql_base)
 
 
-class BaseSql():
-    created = Column(DateTime, index=True)
-    #
-    # @staticmethod
-    # def _build(model, data, mandatory_fields, optional_fields, relations):
-    #
-    #     mfkeys = set(mandatory_fields.keys()) if mandatory_fields else {}
-    #     okeys = set(optional_fields.keys()) if optional_fields else {}
-    #
-    #     if mfkeys.intersection((okeys)):
-    #         raise NameError("keys {mfkeys.intersection((okeys))} can't be mandatory and optional")
-    #
-    #     # add_fk_relations = {}
-    #     # to_remove = []
-    #     for f in mandatory_fields:
-    #         if f not in data:
-    #             raise NameError(f"mandatory field {f} not presented in input")
-    #         # if f in relations:
-    #     #         to_remove.append(f)
-    #     #         add_fk_relations[f] = data[f]
-    #     #
-    #     # try:
-    #
-    #     for f in data:
-    #         if f not in mandatory_fields and f not in optional_fields:
-    #             raise NameError(f"field {f} is not valid field for constructing Product")
-    #
-    #     #         if f in relations:
-    #     #             to_remove.append(f)
-    #     #             if f in data:
-    #     #                 add_fk_relations[f] = data[f]
-    #     # except Exception as e:
-    #     #     print('pass')
-    #     #
-    #     # for k in to_remove:
-    #     #     del data[k]
-    #
-    #     m = model(**data)
-    #     # for id_fk in add_fk_relations:
-    #     #     setattr(m, id_fk, add_fk_relations[id_fk])
-    #
-    #     return m
+class _BaseSql():
 
     def __init__(self, **kwa):
 
         import uuid
-
-        self.created = datetime.datetime.now()
 
         self.id = str(uuid.uuid4()) if 'id' not in kwa else kwa['id']
 
@@ -215,6 +173,16 @@ def activate_orm(db_config):
     _db_url = make_database_url(db_config, 'utf8')
 
     _orm[db_config['database']] = Orm(_db_url, sql_base)
+
+
+class BaseSql(_BaseSql):
+    id = Column(UUID, primary_key=True)
+    created = Column(TIMESTAMP, index=True)
+
+    def __init__(self, **kwargs):
+
+        self.created = datetime.datetime.now()
+        super().__init__(**kwargs)
 
 # izmesteno je u same mikro servise / orm.py da bi importovao konkretnu konfiguraciju kao i module sa modelima
 
