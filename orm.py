@@ -147,7 +147,7 @@ class _BaseSql():
 
         return res
 
-    def serialize(self, keys=None):
+    def serialize(self, keys=None, forbidden=None):
 
         def _serialize(s):
             if type(s) in (int, float, str):
@@ -158,6 +158,9 @@ class _BaseSql():
 
         for key in self.__dict__:
             if key == '_sa_instance_state':
+                continue
+
+            if key in forbidden:
                 continue
 
             if not keys or key in keys:
@@ -181,7 +184,9 @@ class BaseSql(_BaseSql):
 
     def __init__(self, **kwargs):
 
-        self.created = datetime.datetime.now()
+        n = datetime.datetime.now()
+        self.created = datetime.datetime(n.year, n.month, n.day, n.hour, n.minute, n.second)
+
         super().__init__(**kwargs)
 
 # izmesteno je u same mikro servise / orm.py da bi importovao konkretnu konfiguraciju kao i module sa modelima
