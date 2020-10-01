@@ -42,6 +42,8 @@ class BaseTest(AsyncHTTPTestCase):
             expected_result_contain_keys=None,
             raw_response=False):
 
+        url = url.strip()
+
         if not body:
             if method in ('PUT', 'POST', 'PATCH'):
                 body = {}
