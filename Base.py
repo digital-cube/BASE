@@ -315,7 +315,7 @@ class api:
 
             except http.General4xx as e:
 
-                #TODO: Dodati Log
+                # TODO: Dodati Log
 
                 _origin_self.write(
                     json.dumps(e.message) if type(e.message) == dict else json.dumps({"message": e.message}))

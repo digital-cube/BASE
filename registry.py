@@ -9,6 +9,20 @@ test = False
 test_port = None
 
 
+def registered(svc_name):
+    global test
+    if test:
+        return svc_name in _services
+
+    # for monolit apps
+    if svc_name in _services:
+        return svc_name
+
+    # for distributed apps
+    r = redis.Redis()
+    return r.exists('base_svc_' + svc_name)
+
+
 def register(svc_name, service):
     if 'storage' in service and "~" in service['storage']:
         service['storage'] = service['storage'].replace('~', expanduser("~"))

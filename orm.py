@@ -147,7 +147,7 @@ class _BaseSql():
 
         return res
 
-    def serialize(self, keys=None, forbidden=None):
+    def serialize(self, keys=None, forbidden=[]):
 
         def _serialize(s):
             if type(s) in (int, float, str):
@@ -156,15 +156,22 @@ class _BaseSql():
 
         result = {}
 
-        for key in self.__dict__:
-            if key == '_sa_instance_state':
-                continue
+        # ukoliko su navedeni kljucevi, zgodno bi bilo ubaciti ih u serializaciju po redosledu
+        if keys:
+            for key in keys:
+                if key in self.__dict__ and key not in forbidden:
+                    result[key] = _serialize(self.__dict__[key])
 
-            if key in forbidden:
-                continue
+        else:
+            for key in self.__dict__:
+                if key == '_sa_instance_state':
+                    continue
 
-            if not keys or key in keys:
-                result[key] = _serialize(self.__dict__[key])
+                if key in forbidden:
+                    continue
+
+                if not keys or key in keys:
+                    result[key] = _serialize(self.__dict__[key])
 
         return result
 
