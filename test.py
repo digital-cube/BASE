@@ -39,7 +39,7 @@ class BaseTest(AsyncHTTPTestCase):
 
     def api(self, token, method, url, body=None,
             expected_code=None, expected_result=None, expected_result_subset=None,
-            expected_result_contain_keys=None,
+            expected_result_contain_keys=None, expected_length=None,
             raw_response=False):
 
         url = url.strip()
@@ -50,7 +50,12 @@ class BaseTest(AsyncHTTPTestCase):
 
         headers = {"Authorization": token} if token else {}
 
-        response = self.fetch(url, method=method, body=json.dumps(body) if body is not None else None, headers=headers)
+        try:
+            response = self.fetch(url, method=method, body=json.dumps(body) if body is not None else None, headers=headers)
+        except:
+            print('error serializing output')
+            print("body",body)
+            print('-'*1000)
 
 
         if expected_code:
@@ -82,5 +87,8 @@ class BaseTest(AsyncHTTPTestCase):
             for key in expected_result_subset:
                 self.assertTrue(key in res)
                 self.assertEqual(res[key], expected_result_subset[key])
+
+        if expected_length is not None:
+            self.assertEqual(len(res), expected_length)
 
         return res

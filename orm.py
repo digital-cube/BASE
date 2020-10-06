@@ -150,7 +150,7 @@ class _BaseSql():
     def serialize(self, keys=None, forbidden=[]):
 
         def _serialize(s):
-            if type(s) in (int, float, str):
+            if type(s) in (int, float, str, dict):
                 return s
             return str(s) if s is not None else None
 
