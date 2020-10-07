@@ -4,6 +4,8 @@ import json
 
 from uuid import uuid4 as UUIDUUID4
 
+from base.registry import AuthorizationKey
+
 def b64file(fn):
     import base64
     with open(fn, 'rb') as f:
@@ -48,7 +50,7 @@ class BaseTest(AsyncHTTPTestCase):
             if method in ('PUT', 'POST', 'PATCH'):
                 body = {}
 
-        headers = {"Authorization": token} if token else {}
+        headers = {AuthorizationKey: token} if token else {}
 
         try:
             response = self.fetch(url, method=method, body=json.dumps(body) if body is not None else None, headers=headers)

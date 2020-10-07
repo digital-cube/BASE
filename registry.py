@@ -2,6 +2,10 @@ import base.base_redis as redis
 import json
 from os.path import expanduser
 
+
+AuthorizationKey = 'jwt'
+
+
 _services = {}
 _last = None
 

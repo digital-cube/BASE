@@ -27,15 +27,7 @@ from inspect import isclass
 
 LOGGER_NAME = 'microsvc-base-test'
 
-ModelUser = None
-try:
-    _models = importlib.import_module('orm.models')
-    ModelUser = getattr(_models, 'User')
-except:
-    pass
-
 LocalOrmModule = None
-
 
 class BASE(tornado.web.RequestHandler):
 
@@ -373,6 +365,8 @@ class auth:
         @wraps(funct)
         async def wrapper(_self_origin, *args, **kwargs):
 
+            from base.registry import AuthorizationKey
+
             # _args = []
 
             # ISTI PROBLEM KAO DOLE
@@ -386,9 +380,9 @@ class auth:
                 if self.__local_orm_module:
                     _self_origin.orm_session = self.__local_orm_module.session()
 
-            if 'Authorization' in _self_origin.request.headers:
+            if AuthorizationKey in _self_origin.request.headers:
 
-                res = token.token2user(_self_origin.request.headers['Authorization'])
+                res = token.token2user(_self_origin.request.headers[AuthorizationKey])
 
                 id_user = res['id_user'] if res and 'id_user' in res else None
                 id_session = res['id'] if res and 'id' in res else None
