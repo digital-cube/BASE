@@ -50,14 +50,20 @@ class BaseTest(AsyncHTTPTestCase):
             if method in ('PUT', 'POST', 'PATCH'):
                 body = {}
 
+        if method in ('GET','DELETE'):
+            body = None
+
         headers = {AuthorizationKey: token} if token else {}
 
         try:
-            response = self.fetch(url, method=method, body=json.dumps(body) if body is not None else None, headers=headers)
-        except:
+            response = self.fetch(url, method=method,
+                                  body=json.dumps(body) if body is not None else None,
+                                  headers=headers)
+        except Exception as e:
             print('error serializing output')
             print("body",body)
             print('-'*1000)
+            self.assertTrue(False)
 
 
         if expected_code:
@@ -68,8 +74,6 @@ class BaseTest(AsyncHTTPTestCase):
 
         resp_txt = response.body.decode('utf-8')
 
-        # print("RESP_TXT",resp_txt)
-
         try:
             res = json.loads(resp_txt) if resp_txt else {}
         except:
@@ -77,7 +81,7 @@ class BaseTest(AsyncHTTPTestCase):
             print(resp_txt)
             print("-"*100)
             self.assertTrue(False)
-            
+
         if expected_result:
             self.assertEqual(res, expected_result)
 
