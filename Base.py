@@ -189,12 +189,12 @@ class api:
                                 else:
                                     raise http.General4xx(f"Invalid datatype for type boolean")
 
-                            # elif pp.annotation in (datetime.date, datetime.time, datetime.datetime):
-                            #
-                            #     try:
-                            #         value = dateutil.parser(value)
-                            #     except:
-                            #         raise http.General4xx(f"Invalid value for date/time field")
+                            elif pp.annotation in (datetime.date, datetime.time, datetime.datetime):
+
+                                try:
+                                    value = dateutil.parser.parse(value)
+                                except:
+                                    raise http.General4xx(f"Invalid value for date/time field")
 
                             elif pp.annotation == float and not type(value) in (float, int):
                                 try:
