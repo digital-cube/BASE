@@ -48,6 +48,13 @@ def register(svc_name, service):
 
 def address(svc_name):
     if not test:
+
+        r = redis.Redis()
+        r_svc = json.loads(r.get('base_svc_'+svc_name))
+        if 'service' in r_svc:
+            return r_svc['service']
+
+
         return f"http://localhost:{port(svc_name)}"
 
     return f"http://localhost:{test_port}"
