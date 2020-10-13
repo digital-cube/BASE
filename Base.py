@@ -46,6 +46,16 @@ class BASE(tornado.web.RequestHandler):
 
         return super().prepare()
 
+    def options(self, *args, **kwargs):
+
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
+        self.set_header('Access-Control-Max-Age', 1000)
+        self.set_header('Access-Control-Allow-Headers',
+                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control')
+        self.set_status(200)
+        self.finish('OK')    
+
     def initialize(self, logger=None):
         if not logger:
             full_path = os.path.realpath(__file__)
