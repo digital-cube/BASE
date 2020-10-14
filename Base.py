@@ -14,7 +14,11 @@ from functools import wraps
 from inspect import signature
 import inspect
 import importlib
-import sqlalchemy.orm.attributes
+try:
+    import sqlalchemy.orm.attributes
+except:
+    pass
+
 from typing import Any
 import datetime
 import dateutil.parser
@@ -22,7 +26,12 @@ import dateutil.parser
 from base import http, token
 
 import base.utils.log as logutils
-from base.orm import sql_base
+
+try:
+    from base.orm import sql_base
+except:
+    pass
+
 from inspect import isclass
 
 # import config.services
