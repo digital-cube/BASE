@@ -61,7 +61,7 @@ class BASE(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
         self.set_header('Access-Control-Max-Age', 1000)
         self.set_header('Access-Control-Allow-Headers',
-                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control')
+                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control, jwt')
         self.set_status(200)
         self.finish('OK')    
 
@@ -71,7 +71,7 @@ class BASE(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
         self.set_header('Access-Control-Max-Age', 1000)
         self.set_header('Access-Control-Allow-Headers',
-                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control')
+                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control, jwt')
 
 
     def initialize(self, logger=None):
