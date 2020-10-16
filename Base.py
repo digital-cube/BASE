@@ -3,6 +3,8 @@ import logging.config
 import sys
 import os
 
+import datetime
+import dateutil.parser
 import tornado.ioloop
 import asyncio
 import aiotask_context as context
@@ -204,6 +206,23 @@ class api:
                                     value = int(value)
                                 except:
                                     raise http.General4xx(f"Invalid datatype, int type is expected for {pp.name}")
+
+
+                            elif pp.annotation == bool:
+
+                                if value in (True, '1', 'true', 't', 'T', 'True', 'yes', 'Yes', 'YES'):
+                                    value = True
+                                elif value in (False, '0', 'false', 'f', 'F', 'False', 'no', 'No', 'NO'):
+                                    value = False
+                                else:
+                                    raise http.General4xx(f"Invalid datatype for type boolean")
+
+                            elif pp.annotation in (datetime.date, datetime.time, datetime.datetime):
+
+                                try:
+                                    value = dateutil.parser.parse(value)
+                                except:
+                                    raise http.General4xx(f"Invalid value for date/time field")
 
 
                             elif pp.annotation == float and not type(value) in (float, int):
