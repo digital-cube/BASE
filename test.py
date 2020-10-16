@@ -4,6 +4,8 @@ import json
 
 from uuid import uuid4 as UUIDUUID4
 
+from base.registry import AuthorizationKey
+
 def b64file(fn):
     import base64
     with open(fn, 'rb') as f:
@@ -39,7 +41,7 @@ class BaseTest(AsyncHTTPTestCase):
 
     def api(self, token, method, url, body=None,
             expected_code=None, expected_result=None, expected_result_subset=None,
-            expected_result_contain_keys=None,
+            expected_result_contain_keys=None, expected_length=None,
             raw_response=False):
 
         url = url.strip()
@@ -48,9 +50,20 @@ class BaseTest(AsyncHTTPTestCase):
             if method in ('PUT', 'POST', 'PATCH'):
                 body = {}
 
-        headers = {"Authorization": token} if token else {}
+        if method in ('GET','DELETE'):
+            body = None
 
-        response = self.fetch(url, method=method, body=json.dumps(body) if body is not None else None, headers=headers)
+        headers = {AuthorizationKey: token} if token else {}
+
+        try:
+            response = self.fetch(url, method=method,
+                                  body=json.dumps(body) if body is not None else None,
+                                  headers=headers)
+        except Exception as e:
+            print('error serializing output')
+            print("body",body)
+            print('-'*1000)
+            self.assertTrue(False)
 
 
         if expected_code:
@@ -61,8 +74,6 @@ class BaseTest(AsyncHTTPTestCase):
 
         resp_txt = response.body.decode('utf-8')
 
-        # print("RESP_TXT",resp_txt)
-
         try:
             res = json.loads(resp_txt) if resp_txt else {}
         except:
@@ -70,7 +81,7 @@ class BaseTest(AsyncHTTPTestCase):
             print(resp_txt)
             print("-"*100)
             self.assertTrue(False)
-            
+
         if expected_result:
             self.assertEqual(res, expected_result)
 
@@ -82,5 +93,8 @@ class BaseTest(AsyncHTTPTestCase):
             for key in expected_result_subset:
                 self.assertTrue(key in res)
                 self.assertEqual(res[key], expected_result_subset[key])
+
+        if expected_length is not None:
+            self.assertEqual(len(res), expected_length)
 
         return res

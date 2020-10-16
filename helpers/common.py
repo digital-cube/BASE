@@ -1,3 +1,5 @@
+import datetime
+
 def missing_keys(source, expected_keys: list):
     if not source:
         return expected_keys
@@ -8,3 +10,11 @@ def missing_keys(source, expected_keys: list):
             missing.append(key)
 
     return missing
+
+
+def fdate(s):
+    if type(s) == datetime.datetime:
+        return s.date()
+    if type(s) == datetime.date:
+        return s
+    return 'N/A'

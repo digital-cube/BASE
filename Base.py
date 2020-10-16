@@ -36,6 +36,7 @@ except:
 
 LocalOrmModule = None
 
+from base.registry import AuthorizationKey
 
 class BASE(tornado.web.RequestHandler):
 
@@ -50,6 +51,25 @@ class BASE(tornado.web.RequestHandler):
         )
 
         return super().prepare()
+
+    def options(self, *args, **kwargs):
+
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
+        self.set_header('Access-Control-Max-Age', 1000)
+        self.set_header('Access-Control-Allow-Headers',
+                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control, jwt')
+        self.set_status(200)
+        self.finish('OK')    
+
+    def set_default_headers(self):
+
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
+        self.set_header('Access-Control-Max-Age', 1000)
+        self.set_header('Access-Control-Allow-Headers',
+                        'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control, jwt')
+
 
     def initialize(self, logger=None):
         if not logger:
@@ -366,22 +386,15 @@ class auth:
         @wraps(funct)
         async def wrapper(_self_origin, *args, **kwargs):
 
-            # _args = []
-
-            # ISTI PROBLEM KAO DOLE
-            #
-            # if 'Authorization' not in _self_origin.request.headers:
-            #     raise http.HttpErrorUnauthorized
-
             if not hasattr(_self_origin, 'orm_session'):
                 _self_origin.orm_session = None
 
                 if self.__local_orm_module:
                     _self_origin.orm_session = self.__local_orm_module.session()
 
-            if 'Authorization' in _self_origin.request.headers:
+            if AuthorizationKey in _self_origin.request.headers:
 
-                res = token.token2user(_self_origin.request.headers['Authorization'])
+                res = token.token2user(_self_origin.request.headers[AuthorizationKey])
 
                 id_user = res['id_user'] if res and 'id_user' in res else None
                 id_session = res['id'] if res and 'id' in res else None
