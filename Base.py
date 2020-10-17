@@ -439,8 +439,12 @@ class auth:
                             return
 
                 if res:
-                    # print("RES",res)
+                    # print("RES",res, 'id_user', id_user)
                     # on user service try to assign user
+
+                    _self_origin.id_user = id_user
+                    _self_origin.id_session = id_session
+
                     try:
                         usermodule = importlib.import_module('orm.models')
                         _self_origin.user = _self_origin.orm_session.query(usermodule.User).filter(
@@ -448,8 +452,6 @@ class auth:
                     except Exception as e:
                         _self_origin.user = None
 
-                    _self_origin.id_user = id_user
-                    _self_origin.id_session = id_session
                     await funct(_self_origin, *args, **kwargs)
                     return
 
