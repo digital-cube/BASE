@@ -27,6 +27,9 @@ from inspect import isclass
 
 # import config.services
 
+import base.registry
+from tornado.httpclient import AsyncHTTPClient
+
 LOGGER_NAME = 'microsvc-base-test'
 
 ModelUser = None
@@ -39,6 +42,7 @@ except:
 LocalOrmModule = None
 
 from base.registry import AuthorizationKey
+
 
 class BASE(tornado.web.RequestHandler):
 
@@ -55,23 +59,20 @@ class BASE(tornado.web.RequestHandler):
         return super().prepare()
 
     def options(self, *args, **kwargs):
-
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
         self.set_header('Access-Control-Max-Age', 1000)
         self.set_header('Access-Control-Allow-Headers',
                         'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control, jwt')
         self.set_status(200)
-        self.finish('OK')    
+        self.finish('OK')
 
     def set_default_headers(self):
-
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS, LINK, UNLINK, LOCK')
         self.set_header('Access-Control-Max-Age', 1000)
         self.set_header('Access-Control-Allow-Headers',
                         'Origin, X-CSRFToken, Content-Type, Accept, Authorization, Cache-Control, jwt')
-
 
     def initialize(self, logger=None):
         if not logger:
@@ -342,28 +343,31 @@ class api:
                 else:
                     response = res
 
-
                 _origin_self.set_status(status_code)
 
                 if response is not None:
                     try:
-                        prepared_response = json.dumps(response, indent=4)
+                        prepared_response = json.dumps(response)
                         _origin_self.write(prepared_response)
                     except:
                         _origin_self.write(response)
 
 
             except http.HttpErrorUnauthorized as e:
-                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
+                _origin_self.write(
+                    json.dumps(e.message) if type(e.message) == dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except http.General4xx as e:
-                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
+                _origin_self.write(
+                    json.dumps(e.message) if type(e.message) == dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except http.HttpInvalidParam as e:
-                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
+                _origin_self.write(
+                    json.dumps(e.message) if type(e.message) == dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except http.HttpInternalServerError as e:
-                _origin_self.write(json.dumps(e.message) if type(e.message)==dict else json.dumps({"message": e.message}))
+                _origin_self.write(
+                    json.dumps(e.message) if type(e.message) == dict else json.dumps({"message": e.message}))
                 _origin_self.set_status(e.status)
             except Exception as e:
                 print("-" * 100)
@@ -603,6 +607,27 @@ def make_app():
     return tornado.web.Application(route.handlers(),
                                    debug=True,  # TODO: debug= iz yaml.deebug
                                    log_function=log_function)
+
+
+async def IPC(request, service: str, method: str, relative_uri: str, body: dict):
+    if base.registry.registered(service):
+        http_client = AsyncHTTPClient()
+        uri = f'{base.registry.address(service)}{base.registry.prefix(service)}{relative_uri}'
+        method = method.upper()
+        headers = {}
+
+        if request and request.headers and AuthorizationKey in request.headers:
+            headers[AuthorizationKey] = request.headers[AuthorizationKey]
+
+        try:
+            _body = None if method in ('GET', 'DELETE') else json.dumps(body)
+            result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
+        except Exception as e:
+            return False, str(e)
+
+        return True, json.loads(result.body)
+
+    return False, f"Service {service} is not registered"
 
 
 def run(port):
