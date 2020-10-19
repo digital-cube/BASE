@@ -3,7 +3,7 @@ import json
 from os.path import expanduser
 
 
-AuthorizationKey = 'Authorization'
+from base.authorization import AuthorizationKey 
 
 
 _services = {}

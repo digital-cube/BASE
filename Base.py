@@ -603,6 +603,28 @@ def make_app():
                                    log_function=log_function)
 
 
+async def IPC(request, service: str, method: str, relative_uri: str, body: dict):
+    if base.registry.registered(service):
+        http_client = AsyncHTTPClient()
+        uri = f'{base.registry.address(service)}{base.registry.prefix(service)}{relative_uri}'
+        method = method.upper()
+        headers = {}
+
+        if request and request.headers and AuthorizationKey in request.headers:
+            headers[AuthorizationKey] = request.headers[AuthorizationKey]
+
+        try:
+            _body = None if method in ('GET', 'DELETE') else json.dumps(body)
+            result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
+        except Exception as e:
+            return False, str(e)
+
+        return True, json.loads(result.body)
+
+    return False, f"Service {service} is not registered"
+
+
+
 def run(port):
     app = make_app()
     app.listen(port)
