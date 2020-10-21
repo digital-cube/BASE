@@ -150,7 +150,10 @@ class api:
                 if str(sig) != '(self)':
 
                     if _origin_self.request.body:
-                        body = json.loads(_origin_self.request.body.decode('utf-8'))
+                        try:
+                            body = json.loads(_origin_self.request.body.decode('utf-8'))
+                        except:
+                            body = _origin_self.request.body
                     else:
                         body = {}
 
@@ -266,6 +269,9 @@ class api:
                                 if hasattr(model_class, 'id_user') and \
                                         'id_user' not in value and \
                                         hasattr(_origin_self, 'id_user'):
+
+                                    print("VVVV",value)
+
                                     value['id_user'] = _origin_self.id_user
 
                                 try:
