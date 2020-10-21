@@ -623,7 +623,12 @@ async def IPC(request, service: str, method: str, relative_uri: str, body: dict)
             _body = None if method in ('GET', 'DELETE') else json.dumps(body)
             result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
         except Exception as e:
-            return False, str(e)
+            msg = str(e)
+            try:
+                msg = json.loads(e.response.body.decode('utf-8'))
+            except:
+                pass
+            return False, msg
 
         return True, json.loads(result.body)
 
