@@ -13,6 +13,8 @@ import datetime
 from sqlalchemy.engine.url import URL
 from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Integer, String, Date, Time, UniqueConstraint, Numeric
+import decimal
 
 sql_base = declarative_base()
 _orm = {}
@@ -150,7 +152,11 @@ class _BaseSql():
     def serialize(self, keys=None, forbidden=[]):
 
         def _serialize(s):
-            if type(s) in (int, float, str, dict):
+            # print(type(s), s)
+
+            if type(s) in (Numeric,decimal.Decimal):
+                return float(s)
+            elif type(s) in (int, float, str, dict, None):
                 return s
             return str(s) if s is not None else None
 

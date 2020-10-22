@@ -150,7 +150,10 @@ class api:
                 if str(sig) != '(self)':
 
                     if _origin_self.request.body:
-                        body = json.loads(_origin_self.request.body.decode('utf-8'))
+                        try:
+                            body = json.loads(_origin_self.request.body.decode('utf-8'))
+                        except:
+                            body = _origin_self.request.body
                     else:
                         body = {}
 
@@ -267,6 +270,9 @@ class api:
                                 if hasattr(model_class, 'id_user') and \
                                         'id_user' not in value and \
                                         hasattr(_origin_self, 'id_user'):
+
+                                    print("VVVV",value)
+
                                     value['id_user'] = _origin_self.id_user
 
                                 try:
@@ -624,7 +630,12 @@ async def IPC(request, service: str, method: str, relative_uri: str, body: dict 
             _body = None if method in ('GET', 'DELETE') else json.dumps(body)
             result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
         except Exception as e:
-            return False, str(e)
+            msg = str(e)
+            try:
+                msg = json.loads(e.response.body.decode('utf-8'))
+            except:
+                pass
+            return False, msg
 
         return True, json.loads(result.body)
 
