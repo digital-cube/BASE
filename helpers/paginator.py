@@ -7,6 +7,12 @@ def paginate(query, base_uri, page, per_page):
     '''
     Paginate
     '''
+
+    if page < 1:
+        raise NameError('page should be greater than zero')
+    if per_page < 1:
+        raise NameError('per page should be greater than zero')
+
     limit = per_page
     offset = (page - 1) * per_page
 

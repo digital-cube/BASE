@@ -186,6 +186,7 @@ class api:
                         elif pp.name in body:
                             passed = True
                             value = body[pp.name]
+                            # print("V",pp.name, value)
 
                         if passed:
 
@@ -609,7 +610,7 @@ def make_app():
                                    log_function=log_function)
 
 
-async def IPC(request, service: str, method: str, relative_uri: str, body: dict):
+async def IPC(request, service: str, method: str, relative_uri: str, body: dict = None):
     if base.registry.registered(service):
         http_client = AsyncHTTPClient()
         uri = f'{base.registry.address(service)}{base.registry.prefix(service)}{relative_uri}'
