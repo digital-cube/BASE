@@ -271,8 +271,6 @@ class api:
                                         'id_user' not in value and \
                                         hasattr(_origin_self, 'id_user'):
 
-                                    print("VVVV",value)
-
                                     value['id_user'] = _origin_self.id_user
 
                                 try:
@@ -326,7 +324,6 @@ class api:
                                 else:
                                     kwa[pp.name] = pp.default
 
-                    # print("KWA",kwa)
 
                 _args = []
 
@@ -628,6 +625,9 @@ async def IPC(request, service: str, method: str, relative_uri: str, body: dict 
 
         try:
             _body = None if method in ('GET', 'DELETE') else json.dumps(body)
+
+            print("URI", uri)
+
             result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
         except Exception as e:
             msg = str(e)

@@ -60,9 +60,10 @@ class BaseTest(AsyncHTTPTestCase):
                                   body=json.dumps(body) if body is not None else None,
                                   headers=headers)
         except Exception as e:
-            print('error serializing output')
-            print("body",body)
-            print('-'*1000)
+            print('error serializing output ',e, e)
+            print("body",type(body),body)
+            print('_'*100)
+            print("")
             self.assertTrue(False)
 
 

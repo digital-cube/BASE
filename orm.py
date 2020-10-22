@@ -202,21 +202,3 @@ class BaseSql(_BaseSql):
 
         super().__init__(**kwargs)
 
-# izmesteno je u same mikro servise / orm.py da bi importovao konkretnu konfiguraciju kao i module sa modelima
-
-#
-# @contextlib.contextmanager
-# def orm_session():
-#     if not base_orm._orm:
-#
-#         base_orm.activate_orm(db_config)
-#
-#     _session = base_orm._orm.session()
-#     try:
-#         yield _session
-#     except:
-#         _session.rollback()
-#         _session.close()
-#         raise
-#     finally:
-#         _session.close()
