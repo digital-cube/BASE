@@ -86,6 +86,16 @@ class BASE(tornado.web.RequestHandler):
 
         self.logger = logger
 
+    def log(self, message, level=10):
+        logutils.log(
+            self.logger,
+            level,
+            include_context=True,
+            message=message,
+            status=self.get_status(),
+            time_ms=(1000.0 * self.request.request_time())
+        )
+
 
 class develgen:
 
