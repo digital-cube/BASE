@@ -1,4 +1,4 @@
-    from tornado.testing import AsyncHTTPTestCase
+from tornado.testing import AsyncHTTPTestCase
 from tornado.ioloop import IOLoop
 import json
 
