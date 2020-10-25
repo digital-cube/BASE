@@ -361,7 +361,7 @@ class api:
 
                 if response is not None:
                     try:
-                        prepared_response = json.dumps(response)
+                        prepared_response = json.dumps(response, ensure_ascii=False)
                         _origin_self.write(prepared_response)
                     except:
                         _origin_self.write(response)
@@ -396,7 +396,7 @@ class api:
                                           limit=2, file=sys.stdout)
                 print("-" * 100)
                 "*** print_exc:"
-                _origin_self.write(json.dumps({"message": str(e)}))
+                _origin_self.write(json.dumps({"message": str(e)}, ensure_ascii=False))
                 _origin_self.set_status(http.code.HTTPStatus.INTERNAL_SERVER_ERROR)
 
             finally:
@@ -634,9 +634,9 @@ async def IPC(request, service: str, method: str, relative_uri: str, body: dict 
             headers[AuthorizationKey] = request.headers[AuthorizationKey]
 
         try:
-            _body = None if method in ('GET', 'DELETE') else json.dumps(body)
+            _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False)
 
-            print("URI", uri)
+            # print("URI", uri)
 
             result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
         except Exception as e:

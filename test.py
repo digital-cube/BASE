@@ -1,13 +1,14 @@
-from tornado.testing import AsyncHTTPTestCase
+    from tornado.testing import AsyncHTTPTestCase
 from tornado.ioloop import IOLoop
 import json
 
 from uuid import uuid4 as UUIDUUID4
 
 from base.registry import AuthorizationKey
+import base64
+
 
 def b64file(fn):
-    import base64
     with open(fn, 'rb') as f:
         content = f.read()
     res = base64.encodebytes(content)
@@ -39,18 +40,28 @@ class BaseTest(AsyncHTTPTestCase):
     def get_app(self):
         return self.my_app
 
+    def show_last_result(self, marker='LAST_RES'):
+        if hasattr(self, 'last_uri'):
+            print(f"{marker} :: URI", self.last_uri)
+        if hasattr(self, 'code'):
+            print(f"{marker} :: code =", self.code)
+        if hasattr(self, 'r'):
+            print(f"{marker} :: Last result content")
+            print(json.dumps(self.r, indent=4))
+
     def api(self, token, method, url, body=None,
             expected_code=None, expected_result=None, expected_result_subset=None,
             expected_result_contain_keys=None, expected_length=None,
             raw_response=False):
 
         url = url.strip()
+        self.last_uri = url
 
         if not body:
             if method in ('PUT', 'POST', 'PATCH'):
                 body = {}
 
-        if method in ('GET','DELETE'):
+        if method in ('GET', 'DELETE'):
             body = None
 
         headers = {AuthorizationKey: token} if token else {}
@@ -60,13 +71,13 @@ class BaseTest(AsyncHTTPTestCase):
                                   body=json.dumps(body) if body is not None else None,
                                   headers=headers)
         except Exception as e:
-            print('error serializing output ',e, e)
-            print("body",type(body),body)
-            print('_'*100)
+            print('error serializing output ', e, e)
+            print("body", type(body), body)
+            print('_' * 100)
             print("")
             self.assertTrue(False)
 
-
+        self.code = response.code
         if expected_code:
             self.assertEqual(expected_code, response.code)
 
@@ -77,10 +88,11 @@ class BaseTest(AsyncHTTPTestCase):
 
         try:
             res = json.loads(resp_txt) if resp_txt else {}
+            self.r = res
         except:
             print("Error decoding following response")
             print(resp_txt)
-            print("-"*100)
+            print("-" * 100)
             self.assertTrue(False)
 
         if expected_result:
@@ -98,4 +110,5 @@ class BaseTest(AsyncHTTPTestCase):
         if expected_length is not None:
             self.assertEqual(len(res), expected_length)
 
+        self.r = res
         return res
