@@ -56,7 +56,7 @@ def address(svc_name):
         if 'service' in r_svc:
             print("NASAO GA")
             return r_svc['service']
-        
+
         print("NEMA GA I VRACAM DEFAULT")
 
         return f"http://localhost:{port(svc_name)}"
