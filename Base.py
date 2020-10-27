@@ -280,7 +280,6 @@ class api:
                                 if hasattr(model_class, 'id_user') and \
                                         'id_user' not in value and \
                                         hasattr(_origin_self, 'id_user'):
-
                                     value['id_user'] = _origin_self.id_user
 
                                 try:
@@ -333,7 +332,6 @@ class api:
                                     kwa[pp.name] = value
                                 else:
                                     kwa[pp.name] = pp.default
-
 
                 _args = []
 
@@ -623,10 +621,14 @@ def make_app():
                                    log_function=log_function)
 
 
-async def IPC(request, service: str, method: str, relative_uri: str, body: dict = None):
+async def IPC(request, service: str, method: str, relative_uri: str, body: dict = None, abs_uri: str = None):
     if base.registry.registered(service):
         http_client = AsyncHTTPClient()
-        uri = f'{base.registry.address(service)}{base.registry.prefix(service)}{relative_uri}'
+
+        if abs_uri:
+            uri = f'{base.registry.address(service)}{abs_uri}'
+        else:
+            uri = f'{base.registry.address(service)}{base.registry.prefix(service)}{relative_uri}'
         method = method.upper()
         headers = {}
 
@@ -635,10 +637,10 @@ async def IPC(request, service: str, method: str, relative_uri: str, body: dict 
 
         try:
             _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False)
-
-            print("URI", uri)
-
+            print("IPC URI", uri)
             result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
+            print("RES", result)
+            print("_"*100)
         except Exception as e:
             msg = str(e)
             try:
@@ -647,7 +649,7 @@ async def IPC(request, service: str, method: str, relative_uri: str, body: dict 
                 pass
             return False, msg
 
-        return True, json.loads(result.body)
+        return True, json.loads(result.body) if result.body else None
 
     return False, f"Service {service} is not registered"
 
