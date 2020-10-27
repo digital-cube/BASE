@@ -54,6 +54,9 @@ def address(svc_name):
         if 'service' in r_svc:
             return r_svc['service']
 
+        "{\"port\": \"80\", \"prefix\": \"/tcapi/clients\", \"ombis\": {\"host\": \"10.81.16.45\", \"user\": \"WebService\", \"password\": \"Omb!Rest#\", \"port\": \"8070\"}, \"db\": {\"type\": \"postgresql\", \"port\": \"5432\", \"host\": \"postgres\", \"username\": \"telmekom\", \"password\": \"123\", \"database\": \"tc_clients\"}}"
+
+        "{\"service\": \"http://users\", \"prefix\": \"/tcapi/users\", \"port\": \"80\", \"ombis\": {\"host\": \"10.81.16.45\", \"user\": \"WebService\", \"password\": \"Omb!Rest#\", \"port\": \"8070\"}, \"db\": {\"type\": \"postgresql\", \"port\": \"5432\", \"host\": \"postgres\", \"username\": \"telmekom\", \"password\": \"123\", \"database\": \"tc_users\"}, \"mysql\": {\"db_host\": \"192.168.0.14\", \"db_name\": \"client\", \"db_user\": \"reader\", \"db_password\": \"123\", \"db_port\": \"3306\", \"db_type\": \"mysql\", \"db_charset\": \"utf8\"}}"
 
         return f"http://localhost:{port(svc_name)}"
 
