@@ -28,6 +28,9 @@ def registered(svc_name):
 
 
 def register(svc_name, service):
+
+    print('registrujem servis',svc_name, json.dumps(service, indent=4))
+
     if 'storage' in service and "~" in service['storage']:
         service['storage'] = service['storage'].replace('~', expanduser("~"))
         service['storage'] = service['storage'].strip()
