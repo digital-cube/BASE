@@ -29,7 +29,7 @@ def registered(svc_name):
 
 def register(svc_name, service):
 
-    print('registrujem servis',svc_name, json.dumps(service, indent=4))
+    # print('registrujem servis',svc_name, json.dumps(service, indent=4))
 
     if 'storage' in service and "~" in service['storage']:
         service['storage'] = service['storage'].replace('~', expanduser("~"))
@@ -55,12 +55,12 @@ def address(svc_name):
         r = redis.Redis()
         r_svc = json.loads(r.get('base_svc_'+svc_name))
 
-        print("TRAZIM SERVIS "+'base_svc_'+svc_name)
+        # print("TRAZIM SERVIS "+'base_svc_'+svc_name)
         if 'service' in r_svc:
-            print("NASAO GA")
+            # print("NASAO GA")
             return r_svc['service']
 
-        print("NEMA GA I VRACAM DEFAULT")
+        # print("NEMA GA I VRACAM DEFAULT")
 
         return f"http://localhost:{port(svc_name)}"
 
