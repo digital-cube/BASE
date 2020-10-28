@@ -230,7 +230,7 @@ class api:
                                 elif value in (False, '0', 'false', 'f', 'F', 'False', 'no', 'No', 'NO'):
                                     value = False
                                 else:
-                                    raise http.General4xx(f"Invalid datatype for type boolean")
+                                    raise http.General4xx(f"Invalid datatype for type boolean {value} {type(value)}")
 
                             elif pp.annotation in (datetime.date, datetime.time, datetime.datetime):
 
@@ -637,10 +637,10 @@ async def IPC(request, service: str, method: str, relative_uri: str, body: dict 
 
         try:
             _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False)
-            print("IPC URI", uri)
+            # print(f"IPC URI on service {service}", uri)
             result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
-            print("RES", result)
-            print("_"*100)
+            # print("RES", result)
+            # print("_"*100)
         except Exception as e:
             msg = str(e)
             try:

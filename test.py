@@ -44,7 +44,7 @@ class BaseTest(AsyncHTTPTestCase):
         if hasattr(self, 'last_uri'):
             print(f"{marker} :: URI", self.last_uri)
         if hasattr(self, 'code'):
-            print(f"{marker} :: code =", self.code)
+            print(f"{marker} :: code =", self.code, "EXECUTE TIME",self.execution_time)
         if hasattr(self, 'r'):
             print(f"{marker} :: Last result content")
             print(json.dumps(self.r, indent=4))
@@ -66,6 +66,9 @@ class BaseTest(AsyncHTTPTestCase):
 
         headers = {AuthorizationKey: token} if token else {}
 
+        import time
+        stime = time.time()
+        self.execution_time = 'n/a'
         try:
             response = self.fetch(url, method=method,
                                   body=json.dumps(body) if body is not None else None,
@@ -82,6 +85,7 @@ class BaseTest(AsyncHTTPTestCase):
             self.assertEqual(expected_code, response.code)
 
         if raw_response:
+            self.self.execution_time = time.time - stime
             return response.body
 
         resp_txt = response.body.decode('utf-8')
@@ -111,4 +115,6 @@ class BaseTest(AsyncHTTPTestCase):
             self.assertEqual(len(res), expected_length)
 
         self.r = res
+        self.execution_time = time.time() - stime
+
         return res
