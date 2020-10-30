@@ -92,6 +92,18 @@ def port(svc_name=None):
     s = service(svc_name)
     return s['port'] if s and 'port' in s else None
 
+def info(svc_name=None):
+    if test:
+        return "INFO"
+    
+    s= service(svc_name)
+    inf = f'port: {port(svc_name)};'
+    
+    d = db(svc_name)
+    if d:
+        inf+=f'db: {d["host"]}/{d["database"]}'
+    
+    return inf
 
 def prefix(svc_name=None):
     s = service(svc_name)
