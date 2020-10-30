@@ -205,7 +205,7 @@ class api:
 
                             # TODO: izbaciti kao izuzetak a ne ovako !
 
-                            if pp.annotation == str and not type(value) == str:
+                            if pp.annotation == str and type(value) not in (str, type(None)): #type(value) != None and not type(value) == str:
                                 raise http.General4xx(f"Invalid datatype, int type is expected for {pp.name}")
 
                                 # _origin_self.write(
