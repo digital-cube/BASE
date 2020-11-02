@@ -25,7 +25,7 @@ class HttpErrorUnauthorized(General4xx):
 class HttpErrorNotFound(General4xx):
     status = code.HTTPStatus.NOT_FOUND
 
-    def __init__(self, message=''):
+    def __init__(self, message='Not Found'):
         self.message = message
 
     def __str__(self):

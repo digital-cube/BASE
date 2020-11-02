@@ -229,6 +229,8 @@ class api:
                                     value = True
                                 elif value in (False, '0', 'false', 'f', 'F', 'False', 'no', 'No', 'NO'):
                                     value = False
+                                elif value in ('None','null'):
+                                    value = None
                                 else:
                                     raise http.General4xx(f"Invalid datatype for type boolean {value} {type(value)}")
 
