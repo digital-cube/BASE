@@ -27,7 +27,7 @@ def paginate(query, base_uri, page, per_page):
     if page == 1:
         next_uri = f'{base_uri}page={page + 1}&per_page={per_page}'
         previous_uri = None
-    elif page == total_pages:
+    elif page-1 == total_pages:
         next_uri = None
         previous_uri = f'{base_uri}page={page - 1}&per_page={per_page}'
     else:
