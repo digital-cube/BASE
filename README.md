@@ -5,7 +5,7 @@
 # **Base REST API**
 
 * Version 3.0.0
-* [Base](https://base.dev/)
+* [Base](https://base3.dev/)
 * [PyPi](https://pypi.org/project/base3/)
 * [DigitalCube](https://digitalcube.rs/)
 
