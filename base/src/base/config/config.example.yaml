@@ -1,0 +1,83 @@
+# Name of the application
+name: 'base_app'
+# Description of the application
+description: 'base3 application'
+# Route prefixes to be prepended to all routes
+prefix: ''
+# Current version of the app
+app_version: '0.0.1'
+# Application host location
+host: 'localhost'
+# Port on which the application will listen to requests
+port: &port 9000
+
+store:
+  # Which type of common data store and registry will be used (currently supports 'redis' and 'memory' types)
+  type: 'redis'
+  # Location of the Redis server
+  host: 'localhost'
+  # Port for the Redis server
+  port: '6379'
+
+db:
+  # Database to be used by the application
+  # Currently supported: 'postgres'
+  type: 'postgres'
+  # Database port
+  port: 5432
+  # Database host
+  host: 'localhost'
+  # Database username
+  username: 'base'
+  # Database password
+  password: 'base'
+  # Database name
+  database: 'base'
+
+authorization:
+  # Header to read for the Authorization key
+  key: 'Authorization'
+
+logging:
+  version: 1
+  request_logger: base
+  formatters:
+    brief:
+      format: '%(asctime)s %(name)s %(levelname)s : %(message)s'
+    detailed:
+      format: 'time="%(asctime)s" logger="%(name)s" level="%(levelname)s" %(message)s'
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: WARNING
+      formatter: brief
+      stream: ext://sys.stdout
+    file:
+      class : logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: detailed
+      filename: /tmp/base_app.log
+      backupCount: 3
+  loggers:
+    base:
+      level: DEBUG
+      handlers:
+        - console
+        - file
+      propagate: no
+    tornado.access:
+      level: DEBUG
+      handlers:
+        - file
+    tornado.application:
+      level: DEBUG
+      handlers:
+        - file
+    tornado.general:
+      level: DEBUG
+      handlers:
+        - file
+  root:
+    level: WARNING
+    handlers:
+      - console
