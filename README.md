@@ -12,6 +12,6 @@
 ### Installation
 
 ```bash
-    pip3 install base3
+    pip install base3
 ```
 
