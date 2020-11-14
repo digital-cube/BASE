@@ -10,7 +10,7 @@ def token2user(token):
     try:
         decoded = jwt.decode(token, public_key(), algorithms='RS256')
     except Exception as e:
-        print("DECODE PROBLEM", e)
+        # print("DECODE PROBLEM", e)
         return False
 
     r = redis.Redis()

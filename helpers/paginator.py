@@ -24,15 +24,24 @@ def paginate(query, base_uri, page, per_page):
 
     base_uri = base_uri + ("&" if '?' in base_uri else '?')
 
-    if page == 1:
+    previous_uri, next_uri = None, None
+    if page < total_pages:
         next_uri = f'{base_uri}page={page + 1}&per_page={per_page}'
-        previous_uri = None
-    elif page == total_pages:
-        next_uri = None
+
+    if page > 1:
         previous_uri = f'{base_uri}page={page - 1}&per_page={per_page}'
-    else:
-        next_uri = f'{base_uri}page={page + 1}&per_page={per_page}'
-        previous_uri = f'{base_uri}page={page - 1}&per_page={per_page}'
+
+    # if page == 1:
+    #     previous_uri = None
+    #     next_uri = f'{base_uri}page={page + 1}&per_page={per_page}'
+    #
+    # elif page == total_pages:
+    #     next_uri = None
+    #     previous_uri = f'{base_uri}page={page - 1}&per_page={per_page}'
+    #
+    # else:
+    #     next_uri = f'{base_uri}page={page + 1}&per_page={per_page}'
+    #     previous_uri = f'{base_uri}page={page - 1}&per_page={per_page}'
 
     summary = {
         'total_pages': total_pages,
