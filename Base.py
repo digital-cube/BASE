@@ -238,6 +238,13 @@ class api:
 
                                 try:
                                     value = dateutil.parser.parse(value)
+
+                                    # u team kelandaru izbaceno zbog problema sa testovima TODO: srediti AttributeError: 'datetime.date' object has no attribute 'date'
+
+                                    # if pp.annotation == datetime.date:
+                                    #     value = value.date()
+                                    # if pp.annotation == datetime.time:
+                                    #     value = value.time()
                                 except:
                                     raise http.General4xx(f"Invalid value for date/time field")
 
