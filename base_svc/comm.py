@@ -40,9 +40,10 @@ class BaseAPIRequestHandler:
         return self._map[key]
 
 
-def call(svc_url, port, location, data, method, request_timeout=10, force_json=False, call_headers=None):
+def call(svc_url, port, location, data, method, force_json=False, call_headers=None, timeout=None):
     import http.client
-    conn = http.client.HTTPConnection(svc_url, port)
+    conn = http.client.HTTPConnection(svc_url, port) if timeout is None else http.client.HTTPConnection(svc_url, port,
+                                                                                                        timeout=timeout)
 
     if force_json:
         body = json.dumps(data, ensure_ascii=False)

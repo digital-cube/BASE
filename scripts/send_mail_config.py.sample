@@ -21,7 +21,7 @@ db_passwd = '123'
 db_name = 'avalon'  # Promenjeno za potrebe TESTA
 db_charset = 'utf8'
 
-sg_key = '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'
+sg_key = '_api_key_here_'
 
 REDIS_SERVER = 'localhost'
 REDIS_PORT = 6379

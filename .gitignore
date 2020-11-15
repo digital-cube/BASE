@@ -1,5 +1,6 @@
 # local settings
 *settings.py
+**send_mail_config.py
 .venv
 .vscode
 

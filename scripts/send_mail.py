@@ -34,7 +34,7 @@ def get_mail_query_err(id_msg, msg_datetime, status, mdata):
 
 
 def conn_to_db():
-    print('AAA', db_name, db_host, db_user, db_passwd, db_charset)
+
     return MySQLdb.connect(
         db=db_name,
         host=db_host,
@@ -111,14 +111,23 @@ if __name__ == '__main__':
                 # try:
                 if True:
                     from sendgrid.helpers.mail import *
-                    message = Mail()
-                    personal = Personalization()
-                    message.set_from(Email(sender, sender_name))
-                    personal.add_to(Email(receiver, receiver_name))
-                    message.add_personalization(personal)
-                    message.set_subject(subject)
-                    message.add_content(Content("text/html", emsg))
-                    m_data = message.get()
+
+                    if sendgrid.__version__ > '3.x.x':
+                        from_email = Email(sender, sender_name)
+                        to_email = Email(receiver, receiver_name)
+                        subject = subject
+                        content = Content("text/html", emsg)
+                        message = Mail(from_email, subject, to_email, content)
+                        m_data = message.get()
+                    else:
+                        message = Mail()
+                        personal = Personalization()
+                        message.set_from(Email(sender, sender_name))
+                        personal.add_to(Email(receiver, receiver_name))
+                        message.add_personalization(personal)
+                        message.set_subject(subject)
+                        message.add_content(Content("text/html", emsg))
+                        m_data = message.get()
                     try:
                         response = sg.client.mail.send.post(request_body=m_data)
                     except Exception as e:

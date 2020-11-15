@@ -53,7 +53,7 @@ def do_post(**kwargs):
             return base_common.msg.error(msgs.ERROR_POST_LOGIN)
 
     if csettings.AUTHORIZATION_TYPE == authorization_type.rev[authorization_type.COOKIE]:
-        kwargs['request_handler'].clear_cookie(csettings.SECURE_COOKIE, tk)
+        kwargs['request_handler'].clear_cookie(csettings.SECURE_COOKIE)
 
     apphooks.action_log_hook(dbuser.id_user, kwargs['r_ip'], 'logout', 'user {} successfuly logged out'.format(dbuser.username))
     return base_common.msg.post_ok()
