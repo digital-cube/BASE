@@ -164,6 +164,8 @@ def _load_app_configuration_with_database(config_file):
         setattr(base.config.application_config, 'reload_session', config_file.reload_session)
     if hasattr(config_file, 'authentication_type'):
         setattr(base.config.application_config, 'authentication_type', config_file.authentication_type)
+    if hasattr(config_file, 'cookie_domain'):
+        setattr(base.config.application_config, 'cookie_domain', config_file.cookie_domain)
     if hasattr(config_file, 'session_expiration_timeout'):
         setattr(base.config.application_config, 'session_expiration_timeout', config_file.session_expiration_timeout)
     if hasattr(config_file, 'cached_session'):

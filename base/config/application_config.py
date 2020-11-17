@@ -71,6 +71,7 @@ count_call_file = 'log/count_call.json'
 entry_points_extended = {}
 balanced_readonly_get = set()
 authentication_type = 'TOKEN'
+cookie_domain = None                # domain name for cookies
 test_mode = False
 session_expiration_timeout = None   # seconds for session's token timeout
 disable_spec = False                # disable spec URI

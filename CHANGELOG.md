@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2020 11 17
+
+## BASE version 1.13.4
+- set domain for secure cookie
+
 ### 2020 07 17
 
 ## BASE version 1.13.3

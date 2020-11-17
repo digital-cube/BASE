@@ -250,13 +250,19 @@ class Base(tornado.web.RequestHandler):
         import base.config.application_config
         import base.application.lookup.authentication_type as authentication_type
         if base.config.application_config.authentication_type == authentication_type.lmap[authentication_type.COOKIE]:
-            self.set_secure_cookie(base.config.application_config.secret_cookie_name, _token['token'])
+            self.set_secure_cookie(
+                base.config.application_config.secret_cookie_name, _token['token'],
+                domain=base.config.application_config.cookie_domain
+            )
 
     def remove_authorized_cookie(self):
         import base.config.application_config
         import base.application.lookup.authentication_type as authentication_type
         if base.config.application_config.authentication_type == authentication_type.lmap[authentication_type.COOKIE]:
-            self.clear_cookie(base.config.application_config.secret_cookie_name)
+            self.clear_cookie(
+                base.config.application_config.secret_cookie_name,
+                domain=base.config.application_config.cookie_domain
+            )
 
 
 class api(object):
