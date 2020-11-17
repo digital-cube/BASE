@@ -715,7 +715,7 @@ class route:
         return cls
 
 
-async def IPC(request, service: str, method: str, relative_uri: str, body: dict = None, abs_uri: str = None):
+async def depricated_IPC(request, service: str, method: str, relative_uri: str, body: dict = None, abs_uri: str = None):
     from . import registry
 
     if registry.registered(service):
