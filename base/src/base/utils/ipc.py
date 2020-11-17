@@ -28,7 +28,7 @@ async def call(request, service, method, endpoint, body=None):
             raise http.HttpInternalServerError(id_message="INTERNAL_SERVER_ERROR",
                                                message=f"missing prefix in service configuration")
         prefix = scfg['prefix']
-        uri = 'http://' + scfg['host'] + prefix + '/' + endpoint
+        uri = 'http://' + scfg['host'] + prefix + ('/' if endpoint[0]!='/' else '') + endpoint
 
     else:
 
@@ -40,7 +40,7 @@ async def call(request, service, method, endpoint, body=None):
         else:
             port = base.registry.test_port
 
-        uri = 'http://' + host + ':' + str(port) + prefix + '/' + endpoint
+        uri = 'http://' + host + ':' + str(port) + prefix + ('/' if endpoint[0]!='/' else '') + endpoint
 
     http_client = AsyncHTTPClient()
     headers = {}

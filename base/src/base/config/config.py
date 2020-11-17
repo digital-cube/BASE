@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 import logging.config
@@ -40,6 +41,21 @@ class config:
         except Exception as e:
             print(e)
             sys.exit()
+
+        def use_value_from_env(d):
+            '''
+            TODO:
+            :param d:
+            :return:
+            '''
+            for key in d:
+                v = d[key]
+                if type(v) == dict:
+                    use_value_from_env(v)
+                elif type(v) == str and len(v) > 0 and v[0] == '$':
+                    d[key] = os.getenv(v[1:], '')
+
+        use_value_from_env(config_yaml)
 
         return config_yaml
 

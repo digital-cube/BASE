@@ -119,6 +119,8 @@ class Base(tornado.web.RequestHandler):
     def write_error(self, status_code: int, **kwargs: Any) -> None:
         self.set_header('Content-Type', 'application/json; charset=UTF-8')
 
+        # print("WRITE_ERROR", kwargs)
+
         """Add the request id to the error response for easier debugging and log finding"""
         body = {'id_request': self.req_id}
 
@@ -143,6 +145,10 @@ class Base(tornado.web.RequestHandler):
             'code': status_code,
             'message': message,
         })
+
+        for arg in kwargs:
+            if arg not in body and arg != 'reason':
+                body[arg] = kwargs[arg]
 
         if id_message is not None:
             body.update({
@@ -428,7 +434,7 @@ class api:
                 # try:
                 res = await funct(_origin_self, *_args, **kwa)
                 # except http.HttpInternalServerError as e:
-                #     _origin_self.send_error(e.status, reason=str(e.message))
+                #     _origin_self.send_error(e.status(), reason=str(e.message))
                 #     raise
                 # except Exception as e:
                 #     print("EEEE",e)
@@ -463,14 +469,17 @@ class api:
 
             except http.HttpInvalidParam as e:
                 _origin_self._id_message = str(e.id_message)
-                _origin_self.send_error(e.status, reason=str(e.message))
+
+                kwargs = e._dict()
+                # print("KWARG", kwargs)
+                _origin_self.send_error(e.status(), reason=str(e.message), **kwargs)
 
             except http.BaseHttpException as e:
                 if _origin_self.orm_session:
                     _origin_self.orm_session.rollback()
 
                 _origin_self._id_message = str(e.id_message)
-                _origin_self.send_error(e.status, reason=str(e.message))
+                _origin_self.send_error(e.status(), reason=str(e.message))
 
             except Exception as e:
                 if _origin_self.orm_session:
