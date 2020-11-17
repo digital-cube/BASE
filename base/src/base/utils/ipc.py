@@ -45,6 +45,8 @@ async def call(request, service, method, endpoint, body=None):
     http_client = AsyncHTTPClient()
     headers = {}
 
+    print("IPC",method,uri)
+
     if request and request.headers and base.config.conf['authorization']['key'] in request.headers:
         headers[base.config.conf['authorization']['key']] = request.headers[base.config.conf['authorization']['key']]
 
@@ -54,7 +56,9 @@ async def call(request, service, method, endpoint, body=None):
 
     try:
         result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
+        print("IPC OK")
     except Exception as e:
+        print("IPC FAILED")
         try:
             resp_body = json.loads(e.response.body)
             message, id_message, code = resp_body['message'], resp_body['id'], resp_body['code']
