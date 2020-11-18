@@ -485,9 +485,9 @@ class api:
                 if _origin_self.orm_session:
                     _origin_self.orm_session.rollback()
 
-                _origin_self._id_message = str(e.id_message)
+                _origin_self._id_message = str(e.id_message) if hasattr(e, 'id_message') else None
                 _origin_self.send_error(http.status.INTERNAL_SERVER_ERROR,
-                                        reason=str(e.message).split('\n')[0])
+                                        reason=str(e.message).split('\n')[0] if hasattr(e, 'message') else None)
 
             finally:
                 if _origin_self.orm_session:
