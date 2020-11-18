@@ -7,11 +7,19 @@ _last = None
 
 test = False
 test_port = None
+import base
 
 
 def registered(svc_name):
+
     global test
     if test:
+
+        # print("REGISTERED",svc_name in _services, svc_name, _services)
+        # print('bc',base.config.conf['services'])
+        if svc_name in base.config.conf['services']:
+            return True
+
         return svc_name in _services
 
     # for monolit apps
@@ -20,6 +28,7 @@ def registered(svc_name):
 
     # for distributed apps
     return Store.exists('base_svc_' + svc_name)
+
 
 def register(service: dict):
     if 'storage' in service and "~" in service['storage']:
@@ -106,6 +115,11 @@ def info(svc_name=None):
 
 
 def prefix(svc_name=None):
+
+    global test
+    if test:
+        return base.config.conf['services'][svc_name]['prefix']
+
     s = service(svc_name)
     return s['prefix'] if s and 'prefix' in s else ''  # f'/api/{svc_name}'
 
