@@ -8,6 +8,8 @@ from base import http
 async def call(request, service, method, endpoint, body=None):
     method = method.upper()
 
+    print("ipc.call",service,method)
+
     if base.config.conf['apptype']=='micro-service':
         if not base.store.exists('services'):
             raise http.HttpInternalServerError(id_message="INTERNAL_SERVER_ERROR",
