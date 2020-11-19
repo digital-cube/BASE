@@ -8,7 +8,9 @@ from base import http
 async def call(request, service, method, endpoint, body=None):
     method = method.upper()
 
-    print("ipc.call",service,method)
+    import base
+    if base.registry.test and base.config.conf['apptype']=='micro-service':
+        return None
 
     if base.config.conf['apptype']=='micro-service':
         if not base.store.exists('services'):
@@ -30,7 +32,11 @@ async def call(request, service, method, endpoint, body=None):
             raise http.HttpInternalServerError(id_message="INTERNAL_SERVER_ERROR",
                                                message=f"missing prefix in service configuration")
         prefix = scfg['prefix']
-        uri = 'http://' + scfg['host'] + prefix + ('/' if endpoint[0]!='/' else '') + endpoint
+
+        port = base.registry.test_port if base.registry.test else scfg['port']
+
+
+        uri = 'http://' + scfg['host'] + ':' + str(port) + prefix + ('/' if endpoint[0]!='/' else '') + endpoint
 
     else:
 
@@ -47,20 +53,17 @@ async def call(request, service, method, endpoint, body=None):
     http_client = AsyncHTTPClient()
     headers = {}
 
-    print("IPC",method,uri)
 
     if request and request.headers and base.config.conf['authorization']['key'] in request.headers:
         headers[base.config.conf['authorization']['key']] = request.headers[base.config.conf['authorization']['key']]
 
     _body = None if method in ('GET', 'DELETE') else json.dumps(body if body else {}, ensure_ascii=False)
 
-    # print("URI", uri)
-
     try:
         result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
-        # print("IPC OK")
     except Exception as e:
-        print("IPC FAILED")
+        print("IPC", method, uri, _body)
+        print("\nIPC FAILED\n")
         try:
             resp_body = json.loads(e.response.body)
             message, id_message, code = resp_body['message'], resp_body['id'], resp_body['code']

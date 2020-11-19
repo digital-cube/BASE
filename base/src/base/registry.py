@@ -17,7 +17,7 @@ def registered(svc_name):
 
         # print("REGISTERED",svc_name in _services, svc_name, _services)
         # print('bc',base.config.conf['services'])
-        if svc_name in base.config.conf['services']:
+        if 'services' in base.config.conf and svc_name in base.config.conf['services']:
             return True
 
         return svc_name in _services
