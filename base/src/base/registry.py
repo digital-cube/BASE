@@ -67,7 +67,7 @@ def address(svc_name):
 
         r_svc = json.loads(Store.get('base_svc_' + svc_name))
 
-        if 'service' in r_svc:
+        if 'host' in r_svc:
             return 'http://'+r_svc['host']
 
         return f"http://localhost:{port(svc_name)}"
