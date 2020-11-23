@@ -145,10 +145,13 @@ class _BaseSql():
         def _serialize(s):
             # print(type(s), s)
 
-            if type(s) in (Numeric,decimal.Decimal):
+            if type(s) in (Numeric, decimal.Decimal):
                 return float(s)
             elif type(s) in (int, float, str, dict, None):
                 return s
+            elif type(s) == bool:
+                return True if s in (True, "True", 'true', 'yes', 'Yes', '1') else False
+
             return str(s) if s is not None else None
 
         result = {}
@@ -187,9 +190,7 @@ class BaseSql(_BaseSql):
     created = Column(TIMESTAMP, index=True)
 
     def __init__(self, **kwargs):
-
         n = datetime.datetime.now()
         self.created = datetime.datetime(n.year, n.month, n.day, n.hour, n.minute, n.second)
 
         super().__init__(**kwargs)
-

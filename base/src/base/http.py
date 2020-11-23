@@ -100,3 +100,7 @@ class HttpInternalServerError(BaseHttpException):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._status = status.INTERNAL_SERVER_ERROR
+
+class IPCException(HttpInternalServerError):
+
+    pass
