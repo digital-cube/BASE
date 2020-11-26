@@ -59,11 +59,10 @@ async def call(request, service, method, endpoint, body=None):
 
     _body = None if method in ('GET', 'DELETE') else json.dumps(body if body else {}, ensure_ascii=False)
 
-    print("IPC", method, uri, _body)
     try:
         result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
-        print("IPC OK")
     except Exception as e:
+        print("IPC", method, uri, _body)
         print("\nIPC FAILED\n")
         try:
             resp_body = json.loads(e.response.body)
