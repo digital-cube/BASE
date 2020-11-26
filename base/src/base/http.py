@@ -78,6 +78,19 @@ class HttpErrorNotFound(BaseHttpException):
         self._status = status.NOT_FOUND
 
 
+
+class HttpNotAcceptable(BaseHttpException):
+    """
+    Exception class which is used for HTTP Error 406 - Not Acceptable.
+    """
+    _status = status.NOT_ACCEPTABLE
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._status = status.NOT_ACCEPTABLE
+
+
+
 class HttpInvalidParam(BaseHttpException):
     """
     Exception class which is used for HTTP Error 400 - Bad Request.
