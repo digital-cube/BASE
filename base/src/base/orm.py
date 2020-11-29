@@ -124,7 +124,7 @@ class _BaseSql():
 
             if column.key in source:
                 # if column.key in source.__dict__:
-                if self.__dict__[column.key] != source[column.key]:
+                if str(self.__dict__[column.key]) != str(source[column.key]):
                     updated.append(column.key)
 
                 self.__setattr__(column.key, source[column.key])
