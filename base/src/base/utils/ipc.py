@@ -63,6 +63,7 @@ async def call(request, service, method, endpoint, body=None):
         result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
     except Exception as e:
         print("IPC", method, uri, _body)
+        print("E",e)
         print("\nIPC FAILED\n")
         print(e.response.code)
         print(e.response.body)
