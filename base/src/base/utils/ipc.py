@@ -64,6 +64,9 @@ async def call(request, service, method, endpoint, body=None):
     except Exception as e:
         print("IPC", method, uri, _body)
         print("\nIPC FAILED\n")
+        print(e.response.code)
+        print(e.response.body)
+        print("---IPC---"+"-"*50)
         try:
             resp_body = json.loads(e.response.body)
             message, id_message, code = resp_body['message'], resp_body['id'], resp_body['code']
