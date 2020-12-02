@@ -142,6 +142,7 @@ class _BaseSql():
 
     def serialize(self, keys=None, forbidden=[]):
 
+        # print("serialize",self.id)
         def _serialize(s):
             # print(type(s), s)
 
@@ -155,6 +156,9 @@ class _BaseSql():
             return str(s) if s is not None else None
 
         result = {}
+
+        if self.id:  # TODO: DON'T REMOVE THIS
+            pass  # hack for __dict__, if you remove this code, __dict__ will not be initialized in runtime
 
         # ukoliko su navedeni kljucevi, zgodno bi bilo ubaciti ih u serializaciju po redosledu
         if keys:

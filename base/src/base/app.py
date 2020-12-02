@@ -51,6 +51,9 @@ class Base(tornado.web.RequestHandler):
 
     from typing import Optional, Awaitable
 
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
     def prepare(self) -> Optional[Awaitable[None]]:
         self.settings['serve_traceback'] = False
 
@@ -417,7 +420,7 @@ class api:
 
                                     _origin_self.write(
                                         json.dumps(
-                                            {"message": f"Mandatory argument {pp.name} missing in input request"}))
+                                            {"message": f"Mandatory argument {pp.name} missing in input request"}, ensure_ascii=False))
                                     _origin_self.set_status(http.status.BAD_REQUEST)
                                     return
 

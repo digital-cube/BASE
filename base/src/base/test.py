@@ -61,7 +61,7 @@ class BaseTest(AsyncHTTPTestCase):
             print(f"{marker} :: code =", self.code, "EXECUTE TIME", self.execution_time)
         if hasattr(self, 'r'):
             print(f"{marker} :: Last result content")
-            print(json.dumps(self.r, indent=4))
+            print(json.dumps(self.r, indent=4, ensure_ascii=False))
 
     def api(self, token, method, url, body=None,
             expected_code=None, expected_result=None, expected_result_subset=None,
@@ -86,7 +86,7 @@ class BaseTest(AsyncHTTPTestCase):
         self.execution_time = 'n/a'
         try:
             response = self.fetch(url, method=method,
-                                  body=json.dumps(body) if body is not None else None,
+                                  body=json.dumps(body, ensure_ascii=False) if body is not None else None,
                                   headers=headers)
         except Exception as e:
             print('error serializing output ', e, e)
