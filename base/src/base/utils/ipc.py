@@ -66,18 +66,12 @@ async def call(request, service, method, endpoint, body=None):
         logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"OK {method}:{uri}")
 
     except Exception as e:
-
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED {method}:{uri}")
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED body: {_body}")
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-code: {e.response.code}")
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-body: {e.response.body}")
-
-        # print("IPC", method, uri, _body)
-        # print("E",e)
         print(f"\nIPC FAILED, {e}\n")
-        # print(e.response.code)
-        # print(e.response.body)
-        # print("---IPC---"+"-"*50)
+
         try:
             resp_body = json.loads(e.response.body)
             message, id_message, code = resp_body['message'], resp_body['id'], resp_body['code']
