@@ -3,6 +3,7 @@ import json
 from tornado.httpclient import AsyncHTTPClient
 import base
 from base import http
+import logging
 
 
 async def call(request, service, method, endpoint, body=None):
@@ -59,15 +60,24 @@ async def call(request, service, method, endpoint, body=None):
 
     _body = None if method in ('GET', 'DELETE') else json.dumps(body if body else {}, ensure_ascii=False)
 
+    logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"{method}:{uri}")
     try:
         result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
+        logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"OK {method}:{uri}")
+
     except Exception as e:
-        print("IPC", method, uri, _body)
-        print("E",e)
-        print("\nIPC FAILED\n")
-        print(e.response.code)
-        print(e.response.body)
-        print("---IPC---"+"-"*50)
+
+        logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED {method}:{uri}")
+        logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED body: {_body}")
+        logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-code: {e.response.code}")
+        logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-body: {e.response.body}")
+
+        # print("IPC", method, uri, _body)
+        # print("E",e)
+        print(f"\nIPC FAILED, {e}\n")
+        # print(e.response.code)
+        # print(e.response.body)
+        # print("---IPC---"+"-"*50)
         try:
             resp_body = json.loads(e.response.body)
             message, id_message, code = resp_body['message'], resp_body['id'], resp_body['code']
