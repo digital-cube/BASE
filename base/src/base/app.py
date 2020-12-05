@@ -629,7 +629,7 @@ class route:
         route._handlers.append((uri, handler))
 
     @staticmethod
-    def handlers():
+    def handlers(readonly=False):
         if hasattr(route, '_handlers'):
             return sorted(route._handlers, reverse=True)
 
@@ -764,7 +764,9 @@ def make_app(**kwargs):
     if 'debug' in kwargs:
         debug = kwargs['debug']
 
-    return tornado.web.Application(route.handlers(),
+    readonly = kwargs['readonly'] if 'readonly' in kwargs else False
+
+    return tornado.web.Application(route.handlers(readonly=readonly),
                                    debug=debug,
                                    default_handler_class=default_handler_class,
                                    log_function=Base.log_function)
