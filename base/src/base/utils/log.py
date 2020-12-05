@@ -45,7 +45,7 @@ def log(logger: logging.Logger, lvl: int, include_context: bool = False, **kwarg
 
         info['file'] = current_frame.tb_frame.f_code.co_filename
         info['line'] = current_frame.tb_lineno
-        # info['trace'] = re.sub(r'[\r\n]+', '\t', trace)
+        info['trace'] = re.sub(r'[\r\n]+', '\t', trace)
 
     msg = next(logfmt.format(info))
 
