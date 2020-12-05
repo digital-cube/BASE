@@ -6,7 +6,7 @@ from base import http
 import logging
 
 
-async def call(request, service, method, endpoint, body=None):
+async def call(request, service, method, endpoint, body=None, readonly=False):
     method = method.upper()
 
     import base
@@ -37,7 +37,9 @@ async def call(request, service, method, endpoint, body=None):
         port = base.registry.test_port if base.registry.test else scfg['port']
 
 
-        uri = 'http://' + scfg['host'] + ':' + str(port) + prefix + ('/' if endpoint[0]!='/' else '') + endpoint
+        ro = '_read' if readonly else ''
+
+        uri = 'http://' + scfg['host'] + ro + ':' + str(port) + prefix + ('/' if endpoint[0]!='/' else '') + endpoint
 
     else:
 
