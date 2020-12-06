@@ -9,11 +9,15 @@ import logging
 async def call(request, service, method, endpoint, body=None, readonly=False):
     method = method.upper()
 
+    if readonly and method != 'GET':
+        raise http.HttpInternalServerError(id_message='IPC_READONLY_SUPPORTED_ONLY_FOR_GET_METHOD',
+                                           message='Readonly flag for not get metod')
+
     import base
-    if base.registry.test and base.config.conf['apptype']=='micro-service':
+    if base.registry.test and base.config.conf['apptype'] == 'micro-service':
         return None
 
-    if base.config.conf['apptype']=='micro-service':
+    if base.config.conf['apptype'] == 'micro-service':
         if not base.store.exists('services'):
             raise http.HttpInternalServerError(id_message="INTERNAL_SERVER_ERROR",
                                                message="services not registered in store")
@@ -36,10 +40,9 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
 
         port = base.registry.test_port if base.registry.test else scfg['port']
 
-
         ro = '_read' if readonly else ''
 
-        uri = 'http://' + scfg['host'] + ro + ':' + str(port) + prefix + ('/' if endpoint[0]!='/' else '') + endpoint
+        uri = 'http://' + scfg['host'] + ro + ':' + str(port) + prefix + ('/' if endpoint[0] != '/' else '') + endpoint
 
     else:
 
@@ -51,11 +54,10 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
         else:
             port = base.registry.test_port
 
-        uri = 'http://' + host + ':' + str(port) + prefix + ('/' if endpoint[0]!='/' else '') + endpoint
+        uri = 'http://' + host + ':' + str(port) + prefix + ('/' if endpoint[0] != '/' else '') + endpoint
 
     http_client = AsyncHTTPClient()
     headers = {}
-
 
     if request and request.headers and base.config.conf['authorization']['key'] in request.headers:
         headers[base.config.conf['authorization']['key']] = request.headers[base.config.conf['authorization']['key']]
@@ -83,6 +85,5 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
         raise http.BaseHttpException(message=message,
                                      id_message=id_message,
                                      status=code)
-
 
     return json.loads(result.body.decode('utf-8'))
