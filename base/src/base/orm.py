@@ -154,7 +154,7 @@ class _BaseSql():
 
             if type(s) in (Numeric, decimal.Decimal):
                 return float(s)
-            elif type(s) in (int, float, str, dict, None):
+            elif type(s) in (int, float, str, dict, list, None):
                 return s
             elif type(s) == bool:
                 return True if s in (True, "True", 'true', 'yes', 'Yes', '1') else False
