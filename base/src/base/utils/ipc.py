@@ -4,7 +4,7 @@ from tornado.httpclient import AsyncHTTPClient
 import base
 from base import http
 import logging
-
+import os
 
 async def call(request, service, method, endpoint, body=None, readonly=False):
     method = method.upper()
