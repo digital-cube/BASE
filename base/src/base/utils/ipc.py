@@ -9,6 +9,13 @@ import logging
 async def call(request, service, method, endpoint, body=None, readonly=False):
     method = method.upper()
 
+    if readonly:
+        readonly_supported = os.getenv('USE_READ_REPLICA', 'no').strip().lower() in ('yes','true','1')
+
+        if not readonly_supported:
+            readonly = False
+
+
     if readonly and method != 'GET':
         raise http.HttpInternalServerError(id_message='IPC_READONLY_SUPPORTED_ONLY_FOR_GET_METHOD',
                                            message='Readonly flag for not get metod')
