@@ -2,6 +2,7 @@ import logfmt
 import logging
 import re
 import traceback
+import base
 
 import aiotask_context as context
 
@@ -40,8 +41,9 @@ def log(logger: logging.Logger, lvl: int, include_context: bool = False, **kwarg
     if exc_info:  # tuple (typ, value, tb)
         print(traceback.print_exc())
         trace = '\t'.join(traceback.format_exception(*exc_info))
-        
-        print(traceback.print_exc())
+
+        if not base.registry.test:        
+            print(traceback.print_exc())
         
         current_frame = exc_info[2]
         while current_frame.tb_next is not None:
