@@ -18,6 +18,7 @@ from .src.base.app import api
 from .src.base.app import auth
 from .src.base.app import route
 from .src.base.app import run
+from .src.base.app import make_app
 from .src.base.utils import sync_order
 from .src.base.utils import ipc
 

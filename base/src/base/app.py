@@ -766,6 +766,9 @@ def make_app(**kwargs):
 
     readonly = kwargs['readonly'] if 'readonly' in kwargs else False
 
+    from base import config
+    config.init_logging()
+
     return tornado.web.Application(route.handlers(readonly=readonly),
                                    debug=debug,
                                    default_handler_class=default_handler_class,
@@ -779,8 +782,6 @@ def run(**kwargs):
         port = kwargs['port']
     else:
         port = config.conf['port'] if 'port' in config.conf else 9000
-
-    config.init_logging()
 
     app = make_app(**kwargs)
     print(f'listening on port {port}')
