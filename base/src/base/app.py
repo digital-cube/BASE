@@ -225,6 +225,7 @@ class api:
 
     def __init__(self, *args, **kwargs):
         self.skip_db = True if 'db' in kwargs and kwargs['db'] == False else False
+        self.raw_output = True if 'raw_output' in kwargs and kwargs['raw_output'] == True else False
 
         pass
 
@@ -463,12 +464,16 @@ class api:
                 _origin_self.set_status(status_code)
 
                 if response is not None:
-                    try:
-                        _origin_self.set_header('Content-Type', 'application/json; charset=UTF-8')
-                        prepared_response = json.dumps(response, ensure_ascii=False)
-                        _origin_self.write(prepared_response)
-                    except:
+
+                    if self.raw_output:
                         _origin_self.write(response)
+                    else:
+                        try:
+                            _origin_self.set_header('Content-Type', 'application/json; charset=UTF-8')
+                            prepared_response = json.dumps(response, ensure_ascii=False)
+                            _origin_self.write(prepared_response)
+                        except:
+                            _origin_self.write(response)
 
             except http.HttpInvalidParam as e:
                 _origin_self._id_message = str(e.id_message)
