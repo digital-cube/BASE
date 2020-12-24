@@ -100,7 +100,7 @@ class BaseTest(AsyncHTTPTestCase):
             self.assertEqual(expected_code, response.code)
 
         if raw_response:
-            self.self.execution_time = time.time - stime
+            self.execution_time = time.time() - stime
             return response.body
 
         resp_txt = response.body.decode('utf-8')
