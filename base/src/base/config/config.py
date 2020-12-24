@@ -10,6 +10,8 @@ class config:
     """Config pre-filled with default Options"""
     conf: dict = {}
 
+    initialized = False
+
     @staticmethod
     def load_from_dict(config_dictionary: dict) -> None:
         """
@@ -17,12 +19,18 @@ class config:
 
         :param config_dictionary: The dictionary with the settings for the App.
         """
+        
+        if config.initialized:
+            return
+        
+        
         config.load_default_options()
 
         config.conf.update(config_dictionary)
 
         from ..registry import register
         register(config_dictionary)
+        config.initialized = True
 
     @staticmethod
     def __parse_yaml(path: str) -> dict:
@@ -65,6 +73,10 @@ class config:
         Function which loads the Application from the
         :param path:
         """
+
+        if config.initialized:
+            return
+        
         config.load_default_options()
 
         config.conf.update(config.__parse_yaml(path))
@@ -81,6 +93,7 @@ class config:
 
         from ..registry import register
         register(config.conf)
+        config.initialized = True
 
     @staticmethod
     def load_default_options():
