@@ -106,6 +106,8 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'disable_spec', src.config.app_config.disable_spec)
     if hasattr(src.config.app_config, 'disable_all_paths'):
         setattr(base.config.application_config, 'disable_all_paths', src.config.app_config.disable_all_paths)
+    if hasattr(src.config.app_config, 'tornado_settings'):
+        setattr(base.config.application_config, 'tornado_settings', src.config.app_config.tornado_settings)
 
     if _db_is_configured:
         _load_app_configuration_with_database(src.config.app_config)

@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2020 12 28
+
+## BASE version 1.13.5
+- tornado settings through the client application
+
 ### 2020 11 17
 
 ## BASE version 1.13.4

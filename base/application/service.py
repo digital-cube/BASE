@@ -64,6 +64,10 @@ class Application(tornado.web.Application):
         _settings = {'static_path': base.config.application_config.static_path} if \
             base.config.application_config.static_path else {'static_path': 'static'}
 
+        if base.config.application_config.tornado_settings and \
+                isinstance(base.config.application_config.tornado_settings, dict):
+            _settings.update(base.config.application_config.tornado_settings)
+
         super(Application, self).__init__(
             self.entries,
             debug=base.config.application_config.debug if not test else False,      # turn off debugging mode for tests
