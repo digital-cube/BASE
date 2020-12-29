@@ -22,6 +22,13 @@ def registered(svc_name):
 
         return svc_name in _services
 
+    if 'apptype' in base.config.conf and base.config.conf['apptype']=='monolith':
+        if 'services' in base.config.conf:
+            if svc_name in base.config.conf['services']:
+                return True
+    
+        return False
+
     # for monolit apps
     if svc_name in _services:
         return svc_name
@@ -64,6 +71,11 @@ def register(service: dict):
 
 def address(svc_name):
     if not test:
+    
+        if 'apptype' in base.config.conf and base.config.conf['apptype']=='monolith':
+            if 'services' in base.config.conf:
+                if svc_name in base.config.conf['services']:
+                    return 'http://localhost'    
 
         r_svc = json.loads(Store.get('base_svc_' + svc_name))
 
@@ -119,6 +131,12 @@ def prefix(svc_name=None):
     global test
     if test:
         return base.config.conf['services'][svc_name]['prefix']
+
+    if 'apptype' in base.config.conf and base.config.conf['apptype']=='monolith':
+        if 'services' in base.config.conf:
+            if svc_name in base.config.conf['services']:
+                return base.config.conf['services'][svc_name]['prefix']
+
 
     s = service(svc_name)
     return s['prefix'] if s and 'prefix' in s else ''  # f'/api/{svc_name}'

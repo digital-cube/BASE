@@ -14,7 +14,7 @@ class DictStore:
         DictStore.store = {}
 
     def rpush(self, queue_name, value):
-        print("RPUSH ",queue_name)
+        # print("RPUSH ",queue_name)
         pass
 
     def exists(self, *names):
