@@ -6,6 +6,7 @@ import logging.config
 import asyncio
 import aiotask_context as context
 
+
 class config:
     """Config pre-filled with default Options"""
     conf: dict = {}
@@ -19,11 +20,10 @@ class config:
 
         :param config_dictionary: The dictionary with the settings for the App.
         """
-        
+
         if config.initialized:
             return
-        
-        
+
         config.load_default_options()
 
         config.conf.update(config_dictionary)
@@ -76,7 +76,7 @@ class config:
 
         if config.initialized:
             return
-        
+
         config.load_default_options()
 
         config.conf.update(config.__parse_yaml(path))
@@ -113,6 +113,26 @@ class config:
         Base.logger = logging.getLogger(config.conf.get('logging')['request_logger'])
         loop = asyncio.get_event_loop()
         loop.set_task_factory(context.task_factory)
+
+    @staticmethod
+    def tortoise_config() -> dict:
+        """
+        Get parts of the configuration used for initialising Tortoise ORM and
+        make sure the structure of the config is adjusted
+        :return: dict
+        """
+        tort_conf = config.conf['tortoise']
+
+        for connection in tort_conf['connections']:
+            tort_conf['connections'][connection]['credentials'] = {
+                'host': config.conf['db']['host'],
+                'port': config.conf['db']['port'],
+                'user': config.conf['db']['username'],
+                'password': config.conf['db']['password'],
+                'database': config.conf['db']['database'],
+            }
+
+        return tort_conf
 
 
 config.load_default_options()

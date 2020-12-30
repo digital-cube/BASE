@@ -5,6 +5,8 @@ import logging
 import logging.config
 import traceback
 import uuid
+import tortoise
+import asyncio
 from functools import wraps
 from inspect import isclass, signature
 
@@ -16,8 +18,9 @@ import tornado.ioloop
 import tornado.web
 from tornado.httpclient import AsyncHTTPClient
 
+from tortoise import Tortoise
+
 from . import http, token
-from .orm import sql_base
 from .utils.log import log, set_log_context, clear_log_context
 
 LocalOrmModule = None
@@ -353,6 +356,14 @@ class api:
                                         message=f"Invalid datatype, float type is expected for {pp.name}",
                                         id_message="INVALID_DATA_TYPE")
 
+                            elif pp.annotation == uuid.UUID and not type(value) == uuid.UUID:
+                                try:
+                                    value = uuid.UUID(value)
+                                except:
+                                    raise http.General4xx(
+                                        message=f"Invalid datatype, UUID type is expected for {pp.name}",
+                                        id_message="INVALID_DATA_TYPE")
+
                             elif isinstance(pp.annotation, sqlalchemy.orm.attributes.InstrumentedAttribute):
 
                                 cls = pp.annotation.class_
@@ -369,37 +380,40 @@ class api:
 
                                     kwa[pp.name] = res
 
-                            elif issubclass(pp.annotation, sql_base):
-                                model_class = pp.annotation
+                            elif isinstance(pp.annotation, tortoise.fields.data.Field) and pp.annotation.pk:
+                                print(pp.annotation.model)
 
-                                # ukoliko id_user postoji u modelu, i ukoliko se radi u auth useru, znaci
-                                # da je user ulogovan, ako neko pokusava da upise id_usera, radi se o upravo ulogovanom
-                                # korisniku, ovo nije dobro jer se time id_user, rezervise za ovu akciju, sto moze
-                                # da zezne nekog ko to nema u vidu, takod a treba smisliti nesto bolje
-
-                                if hasattr(model_class, 'id_user') and \
-                                        'id_user' not in value and \
-                                        hasattr(_origin_self, 'id_user'):
-                                    value['id_user'] = _origin_self.id_user
-
-                                try:
-
-                                    if hasattr(model_class, 'build'):
-                                        kwa[pp.name] = model_class.build(value)
-                                    else:
-                                        # there is no builder, try to construct class
-                                        kwa[pp.name] = model_class(**value)
-                                except TypeError as te:
-                                    if 'missing' in str(te) and 'required' in str(te) and 'argument' in str(te):
-                                        kwa[pp.name] = None
-                                    else:
-                                        raise http.HttpInvalidParam(str(te))
-                                except Exception as e:
-                                    kwa[pp.name] = None
-                                    # _origin_self.write(
-                                    #     json.dumps(
-                                    #         {"message": f"Invalid datatype {pp.annotation} error builiding object"}))
-                                    # _origin_self.set_status(http.status.BAD_REQUEST)
+                            # elif issubclass(pp.annotation, sql_base):
+                            #     model_class = pp.annotation
+                            #
+                            #     # ukoliko id_user postoji u modelu, i ukoliko se radi u auth useru, znaci
+                            #     # da je user ulogovan, ako neko pokusava da upise id_usera, radi se o upravo ulogovanom
+                            #     # korisniku, ovo nije dobro jer se time id_user, rezervise za ovu akciju, sto moze
+                            #     # da zezne nekog ko to nema u vidu, takod a treba smisliti nesto bolje
+                            #
+                            #     if hasattr(model_class, 'id_user') and \
+                            #             'id_user' not in value and \
+                            #             hasattr(_origin_self, 'id_user'):
+                            #         value['id_user'] = _origin_self.id_user
+                            #
+                            #     try:
+                            #
+                            #         if hasattr(model_class, 'build'):
+                            #             kwa[pp.name] = model_class.build(value)
+                            #         else:
+                            #             # there is no builder, try to construct class
+                            #             kwa[pp.name] = model_class(**value)
+                            #     except TypeError as te:
+                            #         if 'missing' in str(te) and 'required' in str(te) and 'argument' in str(te):
+                            #             kwa[pp.name] = None
+                            #         else:
+                            #             raise http.HttpInvalidParam(str(te))
+                            #     except Exception as e:
+                            #         kwa[pp.name] = None
+                            #         # _origin_self.write(
+                            #         #     json.dumps(
+                            #         #         {"message": f"Invalid datatype {pp.annotation} error builiding object"}))
+                            #         # _origin_self.set_status(http.status.BAD_REQUEST)
 
                             elif isinstance(pp.annotation, type(Any)):
 
@@ -780,6 +794,14 @@ def make_app(**kwargs):
                                    log_function=Base.log_function)
 
 
+async def init_orm():
+    from base import config
+
+    await Tortoise.init(
+        config=config.tortoise_config()
+    )
+
+
 def run(**kwargs):
     from base import config
 
@@ -791,7 +813,12 @@ def run(**kwargs):
     app = make_app(**kwargs)
     print(f'listening on port {port}')
     app.listen(port)
+    loops = tornado.ioloop.IOLoop.current()
+    loops.run_sync(init_orm)
 
     route.print_all_routes()
 
-    tornado.ioloop.IOLoop.current().start()
+    try:
+        loops.start()
+    finally:
+        asyncio.get_event_loop().run_until_complete(Tortoise.close_connections())
