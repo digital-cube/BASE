@@ -381,7 +381,26 @@ class api:
                                     kwa[pp.name] = res
 
                             elif isinstance(pp.annotation, tortoise.fields.data.Field) and pp.annotation.pk:
-                                print(pp.annotation.model)
+                                cls = pp.annotation.model
+                                print(cls)
+
+                                scls = str(cls).replace("<class '", '').replace("'>", '')
+                                amodul = scls.split('.')
+                                modul = '.'.join(amodul[:-1])
+
+                                module = importlib.import_module(modul)
+
+                                cls = getattr(module, amodul[-1])
+
+                                field_name = pp.annotation.model_field_name
+
+                                kwa[pp.name] = await cls.filter(**{field_name: value}).get_or_none()
+
+                            elif issubclass(pp.annotation, tortoise.models.Model):
+                                try:
+                                    kwa[pp.name] = await pp.annotation(**value)
+                                except:
+                                    pass
 
                             # elif issubclass(pp.annotation, sql_base):
                             #     model_class = pp.annotation
@@ -414,6 +433,12 @@ class api:
                             #         #     json.dumps(
                             #         #         {"message": f"Invalid datatype {pp.annotation} error builiding object"}))
                             #         # _origin_self.set_status(http.status.BAD_REQUEST)
+
+
+                            elif isinstance(pp.annotation, tuple):
+                                cls, attr = pp.annotation
+                                kwa[pp.name] = await cls.filter(**{attr: value}).get_or_none()
+                                pass
 
                             elif isinstance(pp.annotation, type(Any)):
 
