@@ -63,8 +63,8 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
 
         uri = 'http://' + host + ':' + str(port) + prefix + ('/' if endpoint[0] != '/' else '') + endpoint
 
-    print("-"*100)
-    print(uri)
+    # print("-"*100)
+    # print(uri)
 
     http_client = AsyncHTTPClient()
     headers = {}

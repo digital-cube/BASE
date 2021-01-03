@@ -20,8 +20,8 @@ class config:
         :param config_dictionary: The dictionary with the settings for the App.
         """
         
-        if config.initialized:
-            return
+        # if config.initialized:
+        #     return
         
         
         config.load_default_options()
@@ -30,7 +30,7 @@ class config:
 
         from ..registry import register
         register(config_dictionary)
-        config.initialized = True
+        # config.initialized = True
 
     @staticmethod
     def __parse_yaml(path: str) -> dict:
@@ -74,8 +74,8 @@ class config:
         :param path:
         """
 
-        if config.initialized:
-            return
+        # if config.initialized:
+        #     return
         
         config.load_default_options()
 
@@ -93,7 +93,7 @@ class config:
 
         from ..registry import register
         register(config.conf)
-        config.initialized = True
+        # config.initialized = True
 
     @staticmethod
     def load_default_options():

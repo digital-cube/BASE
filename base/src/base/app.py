@@ -472,7 +472,7 @@ class api:
                             _origin_self.set_header('Content-Type', 'application/json; charset=UTF-8')
                             prepared_response = json.dumps(response, ensure_ascii=False)
                             _origin_self.write(prepared_response)
-                        except:
+                        except Exception as e:
                             _origin_self.write(response)
 
             except http.HttpInvalidParam as e:

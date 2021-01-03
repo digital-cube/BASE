@@ -79,7 +79,10 @@ class BaseTest(AsyncHTTPTestCase):
             body = None
 
         from base import config
-        headers.update({config.conf['authorization']['key']: token} if token else {})
+        headers = {config.conf['authorization']['key']: token} if token else {}
+
+        #TODO: Check out this !!!
+        #headers.update({config.conf['authorization']['key']: token} if token else {})
 
         import time
         stime = time.time()
