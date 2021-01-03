@@ -66,7 +66,7 @@ class BaseTest(AsyncHTTPTestCase):
     def api(self, token, method, url, body=None,
             expected_code=None, expected_result=None, expected_result_subset=None,
             expected_result_contain_keys=None, expected_length=None,
-            raw_response=False):
+            raw_response=False, headers={}):
 
         url = url.strip()
         self.last_uri = url
@@ -79,7 +79,7 @@ class BaseTest(AsyncHTTPTestCase):
             body = None
 
         from base import config
-        headers = {config.conf['authorization']['key']: token} if token else {}
+        headers.update({config.conf['authorization']['key']: token} if token else {})
 
         import time
         stime = time.time()
