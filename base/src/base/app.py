@@ -396,7 +396,7 @@ class api:
 
                                 kwa[pp.name] = await cls.filter(**{field_name: value}).get_or_none()
 
-                            elif issubclass(pp.annotation, tortoise.models.Model):
+                            elif type(pp.annotation)!=tuple and issubclass(pp.annotation, tortoise.models.Model):
                                 try:
                                     kwa[pp.name] = await pp.annotation(**value)
                                 except:
