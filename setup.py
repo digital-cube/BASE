@@ -45,7 +45,10 @@ setup(
                       'PyYAML',
                       'redis',
                       'requests',
-                      'SQLAlchemy'
+                      'aerich',
+                      'tortoise-orm[asyncpg]',
+                      'tortoise-orm[accel]',
+                      'aiomysql'
                       ],
     package_data={
         'base': [
