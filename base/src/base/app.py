@@ -396,7 +396,7 @@ class api:
 
                                 kwa[pp.name] = await cls.filter(**{field_name: value}).get_or_none()
 
-                            elif type(pp.annotation)!=tuple and issubclass(pp.annotation, tortoise.models.Model):
+                            elif type(pp.annotation) != tuple and issubclass(pp.annotation, tortoise.models.Model):
                                 try:
                                     kwa[pp.name] = await pp.annotation(**value)
                                 except:
@@ -434,7 +434,6 @@ class api:
                             #         #         {"message": f"Invalid datatype {pp.annotation} error builiding object"}))
                             #         # _origin_self.set_status(http.status.BAD_REQUEST)
 
-
                             elif isinstance(pp.annotation, tuple):
                                 cls, attr = pp.annotation
                                 kwa[pp.name] = await cls.filter(**{attr: value}).get_or_none()
@@ -460,7 +459,8 @@ class api:
 
                                     _origin_self.write(
                                         json.dumps(
-                                            {"message": f"Mandatory argument {pp.name} missing in input request"}, ensure_ascii=False))
+                                            {"message": f"Mandatory argument {pp.name} missing in input request"},
+                                            ensure_ascii=False))
                                     _origin_self.set_status(http.status.BAD_REQUEST)
                                     return
 
