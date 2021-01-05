@@ -39,10 +39,9 @@ def log(logger: logging.Logger, lvl: int, include_context: bool = False, **kwarg
 
     exc_info = all_info.get('exc_info')
     if exc_info:  # tuple (typ, value, tb)
-        print(traceback.print_exc())
         trace = '\t'.join(traceback.format_exception(*exc_info))
 
-        if not base.registry.test:        
+        if not base.registry.test:
             print(traceback.print_exc())
         
         current_frame = exc_info[2]

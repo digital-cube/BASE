@@ -623,6 +623,45 @@ class auth:
         return wrapper
 
 
+class auth_tortoise:
+    def __init__(self, *args, **kwargs):
+
+        self.allowed_flags = kwargs['permissions'] if 'permissions' in kwargs else None
+
+        pass
+
+    def __call__(self, funct):
+
+        @wraps(funct)
+        async def wrapper(_self_origin, *args, **kwargs):
+
+            from base import config
+            if config.conf['authorization']['key'] in _self_origin.request.headers:
+
+                _token = _self_origin.request.headers[config.conf['authorization']['key']]
+                res = token.token2user(_token)
+
+                id_user = res['id_user'] if res and 'id_user' in res else None
+                id_session = res['id'] if res and 'id' in res else None
+
+                # ?!? iz nekog razloga je prestalo da sljaka
+                # ERROR : Exception after Future was cancelled
+
+                # if not res:
+                #     raise http.HttpErrorUnauthorized
+
+                _self_origin.id_user = id_user
+                _self_origin.id_session = id_session
+
+                await funct(_self_origin, *args, **kwargs)
+                return
+
+            _self_origin.send_error(http.status.UNAUTHORIZED, message='Unauthorized',
+                                    id_message='UNAUTHORIZED')
+
+        return wrapper
+
+
 class route:
     uri = []
 

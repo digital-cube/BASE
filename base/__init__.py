@@ -15,7 +15,7 @@ from .src.base import test
 from .src.base import token
 from .src.base.app import Base
 from .src.base.app import api
-from .src.base.app import auth
+from .src.base.app import auth, auth_tortoise
 from .src.base.app import route
 from .src.base.app import run
 from .src.base.app import make_app
