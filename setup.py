@@ -1,11 +1,9 @@
 import os
-#import base
-
-VERSION = [3, 0, 0]
-__VERSION__ = '.'.join(map(str, VERSION))
-
 import platform
 from setuptools import setup
+
+from base import __VERSION__
+
 
 _dir = os.path.dirname(__file__)
 
@@ -30,28 +28,38 @@ setup(
     author_email='info@digitalcube.rs',
     description='Base3',
     long_description=long_description,
-
-    install_requires=['tornado',
-                      'bcrypt',
-                      'logfmt',
-                      'python-dateutil',
-                      'sendgrid',
-                      'aiotask-context',
-                      'alembic',
-                      'bcrypt',
-                      'psycopg2-binary',
-                      'PyJWT',
-                      'pyjwt-rsa',
-                      'PyYAML',
-                      'redis',
-                      'requests',
-                      'aerich',
-                      'tortoise-orm[asyncpg]',
-                      'tortoise-orm[accel]',
-                      'aiomysql'
-                      ],
+    install_requires=[
+        'aerich',
+        'aiomysql',
+        'aiotask-context',
+        'bcrypt',
+        'logfmt',
+        'psycopg2-binary',
+        'PyJWT',
+        'pyjwt-rsa',
+        'PyYAML',
+        'python-dateutil',
+        'redis',
+        'requests',
+        'tornado',
+        'tortoise-orm[asyncpg]',
+        'tortoise-orm[accel]',
+    ],
     package_data={
         'base': [
-            'src/base/config/config.example.yaml',
-    ]}
+            'src/base/config/config.yaml',
+    ]},
+    classifiers=[
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "Natural Language :: English",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
+        "Topic :: Software Development"
+    ],
 )

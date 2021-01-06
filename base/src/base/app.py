@@ -1,24 +1,27 @@
-import datetime
-import importlib
+import os
+import sys
 import json
-import logging
-import logging.config
-import traceback
 import uuid
-import tortoise
+import inspect
+import logging
 import asyncio
-from functools import wraps
-from inspect import isclass, signature
+import tortoise
+import argparse
+import datetime
+import traceback
+import importlib
+import tornado.web
+import tornado.ioloop
+import logging.config
+import dateutil.parser
+# import sqlalchemy.orm.attributes
 
 from typing import Any
-
-import dateutil.parser
-import sqlalchemy.orm.attributes
-import tornado.ioloop
-import tornado.web
-from tornado.httpclient import AsyncHTTPClient
-
+from functools import wraps
 from tortoise import Tortoise
+from typing import Optional, Awaitable
+from inspect import isclass, signature
+from tornado.httpclient import AsyncHTTPClient
 
 from . import http, token
 from .utils.log import log, set_log_context, clear_log_context
@@ -52,7 +55,6 @@ class Base(tornado.web.RequestHandler):
     _id_message: str = None
     _message: str = None
 
-    from typing import Optional, Awaitable
 
     def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
         pass
@@ -60,12 +62,10 @@ class Base(tornado.web.RequestHandler):
     def prepare(self) -> Optional[Awaitable[None]]:
         self.settings['serve_traceback'] = False
 
-        """
-        If the request came from another Base service, it will have a req_id header which can allow us to track a 
-        request chain easily between services.
-        
-        If there is no req_id header, then we create the request id on this initial Handler and pass it on if necessary.
-        """
+        # If the request came from another Base service, it will have a req_id header which can allow us to track a
+        # request chain easily between services.
+        #
+        # If there is no req_id header, then we create the request id on this initial Handler and pass it on if necessary.
         self.req_id = str(uuid.uuid4()) if 'req_id' not in self.request.headers else self.request.headers['req_id']
 
         set_log_context(
@@ -104,15 +104,14 @@ class Base(tornado.web.RequestHandler):
         :param level: The level (according to Python spec) of the log message severity
         """
 
-        """Find the caller function of the log method and log it as well (go back one frame essentially) """
-        import inspect
+        # Find the caller function of the log method and log it as well (go back one frame essentially)
         func = inspect.currentframe().f_back.f_code
 
         set_log_context(
             file=func.co_filename, line=func.co_firstlineno
         )
 
-        """Call the log method from utils which handles the full context and outputting to Loggers"""
+        # Call the log method from utils which handles the full context and outputting to Loggers
         log(
             self.logger,
             level,
@@ -125,24 +124,18 @@ class Base(tornado.web.RequestHandler):
     def write_error(self, status_code: int, **kwargs: Any) -> None:
         self.set_header('Content-Type', 'application/json; charset=UTF-8')
 
-        # print("WRITE_ERROR", kwargs)
-
-        """Add the request id to the error response for easier debugging and log finding"""
+        # Add the request id to the error response for easier debugging and log finding
         body = {'id_request': self.req_id}
 
-        """
-        Look for the message string we are adding to the Exception object
-        
-        If it is empty, check the handler for the private attribute _reason which can also have the Exception error message
-        """
+        # Look for the message string we are adding to the Exception object
+        #
+        # If it is empty, check the handler for the private attribute _reason which can also have the Exception error message
         if 'message' in kwargs and kwargs['message'] is not None:
             message = kwargs['message']
         else:
             message = self._reason
 
-        """
-        Look for the id_message string we are adding to the Exception object
-        """
+        # Look for the id_message string we are adding to the Exception object
         id_message = self._id_message if self._id_message else None
 
         body.update({
@@ -161,8 +154,7 @@ class Base(tornado.web.RequestHandler):
                 'id': id_message
             })
 
-        """Set the exc_info value in logging context for exception logging purposes"""
-        import sys
+        # Set the exc_info value in logging context for exception logging purposes
         exc_info = sys.exc_info()
         if exc_info != (None, None, None):
             set_log_context(exc_info=exc_info)
@@ -229,8 +221,6 @@ class api:
     def __init__(self, *args, **kwargs):
         self.skip_db = True if 'db' in kwargs and kwargs['db'] == False else False
         self.raw_output = True if 'raw_output' in kwargs and kwargs['raw_output'] == True else False
-
-        pass
 
     def __call__(self, funct):
 
@@ -364,21 +354,21 @@ class api:
                                         message=f"Invalid datatype, UUID type is expected for {pp.name}",
                                         id_message="INVALID_DATA_TYPE")
 
-                            elif isinstance(pp.annotation, sqlalchemy.orm.attributes.InstrumentedAttribute):
-
-                                cls = pp.annotation.class_
-                                scls = str(cls).replace("<class '", '').replace("'>", '')
-                                amodul = scls.split('.')
-                                modul = '.'.join(amodul[:-1])
-
-                                module = importlib.import_module(modul)
-
-                                cls = getattr(module, amodul[-1])
-
-                                if True:
-                                    res = _origin_self.orm_session.query(cls).filter(cls.id == value).one_or_none()
-
-                                    kwa[pp.name] = res
+                            # elif isinstance(pp.annotation, sqlalchemy.orm.attributes.InstrumentedAttribute):
+                            #
+                            #     cls = pp.annotation.class_
+                            #     scls = str(cls).replace("<class '", '').replace("'>", '')
+                            #     amodul = scls.split('.')
+                            #     modul = '.'.join(amodul[:-1])
+                            #
+                            #     module = importlib.import_module(modul)
+                            #
+                            #     cls = getattr(module, amodul[-1])
+                            #
+                            #     if True:
+                            #         res = _origin_self.orm_session.query(cls).filter(cls.id == value).one_or_none()
+                            #
+                            #         kwa[pp.name] = res
 
                             elif isinstance(pp.annotation, tortoise.fields.data.Field) and pp.annotation.pk:
                                 cls = pp.annotation.model
@@ -401,38 +391,6 @@ class api:
                                     kwa[pp.name] = await pp.annotation(**value)
                                 except:
                                     pass
-
-                            # elif issubclass(pp.annotation, sql_base):
-                            #     model_class = pp.annotation
-                            #
-                            #     # ukoliko id_user postoji u modelu, i ukoliko se radi u auth useru, znaci
-                            #     # da je user ulogovan, ako neko pokusava da upise id_usera, radi se o upravo ulogovanom
-                            #     # korisniku, ovo nije dobro jer se time id_user, rezervise za ovu akciju, sto moze
-                            #     # da zezne nekog ko to nema u vidu, takod a treba smisliti nesto bolje
-                            #
-                            #     if hasattr(model_class, 'id_user') and \
-                            #             'id_user' not in value and \
-                            #             hasattr(_origin_self, 'id_user'):
-                            #         value['id_user'] = _origin_self.id_user
-                            #
-                            #     try:
-                            #
-                            #         if hasattr(model_class, 'build'):
-                            #             kwa[pp.name] = model_class.build(value)
-                            #         else:
-                            #             # there is no builder, try to construct class
-                            #             kwa[pp.name] = model_class(**value)
-                            #     except TypeError as te:
-                            #         if 'missing' in str(te) and 'required' in str(te) and 'argument' in str(te):
-                            #             kwa[pp.name] = None
-                            #         else:
-                            #             raise http.HttpInvalidParam(str(te))
-                            #     except Exception as e:
-                            #         kwa[pp.name] = None
-                            #         # _origin_self.write(
-                            #         #     json.dumps(
-                            #         #         {"message": f"Invalid datatype {pp.annotation} error builiding object"}))
-                            #         # _origin_self.set_status(http.status.BAD_REQUEST)
 
                             elif isinstance(pp.annotation, tuple):
                                 cls, attr = pp.annotation
@@ -518,7 +476,6 @@ class api:
                 _origin_self._id_message = str(e.id_message)
 
                 kwargs = e._dict()
-                # print("KWARG", kwargs)
                 _origin_self.send_error(e.status(), reason=str(e.message), **kwargs)
 
             except http.BaseHttpException as e:
@@ -587,16 +544,12 @@ class auth:
 
                 if self.allowed_flags is not None:
                     if permissions is not None:
-                        # print("PROVERAVAM PERMISSIONS", "permissions:", permissions, "self.allowed_flags:",
-                        #       self.allowed_flags, "|:", permissions | self.allowed_flags, "&:",
-                        #       permissions & self.allowed_flags)
                         if permissions & self.allowed_flags == 0:
                             _self_origin.set_status(http.status.UNAUTHORIZED)
                             _self_origin.write('{"message":"unauthorized"}')
                             return
 
                 if res:
-                    # print("RES",res, 'id_user', id_user)
                     # on user service try to assign user
 
                     _self_origin.id_user = id_user
@@ -604,22 +557,11 @@ class auth:
 
                     _self_origin.user = None
 
-                    # try:
-                    #     usermodule = importlib.import_module('orm.models')
-                    #     _self_origin.user = _self_origin.orm_session.query(usermodule.User).filter(
-                    #         usermodule.User.id == id_user).one_or_none()
-                    # except Exception as e:
-                    #     _self_origin.user = None
-
                     await funct(_self_origin, *args, **kwargs)
                     return
 
-            #             _self_origin.set_status(http.status.UNAUTHORIZED)
-            #             _self_origin.write('{"message":"unauthorized"}')
-
             _self_origin.send_error(http.status.UNAUTHORIZED, message='Unauthorized',
                                     id_message='UNAUTHORIZED')
-
         return wrapper
 
 
@@ -708,8 +650,6 @@ class route:
 
     def __call__(self, cls):
 
-        # print("CLS", cls)
-
         scls = str(cls).replace("<class '", "").replace("'>", "")
         svc = scls.split('.')
 
@@ -723,32 +663,13 @@ class route:
         route_handler_names.add(self.handler_name)
         route.set_handler_names(route_handler_names)
 
-        # prefix = config.services.prefix if hasattr(config.services, 'prefix') else ''
-        #
-        # if svc[0] == 'services' and len(svc) > 2:
-        #     svc_name = svc[1]
-        #
-        #     scfg = config.services.svc(svc_name)
-        #     if 'api' in scfg and 'prefix' in scfg['api']:
-        #         prefix += scfg['api']['prefix']
-
-        # from base import registry
-        # prefix = registry.prefix()
-        # print('prefix:',prefix)
-
-        # prefix = ''
-
         prefix = route.get('prefix', '')
-        # print('pfx', prefix)
-        # prefix = '' if not hasattr(route, '_prefix') else route._prefix
 
         for duri in self.uri:
             uri = duri['route']
             default_prefix = prefix + ('/' if len(uri) > 0 and uri[0] != '/' else '')
             if duri['specified_prefix'] is not None:
                 default_prefix = duri['specified_prefix'].strip()
-                # if len(default_prefix) and default_prefix[-1] != '/':
-                #     default_prefix += '/'
 
             furi = default_prefix + uri
 
@@ -781,10 +702,7 @@ async def depricated_IPC(request, service: str, method: str, relative_uri: str, 
 
         try:
             _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False)
-            # print(f"IPC URI on service {service}", uri)
             result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
-            # print("RES", result)
-            # print("_"*100)
         except Exception as e:
             msg = str(e)
             try:
@@ -812,11 +730,19 @@ def make_app(**kwargs):
 
     from base import config
     config.init_logging()
+    _tronado_settings = config.conf['tornado_settings']
 
-    return tornado.web.Application(route.handlers(readonly=readonly),
-                                   debug=debug,
-                                   default_handler_class=default_handler_class,
-                                   log_function=Base.log_function)
+    # present all api modules
+    for api_module in config.conf['APIs']:
+        importlib.import_module(api_module)
+
+    return tornado.web.Application(
+        route.handlers(readonly=readonly),
+        debug=debug,
+        default_handler_class=default_handler_class,
+        log_function=Base.log_function,
+        **_tronado_settings
+    )
 
 
 async def init_orm():
@@ -827,21 +753,91 @@ async def init_orm():
     )
 
 
+def get_the_caller():
+    '''
+    Returns a dictionary with information about the running top level Python
+    script:
+    ---------------------------------------------------------------------------
+    dir:    directory containing script or compiled executable
+    name:   name of script or executable
+    source: name of source code file
+    ---------------------------------------------------------------------------
+    "name" and "source" are identical if and only if running interpreted code.
+    When running code compiled by py2exe or cx_freeze, "source" contains
+    the name of the originating Python script.
+    If compiled by PyInstaller, "source" contains no meaningful information.
+    
+    ============================================================================
+    from :
+
+    https://code.activestate.com/recipes/579018-python-determine-name-and-directory-of-the-top-lev/
+
+    MIT Licence
+    '''
+
+    # ---------------------------------------------------------------------------
+    # scan through call stack for caller information
+    # ---------------------------------------------------------------------------
+    for teil in inspect.stack():
+        # skip system calls
+        if teil[1].startswith("<"):
+            continue
+        if teil[1].upper().startswith(sys.exec_prefix.upper()):
+            continue
+        trc = teil[1]
+
+    # trc contains highest level calling script name
+    # check if we have been compiled
+    if getattr(sys, 'frozen', False):
+        scriptdir, scriptname = os.path.split(sys.executable)
+        return {"dir": scriptdir,
+                "name": scriptname,
+                "source": trc}
+
+    # from here on, we are in the interpreted case
+    scriptdir, trc = os.path.split(trc)
+    # if trc did not contain directory information,
+    # the current working directory is what we need
+    if not scriptdir:
+        scriptdir = os.getcwd()
+
+    scr_dict = {"name": trc,
+                "source": trc,
+                "dir": scriptdir}
+    return scr_dict
+
+def parse_arguments(**kwargs):
+
+    from base import config
+    from base import __VERSION__
+    _app_name = get_the_caller()['name'] if config.conf["default_config"] else config.conf['name']
+    _app_port = kwargs['port'] if 'port' in kwargs else config.conf['port'] if 'port' in config.conf else 9000
+
+    argument_parser = argparse.ArgumentParser(prog=_app_name or os.getcwd())
+    argument_parser.add_argument('-p', '--port', default=_app_port, help='Application port')
+    argument_parser.add_argument('-V', '--verbose', help='Run application with more verbose output', action='store_true')
+    argument_parser.add_argument('-v', '--version', action='version',
+                                 version=f'{_app_name} v{config.conf["app_version"]} (base3 v{__VERSION__})',
+                                 help='Print app version and exit')
+    _args = argument_parser.parse_args()
+    _args.prog = argument_parser.prog
+    return _args
+
 def run(**kwargs):
     from base import config
-
-    if 'port' in kwargs:
-        port = kwargs['port']
-    else:
-        port = config.conf['port'] if 'port' in config.conf else 9000
+    args = parse_arguments(**kwargs)
 
     app = make_app(**kwargs)
-    print(f'listening on port {port}')
-    app.listen(port)
-    loops = tornado.ioloop.IOLoop.current()
-    loops.run_sync(init_orm)
 
-    route.print_all_routes()
+    print(f'{args.prog} listen on port {args.port}')
+    app.listen(args.port)
+    loops = tornado.ioloop.IOLoop.current()
+
+    if config.conf["use_database"]:
+        loops.run_sync(init_orm)
+
+    if args.verbose:
+        route.print_all_routes()
 
     try:
         loops.start()

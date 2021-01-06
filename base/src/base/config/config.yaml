@@ -9,7 +9,9 @@ app_version: '0.0.1'
 # Application host location
 host: 'localhost'
 # Port on which the application will listen to requests
-port: &port 9000
+port: 9000
+# Tornado Application additional settings
+tornado_settings: {}
 
 store:
   # Which type of common data store and registry will be used (currently supports 'redis' and 'memory' types)
@@ -19,20 +21,36 @@ store:
   # Port for the Redis server
   port: '6379'
 
+# Use database in an application
+use_database: false
+
+# APIs
+APIs: []
+
 db:
   # Database to be used by the application
   # Currently supported: 'postgres'
   type: 'postgres'
-  # Database port
   port: 5432
-  # Database host
   host: 'localhost'
-  # Database username
   username: 'base'
-  # Database password
   password: 'base'
-  # Database name
   database: 'base'
+
+tortoise:
+  # Tortoise ORM base configuration
+  connections:
+    default:
+      engine: 'tortoise.backends.asyncpg'
+  apps:
+    base:
+      models:
+#        - 'models.users'
+#        - 'aerich.models'
+      # If no default_connection specified, defaults to 'default'
+      default_connection: 'default'
+  use_tz: false
+  timezone: 'UTC'
 
 authorization:
   # Header to read for the Authorization key

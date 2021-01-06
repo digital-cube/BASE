@@ -1,0 +1,7 @@
+#### 4.0.0
+- tortoise orm implementation
+- rename base config yaml file
+- remove all unnecessary prints and comments
+- add argument parser
+- detect app name from client configuration or start file
+- print app version with base version
