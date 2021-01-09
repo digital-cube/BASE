@@ -1,6 +1,6 @@
 import sys
 import time
-import base
+import base3t as base
 import json
 import psycopg2
 

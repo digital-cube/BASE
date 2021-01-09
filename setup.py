@@ -14,15 +14,15 @@ with open('README.rst') as f:
     long_description = f.read()
 
 setup(
-    name='base3',
+    name='base3t',
     version=__VERSION__,
-    packages=['base',
-              'base.src',
-              'base.src.base',
-              'base.src.base.common',
-              'base.src.base.config',
-              'base.src.base.helpers',
-              'base.src.base.utils',
+    packages=['base3t',
+              'base3t.src',
+              'base3t.src.base',
+              'base3t.src.base.common',
+              'base3t.src.base.config',
+              'base3t.src.base.helpers',
+              'base3t.src.base.utils',
               ],
     url='https://base3.dev',
     license='https://www.gnu.org/licenses/gpl-3.0.en.html',
@@ -51,7 +51,7 @@ setup(
                       'aiomysql'
                       ],
     package_data={
-        'base': [
+        'base3t': [
             'src/base/config/config.example.yaml',
     ]}
 )

@@ -7,7 +7,7 @@ _last = None
 
 test = False
 test_port = None
-import base
+import base3t as base
 
 
 def registered(svc_name):

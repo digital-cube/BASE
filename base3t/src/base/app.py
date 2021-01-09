@@ -810,7 +810,7 @@ def make_app(**kwargs):
 
     readonly = kwargs['readonly'] if 'readonly' in kwargs else False
 
-    from base import config
+    from base3t import config
     config.init_logging()
 
     return tornado.web.Application(route.handlers(readonly=readonly),
@@ -820,7 +820,7 @@ def make_app(**kwargs):
 
 
 async def init_orm():
-    from base import config
+    from base3t import config
 
     await Tortoise.init(
         config=config.tortoise_config()
@@ -828,7 +828,7 @@ async def init_orm():
 
 
 def run(**kwargs):
-    from base import config
+    from base3t import config
 
     if 'port' in kwargs:
         port = kwargs['port']

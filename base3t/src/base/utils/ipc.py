@@ -1,8 +1,8 @@
 import json
 
 from tornado.httpclient import AsyncHTTPClient
-import base
-from base import http
+import base3t as base
+from base3t import http
 import logging
 import os
 
@@ -20,7 +20,6 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
         raise http.HttpInternalServerError(id_message='IPC_READONLY_SUPPORTED_ONLY_FOR_GET_METHOD',
                                            message='Readonly flag for not get metod')
 
-    import base
     if base.registry.test and base.config.conf['apptype'] == 'micro-service':
         return None
 

@@ -3,7 +3,7 @@ import datetime
 from typing import Union
 
 from .store import Store
-from base.src.base.registry import public_key
+from base3t.src.base.registry import public_key
 
 
 def token2user(token) -> Union[dict, bool]:

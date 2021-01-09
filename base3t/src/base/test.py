@@ -78,7 +78,7 @@ class BaseTest(AsyncHTTPTestCase):
         if method in ('GET', 'DELETE'):
             body = None
 
-        from base import config
+        from base3t import config
         headers = {config.conf['authorization']['key']: token} if token else {}
 
         import time
