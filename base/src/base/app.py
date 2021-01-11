@@ -5,6 +5,8 @@ import logging
 import logging.config
 import traceback
 import uuid
+import tortoise
+import asyncio
 from functools import wraps
 from inspect import isclass, signature
 
@@ -15,6 +17,8 @@ import sqlalchemy.orm.attributes
 import tornado.ioloop
 import tornado.web
 from tornado.httpclient import AsyncHTTPClient
+
+from tortoise import Tortoise
 
 from . import http, token
 from .orm import sql_base
@@ -353,6 +357,14 @@ class api:
                                         message=f"Invalid datatype, float type is expected for {pp.name}",
                                         id_message="INVALID_DATA_TYPE")
 
+                            elif pp.annotation == uuid.UUID and not type(value) == uuid.UUID:
+                                try:
+                                    value = uuid.UUID(value)
+                                except:
+                                    raise http.General4xx(
+                                        message=f"Invalid datatype, UUID type is expected for {pp.name}",
+                                        id_message="INVALID_DATA_TYPE")
+
                             elif isinstance(pp.annotation, sqlalchemy.orm.attributes.InstrumentedAttribute):
 
                                 cls = pp.annotation.class_
@@ -368,6 +380,28 @@ class api:
                                     res = _origin_self.orm_session.query(cls).filter(cls.id == value).one_or_none()
 
                                     kwa[pp.name] = res
+
+                            elif isinstance(pp.annotation, tortoise.fields.data.Field) and pp.annotation.pk:
+                                cls = pp.annotation.model
+                                print(cls)
+
+                                scls = str(cls).replace("<class '", '').replace("'>", '')
+                                amodul = scls.split('.')
+                                modul = '.'.join(amodul[:-1])
+
+                                module = importlib.import_module(modul)
+
+                                cls = getattr(module, amodul[-1])
+
+                                field_name = pp.annotation.model_field_name
+
+                                kwa[pp.name] = await cls.filter(**{field_name: value}).get_or_none()
+
+                            elif type(pp.annotation) != tuple and issubclass(pp.annotation, tortoise.models.Model):
+                                try:
+                                    kwa[pp.name] = await pp.annotation(**value)
+                                except:
+                                    pass
 
                             elif issubclass(pp.annotation, sql_base):
                                 model_class = pp.annotation
@@ -401,6 +435,11 @@ class api:
                                     #         {"message": f"Invalid datatype {pp.annotation} error builiding object"}))
                                     # _origin_self.set_status(http.status.BAD_REQUEST)
 
+                            elif isinstance(pp.annotation, tuple):
+                                cls, attr = pp.annotation
+                                kwa[pp.name] = await cls.filter(**{attr: value}).get_or_none()
+                                pass
+
                             elif isinstance(pp.annotation, type(Any)):
 
                                 pass
@@ -421,7 +460,8 @@ class api:
 
                                     _origin_self.write(
                                         json.dumps(
-                                            {"message": f"Mandatory argument {pp.name} missing in input request"}, ensure_ascii=False))
+                                            {"message": f"Mandatory argument {pp.name} missing in input request"},
+                                            ensure_ascii=False))
                                     _origin_self.set_status(http.status.BAD_REQUEST)
                                     return
 
@@ -470,7 +510,7 @@ class api:
                     else:
                         try:
                             _origin_self.set_header('Content-Type', 'application/json; charset=UTF-8')
-                            prepared_response = json.dumps(response, ensure_ascii=False)
+                            prepared_response = json.dumps(response, ensure_ascii=False, default=lambda o: str(o))
                             _origin_self.write(prepared_response)
                         except Exception as e:
                             _origin_self.write(response)
@@ -763,6 +803,9 @@ def make_app(**kwargs):
     debug = True
     default_handler_class = NotFoundHandler
 
+    from base import config
+    config.init_logging()
+
     if 'default_handler_class' in kwargs:
         default_handler_class = kwargs['default_handler_class']
 
@@ -777,6 +820,14 @@ def make_app(**kwargs):
                                    log_function=Base.log_function)
 
 
+async def init_orm():
+    from base import config
+
+    await Tortoise.init(
+        config=config.tortoise_config()
+    )
+
+
 def run(**kwargs):
     from base import config
 
@@ -785,12 +836,15 @@ def run(**kwargs):
     else:
         port = config.conf['port'] if 'port' in config.conf else 9000
 
-    config.init_logging()
-
     app = make_app(**kwargs)
     print(f'listening on port {port}')
     app.listen(port)
+    loops = tornado.ioloop.IOLoop.current()
+    # loops.run_sync(init_orm)
 
     route.print_all_routes()
 
-    tornado.ioloop.IOLoop.current().start()
+    try:
+        loops.start()
+    finally:
+        asyncio.get_event_loop().run_until_complete(Tortoise.close_connections())
