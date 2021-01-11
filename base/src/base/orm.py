@@ -196,7 +196,7 @@ def activate_orm(db_config: dict):
 
 
 class BaseSql(_BaseSql):
-    id = Column(UUID, primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     created = Column(TIMESTAMP, index=True)
 
     def __init__(self, **kwargs):

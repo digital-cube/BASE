@@ -840,7 +840,7 @@ def run(**kwargs):
     print(f'listening on port {port}')
     app.listen(port)
     loops = tornado.ioloop.IOLoop.current()
-    # loops.run_sync(init_orm)
+    loops.run_sync(init_orm)
 
     route.print_all_routes()
 
