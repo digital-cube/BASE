@@ -137,5 +137,18 @@ class config:
 
         return tort_conf
 
+    @staticmethod
+    def get_db_url(test=False) -> str:
+        """
+        Get database connection url, e.g.:
+        postgres://_username_:123@127.0.0.1:5432/test_openwaste_users
+
+        :return: str - db url
+        """
+
+        _db_name = f'{"test_" if test else ""}{config.conf["db"]["database"]}'
+        return f'postgres://{config.conf["db"]["username"]}:{config.conf["db"]["password"]}@{config.conf["db"]["host"]}:{config.conf["db"]["port"]}/{_db_name}'
+
+
 
 config.load_default_options()
