@@ -403,7 +403,7 @@ class api:
                                 except:
                                     pass
 
-                            elif issubclass(pp.annotation, sql_base):
+                            elif isclass(pp.annotation) and issubclass(pp.annotation, sql_base):
                                 model_class = pp.annotation
 
                                 # ukoliko id_user postoji u modelu, i ukoliko se radi u auth useru, znaci
