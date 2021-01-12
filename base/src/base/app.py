@@ -781,7 +781,8 @@ async def depricated_IPC(request, service: str, method: str, relative_uri: str, 
             headers[config.conf['authorization']['key']] = request.headers[config.conf['authorization']['key']]
 
         try:
-            _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False)
+            _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False, default=lambda o: str(o))
+
             # print(f"IPC URI on service {service}", uri)
             result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
             # print("RES", result)
