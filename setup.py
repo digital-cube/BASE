@@ -1,8 +1,8 @@
 import os
-import platform
+# import platform
 from setuptools import setup
 
-from base import __VERSION__
+__VERSION__ = '3.0.0'
 
 
 _dir = os.path.dirname(__file__)
