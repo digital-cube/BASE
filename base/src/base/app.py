@@ -525,7 +525,8 @@ class api:
 
                                 return res
 
-                            response = ttt(response)
+                            if type(response)==dict:
+                                response = ttt(response)
 
                             prepared_response = json.dumps(response, ensure_ascii=False, default=lambda o: str(o))
                             _origin_self.write(prepared_response)
