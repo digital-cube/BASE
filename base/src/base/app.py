@@ -510,6 +510,23 @@ class api:
                     else:
                         try:
                             _origin_self.set_header('Content-Type', 'application/json; charset=UTF-8')
+
+                            def ttt(dct):
+                                res = {}
+                                for key in dct.keys():
+                                    k = key
+                                    if type(key) == uuid.UUID:
+                                        k = str(key)
+
+                                    res[k] = dct[key]
+
+                                    if type(res[k]) == dict:
+                                        res[k] = ttt(res[k])
+
+                                return res
+
+                            response = ttt(response)
+
                             prepared_response = json.dumps(response, ensure_ascii=False, default=lambda o: str(o))
                             _origin_self.write(prepared_response)
                         except Exception as e:
@@ -762,42 +779,6 @@ class route:
             route.register_handler(furi, cls)
         return cls
 
-
-async def depricated_IPC(request, service: str, method: str, relative_uri: str, body: dict = None, abs_uri: str = None):
-    from . import registry
-
-    if registry.registered(service):
-        http_client = AsyncHTTPClient()
-
-        if abs_uri:
-            uri = f'{registry.address(service)}{abs_uri}'
-        else:
-            uri = f'{registry.address(service)}{registry.prefix(service)}{relative_uri}'
-        method = method.upper()
-        headers = {}
-
-        from base import config
-        if request and request.headers and config.conf['authorization']['key'] in request.headers:
-            headers[config.conf['authorization']['key']] = request.headers[config.conf['authorization']['key']]
-
-        try:
-            _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False, default=lambda o: str(o))
-
-            # print(f"IPC URI on service {service}", uri)
-            result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
-            # print("RES", result)
-            # print("_"*100)
-        except Exception as e:
-            msg = str(e)
-            try:
-                msg = json.loads(e.response.body.decode('utf-8'))
-            except:
-                pass
-            return False, msg
-
-        return True, json.loads(result.body) if result.body else None
-
-    return False, f"Service {service} is not registered"
 
 
 def make_app(**kwargs):
