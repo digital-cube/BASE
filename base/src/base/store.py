@@ -64,7 +64,7 @@ class Store:
 
 
 def set(key, value):
-    Store.set(key, str(value))
+    Store.set(str(key), value)
 
 
 def get(key):
