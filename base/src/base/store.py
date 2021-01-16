@@ -8,7 +8,7 @@ class DictStore:
 
     def get(self, key):
         key = str(key)
-        return DictStore.store[key]
+        return DictStore.store[key] if key in DictStore.store else None
 
     def flushall(self):
         DictStore.store = {}
@@ -24,6 +24,11 @@ class DictStore:
                 ret += 1
 
         return ret
+
+    def delete(self, *names):
+        for key in names:
+            if key in DictStore.store:
+                del DictStore.store[key]
 
 
 class Store:
@@ -62,6 +67,10 @@ class Store:
     def flushall():
         Store.engine.flushall()
 
+    @staticmethod
+    def delete(*names):
+        Store.engine.delete(*names)
+
 
 def set(key, value):
     Store.set(key, value)
@@ -81,3 +90,7 @@ def flushall():
 
 def rpush(queue_name, value):
     Store.rpush(queue_name, value)
+
+def delete(*names):
+    "Delete one or more keys specified by ``names``"
+    Store.delete(*names)

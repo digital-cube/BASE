@@ -829,7 +829,7 @@ def run(**kwargs):
 
     app = make_app(**kwargs)
 
-    print(f'{args.prog} listen on port {args.port}')
+    print(f'{args.prog} listen on port {args.port}: http://localhost:{args.port}{kwargs["about"] if "about" in kwargs else ""}')
     app.listen(args.port)
     loops = tornado.ioloop.IOLoop.current()
 
