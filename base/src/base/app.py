@@ -400,7 +400,8 @@ class api:
                             elif type(pp.annotation) != tuple and issubclass(pp.annotation, tortoise.models.Model):
                                 try:
                                     kwa[pp.name] = await pp.annotation(**value)
-                                except:
+                                except Exception as e:
+                                    print("E",e)
                                     pass
 
                             elif isclass(pp.annotation) and issubclass(pp.annotation, sql_base):

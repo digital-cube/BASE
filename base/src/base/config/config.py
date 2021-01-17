@@ -124,14 +124,14 @@ class config:
         """
         tort_conf = config.conf['tortoise']
 
-        for connection in tort_conf['connections']:
-            tort_conf['connections'][connection]['credentials'] = {
-                'host': config.conf['db']['host'],
-                'port': config.conf['db']['port'],
-                'user': config.conf['db']['username'],
-                'password': config.conf['db']['password'],
-                'database': config.conf['db']['database'],
-            }
+        # for connection in tort_conf['connections']:
+        #     tort_conf['connections'][connection]['credentials'] = {
+        #         'host': config.conf['db']['host'],
+        #         'port': config.conf['db']['port'],
+        #         'user': config.conf['db']['username'],
+        #         'password': config.conf['db']['password'],
+        #         'database': config.conf['db']['database'],
+        #     }
 
         return tort_conf
 
