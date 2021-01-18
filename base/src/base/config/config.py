@@ -20,11 +20,6 @@ class config:
 
         :param config_dictionary: The dictionary with the settings for the App.
         """
-        
-        # if config.initialized:
-        #     return
-        
-        
         config.load_default_options()
 
         config.conf.update(config_dictionary)
@@ -53,9 +48,9 @@ class config:
 
         def use_value_from_env(d):
             '''
-            TODO:
-            :param d:
-            :return:
+            Read value for configuration from an environment variable with the same name as in the config file
+            :param d: dict - dictionary of settings from yaml file or nested configuration
+            :return: void
             '''
             for key in d:
                 v = d[key]
@@ -65,6 +60,8 @@ class config:
                     d[key] = os.getenv(v[1:], '')
 
         use_value_from_env(config_yaml)
+        # trace if client defined it's own configuration
+        config_yaml["default_config"] = True
 
         return config_yaml
 
@@ -75,9 +72,6 @@ class config:
         :param path:
         """
 
-        # if config.initialized:
-        #     return
-        
         config.load_default_options()
 
         config.conf.update(config.__parse_yaml(path))
@@ -94,12 +88,12 @@ class config:
 
         from ..registry import register
         register(config.conf)
-        # config.initialized = True
+        config.conf["default_config"] = False
 
     @staticmethod
     def load_default_options():
         import os
-        config.conf = config.__parse_yaml(os.path.dirname(os.path.realpath(__file__)) + '/config.example.yaml')
+        config.conf = config.__parse_yaml(os.path.dirname(os.path.realpath(__file__)) + '/config.yaml')
 
     @staticmethod
     def load_private_key(path: str) -> None:
@@ -124,16 +118,19 @@ class config:
         """
         tort_conf = config.conf['tortoise']
 
-        # for connection in tort_conf['connections']:
-        #     tort_conf['connections'][connection]['credentials'] = {
-        #         'host': config.conf['db']['host'],
-        #         'port': config.conf['db']['port'],
-        #         'user': config.conf['db']['username'],
-        #         'password': config.conf['db']['password'],
-        #         'database': config.conf['db']['database'],
-        #     }
-
         return tort_conf
+
+    @staticmethod
+    def get_db_url(test=False) -> str:
+        """
+        Get database connection url, e.g.:
+        postgres://_username_:123@127.0.0.1:5432/test_openwaste_users
+
+        :return: str - db url
+        """
+
+        _db_name = f'{"test_" if test else ""}{config.conf["db"]["database"]}'
+        return f'postgres://{config.conf["db"]["username"]}:{config.conf["db"]["password"]}@{config.conf["db"]["host"]}:{config.conf["db"]["port"]}/{_db_name}'
 
 
 config.load_default_options()
