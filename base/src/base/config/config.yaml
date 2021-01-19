@@ -1,49 +1,35 @@
-# Name of the application
-name: 'base_app'
-# Description of the application
-description: 'base3 application'
-# Route prefixes to be prepended to all routes
-prefix: ''
-# Current version of the app
-app_version: '0.0.1'
-# Application host location
-host: 'localhost'
-# Port on which the application will listen to requests
-port: 9000
-# Tornado Application additional settings
-tornado_settings: {}
-# More verbose output
-verbose: true
+name: 'base_app'                                # Name of the application
+description: 'base3 application'                # Description of the application
+prefix: ''                                      # Route prefixes to be prepended to all routes
+app_version: '0.0.1'                            # Current version of the app
+host: 'localhost'                               # Application host location
+port: 9000                                      # Port on which the application will listen to requests
+tornado_settings: {}                            # Tornado Application additional settings
+verbose: true                                   # More verbose output
 
 store:
-  # Which type of common data store and registry will be used (currently supports 'redis' and 'memory' types)
-  type: 'redis'
-  # Location of the Redis server
-  host: 'localhost'
-  # Port for the Redis server
-  port: '6379'
+  type: 'redis'                                 # Which type of common data store and registry will be used ('redis', 'memory')
+  host: 'localhost'                             # Location of the Redis server
+  port: '6379'                                  # Port for the Redis server
 
-# Use database in an application
-use_database: false
+use_database: false                             # Use database in an application
 
 # APIs
 APIs: []
 
-db:
-  # Database to be used by the application
-  # Currently supported: 'postgres'
-  type: 'postgres'
+db: &db                                         # Database to be used by the application
+  type: 'postgres'                              # Currently supported: 'postgres'
   port: 5432
   host: 'localhost'
   username: 'base'
   password: 'base'
   database: 'base'
 
-tortoise:
-  # Tortoise ORM base configuration
+tortoise:                                       # Tortoise ORM base configuration
   connections:
     default:
       engine: 'tortoise.backends.asyncpg'
+      credentials: *db
   apps:
     base:
       models:
@@ -55,8 +41,7 @@ tortoise:
   timezone: 'UTC'
 
 authorization:
-  # Header to read for the Authorization key
-  key: 'Authorization'
+  key: 'Authorization'                          # Header to read for the Authorization key
 
 logging:
   version: 1
@@ -69,7 +54,7 @@ logging:
   handlers:
     console:
       class: logging.StreamHandler
-      level: WARNING
+      level: INFO
       formatter: brief
       stream: ext://sys.stdout
     file:

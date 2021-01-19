@@ -1,18 +1,3 @@
 pip --install-option=--upgrade
-pygments
-twine
 wheel
-tortoise
-aerich
-aiomysql
-aiotask-context
-bcrypt
-logfmt
-psycopg2-binary
-PyJWT
-pyjwt-rsa
-PyYAML
-python-dateutil
-redis
-requests
-tornado
+twine

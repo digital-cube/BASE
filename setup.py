@@ -1,5 +1,4 @@
 import os
-# import platform
 from setuptools import setup
 
 __VERSION__ = '3.0.0'

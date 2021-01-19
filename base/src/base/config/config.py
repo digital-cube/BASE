@@ -1,5 +1,6 @@
 import os
 import sys
+import copy
 import logging
 import logging.config
 
@@ -124,16 +125,12 @@ class config:
         make sure the structure of the config is adjusted
         :return: dict
         """
-        tort_conf = config.conf['tortoise']
+        tort_conf = copy.deepcopy(config.conf['tortoise'])
 
+        # remove unwanted parts
         for connection in tort_conf['connections']:
-            tort_conf['connections'][connection]['credentials'] = {
-                'host': config.conf['db']['host'],
-                'port': config.conf['db']['port'],
-                'user': config.conf['db']['username'],
-                'password': config.conf['db']['password'],
-                'database': config.conf['db']['database'],
-            }
+            if 'type' in tort_conf['connections'][connection]['credentials']:
+                del tort_conf['connections'][connection]['credentials']['type']
 
         return tort_conf
 
@@ -147,7 +144,7 @@ class config:
         """
 
         _db_name = f'{"test_" if test else ""}{config.conf["db"]["database"]}'
-        return f'postgres://{config.conf["db"]["username"]}:{config.conf["db"]["password"]}@{config.conf["db"]["host"]}:{config.conf["db"]["port"]}/{_db_name}'
+        return f'postgres://{config.conf["db"]["user"]}:{config.conf["db"]["password"]}@{config.conf["db"]["host"]}:{config.conf["db"]["port"]}/{_db_name}'
 
 
 

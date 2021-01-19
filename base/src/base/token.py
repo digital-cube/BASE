@@ -1,4 +1,5 @@
 import jwt
+import json
 import datetime
 from typing import Union
 
@@ -18,21 +19,24 @@ def token2user(token) -> Union[dict, bool]:
     except Exception as e:
         return False
 
-    active = Store.get(decoded['id'])
+    token_data = Store.get(decoded['id'])
 
     now = int(datetime.datetime.now().timestamp())
 
     try:
 
-        if active == b'1':
-
-            res = {}
+        token_data = str(token_data, 'utf8')
+        token_data = json.loads(token_data)
+        if 'active' in token_data and token_data['active']:
 
             if 'exp' in decoded and decoded['exp']:
                 if now > decoded['exp']:
                     return False
 
-            res['id'] = decoded['id']
+            res = {
+                'user': token_data
+            }
+            res['id_session'] = decoded['id']
             res['id_user'] = decoded['id_user'] if 'id_user' in decoded else None
             res['permissions'] = decoded['permissions'] if 'permissions' in decoded else None
 

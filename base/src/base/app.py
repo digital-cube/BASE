@@ -530,13 +530,11 @@ class auth:
                 res = token.token2user(_token)
 
                 id_user = res['id_user'] if res and 'id_user' in res else None
+                user  = res['user']
                 id_session = res['id'] if res and 'id' in res else None
 
-                # ?!? iz nekog razloga je prestalo da sljaka
-                # ERROR : Exception after Future was cancelled
-
-                # if not res:
-                #     raise http.HttpErrorUnauthorized
+                if not res:
+                    raise http.HttpErrorUnauthorized
 
                 permissions = res['permissions'] if res and 'permissions' in res else None
 
@@ -553,9 +551,8 @@ class auth:
                     # on user service try to assign user
 
                     _self_origin.id_user = id_user
+                    _self_origin.user = user
                     _self_origin.id_session = id_session
-
-                    _self_origin.user = None
 
                     await funct(_self_origin, *args, **kwargs)
                     return
