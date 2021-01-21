@@ -24,9 +24,10 @@ from inspect import isclass, signature
 from tornado.httpclient import AsyncHTTPClient
 
 from . import http, token
-from .utils.log import log, set_log_context, clear_log_context
+from .utils.log import log, set_log_context, clear_log_context, message_from_context, get_log_context
 
 LocalOrmModule = None
+base_logger = logging.getLogger('base')
 
 
 class NotFoundHandler(tornado.web.RequestHandler):
@@ -171,6 +172,12 @@ class Base(tornado.web.RequestHandler):
         self.finish(body)
 
     def log_exception(self, typ, value, tb) -> None:
+        from base import config
+        if not config.conf['verbose']:
+            _message = message_from_context()
+            base_logger.critical(_message)
+            return
+
         if isinstance(value, tornado.web.HTTPError):
             if value.log_message:
                 msg = value.log_message % value.args
@@ -193,6 +200,16 @@ class Base(tornado.web.RequestHandler):
 
     @staticmethod
     def log_function(handler: tornado.web.RequestHandler) -> None:
+
+        from base import config
+        if not config.conf['verbose']:
+            # stop logging every call except it is an exception
+            context = get_log_context()
+            if 'exc_info' in context:
+                _message = message_from_context()
+                base_logger.critical(_message)
+            return
+
         logger = getattr(handler, 'logger',
                          logging.getLogger('base'))
         if handler.get_status() < 400:
@@ -302,6 +319,24 @@ class api:
                                 raise http.General4xx(message=f"Invalid datatype, int type is expected for {pp.name}",
                                                       id_message="INVALID_DATA_TYPE")
 
+                            elif pp.annotation == dict:
+                                if type(value) != dict:
+                                    if type(value) == str:
+                                        try:
+                                            value = json.loads(value)
+                                        except json.JSONDecodeError as e:
+                                            base_logger.error(f'Can not load dict from string -> {value}: {e}')
+                                            raise http.General4xx(
+                                                message=f"Invalid data type {type(value)} for {value}",
+                                                id_message="INVALID_DATA_TYPE")
+
+                                    else:
+                                        base_logger.error(f'Can not cast to dict type {type(value)} value {value}')
+                                        raise http.General4xx(
+                                            message=f"Invalid data type {type(value)} for {value}",
+                                            id_message="INVALID_DATA_TYPE")
+                                # else do nothing with the value
+
                             elif pp.annotation == int and not type(value) == int:
                                 try:
                                     if '.' in value:
@@ -386,16 +421,23 @@ class api:
 
                                 kwa[pp.name] = await cls.filter(**{field_name: value}).get_or_none()
 
-                            elif type(pp.annotation) != tuple and issubclass(pp.annotation, tortoise.models.Model):
+                            elif not isinstance(pp.annotation, tuple) and issubclass(pp.annotation, tortoise.models.Model):
                                 try:
                                     kwa[pp.name] = await pp.annotation(**value)
-                                except:
+                                except Exception as e:
                                     pass
 
                             elif isinstance(pp.annotation, tuple):
                                 cls, attr = pp.annotation
-                                kwa[pp.name] = await cls.filter(**{attr: value}).get_or_none()
-                                pass
+                                try:
+                                    kwa[pp.name] = await cls.filter(**{attr: value}).get_or_none()
+                                except tortoise.exceptions.OperationalError as e:
+                                    _cls_name = cls.__name__
+                                    base_logger.error(f'Error getting {_cls_name} with {attr} {value}: {e}')
+
+                                    raise http.General4xx(
+                                        message=f"Invalid data {value} for {attr} {_cls_name} or {_cls_name} not found",
+                                        id_message="INVALID_DATA_TYPE")
 
                             elif isinstance(pp.annotation, type(Any)):
 
@@ -823,6 +865,8 @@ def parse_arguments(**kwargs):
 def run(**kwargs):
     from base import config
     args = parse_arguments(**kwargs)
+    if args.verbose:
+        config.conf['verboase'] = args.verbose
 
     app = make_app(**kwargs)
 

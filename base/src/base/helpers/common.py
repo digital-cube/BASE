@@ -1,31 +1,4 @@
-import bcrypt
 import datetime
-
-
-def format_password(username, password):
-    """
-    Format user's password, salt it with the username.
-    For changing the username there has to be a password provided
-    :param username: user's username
-    :param password: user's password
-    :return: bcrypt-ed password
-    """
-
-    return bcrypt.hashpw('{}{}'.format(username, password).encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-
-def password_match(username, password, db_password) -> bool:
-    """
-    Check if the user's provided password match the one in the database, with bcrypt
-    :param username: provided by an user
-    :param password: provided by an user
-    :param db_password: user's bcrypt-ed password from the database
-    :return: True if provided credentials match, otherwise False
-    """
-
-    generated_password = '{}{}'.format(username, password).encode('utf-8')
-    database_password = db_password.encode('utf-8')
-    return database_password == bcrypt.hashpw(generated_password, database_password)
 
 
 def get_request_ip(request_handler):
@@ -37,6 +10,24 @@ def get_request_ip(request_handler):
     _proxy_ip = request_handler.request.headers.get('X-Forwarded-For')
     _ip = _proxy_ip or request_handler.request.remote_ip
     return _ip
+
+
+def get_pages_counts(total_number_of_elements, limit, offset):
+    """
+    Calculate current page and total pages
+    :param total_number_of_elements: int - number of elements for calculating page numbers
+    :param limit: int - limit of elements to be shown on a page
+    :param offset: int - offset for elements
+    :return:
+        total_pages - int - number of total pages for given number of elements
+        current_page - int - number of a current page for given number of elements and a limit
+    """
+    _total_pages = (total_number_of_elements // limit) or 1
+    if _total_pages * limit < total_number_of_elements:
+        _total_pages += 1
+    _current_page = offset // limit + 1
+
+    return _total_pages, _current_page
 
 
 def filter_only_allowed_keys(allowed: list, source: list):
