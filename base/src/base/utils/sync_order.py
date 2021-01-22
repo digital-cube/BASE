@@ -54,16 +54,16 @@ def wait4store_permissions(max_attempt=30):
 
 
 def wait4database(db_config, max_attempts=30):
-    if db_config['type'] == 'postgres':
+    if True: #db_config['type'] == 'postgres':
 
         for attempt in range(1, max_attempts):
             try:
                 c = psycopg2.connect(database=db_config['database'],
-                                     user=db_config['username'],
+                                     user=db_config['user'],
                                      password=db_config['password'],
                                      host=db_config['host'],
                                      port=db_config['port'])
-            except:
+            except Exception as e:
                 c = None
 
             if c and not c.closed:
@@ -72,7 +72,7 @@ def wait4database(db_config, max_attempts=30):
                 sys.exit(0)
 
             print(
-                f"waiting for postgres server {db_config['username']}@{db_config['host']}:{db_config['port']}/{db_config['database']} ...")
+                f"waiting for postgres server {db_config['user']}@{db_config['host']}:{db_config['port']}/{db_config['database']} ...")
             time.sleep(attempt)
 
         return False

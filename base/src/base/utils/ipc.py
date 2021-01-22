@@ -19,10 +19,10 @@ async def call_TTPlus(request, service, method, endpoint, body=None, readonly=Fa
     import base
 
     prefix = base.config.conf['services'][service]['prefix']
-    host = base.config.conf['host']
+    host = base.config.conf['services'][service]['host']
 
     if not base.registry.test:
-        port = base.config.conf['port']
+        port = base.config.conf['services'][service]['port']
     else:
         port = base.registry.test_port
 
