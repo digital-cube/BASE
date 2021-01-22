@@ -430,11 +430,18 @@ class api:
                             elif isinstance(pp.annotation, tuple):
                                 cls, attr = pp.annotation
                                 try:
-                                    kwa[pp.name] = await cls.filter(**{attr: value}).get_or_none()
+                                    _db_item = await cls.filter(**{attr: value}).get_or_none()
+                                    if not _db_item:
+                                        _cls_name = cls.__name__
+                                        base_logger.error(f'Error getting {_cls_name} with {attr} {value}: Item not found')
+                                        raise http.HttpErrorNotFound(
+                                            message=f"{_cls_name} not found",
+                                            id_message="INVALID_DATA")
+
+                                    kwa[pp.name] = _db_item
                                 except tortoise.exceptions.OperationalError as e:
                                     _cls_name = cls.__name__
                                     base_logger.error(f'Error getting {_cls_name} with {attr} {value}: {e}')
-
                                     raise http.General4xx(
                                         message=f"Invalid data {value} for {attr} {_cls_name} or {_cls_name} not found",
                                         id_message="INVALID_DATA_TYPE")
