@@ -34,7 +34,12 @@ async def call_TTPlus(request, service, method, endpoint, body=None, readonly=Fa
     if request and request.headers and base.config.conf['authorization']['key'] in request.headers:
         headers[base.config.conf['authorization']['key']] = request.headers[base.config.conf['authorization']['key']]
 
-    _body = None if method in ('GET', 'DELETE') else json.dumps(body if body else {}, ensure_ascii=False)
+    # _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False) if body else {}
+
+    _body = None
+    if method not in ('GET','DELETE'):
+        if body:
+            _body = json.dumps(body, ensure_ascii=False)
 
     logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"{method}:{uri}")
     try:
@@ -130,7 +135,7 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
     if request and request.headers and base.config.conf['authorization']['key'] in request.headers:
         headers[base.config.conf['authorization']['key']] = request.headers[base.config.conf['authorization']['key']]
 
-    _body = None if method in ('GET', 'DELETE') else json.dumps(body if body else {}, ensure_ascii=False)
+    _body = None if method in ('GET', 'DELETE') else json.dumps(body, ensure_ascii=False) if body else {}
 
     logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"{method}:{uri}")
     try:
