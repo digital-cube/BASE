@@ -6,15 +6,15 @@ from base import http
 import logging
 import os
 
+
 async def call(request, service, method, endpoint, body=None, readonly=False):
     method = method.upper()
 
     if readonly:
-        readonly_supported = os.getenv('USE_READ_REPLICA', 'no').strip().lower() in ('yes','true','1')
+        readonly_supported = os.getenv('USE_READ_REPLICA', 'no').strip().lower() in ('yes', 'true', '1')
 
         if not readonly_supported:
             readonly = False
-
 
     if readonly and method != 'GET':
         raise http.HttpInternalServerError(id_message='IPC_READONLY_SUPPORTED_ONLY_FOR_GET_METHOD',
@@ -76,7 +76,7 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
 
     logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"{method}:{uri}")
     try:
-        result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
+        result = await http_client.fetch(uri, method=method, headers=headers, body=_body, request_timeout=600)
         logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"OK {method}:{uri}")
 
     except Exception as e:
