@@ -25,6 +25,7 @@ from tornado.httpclient import AsyncHTTPClient
 
 from . import http, token
 from .utils.log import log, set_log_context, clear_log_context, message_from_context, get_log_context
+from .lookup.scope_permissions import WRITE
 
 LocalOrmModule = None
 base_logger = logging.getLogger('base')
@@ -584,6 +585,20 @@ class auth:
 
                 if not res:
                     raise http.HttpErrorUnauthorized
+
+                if 'scope_id' in config.conf and config.conf['scope_id']:
+                    if 'scopes' not in user or not user['scopes'] or config.conf['scope_id'] not in user['scopes']:
+                        base_logger.error(f'User {user["id"]} scopes {user["scopes"]} not match for service {config.conf["name"]} scope {config.conf["scope_id"]}')
+                        _self_origin.set_status(http.status.UNAUTHORIZED)
+                        _self_origin.write('{"message":"unauthorized"}')
+                        return
+
+                    user_scope_permissions = user['scopes'][config.conf['scope_id']]
+                    if not bool(user_scope_permissions & WRITE) and funct.__name__ != 'get':
+                        base_logger.error(f'User {user["id"]} scopes {user["scopes"]} are insufficient for {funct}')
+                        _self_origin.set_status(http.status.UNAUTHORIZED)
+                        _self_origin.write('{"message":"unauthorized"}')
+                        return
 
                 permissions = res['permissions'] if res and 'permissions' in res else None
 

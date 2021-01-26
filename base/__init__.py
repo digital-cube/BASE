@@ -27,3 +27,5 @@ from .src.base.config.config import config
 from .src.base.helpers.paginator import paginate
 
 from .src.base.helpers import common
+
+from .src.base.lookup import scope_permissions

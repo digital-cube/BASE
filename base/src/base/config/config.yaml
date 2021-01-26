@@ -7,6 +7,8 @@ port: 9000                                      # Port on which the application 
 tornado_settings: {}                            # Tornado Application additional settings
 verbose: true                                   # More verbose output
 
+scope_id: null                                  # id of a service
+
 store:
   type: 'redis'                                 # Which type of common data store and registry will be used ('redis', 'memory')
   host: 'localhost'                             # Location of the Redis server

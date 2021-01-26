@@ -19,6 +19,7 @@ setup(
               'base.src.base.common',
               'base.src.base.config',
               'base.src.base.helpers',
+              'base.src.base.lookup',
               'base.src.base.utils',
               ],
     url='https://base3.dev',
