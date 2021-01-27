@@ -86,11 +86,13 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-body: {e.response.body}")
         print(f"\nIPC FAILED, {e}\n")
 
+        resp_body = None
         try:
             resp_body = json.loads(e.response.body)
             message, id_message, code = resp_body['message'], resp_body['id'], resp_body['code']
         except:
-            raise http.HttpInternalServerError
+            raise http.HttpInternalServerError(id_message='IPC_ERROR',
+                                               message=str(resp_body))
 
         raise http.BaseHttpException(message=message,
                                      id_message=id_message,
