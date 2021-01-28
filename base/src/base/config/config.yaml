@@ -6,6 +6,7 @@ host: 'localhost'                               # Application host location
 port: 9000                                      # Port on which the application will listen to requests
 tornado_settings: {}                            # Tornado Application additional settings
 verbose: true                                   # More verbose output
+test: false                                     # Test mode
 
 scope_id: null                                  # id of a service
 
