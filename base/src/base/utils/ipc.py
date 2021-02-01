@@ -19,11 +19,12 @@ async def call_TTPlus(request, service, method, endpoint, body=None, readonly=Fa
     import base
 
     prefix = base.config.conf['services'][service]['prefix']
-    host = base.config.conf['services'][service]['host']
 
     if not base.registry.test:
-        port = base.config.conf['services'][service]['port']
+        host = base.config.conf['services'][service]['host'] if 'host' in base.config.conf['services'][service] else base.config.conf['host']
+        port = base.config.conf['services'][service]['port'] if 'port' in base.config.conf['services'][service] else base.config.conf['port']
     else:
+        host = 'localhost'
         port = base.registry.test_port
 
     uri = 'http://' + host + ':' + str(port) + prefix + ('/' if endpoint[0] != '/' else '') + endpoint
@@ -43,7 +44,7 @@ async def call_TTPlus(request, service, method, endpoint, body=None, readonly=Fa
 
     logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"{method}:{uri}")
     try:
-        result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
+        result = await http_client.fetch(uri, method=method, headers=headers, body=_body, request_timeout=600)
         logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"OK {method}:{uri}")
 
     except Exception as e:
