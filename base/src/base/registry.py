@@ -75,7 +75,7 @@ def address(svc_name):
         if 'apptype' in base.config.conf and base.config.conf['apptype']=='monolith':
             if 'services' in base.config.conf:
                 if svc_name in base.config.conf['services']:
-                    return 'http://localhost'    
+                    return 'http://localhost:{}'.format(base.config.conf['port'])
 
         r_svc = json.loads(Store.get('base_svc_' + svc_name))
 
