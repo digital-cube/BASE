@@ -377,7 +377,11 @@ class api:
                                 cls = getattr(module, amodul[-1])
 
                                 if True:
-                                    res = _origin_self.orm_session.query(cls).filter(cls.id == value).one_or_none()
+                                    try:
+                                        res = _origin_self.orm_session.query(cls).filter(cls.id == value).one_or_none()
+                                    except Exception as e:
+                                        raise
+                                        res = None
 
                                     kwa[pp.name] = res
 
@@ -525,7 +529,7 @@ class api:
 
                                 return res
 
-                            if type(response)==dict:
+                            if type(response) == dict:
                                 response = ttt(response)
 
                             prepared_response = json.dumps(response, ensure_ascii=False, default=lambda o: str(o))
@@ -692,7 +696,7 @@ class route:
         route._handlers.append((uri, handler))
 
     @staticmethod
-    def handlers(readonly=False):
+    def handlers():
         if hasattr(route, '_handlers'):
             return sorted(route._handlers, reverse=True)
 
@@ -781,7 +785,6 @@ class route:
         return cls
 
 
-
 def make_app(**kwargs):
     debug = True
     default_handler_class = NotFoundHandler
@@ -797,7 +800,19 @@ def make_app(**kwargs):
 
     readonly = kwargs['readonly'] if 'readonly' in kwargs else False
 
-    return tornado.web.Application(route.handlers(readonly=readonly),
+    import tornado.web
+
+    if 'static' in config.conf:
+        for s in config.conf['static']:
+            print(s, config.conf['static'][s])
+            route._handlers.append((r'{}/(.*)'.format(s), tornado.web.StaticFileHandler, {"path": config.conf['static'][s]}))
+
+        print(json.dumps(config.conf['static'], indent=4))
+
+    route.print_all_routes()
+
+    route.handlers()
+    return tornado.web.Application(handlers=route.handlers(),
                                    debug=debug,
                                    default_handler_class=default_handler_class,
                                    log_function=Base.log_function)
@@ -825,7 +840,6 @@ def run(**kwargs):
     loops = tornado.ioloop.IOLoop.current()
     loops.run_sync(init_orm)
 
-    route.print_all_routes()
 
     try:
         loops.start()
