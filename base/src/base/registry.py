@@ -44,9 +44,9 @@ def register(service: dict):
         if service['storage'][-1] != '/':
             service['storage'] = service['storage'] + '/'
 
-    if 'static' in service:
-        if service['static'][-1] != '/':
-            service['static'] = service['static'] + '/'
+    # if 'static' in service:
+    #     if service['static'][-1] != '/':
+    #         service['static'] = service['static'] + '/'
 
     global _services, _last
     _services[service['name']] = service
