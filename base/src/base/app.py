@@ -809,8 +809,6 @@ def make_app(**kwargs):
 
         print(json.dumps(config.conf['static'], indent=4))
 
-    route.print_all_routes()
-
     route.handlers()
     return tornado.web.Application(handlers=route.handlers(),
                                    debug=debug,
@@ -840,6 +838,7 @@ def run(**kwargs):
     loops = tornado.ioloop.IOLoop.current()
     loops.run_sync(init_orm)
 
+    route.print_all_routes()
 
     try:
         loops.start()
