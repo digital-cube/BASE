@@ -819,8 +819,9 @@ def make_app(**kwargs):
 async def init_orm():
     from base import config
 
+    tconfig = config.tortoise_config()
     await Tortoise.init(
-        config=config.tortoise_config()
+        config=tconfig
     )
 
 
