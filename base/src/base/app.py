@@ -599,6 +599,11 @@ class auth:
                         _self_origin.set_status(http.status.UNAUTHORIZED)
                         _self_origin.write('{"message":"unauthorized"}')
                         return
+                    if not bool(user_scope_permissions & READ) and funct.__name__ == 'get':
+                        base_logger.error(f'User {user["id"]} scopes {user["scopes"]} are insufficient for {funct}')
+                        _self_origin.set_status(http.status.UNAUTHORIZED)
+                        _self_origin.write('{"message":"unauthorized"}')
+                        return
 
                 permissions = res['permissions'] if res and 'permissions' in res else None
 
