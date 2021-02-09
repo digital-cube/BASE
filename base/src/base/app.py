@@ -25,7 +25,7 @@ from tornado.httpclient import AsyncHTTPClient
 
 from . import http, token
 from .utils.log import log, set_log_context, clear_log_context, message_from_context, get_log_context
-from .lookup.scope_permissions import WRITE
+from .lookup.scope_permissions import WRITE, READ
 
 LocalOrmModule = None
 base_logger = logging.getLogger('base')
