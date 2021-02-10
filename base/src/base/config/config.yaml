@@ -20,6 +20,8 @@ use_database: false                             # Use database in an application
 # APIs
 APIs: []
 
+static_paths: null                              # array of arrays with (static_url, static_dir_path - in service path)
+
 db: &db                                         # Database to be used by the application
   type: 'postgres'                              # Currently supported: 'postgres'
   port: 5432

@@ -674,11 +674,26 @@ class route:
         if not hasattr(route, '_handler_names'):
             route._handler_names = set()
 
-        for _uri, _ in route._handlers:
+        for _uri, *_ in route._handlers:
             if _uri == uri:
                 raise NameError(f"Error creating api, endopoint '{_uri}'  already exists")
 
         route._handlers.append((uri, handler))
+
+    @staticmethod
+    def register_static_handler(uri, static_path):
+
+        if not hasattr(route, '_handlers'):
+            route._handlers = []
+
+        if not hasattr(route, '_handler_names'):
+            route._handler_names = set()
+
+        for _uri, *_ in route._handlers:
+            if _uri == uri:
+                raise NameError(f"Error creating api, endopoint '{_uri}'  already exists")
+
+        route._handlers.append((uri, tornado.web.StaticFileHandler, {'path': static_path}))
 
     @staticmethod
     def handlers(readonly=False):
@@ -797,6 +812,10 @@ def make_app(**kwargs):
     from base import config
     config.init_logging()
     _tronado_settings = config.conf['tornado_settings']
+    if 'static_paths' in config.conf and config.conf['static_paths']:
+        for _static in config.conf['static_paths']:
+            _root_dir = os.getcwd()     # todo: check this
+            route.register_static_handler(f'{_static[0]}/(.*)', f'{_root_dir}{_static[1]}')
 
     # present all api modules
     for api_module in config.conf['APIs']:
