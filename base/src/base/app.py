@@ -814,7 +814,7 @@ def make_app(**kwargs):
     _tronado_settings = config.conf['tornado_settings']
     if 'static_paths' in config.conf and config.conf['static_paths']:
         for _static in config.conf['static_paths']:
-            _root_dir = os.getcwd()     # todo: check this
+            _root_dir = sys.path[0]
             route.register_static_handler(f'{_static[0]}/(.*)', f'{_root_dir}{_static[1]}')
 
     # present all api modules
