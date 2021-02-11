@@ -90,6 +90,17 @@ class HttpNotAcceptable(BaseHttpException):
         self._status = status.NOT_ACCEPTABLE
 
 
+class HttpForbiden(BaseHttpException):
+    """
+    Exception class which is used for HTTP Error FORBIDDEN.
+    """
+    _status = status.FORBIDDEN
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._status = status.FORBIDDEN
+
+
 
 class HttpInvalidParam(BaseHttpException):
     """
