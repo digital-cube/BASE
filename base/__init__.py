@@ -24,5 +24,6 @@ from .src.base.utils import ipc
 from .src.base.config.config import config
 
 from .src.base.helpers.paginator import paginate
+from .src.base.helpers.tt_paginator import tt_paginate
 
 from .src.base.helpers import common
