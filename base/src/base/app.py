@@ -693,6 +693,8 @@ class route:
             if _uri == uri:
                 raise NameError(f"Error creating api, endopoint '{_uri}'  already exists")
 
+        # print("URI URI", uri)
+
         route._handlers.append((uri, handler))
 
     @staticmethod
