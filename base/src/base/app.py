@@ -387,7 +387,7 @@ class api:
 
                             elif isinstance(pp.annotation, tortoise.fields.data.Field) and pp.annotation.pk:
                                 cls = pp.annotation.model
-                                print(cls)
+                                # print(cls)
 
                                 scls = str(cls).replace("<class '", '').replace("'>", '')
                                 amodul = scls.split('.')
@@ -806,10 +806,10 @@ def make_app(**kwargs):
 
     if 'static' in config.conf:
         for s in config.conf['static']:
-            print(s, config.conf['static'][s])
+            # print(s, config.conf['static'][s])
             route._handlers.append((r'{}/(.*)'.format(s), tornado.web.StaticFileHandler, {"path": config.conf['static'][s]}))
 
-        print(json.dumps(config.conf['static'], indent=4))
+        # print(json.dumps(config.conf['static'], indent=4))
 
     route.handlers()
     return tornado.web.Application(handlers=route.handlers(),
