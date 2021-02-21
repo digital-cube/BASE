@@ -7,6 +7,34 @@ import logging
 import os
 
 
+async def call_raw(request, method, fullurl, body=None, exected_format='json', headers={}):
+    request_timeout = 300
+
+    if request and request.headers and base.config.conf['authorization']['key'] in request.headers:
+        if base.config.conf['authorization']['key'] not in headers:
+            headers[base.config.conf['authorization']['key']] = request.headers[
+                base.config.conf['authorization']['key']]
+
+    _body = None if method in ('GET', 'DELETE') else json.dumps(body if body else {}, ensure_ascii=False)
+
+    http_client = AsyncHTTPClient()
+    try:
+        result = await http_client.fetch(fullurl,
+                                         method=method,
+                                         headers=headers,
+                                         body=_body,
+                                         request_timeout=request_timeout)
+
+        try:
+            return json.loads(result.body.decode('utf-8')) if result.body else None, result.code
+        except Exception as e:
+            logging.getLogger('base').log(level=logging.CRITICAL, msg=str(e))
+
+    except Exception as e:
+        try:
+            logging.getLogger('base').log(level=logging.CRITICAL, msg=f"FAILED {method}:{uri}")
+
+
 async def call_new(request, service, method, endpoint, body=None):
     request_timeout = 300
 
@@ -59,7 +87,6 @@ async def call_new(request, service, method, endpoint, body=None):
             logging.getLogger('base').log(level=logging.CRITICAL, msg=f"FAILED response-body: {e.response.body}")
         except Exception as e:
             logging.getLogger('base').log(level=logging.CRITICAL, msg=f"FAILED {e}")
-
 
 
 async def call(request, service, method, endpoint, body=None, readonly=False):
