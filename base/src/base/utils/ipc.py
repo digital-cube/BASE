@@ -32,7 +32,10 @@ async def call_raw(request, method, fullurl, body=None, exected_format='json', h
 
     except Exception as e:
         try:
-            logging.getLogger('base').log(level=logging.CRITICAL, msg=f"FAILED {method}:{uri}")
+            logging.getLogger('base').log(level=logging.CRITICAL, msg=f"FAILED {method}:{method}")
+            logging.getLogger('base').log(level=logging.CRITICAL, msg=f"body {_body}")
+        except Exception as e:
+            logging.getLogger('base').log(level=logging.CRITICAL, msg=str(e))
 
 
 async def call_new(request, service, method, endpoint, body=None):
