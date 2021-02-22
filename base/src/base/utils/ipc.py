@@ -96,4 +96,4 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
                                      id_message=id_message,
                                      status=code)
 
-    return json.loads(result.body.decode('utf-8'))
+    return json.loads(result.body.decode('utf-8')) if result.body else None
