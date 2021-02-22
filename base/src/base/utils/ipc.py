@@ -26,7 +26,11 @@ async def call_raw(request, method, fullurl, body=None, exected_format='json', h
                                          request_timeout=request_timeout)
 
         try:
-            return json.loads(result.body.decode('utf-8')) if result.body else None, result.code
+            if exected_format == 'json':
+                return json.loads(result.body.decode('utf-8')) if result.body else None, result.code
+            else:
+                return result.body, result.code
+            
         except Exception as e:
             logging.getLogger('base').log(level=logging.CRITICAL, msg=str(e))
 
