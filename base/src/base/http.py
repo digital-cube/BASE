@@ -54,7 +54,6 @@ class General4xx(BaseHttpException):
         self._status = status.BAD_REQUEST
 
 
-
 class HttpErrorUnauthorized(BaseHttpException):
     """
     Exception class which is used for HTTP Error 401 - Unauthorized.
@@ -64,6 +63,17 @@ class HttpErrorUnauthorized(BaseHttpException):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._status = status.UNAUTHORIZED
+
+
+class HttpErrorForbiden(BaseHttpException):
+    """
+    Exception class which is used for HTTP Error 403 - Forbidden.
+    """
+    _status = status.FORBIDDEN
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._status = status.FORBIDDEN
 
 
 
