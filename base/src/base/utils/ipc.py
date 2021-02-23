@@ -76,7 +76,7 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
 
     logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"{method}:{uri}")
     try:
-        result = await http_client.fetch(uri, method=method, headers=headers, body=_body)
+        result = await http_client.fetch(uri, method=method, headers=headers, body=_body, request_timeout=600)
         logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"OK {method}:{uri}")
 
     except Exception as e:
@@ -96,4 +96,4 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
                                      id_message=id_message,
                                      status=code)
 
-    return json.loads(result.body.decode('utf-8'))
+    return json.loads(result.body.decode('utf-8')) if result.body else None
