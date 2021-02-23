@@ -579,12 +579,14 @@ class auth:
                 _token = _self_origin.request.headers[config.conf['authorization']['key']]
                 res = token.token2user(_token)
 
+                if not res:
+                    _self_origin.set_status(http.status.UNAUTHORIZED)
+                    _self_origin.write('{"message":"unauthorized"}')
+                    return
+
                 id_user = res['id_user'] if res and 'id_user' in res else None
                 user  = res['user']
                 id_session = res['id'] if res and 'id' in res else None
-
-                if not res:
-                    raise http.HttpErrorUnauthorized
 
                 if 'scope_id' in config.conf and config.conf['scope_id']:
                     if 'scopes' not in user or not user['scopes'] or config.conf['scope_id'] not in user['scopes']:
