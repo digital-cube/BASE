@@ -83,7 +83,7 @@ def _load_app_configuration(svc_port):
         setattr(base.config.application_config, 'static_path', src.config.app_config.static_path)
     if hasattr(src.config.app_config, 'static_uri'):
         setattr(base.config.application_config, 'static_uri', src.config.app_config.static_uri)
-    if hasattr(src.config.app_config, 'log_directory '):
+    if hasattr(src.config.app_config, 'log_directory'):
         setattr(base.config.application_config, 'log_directory', src.config.app_config.log_directory)
     if hasattr(src.config.app_config, 'pre_app_processes'):
         setattr(base.config.application_config, 'pre_app_processes', src.config.app_config.pre_app_processes)

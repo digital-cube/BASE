@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### 2021 02 26
+
+## BASE version 1.12.9
+- fix log directory in importer
+
 ### 2020 04 13
 
 ## BASE version 1.12.9
