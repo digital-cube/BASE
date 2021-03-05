@@ -8,23 +8,6 @@ async def tt_paginate(query, base_uri, page, per_page):
     '''
     Paginate
     '''
-    #
-    # sig = inspect.signature(func)
-    # print(sig)
-    #
-    # params = [
-    #     i for i in sig.parameters if i not in ('page', 'per_page')
-    # ]
-    #
-    # caller_frame = inspect.stack()[1].frame
-    # args, _, _, values = inspect.getargvalues(caller_frame)
-    #
-    #
-    #
-    #
-    # print(func.get_argument('page'))
-    #
-    # print(params)
 
     if page < 1:
         raise NameError('page should be greater than zero')
