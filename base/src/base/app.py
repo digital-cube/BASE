@@ -644,11 +644,11 @@ class route:
 
     @staticmethod
     def print_all_routes():
-        print("---[", 'routes', "]" + ('-' * 47))
+        print("---[", 'routes', "]" + ('-' * 77))
         for r in route.all():
             print("ROUTE", r)
 
-        print("-" * 60)
+        print("-" * 90)
 
     @staticmethod
     def set(key, value):
@@ -911,6 +911,7 @@ def parse_arguments(**kwargs):
     return _args
 
 def run(**kwargs):
+    import base
     from base import config
     args = parse_arguments(**kwargs)
     if args.verbose:
@@ -918,7 +919,12 @@ def run(**kwargs):
 
     app = make_app(**kwargs)
 
-    print(f'{args.prog} listen on port {args.port}: http://localhost:{args.port}{kwargs["about"] if "about" in kwargs else ""}')
+    if 'print_app_info' in kwargs and kwargs['print_app_info']:
+        print(f'{args.prog} listen on port {args.port}: http://{config.conf["host"]}:{args.port}{kwargs["about"] if "about" in kwargs else ""}')
+
+    if 'print_routes' in kwargs and kwargs['print_routes']:
+        base.route.print_all_routes()
+
     app.listen(args.port)
     loops = tornado.ioloop.IOLoop.current()
 

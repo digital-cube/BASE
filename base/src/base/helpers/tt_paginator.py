@@ -18,6 +18,7 @@ async def tt_paginate(query, base_uri, page, per_page):
     offset = (page - 1) * per_page
 
     total_items = await query.count()
+
     total_pages = total_items // per_page + \
                   (1 if total_items % per_page else 0)
 
