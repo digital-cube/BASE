@@ -47,6 +47,8 @@ tortoise:                                       # Tortoise ORM base configuratio
 
 authorization:
   key: 'Authorization'                          # Header to read for the Authorization key
+  api_key_header_name: null
+  api_key: null
 
 logging:
   version: 1

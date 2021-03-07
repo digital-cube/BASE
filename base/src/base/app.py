@@ -625,11 +625,45 @@ class auth:
                     _self_origin.user = user
                     _self_origin.id_session = id_session
 
-                    await funct(_self_origin, *args, **kwargs)
-                    return
+                    return await funct(_self_origin, *args, **kwargs)
 
             _self_origin.send_error(http.status.UNAUTHORIZED, message='Unauthorized',
                                     id_message='UNAUTHORIZED')
+        return wrapper
+
+
+class api_auth:
+
+    def __call__(self, funct):
+
+        @wraps(funct)
+        async def wrapper(_self_origin, *args, **kwargs):
+
+            from base import config
+            _authorization_key_name = config.conf['authorization']['api_key_header_name'] if 'api_key_header_name' in config.conf['authorization'] else None
+            _authorization_key = config.conf['authorization']['api_key'] if 'api_key' in config.conf['authorization'] else None
+            if not _authorization_key_name:
+                base_logger.critical('Missing api authorization header name in configuration, set "api_key_header_name"')
+                _self_origin.set_status(http.status.UNAUTHORIZED)
+                _self_origin.write('{"message":"unauthorized"}')
+                return
+
+            if not _authorization_key:
+                base_logger.critical('Missing api key in configuration, set: "api_key"')
+                _self_origin.set_status(http.status.UNAUTHORIZED)
+                _self_origin.write('{"message":"unauthorized"}')
+                return
+
+            _header_api_key = _self_origin.request.headers.get(_authorization_key_name)
+            if _header_api_key != _authorization_key:
+                base_logger.error(f'Invalid {_authorization_key_name}: {_header_api_key}')
+                _self_origin.set_status(http.status.UNAUTHORIZED)
+                _self_origin.write('{"message":"unauthorized"}')
+                return
+
+
+            return await funct(_self_origin, *args, **kwargs)
+
         return wrapper
 
 
