@@ -17,6 +17,10 @@ class DictStore:
         # print("RPUSH ",queue_name)
         pass
 
+    def lpush(self, queue_name, value):
+        # print("LPUSH ",queue_name)
+        pass
+
     def exists(self, *names):
         ret = 0
         for key in names:
@@ -55,6 +59,10 @@ class Store:
         return Store.engine.rpush(str(queue_name), value)
 
     @staticmethod
+    def lpush(queue_name, value):
+        return Store.engine.lpush(str(queue_name), value)
+
+    @staticmethod
     def exists(*names):
         return Store.engine.exists(*names)
 
@@ -81,3 +89,6 @@ def flushall():
 
 def rpush(queue_name, value):
     Store.rpush(queue_name, value)
+
+def lpush(queue_name, value):
+    Store.lpush(queue_name, value)
