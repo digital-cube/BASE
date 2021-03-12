@@ -18,7 +18,8 @@ async def call(request, service, method, endpoint, body=None):
         raise http.HttpInternalServerError(id_message="SERVICE_NOT_DEFINED",
                                            message=f"{service} service is not defined")
 
-    host = base.config.conf['host']
+#    host = base.config.conf['host']
+    host = service
     port = base.config.conf['port']
 
     prefix = base.config.conf['services'][service]['prefix'].strip('/')
