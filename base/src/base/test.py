@@ -1,10 +1,12 @@
 from tornado.testing import AsyncHTTPTestCase
 from tornado.ioloop import IOLoop
 import json
+from base import http
 
 from uuid import uuid4 as UUIDUUID4
 
 import base64
+
 
 class MockedRedis:
     store = {}
@@ -64,7 +66,7 @@ class BaseTest(AsyncHTTPTestCase):
             print(json.dumps(self.r, indent=4, ensure_ascii=False))
 
     def api(self, token, method, url, body=None,
-            expected_code=None, expected_result=None, expected_result_subset=None,
+            expected_code=(http.status.OK, http.status.CREATED), expected_result=None, expected_result_subset=None,
             expected_result_contain_keys=None, expected_length=None,
             raw_response=False, headers={}):
 
@@ -81,13 +83,14 @@ class BaseTest(AsyncHTTPTestCase):
         from base import config
         # headers = {config.conf['authorization']['key']: token} if token else {}
 
-        #TODO: Check out this !!!
+        # TODO: Check out this !!!
         headers.update({config.conf['authorization']['key']: token} if token else {})
 
         import time
         stime = time.time()
         self.execution_time = 'n/a'
         try:
+            self.http_client.configure(None, connect_timeout=600, request_timeout=600)
             response = self.fetch(url, method=method,
                                   body=json.dumps(body, ensure_ascii=False) if body is not None else None,
                                   headers=headers)
