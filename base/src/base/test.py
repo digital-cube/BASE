@@ -68,7 +68,7 @@ class BaseTest(AsyncHTTPTestCase):
     def api(self, token, method, url, body=None,
             expected_code=(http.status.OK, http.status.CREATED), expected_result=None, expected_result_subset=None,
             expected_result_contain_keys=None, expected_length=None,
-            raw_response=False, headers={}):
+            raw_response=False, headers={}, default_timeout=600):
 
         url = url.strip()
         self.last_uri = url
@@ -90,10 +90,12 @@ class BaseTest(AsyncHTTPTestCase):
         stime = time.time()
         self.execution_time = 'n/a'
         try:
-            self.http_client.configure(None, connect_timeout=600, request_timeout=600)
+            self.http_client.configure(None, connect_timeout=default_timeout, request_timeout=default_timeout)
             response = self.fetch(url, method=method,
                                   body=json.dumps(body, ensure_ascii=False) if body is not None else None,
-                                  headers=headers)
+                                  headers=headers,
+                                  connect_timeout=default_timeout,
+                                  request_timeout=default_timeout)
         except Exception as e:
             print('error serializing output ', e, e)
             print("body", type(body), body)
