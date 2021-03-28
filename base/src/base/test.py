@@ -5,6 +5,8 @@ import json
 from uuid import uuid4 as UUIDUUID4
 
 import base64
+from base import http
+
 
 class MockedRedis:
     store = {}
@@ -64,9 +66,10 @@ class BaseTest(AsyncHTTPTestCase):
             print(json.dumps(self.r, indent=4, ensure_ascii=False))
 
     def api(self, token, method, url, body=None,
-            expected_code=None, expected_result=None, expected_result_subset=None,
+            expected_code=(http.status.OK, http.status.CREATED, http.status.NO_CONTENT),
+            expected_result=None, expected_result_subset=None,
             expected_result_contain_keys=None, expected_length=None, expected_lenght_for_key: tuple = None,
-            raw_response=False, headers:dict={}):
+            raw_response=False, headers: dict = {}):
 
         url = url.strip()
         self.last_uri = url
@@ -98,7 +101,10 @@ class BaseTest(AsyncHTTPTestCase):
 
         self.code = response.code
         if expected_code:
-            self.assertEqual(expected_code, response.code)
+            if type(expected_code) == tuple:
+                self.assertIn(response.code, expected_code)
+            else:
+                self.assertEqual(expected_code, response.code)
 
         if raw_response:
             self.execution_time = time.time() - stime

@@ -757,6 +757,10 @@ class route:
 
         specified_prefix = kwargs['PREFIX'] if 'PREFIX' in kwargs else None
 
+        if not specified_prefix:
+            from base import config
+            specified_prefix = config.conf['prefix']
+
         for uri in uris:
             parts = uri.split('/')
             rparts = []
