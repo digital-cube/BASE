@@ -1,5 +1,6 @@
 - build for distribution:
 
+  - rm -rf dist build base3.egg-info
   - python3 setup.py sdist bdist_wheel
 
 - check that only the last version is in the dist/ folder
