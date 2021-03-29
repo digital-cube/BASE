@@ -4,12 +4,12 @@
 .. image:: https://img.shields.io/pypi/pyversions/base3.svg
     :alt: python3
    :target: https://www.python.org/download/releases/3.0/
-.. image:: https://img.shields.io/badge/version-3.0.0-blue.svg
-   :alt: Version 3.0.0
+.. image:: https://img.shields.io/badge/version-3.0.2-blue.svg
+   :alt: Version 3.0.2
 
 Base REST API
 =============
-* Version 3.0.0
+* Version 3.0.2
 * `base3.dev <https://base3.dev/>`_
 
 Installation
