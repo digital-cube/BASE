@@ -1,5 +1,6 @@
 import uuid
 import datetime
+import asyncpg.pgproto.pgproto
 
 class BaseOrmHelpers:
 
@@ -19,9 +20,27 @@ class BaseOrmHelpers:
             if hasattr(self, field):
                 _type = type(getattr(self, field))
 
-                if _type in (datetime.datetime, uuid.UUID, ):
+                if _type in (datetime.datetime, uuid.UUID, asyncpg.pgproto.pgproto.UUID):
                     res[field] = str(getattr(self, field))
                 else:
                     res[field] = getattr(self, field)
 
         return res
+
+    def update(self, data: dict):
+        return self._update(forbidden_fields=('id',), data=data)
+        pass
+
+    def _update(self, forbidden_fields=('id',), data: dict = {}):
+
+        updated = []
+        for field in data:
+            if field in forbidden_fields:
+                continue
+
+            if hasattr(self, field):
+                if getattr(self, field) != data[field]:
+                    setattr(self, field, data[field])
+                    updated.append(field)
+
+        return updated
