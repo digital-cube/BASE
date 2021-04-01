@@ -28,7 +28,7 @@ def make_database_url(db_config, charset='utf8'):
         return URL(drivername='mysql+mysqldb', username=username, password=password, host=host, port=port,
                    database=name, query={'charset': charset})
     if db_type in ('postgresql', 'postgres'):
-        return URL(drivername='postgresql+psycopg2', username=username, password=password, host=host, port=port,
+        return URL.create(drivername='postgresql+psycopg2', username=username, password=password, host=host, port=port,
                    database=name, query={'client_encoding': charset})
     if db_type == 'sqlite':
         return URL(drivername='sqlite', database='{}.db'.format(name))
