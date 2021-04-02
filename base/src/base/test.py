@@ -63,7 +63,10 @@ class BaseTest(AsyncHTTPTestCase):
             print(f"{marker} :: code =", self.code, "EXECUTE TIME", self.execution_time)
         if hasattr(self, 'r'):
             print(f"{marker} :: Last result content")
-            print(json.dumps(self.r, indent=4, ensure_ascii=False))
+            if self.raw_response:
+                print('binary content, size=',len(self.r))
+            else:
+                print(json.dumps(self.r, indent=4, ensure_ascii=False))
 
     def api(self, token, method, url, body=None,
             expected_code=(http.status.OK, http.status.CREATED, http.status.NO_CONTENT),
@@ -73,6 +76,7 @@ class BaseTest(AsyncHTTPTestCase):
 
         url = url.strip()
         self.last_uri = url
+        self.raw_response = raw_response
 
         if not body:
             if method in ('PUT', 'POST', 'PATCH'):
@@ -108,6 +112,8 @@ class BaseTest(AsyncHTTPTestCase):
 
         if raw_response:
             self.execution_time = time.time() - stime
+            self.last_result = response.body
+            self.r = response.body
             return response.body
 
         resp_txt = response.body.decode('utf-8')

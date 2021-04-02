@@ -702,7 +702,7 @@ class route:
         return default
 
     @staticmethod
-    def register_handler(uri, handler):
+    def register_handler(uri, handler, properties=None):
 
         if not hasattr(route, '_handlers'):
             route._handlers = []
@@ -714,7 +714,10 @@ class route:
             if _uri == uri:
                 raise NameError(f"Error creating api, endopoint '{_uri}'  already exists")
 
-        route._handlers.append((uri, handler))
+        if not properties:
+            route._handlers.append((uri, handler))
+        else:
+            route._handlers.append((uri, handler, properties))
 
     @staticmethod
     def register_static_handler(uri, static_path):
