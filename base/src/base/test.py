@@ -131,7 +131,7 @@ class BaseTest(AsyncHTTPTestCase):
             self.assertTrue(False)
 
         if expected_result:
-            self.assertEqual(res, expected_result)
+            self.assertEqual(expected_result, res)
 
         if expected_result_contain_keys:
             for key in expected_result_contain_keys:
@@ -140,10 +140,10 @@ class BaseTest(AsyncHTTPTestCase):
         if expected_result_subset:
             for key in expected_result_subset:
                 self.assertTrue(key in res)
-                self.assertEqual(res[key], expected_result_subset[key])
+                self.assertEqual(expected_result_subset[key], res[key])
 
         if expected_length is not None:
-            self.assertEqual(len(res), expected_length)
+            self.assertEqual(expected_length, len(res))
 
         self.r = res
         self.last_result = res
