@@ -6,6 +6,7 @@ import logging.config
 
 import asyncio
 import aiotask_context as context
+from typing import Union
 
 
 class config:
@@ -27,7 +28,7 @@ class config:
 
         config.load_default_options()
 
-        config.conf.update(config_dictionary)
+        config.update_conf(config_dictionary)
 
         from ..registry import register
         register(config_dictionary)
@@ -51,12 +52,19 @@ class config:
             print(e)
             sys.exit()
 
+        if config_yaml is None:
+            return {}
+
         def use_value_from_env(d):
             '''
             Read value for configuration from an environment variable with the same name as in the config file
             :param d: dict - dictionary of settings from yaml file or nested configuration
             :return: void
             '''
+            if not d:
+                d = {}
+                return
+
             for key in d:
                 v = d[key]
                 if type(v) == dict:
@@ -71,7 +79,27 @@ class config:
         return config_yaml
 
     @staticmethod
-    def load_from_yaml(path: str) -> None:
+    def update_conf(new_conf) -> None:
+        # config.conf.update(new_conf)
+
+        def _update_conf(old_conf, new_conf):
+            for k in new_conf:
+                if k not in old_conf:
+                    old_conf[k] = new_conf[k]
+                else:
+                    value_type = type(new_conf[k])
+                    if value_type != dict:
+                        if value_type == list:
+                            old_conf[k].extend(new_conf[k])
+                        else:
+                            old_conf[k] = new_conf[k]
+                    else:
+                        _update_conf(old_conf[k], new_conf[k])
+
+        _update_conf(config.conf, new_conf)
+
+    @staticmethod
+    def load_from_yaml(paths: Union[str, list]) -> None:
         """
         Function which loads the Application from the
         :param path:
@@ -82,7 +110,11 @@ class config:
 
         config.load_default_options()
 
-        config.conf.update(config.__parse_yaml(path))
+        if type(paths) == str:
+            config.update_conf(config.__parse_yaml(paths))
+        else:
+            for path in paths:
+                config.update_conf(config.__parse_yaml(path))
 
         if 'keys' in config.conf:
             try:

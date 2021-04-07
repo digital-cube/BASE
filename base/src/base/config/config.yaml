@@ -26,7 +26,7 @@ db: &db                                         # Database to be used by the app
   type: 'postgres'                              # Currently supported: 'postgres'
   port: 5432
   host: 'localhost'
-  username: 'base'
+  user: 'base'
   password: 'base'
   database: 'base'
 
@@ -35,10 +35,9 @@ tortoise:                                       # Tortoise ORM base configuratio
     default:
       engine: 'tortoise.backends.asyncpg'
       credentials: *db
-  apps:
-    base:
-      models:
-#        - 'models.users'
+#  apps:
+#    base:
+#      models:
 #        - 'aerich.models'
       # If no default_connection specified, defaults to 'default'
       default_connection: 'default'
