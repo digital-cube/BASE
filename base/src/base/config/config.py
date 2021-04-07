@@ -90,7 +90,10 @@ class config:
                     value_type = type(new_conf[k])
                     if value_type != dict:
                         if value_type == list:
-                            old_conf[k].extend(new_conf[k])
+                            if old_conf[k]:
+                                old_conf[k].extend(new_conf[k])
+                            else:
+                                old_conf[k] = new_conf[k]
                         else:
                             old_conf[k] = new_conf[k]
                     else:
