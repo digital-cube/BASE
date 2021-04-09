@@ -599,6 +599,7 @@ class auth:
                 id_user = res['id_user'] if res and 'id_user' in res else None
                 id_session = res['id'] if res and 'id' in res else None
                 id_tenant = res['id_tenant'] if res and 'id_tenant' in res else None
+                id_groups = res['id_groups'] if res and 'id_groups' in res else None
 
                 # ?!? iz nekog razloga je prestalo da sljaka
                 # ERROR : Exception after Future was cancelled
@@ -627,6 +628,7 @@ class auth:
                     _self_origin.id_user = id_user
                     _self_origin.id_session = id_session
                     _self_origin.id_tenant = id_tenant
+                    _self_origin.id_groups = id_groups
 
                     _self_origin.user = None
 
