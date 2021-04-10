@@ -110,8 +110,8 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
                                            message='Readonly flag for not get metod')
 
     import base
-    if base.registry.test and base.config.conf['apptype'] == 'micro-service':
-        return None
+    # if base.registry.test and base.config.conf['apptype'] == 'micro-service':
+    #     return None
 
     if base.config.conf['apptype'] == 'micro-service':
         if not base.store.exists('services'):

@@ -67,7 +67,7 @@ class BaseTest(AsyncHTTPTestCase):
 
     def api(self, token, method, url, body=None,
             expected_code=(http.status.OK, http.status.CREATED, http.status.NO_CONTENT), expected_result=None, expected_result_subset=None,
-            expected_result_contain_keys=None, expected_length=None,
+            expected_result_contain_keys=None, expected_length=None,expected_lenght_for_key: tuple = None,
             raw_response=False, headers={}, default_timeout=600):
 
         url = url.strip()
@@ -144,6 +144,10 @@ class BaseTest(AsyncHTTPTestCase):
 
         if expected_length is not None:
             self.assertEqual(expected_length, len(res))
+
+        if expected_lenght_for_key is not None:
+            self.assertTrue(len(res[expected_lenght_for_key[0]]) == expected_lenght_for_key[1])
+
 
         self.r = res
         self.last_result = res

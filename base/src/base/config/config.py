@@ -136,4 +136,6 @@ class config:
         return tort_conf
 
 
+#TODO: izbaciti ovo odavde ako je moguce!
+
 config.load_default_options()
