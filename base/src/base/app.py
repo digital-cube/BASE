@@ -340,11 +340,12 @@ class api:
                             elif pp.annotation in (datetime.date, datetime.time, datetime.datetime):
 
                                 try:
+                                    print("VALUE",value)
                                     value = dateutil.parser.parse(value) if value else None
                                     if pp.annotation == datetime.date:
                                         value = value.date() if value else None
                                     if pp.annotation == datetime.time:
-                                        value = value.time() if time else None
+                                        value = value.time() if value else None
                                 except Exception as e:
                                     raise http.General4xx(message=f"Invalid value for date/time field",
                                                           id_message="INVALID_DATA_TYPE")
