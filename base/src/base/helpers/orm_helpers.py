@@ -1,6 +1,8 @@
 import uuid
 import datetime
 import asyncpg.pgproto.pgproto
+from shared.src.tzdate import datetime_tz_aware
+
 
 class BaseOrmHelpers:
 
@@ -20,8 +22,12 @@ class BaseOrmHelpers:
             if hasattr(self, field):
                 _type = type(getattr(self, field))
 
-                if _type in (datetime.datetime, uuid.UUID, asyncpg.pgproto.pgproto.UUID):
+                if _type in (uuid.UUID, asyncpg.pgproto.pgproto.UUID):
                     res[field] = str(getattr(self, field))
+                elif _type in (datetime.datetime,):
+                    res[field] = str(datetime_tz_aware(getattr(self, field)))[:19]
+                elif _type in (datetime.date,):
+                    res[field] = str(getattr(self, field)) #str(datetime_tz_aware(getattr(self, field)))
                 else:
                     res[field] = getattr(self, field)
 
@@ -44,4 +50,3 @@ class BaseOrmHelpers:
                     updated.append(field)
 
         return updated
-

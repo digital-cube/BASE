@@ -79,6 +79,8 @@ class BaseTest(AsyncHTTPTestCase):
 
         if method in ('GET', 'DELETE'):
             body = None
+        else:
+            body = json.dumps(body)
 
         from base import config
         # headers = {config.conf['authorization']['key']: token} if token else {}
@@ -96,7 +98,7 @@ class BaseTest(AsyncHTTPTestCase):
             )
 
             response = self.fetch(url, method=method,
-                                  body=json.dumps(body, ensure_ascii=False) if body is not None else None,
+                                  body=body,
                                   headers=headers,
 #                                  connect_timeout=default_timeout,
                                   request_timeout=default_timeout)
