@@ -315,12 +315,12 @@ class api:
 
                             elif pp.annotation == int and not type(value) == int:
                                 try:
-                                    if '.' in value:
+                                    if value and '.' in value:
                                         raise http.General4xx(f"Invalid datatype, int type is expected for {pp.name}",
                                                               id_message="INVALID_DATA_TYPE")
 
-                                    value = int(value)
-                                except:
+                                    value = int(value) if value is not None else None
+                                except Exception as e:
                                     raise http.General4xx(f"Invalid datatype, int type is expected for {pp.name}",
                                                           id_message="INVALID_DATA_TYPE")
 
