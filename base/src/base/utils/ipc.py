@@ -180,7 +180,15 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
         resp_body = None
         try:
             resp_body = json.loads(e.response.body)
-            message, id_message, code = resp_body['message'], resp_body['id'], resp_body['code']
+
+            print("----- EXCEPTION -----"+'-'*100)
+            print(resp_body)
+            print("----- /EXCEPTION -----"+'-'*100)
+
+            message = resp_body['message'] if 'message' in resp_body else 'unknown message'
+            id_message = resp_body['id'] if 'id' in resp_body else 'unknodnw id message'
+            code = resp_body['code'] if 'code' in resp_body else 400
+            # message, id_message, code = resp_body['message'], resp_body['id'], resp_body['code']
         except:
             raise http.HttpInternalServerError(id_message=str(resp_body))
 
