@@ -45,7 +45,7 @@ setup(
                       'PyYAML',
                       'redis',
                       'requests',
-                      'SQLAlchemy',
+                      'SQLAlchemy==1.3.23',
                       'aerich',
                       'tortoise-orm[asyncpg]',
                       'tortoise-orm[accel]',
