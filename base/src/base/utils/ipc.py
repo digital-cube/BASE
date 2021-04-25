@@ -172,7 +172,7 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
     except Exception as e:
         print('EXCEPT IPC', uri)
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED {method}:{uri}")
-        logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED body: {_body}")
+        # logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED body: {_body}")
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-code: {e.response.code}")
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-body: {e.response.body}")
         print(f"\nIPC FAILED, {e}\n")
@@ -181,9 +181,9 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
         try:
             resp_body = json.loads(e.response.body)
 
-            print("----- EXCEPTION -----"+'-'*100)
-            print(resp_body)
-            print("----- /EXCEPTION -----"+'-'*100)
+            # print("----- EXCEPTION -----"+'-'*100)
+            # print(resp_body)
+            # print("----- /EXCEPTION -----"+'-'*100)
 
             message = resp_body['message'] if 'message' in resp_body else 'unknown message'
             id_message = resp_body['id'] if 'id' in resp_body else 'unknodnw id message'
