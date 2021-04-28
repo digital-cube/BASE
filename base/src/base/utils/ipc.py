@@ -165,6 +165,10 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
 
     logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"{method}:{uri}")
     try:
+        # if 'unique_id' in uri:
+        #     print('stop')
+        # print('-'*100)
+        # print("URI",method,uri)
 
         result = await http_client.fetch(uri, method=method, headers=headers, body=_body, request_timeout=600)
         logging.getLogger('ipc').log(level=logging.DEBUG, msg=f"OK {method}:{uri}")

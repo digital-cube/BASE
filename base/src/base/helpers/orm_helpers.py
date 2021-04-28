@@ -37,7 +37,7 @@ class BaseOrmHelpers:
         return self._update(forbidden_fields=('id',), data=data)
         pass
 
-    def _update(self, forbidden_fields=('id',), data: dict = {}):
+    def _update(self, forbidden_fields=('id','unique_id'), data: dict = {}):
 
         updated = []
         for field in data:
