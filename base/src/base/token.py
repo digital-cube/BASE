@@ -24,7 +24,7 @@ def token2user(token) -> Union[dict, bool]:
 
     try:
 
-        if active == b'1':
+        if active in (b'1', b'{"active": true}'):
 
             res = {}
 
