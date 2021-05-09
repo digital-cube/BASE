@@ -480,8 +480,16 @@ class api:
 
                 _args = []
 
-                # try:
-                res = await funct(_origin_self, *_args, **kwa)
+                try:
+                    res = await funct(_origin_self, *_args, **kwa)
+                except BaseException as e:
+
+                    print('- API EXCEPTION -')
+                    print(e)
+                    print('-'*100)
+
+                    raise
+
                 # except http.HttpInternalServerError as e:
                 #     _origin_self.send_error(e.status(), reason=str(e.message))
                 #     raise
