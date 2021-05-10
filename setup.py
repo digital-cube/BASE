@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__VERSION__ = '3.0.5'
+__VERSION__ = '3.0.6'
 
 
 _dir = os.path.dirname(__file__)
