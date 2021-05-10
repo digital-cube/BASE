@@ -587,6 +587,8 @@ class auth:
                 id_user = res['id_user'] if res and 'id_user' in res else None
                 user  = res['user']
                 id_session = res['id'] if res and 'id' in res else None
+                id_tenant = res['id_tenant'] if res and 'id_tenant' in res else None
+                id_groups = res['id_groups'] if res and 'id_groups' in res else None
 
                 if 'scope_id' in config.conf and config.conf['scope_id']:
                     if 'scopes' not in user or not user['scopes'] or config.conf['scope_id'] not in user['scopes']:
@@ -624,6 +626,8 @@ class auth:
                     _self_origin.id_user = id_user
                     _self_origin.user = user
                     _self_origin.id_session = id_session
+                    _self_origin.id_tenant = id_tenant
+                    _self_origin.id_groups = id_groups
 
                     return await funct(_self_origin, *args, **kwargs)
 

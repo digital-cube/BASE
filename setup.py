@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__VERSION__ = '3.0.4'
+__VERSION__ = '3.0.5'
 
 
 _dir = os.path.dirname(__file__)
@@ -32,6 +32,7 @@ setup(
         'aerich',
         'aiomysql',
         'aiotask-context',
+        'asynctest',
         'bcrypt',
         'logfmt',
         'psycopg2-binary',

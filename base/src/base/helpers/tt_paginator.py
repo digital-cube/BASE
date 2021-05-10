@@ -1,13 +1,17 @@
-'''
+"""
 Paginate helper for Tortoase select queries
-'''
+"""
 
 import inspect
 
-async def tt_paginate(query, base_uri, page, per_page):
-    '''
+
+async def tt_paginate(query, base_uri, page, per_page, query_params=[]):
+    """
     Paginate
-    '''
+    """
+
+    query_params = '?'+'&'.join(query_params) if query_params else ''
+
 
     if page < 1:
         raise NameError('page should be greater than zero')
@@ -24,6 +28,7 @@ async def tt_paginate(query, base_uri, page, per_page):
 
     query = query.offset(offset).limit(limit)
 
+    base_uri = base_uri + query_params
     base_uri = base_uri + ("&" if '?' in base_uri else '?')
 
     previous_uri, next_uri = None, None
