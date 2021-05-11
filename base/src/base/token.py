@@ -39,6 +39,8 @@ def token2user(token) -> Union[dict, bool]:
             res['id_session'] = decoded['id']
             res['id_user'] = decoded['id_user'] if 'id_user' in decoded else None
             res['permissions'] = decoded['permissions'] if 'permissions' in decoded else None
+            res['id_tenant'] = decoded['id_tenant'] if 'id_tenant' in decoded else None
+            res['id_groups'] = decoded['id_groups'] if 'id_groups' in decoded else None
 
             return res
 
