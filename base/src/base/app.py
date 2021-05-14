@@ -317,7 +317,7 @@ class api:
                         if passed:
                             if pp.annotation == str and type(value) not in (
                                     str, type(None)):
-                                raise http.General4xx(message=f"Invalid datatype, int type is expected for {pp.name}",
+                                raise http.General4xx(message=f"Invalid datatype, string type is expected for {pp.name}",
                                                       id_message="INVALID_DATA_TYPE")
 
                             elif pp.annotation == dict:
