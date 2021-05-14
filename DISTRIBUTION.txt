@@ -1,3 +1,10 @@
+- update version in files
+
+	  PKG-INFO
+	  README.md
+	  README.rst
+	  base/__init__.py
+
 - build for distribution:
 
   - rm -rf dist build base3.egg-info
