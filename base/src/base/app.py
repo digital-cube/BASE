@@ -586,7 +586,7 @@ class auth:
 
                 id_user = res['id_user'] if res and 'id_user' in res else None
                 user = res['user']
-                id_session = res['id'] if res and 'id' in res else None
+                id_session = res['id_session'] if res and 'id_session' in res else None
                 id_tenant = res['id_tenant'] if res and 'id_tenant' in res else None
                 id_groups = res['id_groups'] if res and 'id_groups' in res else None
 

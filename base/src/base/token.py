@@ -21,7 +21,11 @@ def token2user(token) -> Union[dict, bool]:
 
     token_data = Store.get(decoded['id'])
 
+    if not token_data:
+        return False
+
     now = int(datetime.datetime.now().timestamp())
+
 
     try:
 
@@ -47,6 +51,5 @@ def token2user(token) -> Union[dict, bool]:
         else:
             return False
     except Exception as e:
-        print("EE", e)
 
         return False

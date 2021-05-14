@@ -24,6 +24,9 @@ async def call(request, service, method, endpoint, body=None):
     prefix = base.config.conf['services'][service]['prefix'].strip('/')
     endpoint = endpoint.strip('/')
 
+    if base.config.conf['apptype'] == 'monolith':
+        host = 'localhost'
+
     if base.registry.test:
         request_timeout = 3600
         host = 'localhost'
