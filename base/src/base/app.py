@@ -315,7 +315,10 @@ class api:
                             value = body[pp.name]
 
                         if passed:
-                            if pp.annotation == str and type(value) not in (
+                            if value == None:
+                                pass
+
+                            elif pp.annotation == str and type(value) not in (
                                     str, type(None)):
                                 raise http.General4xx(message=f"Invalid datatype, string type is expected for {pp.name}",
                                                       id_message="INVALID_DATA_TYPE")

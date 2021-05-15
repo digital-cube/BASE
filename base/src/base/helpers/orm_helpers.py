@@ -1,6 +1,8 @@
 import uuid
 import datetime
 import asyncpg.pgproto.pgproto
+import tortoise.timezone
+
 
 class BaseOrmHelpers:
 
@@ -18,12 +20,20 @@ class BaseOrmHelpers:
         res = {}
         for field in ordered_default_fields:
             if hasattr(self, field):
-                _type = type(getattr(self, field))
+                attr_value = getattr(self, field)
+                _type = type(attr_value)
 
-                if _type in (datetime.datetime, uuid.UUID, asyncpg.pgproto.pgproto.UUID):
-                    res[field] = str(getattr(self, field))
+                if attr_value is None:
+                    res[field] = None
+                elif _type in (uuid.UUID, asyncpg.pgproto.pgproto.UUID):
+                    res[field] = str(attr_value)
+                elif _type in (datetime.datetime,):
+                    if tortoise.timezone.is_aware(attr_value):
+                        res[field] = str(tortoise.timezone.make_naive(attr_value))
+
                 else:
-                    res[field] = getattr(self, field)
+                    res[field] = attr_value
+
 
         return res
 
