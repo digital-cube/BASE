@@ -520,7 +520,7 @@ class api:
                     else:
                         try:
                             _origin_self.set_header('Content-Type', 'application/json; charset=UTF-8')
-                            prepared_response = json.dumps(response, ensure_ascii=False, default=lambda o: str(o))
+                            prepared_response = json.dumps(response, ensure_ascii=False, default=lambda o: str(o), indent=1)
                             _origin_self.write(prepared_response)
                         except:
                             _origin_self.write(response)
