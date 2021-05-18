@@ -72,7 +72,7 @@ class BaseTest(AsyncHTTPTestCase):
             expected_code=(http.status.OK, http.status.CREATED, http.status.NO_CONTENT),
             expected_result=None, expected_result_subset=None,
             expected_result_contain_keys=None, expected_length=None, expected_lenght_for_key: tuple = None,
-            raw_response=False, headers: dict = {}):
+            raw_response=False, headers: dict = {}, default_timeout=600):
 
         url = url.strip()
         self.last_uri = url
@@ -95,7 +95,9 @@ class BaseTest(AsyncHTTPTestCase):
         try:
             response = self.fetch(url, method=method,
                                   body=json.dumps(body, ensure_ascii=False) if body is not None else None,
-                                  headers=headers)
+                                  headers=headers,
+                                  request_timeout=default_timeout
+                                  )
         except Exception as e:
             print('error serializing output ', e, e)
             print("body", type(body), body)

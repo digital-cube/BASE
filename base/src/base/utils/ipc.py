@@ -47,7 +47,8 @@ async def call(request, service, method, endpoint, body=None):
                                          method=method,
                                          headers=headers,
                                          body=_body,
-                                         request_timeout=request_timeout)
+                                         request_timeout=request_timeout,
+                                         connect_timeout=request_timeout)
 
         try:
             return json.loads(result.body.decode('utf-8')) if result.body else None, result.code
