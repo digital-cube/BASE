@@ -6,6 +6,43 @@ from base import http
 import logging
 import os
 
+AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+
+
+async def raw_call(method, full_url_endpoint, body, headers, auth_mode=None, username=None, password=None):
+    request_timeout = 300
+
+    _body = None if method in ('GET', 'DELETE') else json.dumps(body if body else {}, ensure_ascii=False)
+
+    http_client = AsyncHTTPClient()
+    try:
+        args = [full_url_endpoint]
+        kwargs = {
+            'method': method,
+            'headers': headers,
+            'body': _body,
+            'request_timeout': request_timeout,
+        }
+
+        if auth_mode:
+            kwargs['auth_mode'] = auth_mode
+        if username and password:
+            kwargs['auth_username'] = username
+            kwargs['auth_password'] = password
+
+        try:
+            result = await http_client.fetch(*args, **kwargs)
+            return json.loads(result.body.decode('utf-8')) if result.body else None, result.code
+        except Exception as e:
+            logging.getLogger('base').log(level=logging.CRITICAL, msg=str(e))
+            return False, None
+
+    except Exception as e:
+        logging.getLogger('base').log(level=logging.CRITICAL, msg=f"FAILED {method}:{full_url_endpoint}")
+        logging.getLogger('base').log(level=logging.CRITICAL, msg=f"FAILED body: {_body}")
+
+        return False, None
+
 
 async def call(request, service, method, endpoint, body=None):
     request_timeout = 300
