@@ -9,7 +9,7 @@ import os
 AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 
-async def raw_call(method, full_url_endpoint, body, headers, auth_mode=None, username=None, password=None):
+async def raw_call(method, full_url_endpoint, body, headers={}, auth_mode=None, username=None, password=None):
     request_timeout = 300
 
     _body = None if method in ('GET', 'DELETE') else json.dumps(body if body else {}, ensure_ascii=False)
