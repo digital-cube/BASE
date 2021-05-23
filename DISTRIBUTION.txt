@@ -3,6 +3,7 @@
 	  PKG-INFO
 	  README.md
 	  README.rst
+	  setup.py
 	  base/__init__.py
 
 - build for distribution:
