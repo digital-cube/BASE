@@ -580,6 +580,10 @@ class auth:
             if config.conf['authorization']['key'] in _self_origin.request.headers:
 
                 _token = _self_origin.request.headers[config.conf['authorization']['key']]
+
+                if _token and _token[:7] == 'Bearer ':
+                    _token = _token[7:]
+
                 res = token.token2user(_token)
 
                 if not res:
