@@ -37,6 +37,16 @@ class BaseOrmHelpers:
 
         return res
 
+    def match(self, data: dict):
+        for field in data:
+            if not hasattr(self, field):
+                return False
+            if getattr(self, field) != data[field]:
+                return False
+
+        return True
+
+
     def update(self, data: dict):
         return self._update(forbidden_fields=('id',), data=data)
         pass

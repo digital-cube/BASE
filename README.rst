@@ -4,12 +4,12 @@
 .. image:: https://img.shields.io/pypi/pyversions/Django.svg
     :alt: python3
    :target: https://www.python.org/download/releases/3.0/
-.. image:: https://img.shields.io/badge/version-3.0.11-blue.svg
-   :alt: Version 3.0.11
+.. image:: https://img.shields.io/badge/version-3.0.12-blue.svg
+   :alt: Version 3.0.12
 
 Base REST API
 =============
-* Version 3.0.11
+* Version 3.0.12
 * `base3.dev <https://base3.dev/>`_
 
 Installation
