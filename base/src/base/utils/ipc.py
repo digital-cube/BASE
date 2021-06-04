@@ -35,6 +35,7 @@ async def raw_call(method, full_url_endpoint, body, headers={}, auth_mode=None, 
             return json.loads(result.body.decode('utf-8')) if result.body else None, result.code
         except Exception as e:
             logging.getLogger('base').log(level=logging.CRITICAL, msg=str(e))
+            logging.getLogger('base').log(level=logging.CRITICAL, msg='URL: {}'.format(full_url_endpoint))
             return False, None
 
     except Exception as e:
