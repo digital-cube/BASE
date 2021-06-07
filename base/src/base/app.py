@@ -359,10 +359,10 @@ class api:
 
                             elif pp.annotation == uuid.UUID and not type(value) == uuid.UUID:
                                 try:
-                                    value = uuid.UUID(value)
+                                    value = uuid.UUID(value) if value else None
                                 except:
                                     raise http.General4xx(
-                                        message=f"Invalid datatype, UUID type is expected for {pp.name}",
+                                        message=f"Invalid datatype, UUID type is expected for {pp.name}. got >{value}<",
                                         id_message="INVALID_DATA_TYPE")
 
                             elif isinstance(pp.annotation, sqlalchemy.orm.attributes.InstrumentedAttribute):
