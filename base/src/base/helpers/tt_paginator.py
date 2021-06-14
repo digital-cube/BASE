@@ -5,13 +5,12 @@ Paginate helper for Tortoase select queries
 import inspect
 
 
-async def tt_paginate(query, base_uri, page, per_page, query_params=[]):
+async def tt_paginate(query, base_uri, page, per_page, query_params=[],count_by_iteration=False):
     '''
     Paginate
     '''
 
-    query_params = '?'+'&'.join(query_params) if query_params else ''
-
+    query_params = '?' + '&'.join(query_params) if query_params else ''
 
     if page < 1:
         raise NameError('page should be greater than zero')
@@ -21,7 +20,12 @@ async def tt_paginate(query, base_uri, page, per_page, query_params=[]):
     limit = per_page
     offset = (page - 1) * per_page
 
-    total_items = await query.count()
+    if not count_by_iteration:
+        total_items = await query.count()
+    else:
+        total_items = 0
+        for _ in await query.all():
+            total_items += 1
 
     total_pages = total_items // per_page + \
                   (1 if total_items % per_page else 0)
