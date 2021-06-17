@@ -68,7 +68,10 @@ class BaseTest(AsyncHTTPTestCase):
     def api(self, token, method, url, body=None,
             expected_code=(http.status.OK, http.status.CREATED, http.status.NO_CONTENT), expected_result=None, expected_result_subset=None,
             expected_result_contain_keys=None, expected_length=None,expected_lenght_for_key: tuple = None,
-            raw_response=False, headers={}, default_timeout=600):
+            raw_response=False, headers=None, default_timeout=600):
+
+        if not headers:
+            headers = {}
 
         url = url.strip()
         self.last_uri = url
