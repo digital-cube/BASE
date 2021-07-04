@@ -83,7 +83,10 @@ class BaseTest(AsyncHTTPTestCase):
         if method in ('GET', 'DELETE'):
             body = None
         else:
-            body = json.dumps(body)
+            try:
+                body = json.dumps(body)
+            except Exception as e:
+                raise
 
         from base import config
         # headers = {config.conf['authorization']['key']: token} if token else {}
