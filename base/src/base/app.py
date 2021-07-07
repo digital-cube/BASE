@@ -403,8 +403,14 @@ class api:
 
                             elif type(pp.annotation) != tuple and issubclass(pp.annotation, tortoise.models.Model):
                                 try:
+                                    # varijanta gde se automatski dodaje tenant i created by..
+                                    # no to treba da bude negde izmesteno u kod, a ne u app
+
+                                    # value['id_tenant'] = _origin_self.id_tenant
+                                    # value['created_by'] = _origin_self.id_user
+
                                     kwa[pp.name] = await pp.annotation(**value)
-                                except:
+                                except Exception as e:
                                     pass
 
                             elif isclass(pp.annotation) and issubclass(pp.annotation, sql_base):

@@ -3,6 +3,7 @@ import datetime
 import asyncpg.pgproto.pgproto
 from shared.src.tzdate import datetime_tz_aware
 
+import tortoise.queryset
 
 class BaseOrmHelpers:
 
@@ -32,6 +33,39 @@ class BaseOrmHelpers:
                     res[field] = getattr(self, field)
 
         return res
+
+
+    async def aserialize(self, fields: tuple = ()):
+        return await self._aserialize(ordered_default_fields=fields)
+
+    async def _aserialize(self, forbidden_fields: tuple = (), ordered_default_fields: tuple = ()):
+
+        if not ordered_default_fields:
+            ordered_default_fields = [k for k in self.__dict__.keys()
+                                      if not k.startswith('_') and not k.endswith('_') and k not in forbidden_fields]
+        else:
+            ordered_default_fields = [k for k in ordered_default_fields if k not in forbidden_fields]
+
+        res = {}
+        for field in ordered_default_fields:
+            if hasattr(self, field):
+                _type = type(getattr(self, field))
+
+                if _type in (uuid.UUID, asyncpg.pgproto.pgproto.UUID):
+                    res[field] = str(getattr(self, field))
+                elif _type in (datetime.datetime,):
+                    res[field] = str(datetime_tz_aware(getattr(self, field)))[:19]
+                elif _type in (datetime.date,):
+                    res[field] = str(getattr(self, field)) #str(datetime_tz_aware(getattr(self, field)))
+                elif _type == tortoise.queryset.QuerySet:
+                    await self.fetch_related(field)
+                    res[field] = await getattr(self, field).aserialize()
+                    print("STOP HERE")
+                else:
+                    res[field] = getattr(self, field)
+
+        return res
+
 
     def update(self, data: dict):
         return self._update(forbidden_fields=('id',), data=data)
