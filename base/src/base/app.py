@@ -834,7 +834,9 @@ def make_app(**kwargs):
     return tornado.web.Application(handlers=route.handlers(),
                                    debug=debug,
                                    default_handler_class=default_handler_class,
-                                   log_function=Base.log_function)
+                                   log_function=Base.log_function,
+                                   cookie_secret='digitalcube'
+                                   )
 
 
 async def init_orm():
