@@ -857,12 +857,13 @@ def run(**kwargs):
         port = config.conf['port'] if 'port' in config.conf else 9000
 
     app = make_app(**kwargs)
-    print(f'listening on port {port}')
     app.listen(port)
     loops = tornado.ioloop.IOLoop.current()
     loops.run_sync(init_orm)
 
     route.print_all_routes()
+
+    print(f'listening on port {port}')
 
     try:
         loops.start()
