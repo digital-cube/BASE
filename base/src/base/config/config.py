@@ -248,7 +248,7 @@ class config:
             tort_conf['connections'][connection]['credentials'] = {
                 'host': config.conf['db']['host'],
                 'port': config.conf['db']['port'],
-                'user': config.conf['db']['username'],
+                'user': config.conf['db']['user'],
                 'password': config.conf['db']['password'],
                 'database': config.conf['db']['database'],
             }

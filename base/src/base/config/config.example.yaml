@@ -28,7 +28,7 @@ db:
   # Database host
   host: 'localhost'
   # Database username
-  username: 'base'
+  user: 'base'
   # Database password
   password: 'base'
   # Database name

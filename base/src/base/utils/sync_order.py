@@ -59,7 +59,7 @@ def wait4database(db_config, max_attempts=30):
         for attempt in range(1, max_attempts):
             try:
                 c = psycopg2.connect(database=db_config['database'],
-                                     user=db_config['username'],
+                                     user=db_config['user'],
                                      password=db_config['password'],
                                      host=db_config['host'],
                                      port=db_config['port'])
