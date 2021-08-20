@@ -21,7 +21,7 @@ def make_database_url(db_config, charset='utf8'):
     name = db_config['database']
     host = db_config['host']
     port = db_config['port']
-    username = db_config['username']
+    username = db_config['username'] if 'username' in db_config else db_config['user']
     password = db_config['password']
 
     if db_type == 'mysql':
