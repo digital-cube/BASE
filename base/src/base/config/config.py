@@ -245,12 +245,13 @@ class config:
         tort_conf = config.conf['tortoise']
 
         for connection in tort_conf['connections']:
+            _existing_credentials = tort_conf['connections'][connection]['credentials'] if 'credentials' in tort_conf['connections'][connection] else {}
             tort_conf['connections'][connection]['credentials'] = {
-                'host': config.conf['db']['host'],
-                'port': config.conf['db']['port'],
-                'user': config.conf['db']['user'],
-                'password': config.conf['db']['password'],
-                'database': config.conf['db']['database'],
+                'host': _existing_credentials['host'] if 'host' in _existing_credentials else config.conf['db']['host'],
+                'port': _existing_credentials['port'] if 'port' in _existing_credentials else config.conf['db']['port'],
+                'user': _existing_credentials['user'] if 'user' in _existing_credentials else config.conf['db']['user'],
+                'password': _existing_credentials['password'] if 'password' in _existing_credentials else config.conf['db']['password'],
+                'database': _existing_credentials['database'] if 'database' in _existing_credentials else config.conf['db']['database'],
             }
 
         return tort_conf
