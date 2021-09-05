@@ -7,7 +7,7 @@ import logging
 import os
 
 
-async def call_raw(request, method, fullurl, body=None, exected_format='json', headers={}):
+async def call_raw(request, method, fullurl, body=None, exected_format='json', headers={}, username=None, password=None):
     request_timeout = 300
 
     if request and request.headers and base.config.conf['authorization']['key'] in request.headers:
@@ -23,7 +23,10 @@ async def call_raw(request, method, fullurl, body=None, exected_format='json', h
                                          method=method,
                                          headers=headers,
                                          body=_body,
-                                         request_timeout=request_timeout)
+                                         request_timeout=request_timeout,
+                                         auth_username=username,
+                                         auth_password=password
+                                         )
 
         try:
             if exected_format == 'json':
