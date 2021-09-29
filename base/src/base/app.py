@@ -20,6 +20,12 @@ from tornado.httpclient import AsyncHTTPClient
 
 from tortoise import Tortoise
 
+from apispec import APISpec
+from apispec.exceptions import APISpecError
+from apispec.ext.marshmallow import MarshmallowPlugin
+from apispec_webframeworks.tornado import TornadoPlugin
+
+import base
 from . import http, token
 from .orm import sql_base
 from .utils.log import log, set_log_context, clear_log_context
@@ -97,7 +103,7 @@ class Base(tornado.web.RequestHandler):
     def initialize(self) -> None:
         pass
 
-    def log(self, message: str, level: int = 10) -> None:
+    def log(self, message: str, level: int = logging.DEBUG) -> None:
         """
         Logs a message into the current request logger with a message and level.
 
@@ -805,6 +811,33 @@ class route:
             route.register_handler(furi, cls)
         return cls
 
+def setup_swagger():
+    log(
+        logging.getLogger('base'),
+        logging.INFO,
+        message='Swagger enabled'
+    )
+    if 'swagger_configuration' not in base.config.conf:
+        raise UserWarning('Missing swagger_configuration in config file')
+    spec = APISpec(
+        version=base.config.conf['app_version'],
+        **base.config.conf['swagger_configuration'],
+        plugins=[TornadoPlugin(), MarshmallowPlugin()]
+    )
+
+    for handler in route.all():
+        try:
+            spec.path(urlspec=handler)
+        except Exception as e:
+            continue
+
+    # Write the Swagger file into specified location.
+    with open(base.config.conf['swagger_configuration']['json_destination_path'], "w", encoding="utf-8") as file:
+        json.dump(spec.to_dict(), file, ensure_ascii=False, indent=4)
+
+    # log.info('Swagger enabled')
+    # pass
+
 
 def make_app(**kwargs):
     debug = True
@@ -831,6 +864,9 @@ def make_app(**kwargs):
         # print(json.dumps(config.conf['static'], indent=4))
 
     route.handlers()
+    if 'enable_swagger' in base.config.conf and base.config.conf['enable_swagger']:
+        setup_swagger()
+
     return tornado.web.Application(handlers=route.handlers(),
                                    debug=debug,
                                    default_handler_class=default_handler_class,
@@ -861,7 +897,7 @@ def run(**kwargs):
     loops = tornado.ioloop.IOLoop.current()
     loops.run_sync(init_orm)
 
-    route.print_all_routes()
+    # route.print_all_routes()
 
     print(f'listening on port {port}')
 
