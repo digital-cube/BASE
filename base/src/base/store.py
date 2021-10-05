@@ -21,6 +21,22 @@ class DictStore:
         # print("LPUSH ",queue_name)
         pass
 
+    def rpop(self, queue_name):
+        # print("RPOP",queue_name)
+        return None
+
+    def lpop(self, queue_name):
+        # print("LPOP",queue_name)
+        return None
+
+    def brpop(self, queue_name):
+        # print("BRPOP",queue_name)
+        return None
+
+    def blpop(self, queue_name):
+        # print("BLPOP",queue_name)
+        return None
+
     def exists(self, *names):
         ret = 0
         for key in names:
@@ -63,6 +79,22 @@ class Store:
         return Store.engine.lpush(str(queue_name), value)
 
     @staticmethod
+    def lpop(key):
+        return Store.engine.lpop(str(key))
+
+    @staticmethod
+    def rpop(key):
+        return Store.engine.rpop(str(key))
+
+    @staticmethod
+    def blpop(key):
+        return Store.engine.blpop(str(key))
+
+    @staticmethod
+    def brpop(key):
+        return Store.engine.brpop(str(key))
+
+    @staticmethod
     def exists(*names):
         return Store.engine.exists(*names)
 
@@ -89,6 +121,7 @@ def flushall():
 
 def rpush(queue_name, value):
     Store.rpush(queue_name, value)
+
 
 def lpush(queue_name, value):
     Store.lpush(queue_name, value)
