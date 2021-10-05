@@ -843,6 +843,7 @@ async def init_orm():
     from base import config
 
     tconfig = config.tortoise_config()
+    print('TCCONFIG', tconfig)
     await Tortoise.init(
         config=tconfig
     )
@@ -859,7 +860,10 @@ def run(**kwargs):
     app = make_app(**kwargs)
     app.listen(port)
     loops = tornado.ioloop.IOLoop.current()
-    loops.run_sync(init_orm)
+    if "use_database" not in config.conf or config.conf["use_database"]:
+        loops.run_sync(init_orm)
+
+    # loops.run_sync(init_orm)
 
     route.print_all_routes()
 
