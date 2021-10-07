@@ -72,7 +72,7 @@ class BaseTest(AsyncHTTPTestCase):
             expected_code=(http.status.OK, http.status.CREATED, http.status.NO_CONTENT),
             expected_result=None, expected_result_subset=None,
             expected_result_contain_keys=None, expected_length=None, expected_lenght_for_key: tuple = None,
-            raw_response=False, headers: dict = {}, default_timeout=600):
+            raw_response=False, headers: dict = None, default_timeout=600):
 
         url = url.strip()
         self.last_uri = url
@@ -86,6 +86,8 @@ class BaseTest(AsyncHTTPTestCase):
             body = None
 
         from base import config
+        if headers is None:
+            headers = {}
         if token:
             headers.update({config.conf['authorization']['key']: token})
 

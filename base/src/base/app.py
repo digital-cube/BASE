@@ -1,31 +1,32 @@
+import argparse
+import asyncio
+import datetime
+import importlib
+import inspect
+import json
+import logging
+import logging.config
 import os
 import sys
-import json
-import uuid
-import inspect
-import logging
-import asyncio
-import tortoise
-import argparse
-import datetime
 import traceback
-import importlib
-import tornado.web
-import tornado.ioloop
-import logging.config
-import dateutil.parser
-# import sqlalchemy.orm.attributes
-
-from typing import Any
+import uuid
 from functools import wraps
-from tortoise import Tortoise
-from typing import Optional, Awaitable
 from inspect import isclass, signature
+from typing import Any
+from typing import Optional, Awaitable
+
+import dateutil.parser
+import tornado.ioloop
+import tornado.web
+import tortoise
 from tornado.httpclient import AsyncHTTPClient
+from tortoise import Tortoise
 
 from . import http, token
-from .utils.log import log, set_log_context, clear_log_context, message_from_context, get_log_context
 from .lookup.scope_permissions import WRITE, READ
+from .utils.log import log, set_log_context, clear_log_context, message_from_context, get_log_context
+
+# import sqlalchemy.orm.attributes
 
 LocalOrmModule = None
 base_logger = logging.getLogger('base')
@@ -945,6 +946,7 @@ def get_the_caller():
                 "dir": scriptdir}
     return scr_dict
 
+
 def parse_arguments(**kwargs):
 
     from base import config
@@ -961,6 +963,7 @@ def parse_arguments(**kwargs):
     _args = argument_parser.parse_args()
     _args.prog = argument_parser.prog
     return _args
+
 
 def run(**kwargs):
     import base

@@ -6,7 +6,7 @@ from base import http
 import logging
 import os
 
-AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+# AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 
 async def raw_call(method, full_url_endpoint, body, headers={}, auth_mode=None, username=None, password=None):
