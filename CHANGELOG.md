@@ -1,4 +1,6 @@
-#### 4.0.0
+#### 3.2.0
+- new type - e-mail
+#### 3.0.1
 - tortoise orm implementation
 - rename base config yaml file
 - remove all unnecessary prints and comments

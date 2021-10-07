@@ -24,6 +24,7 @@ from tortoise import Tortoise
 
 from . import http, token
 from .lookup.scope_permissions import WRITE, READ
+from .types import email
 from .utils.log import log, set_log_context, clear_log_context, message_from_context, get_log_context
 
 # import sqlalchemy.orm.attributes
@@ -316,6 +317,9 @@ class api:
                             value = body[pp.name]
 
                         if passed:
+                            # print('AANN', pp.annotation)
+                            # print('NAME', pp.name)
+                            # print('VALUE', value)
                             if value == None:
                                 pass
 
@@ -323,6 +327,17 @@ class api:
                                     str, type(None)):
                                 raise http.General4xx(message=f"Invalid datatype, string type is expected for {pp.name}",
                                                       id_message="INVALID_DATA_TYPE")
+
+                            elif pp.annotation == email:
+                                if type(value) not in (email, str, type(None)):
+                                    raise http.General4xx(message=f"Invalid datatype, e-mail is expected for {pp.name}",
+                                                          id_message="INVALID_DATA_TYPE")
+
+                                try:
+                                    value = email(value)
+                                except ValueError:
+                                    raise http.General4xx(message=f"Invalid datatype, e-mail is expected for {pp.name}",
+                                                          id_message="INVALID_DATA_TYPE")
 
                             elif pp.annotation == dict:
                                 if type(value) != dict:

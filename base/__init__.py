@@ -2,7 +2,7 @@
 BASE3 Module
 """
 
-VERSION = [3, 1, 0]
+VERSION = [3, 2, 0]
 __VERSION__ = '.'.join(map(str, VERSION))
 
 from .src.base import app
@@ -13,6 +13,7 @@ from .src.base import registry
 from .src.base import store
 from .src.base import test
 from .src.base import token
+from .src.base import types
 from .src.base.app import Base
 from .src.base.app import api
 from .src.base.app import auth
