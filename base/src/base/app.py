@@ -31,6 +31,7 @@ from .utils.log import log, set_log_context, clear_log_context, message_from_con
 
 LocalOrmModule = None
 base_logger = logging.getLogger('base')
+base_request_logger = logging.getLogger('base_req')
 
 
 class NotFoundHandler(tornado.web.RequestHandler):
@@ -213,8 +214,7 @@ class Base(tornado.web.RequestHandler):
                 base_logger.critical(_message)
             return
 
-        logger = getattr(handler, 'logger',
-                         logging.getLogger('base'))
+        logger = getattr(handler, 'requests_logger', base_request_logger)
         if handler.get_status() < 400:
             level = logging.INFO
         elif handler.get_status() < 500:

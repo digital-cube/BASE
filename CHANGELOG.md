@@ -1,3 +1,5 @@
+#### 3.2.1
+- requests logging configuration
 #### 3.2.0
 - new type - e-mail
 #### 3.0.1

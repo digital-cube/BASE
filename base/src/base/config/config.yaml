@@ -40,7 +40,7 @@ tortoise:                                       # Tortoise ORM base configuratio
 #      models:
 #        - 'aerich.models'
       # If no default_connection specified, defaults to 'default'
-      default_connection: 'default'
+#      default_connection: 'default'
   use_tz: false
   timezone: 'UTC'
 
@@ -69,12 +69,24 @@ logging:
       formatter: brief
       filename: /tmp/base_app.log
       backupCount: 3
+    requests_file:
+      class: logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: brief
+      filename: /tmp/base_requests.log
+      backupCount: 3
   loggers:
     base:
       level: DEBUG
       handlers:
         - console
         - file
+      propagate: no
+    base_req:
+      level: DEBUG
+      handlers:
+        - console
+        - requests_file
       propagate: no
     tornado.access:
       level: DEBUG

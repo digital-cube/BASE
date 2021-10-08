@@ -1,5 +1,6 @@
 import re
 
+
 class email(str):
 
     def __new__(cls, *args, **kwargs):
@@ -12,5 +13,7 @@ class email(str):
             # todo: ([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"([]!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+
             if not re.match('^\S+@\S+\.\S+$', value):
                 raise ValueError(f'Invalid e-mail type: {value}')
+        else:
+            raise ValueError(f'Invalid e-mail type: {value}')
 
         return str.__new__(cls, *args, **kwargs)
