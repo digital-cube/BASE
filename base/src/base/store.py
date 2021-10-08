@@ -21,6 +21,22 @@ class DictStore:
         # print("RPUSH ",queue_name)
         pass
 
+    def rpop(self, queue_name):
+        # print("RPOP",queue_name)
+        return None
+
+    def lpop(self, queue_name):
+        # print("LPOP",queue_name)
+        return None
+
+    def brpop(self, queue_name, *args, **kwargs):
+        # print("BRPOP",queue_name)
+        return None
+
+    def blpop(self, queue_name, *args, **kwargs):
+        # print("BLPOP",queue_name)
+        return None
+
     def exists(self, *names):
         ret = 0
         for key in names:
@@ -68,6 +84,22 @@ class Store:
         return Store.engine.rpush(str(queue_name), value)
 
     @staticmethod
+    def lpop(key):
+        return Store.engine.lpop(str(key))
+
+    @staticmethod
+    def rpop(key):
+        return Store.engine.rpop(str(key))
+
+    @staticmethod
+    def blpop(key, *args, **kwargs):
+        return Store.engine.blpop(str(key), *args, **kwargs)
+
+    @staticmethod
+    def brpop(key, *args, **kwargs):
+        return Store.engine.brpop(str(key), *args, **kwargs)
+
+    @staticmethod
     def exists(*names):
         return Store.engine.exists(*names)
 
@@ -107,3 +139,19 @@ def lpush(queue_name, value):
 def delete(*names):
     "Delete one or more keys specified by ``names``"
     Store.delete(*names)
+
+
+def lpop(key):
+    return Store.engine.lpop(str(key))
+
+
+def rpop(key):
+    return Store.engine.rpop(str(key))
+
+
+def blpop(key, *args, **kwargs):
+    return Store.engine.blpop(str(key), *args, **kwargs)
+
+
+def brpop(key, *args, **kwargs):
+    return Store.engine.brpop(str(key), *args, **kwargs)
