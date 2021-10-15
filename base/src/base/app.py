@@ -492,7 +492,7 @@ class api:
 
                     svcname = bconfig.conf["name"]
 
-                    __pfx = '/log/' if os.getenv('environment', 'local') == 'docker' else '/tmp/'
+                    __pfx = '/log/' if os.getenv('ENVIRONMENT', 'local') == 'docker' else '/tmp/'
 
                     with open(__pfx + 'trace.log', 'at') as f:
                         f.write(f'{s}\n'.replace("__svcname__", svcname))
