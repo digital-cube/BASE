@@ -492,6 +492,8 @@ class api:
 
                     svcname = bconfig.conf["name"]
 
+
+
                     __pfx = '/logs/' if os.getenv('ENVIRONMENT', 'local') == 'docker' else '/tmp/'
 
                     with open(__pfx + 'trace.log', 'at') as f:
@@ -504,11 +506,17 @@ class api:
                 try:
                     __start = time.time()
                     __id = str(uuid.uuid4()).split('-')[0]
-                    lprint(f"{str(datetime.datetime.now()):>30} {' ':>10} __svcname__ in    : {__id} {str(funct)}")
+
+                    try:
+                        fname = str(funct).split(' ')[1]
+                    except Exception as e:
+                        fname = '?'
+
+                    lprint(f"{str(datetime.datetime.now()):>30} {' ':>10} __svcname__ in    : {__id} {fname}")
                     res = await funct(_origin_self, *_args, **kwa)
-                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ out   : {__id}, {type(res)}")
+                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ out   : {__id}, {type(res)} /{fname}")
                 except BaseException as e:
-                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ err   : {__id}")
+                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ err   : {__id} /{fname}")
 
                     print('- API EXCEPTION -')
                     print(e)
