@@ -28,6 +28,8 @@ import time
 LocalOrmModule = None
 
 
+__indent__ = 2
+
 class NotFoundHandler(tornado.web.RequestHandler):
     def prepare(self):
         self.write(json.dumps({'message': 'invalid URI'}))
@@ -512,11 +514,27 @@ class api:
                     except Exception as e:
                         fname = '?'
 
-                    lprint(f"{str(datetime.datetime.now()):>30} {' ':>10} __svcname__ in    : {__id} {fname}")
+                    global __indent__
+
+                    if __indent__< 2 :
+                        __indent__ = 2
+                        indent = '? '
+
+                    else:
+        
+                        __indent__ += 1
+                        indent = __indent__ * '.'
+
+                    lprint(f"{indent} {str(datetime.datetime.now()):>30} {' ':>10} __svcname__ in    : {__id} {fname}")
                     res = await funct(_origin_self, *_args, **kwa)
-                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ out   : {__id}, {type(res)} /{fname}")
+                    lprint(f"{indent} {str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ out   : {__id}, {type(res)} /{fname}")
+
+                    __indent__ -= 1
+
                 except BaseException as e:
-                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ err   : {__id} /{fname}")
+                    lprint(f"{indent} {str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ err   : {__id} /{fname}")
+
+                    __indent__ -= 1
 
                     print('- API EXCEPTION -')
                     print(e)
