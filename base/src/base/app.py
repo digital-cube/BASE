@@ -497,6 +497,7 @@ class api:
                     with open(__pfx + 'trace.log', 'at') as f:
                         f.write(f'{s}\n'.replace("__svcname__", f'{svcname[10]:>10} '))
 
+
                     with open(__pfx + f'trace.{svcname}.log', 'at') as f:
                         f.write(f'{s}\n')
 
