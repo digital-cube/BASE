@@ -23,6 +23,7 @@ from tortoise import Tortoise
 from . import http, token
 from .orm import sql_base
 from .utils.log import log, set_log_context, clear_log_context
+import time
 
 LocalOrmModule = None
 
@@ -426,7 +427,6 @@ class api:
                                         hasattr(_origin_self, 'id_user'):
                                     value['id_user'] = _origin_self.id_user
 
-
                                 try:
 
                                     if hasattr(model_class, 'build'):
@@ -486,13 +486,33 @@ class api:
 
                 _args = []
 
+                def lprint(s):
+                    import os
+                    from base import config as bconfig
+
+                    svcname = bconfig.conf["name"]
+
+                    __pfx = '/logs/' if os.getenv('ENVIRONMENT', 'local') == 'docker' else '/tmp/'
+
+                    with open(__pfx + 'trace.log', 'at') as f:
+                        f.write(f'{s}\n'.replace("__svcname__", f'{svcname[:10]:>10} '))
+
+
+                    with open(__pfx + f'trace.{svcname}.log', 'at') as f:
+                        f.write(f'{s}\n')
+
                 try:
+                    __start = time.time()
+                    __id = str(uuid.uuid4()).split('-')[0]
+                    lprint(f"{str(datetime.datetime.now()):>30} {' ':>10} __svcname__ in    : {__id} {str(funct)}")
                     res = await funct(_origin_self, *_args, **kwa)
+                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ out   : {__id}, {type(res)}")
                 except BaseException as e:
+                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ err   : {__id}")
 
                     print('- API EXCEPTION -')
                     print(e)
-                    print('-'*100)
+                    print('-' * 100)
 
                     raise
 
