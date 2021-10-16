@@ -27,8 +27,10 @@ import time
 
 LocalOrmModule = None
 
-
 __indent__ = 2
+
+__stats__ = {}
+
 
 class NotFoundHandler(tornado.web.RequestHandler):
     def prepare(self):
@@ -494,13 +496,10 @@ class api:
 
                     svcname = bconfig.conf["name"]
 
-
-
                     __pfx = '/logs/' if os.getenv('ENVIRONMENT', 'local') == 'docker' else '/tmp/'
 
                     with open(__pfx + 'trace.log', 'at') as f:
                         f.write(f'{s}\n'.replace("__svcname__", f'{svcname[:10]:>10} '))
-
 
                     with open(__pfx + f'trace.{svcname}.log', 'at') as f:
                         f.write(f'{s}\n')
@@ -516,7 +515,7 @@ class api:
 
                     global __indent__
 
-                    if __indent__< 2 :
+                    if __indent__ < 2:
                         __indent__ = 2
                         indent = '? '
 
@@ -526,12 +525,41 @@ class api:
                         indent = __indent__ * '.'
 
                     lprint(f"{str(datetime.datetime.now()):>30} {' ':>10} __svcname__ in    : {__id} {indent} > {fname}")
+
+                    if fname not in __stats__:
+                        __stats__[fname] = {
+                            'nr_calls': 0,
+                            'successfully': {
+                                'nr_calls': 0,
+                                'total_seconds': 0.0
+                            },
+                            'failed': {
+                                'nr_calls': 0,
+                                'total_seconds': 0.0
+                            }
+                        }
+
+                    _s = __stats__[fname]
+
                     res = await funct(_origin_self, *_args, **kwa)
-                    lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ out   : {__id} {indent} < {fname} {type(res)}")
+
+                    _s['nr_calls'] += 1
+                    _s['successfully']['nr_calls'] += 1
+                    _s['successfully']['total_seconds'] += (time.time() - __start)
+
+                    lprint(
+                        f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ out   : {__id} {indent} < {fname} {type(res)}")
 
                     __indent__ -= 1
 
+
+
                 except BaseException as e:
+
+                    _s['nr_calls'] += 1
+                    _s['failed']['nr_calls'] += 1
+                    _s['failed']['total_seconds'] += (time.time() - __start)
+
                     lprint(f"{str(datetime.datetime.now()):>30} {str(round(time.time() - __start, 6)):>10} __svcname__ err   : {__id} {indent} < {fname}")
 
                     __indent__ -= 1
