@@ -211,8 +211,18 @@ async def call(request, service, method, endpoint, body=None, readonly=False):
         print('EXCEPT IPC', uri)
         logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED {method}:{uri}")
         # logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED body: {_body}")
-        logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-code: {e.response.code}")
-        logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-body: {e.response.body}")
+        try:
+            logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-code: {e.response.code}")
+        except:
+            logging.getLogger('ipc').log(level=logging.CRITICAL, msg='cannt log e.response.code')
+            pass
+            
+        try:
+            logging.getLogger('ipc').log(level=logging.CRITICAL, msg=f"FAILED response-body: {e.response.body}")
+        except:
+            logging.getLogger('ipc').log(level=logging.CRITICAL, msg='cannt log e.response.body')
+            pass
+            
         print(f"\nIPC FAILED, {e}\n")
 
         resp_body = None
