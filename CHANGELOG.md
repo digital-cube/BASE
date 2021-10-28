@@ -1,3 +1,5 @@
+#### 3.4.0
+- json web token data in handler's user
 #### 3.3.0
 - new store methods
 #### 3.2.1

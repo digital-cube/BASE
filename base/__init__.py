@@ -2,7 +2,7 @@
 BASE3 Module
 """
 
-VERSION = [3, 3, 0]
+VERSION = [3, 4, 0]
 __VERSION__ = '.'.join(map(str, VERSION))
 
 from .src.base import app
