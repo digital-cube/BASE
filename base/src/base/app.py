@@ -917,7 +917,7 @@ async def init_orm():
     from base import config
 
     tconfig = config.tortoise_config()
-    print('TCCONFIG', tconfig)
+    # print('TCCONFIG', tconfig)
     await Tortoise.init(
         config=tconfig
     )
