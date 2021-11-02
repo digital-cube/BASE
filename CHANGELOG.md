@@ -1,3 +1,5 @@
+#### 3.4.1
+- additional http error exposed
 #### 3.4.0
 - json web token data in handler's user
 #### 3.3.0

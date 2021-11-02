@@ -100,7 +100,6 @@ class HttpNotAcceptable(BaseHttpException):
         self._status = status.NOT_ACCEPTABLE
 
 
-
 class HttpInvalidParam(BaseHttpException):
     """
     Exception class which is used for HTTP Error 400 - Bad Request.
@@ -123,6 +122,20 @@ class HttpInternalServerError(BaseHttpException):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._status = status.INTERNAL_SERVER_ERROR
+
+
+class HttpUnprocessableEntity(BaseHttpException):
+    """
+    Exception class which is used for HTTP Error 422 - Unprocessable entity.
+
+    Content type of the request entity, and the syntax of the request entity is correct, but the service was unable to process the contained instructions.
+    """
+    _status = status.UNPROCESSABLE_ENTITY
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._status = status.UNPROCESSABLE_ENTITY
+
 
 class IPCException(HttpInternalServerError):
 
