@@ -1,4 +1,6 @@
 #### 3.4.1
+- removed tortoise-orm\[accel\] and added accelerators to the setup
+#### 3.4.1
 - additional http error exposed
 #### 3.4.0
 - json web token data in handler's user

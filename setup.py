@@ -44,7 +44,10 @@ setup(
         'requests',
         'tornado',
         'tortoise-orm[asyncpg]',
-        'tortoise-orm[accel]',
+        # 'tortoise-orm[accel]',
+        'uvloop',
+        'python-rapidjson',
+        'ciso8601'
     ],
     package_data={
         'base': [
