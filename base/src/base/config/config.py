@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import logging
 import logging.config
@@ -62,8 +63,13 @@ class config:
                 v = d[key]
                 if type(v) == dict:
                     use_value_from_env(v)
-                elif type(v) == str and len(v) > 0 and v[0] == '$':
+                elif type(v) == str and len(v) > 1 and v[0] == '$' and v[1] != '{':
                     d[key] = os.getenv(v[1:], '')
+                elif type(v) == str and len(v) > 1 and v[0] == '$' and v[1] == '{':
+                    d[key] = os.getenv(v[1:], '')
+                    match = pattern.findall(v)
+                    for p in match:
+                        d[key] = v.replace(f'${{{p}}}', os.getenv(p, p))
 
         use_value_from_env(config_yaml)
 
@@ -147,12 +153,18 @@ class config:
                 d = {}
                 return
 
+            pattern = re.compile('.*?\${(\w+)}.*?')
             for key in d:
                 v = d[key]
                 if type(v) == dict:
                     use_value_from_env(v)
-                elif type(v) == str and len(v) > 0 and v[0] == '$':
+                elif type(v) == str and len(v) > 1 and v[0] == '$' and v[1] != '{':
                     d[key] = os.getenv(v[1:], '')
+                elif type(v) == str and len(v) > 1 and v[0] == '$' and v[1] == '{':
+                    d[key] = os.getenv(v[1:], '')
+                    match = pattern.findall(v)
+                    for p in match:
+                        d[key] = v.replace(f'${{{p}}}', os.getenv(p, p))
 
         use_value_from_env(config_yaml)
         # trace if client defined it's own configuration
