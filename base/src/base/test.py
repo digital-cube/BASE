@@ -6,6 +6,7 @@ from base import http
 from uuid import uuid4 as UUIDUUID4
 
 import base64
+import uuid
 
 
 class MockedRedis:
@@ -42,6 +43,47 @@ def my_uuid4():
     return res
 
 
+def is_uuid(s):
+    if type(s) == uuid.UUID:
+        return True
+    try:
+        uuid.UUID(s)
+    except:
+        return False
+    return True
+
+
+def clear_uuid_values_in_list(lst):
+    pos = -1
+    for item in lst:
+        pos += 1
+        if type(item) == dict:
+            clear_uuid_values(lst[pos])
+            continue
+        if type(item) == list:
+            clear_uuid_values_in_list(lst[pos])
+            continue
+        if is_uuid(item):
+            lst[pos] = '__IGNORE_THIS_UUID__'
+
+
+def clear_uuid_values(dct):
+    for key in dct:
+        val = dct[key]
+
+        if type(val) == list:
+            clear_uuid_values_in_list(val)
+            continue
+
+
+        elif type(val) == dict:
+            clear_uuid_values(val)
+            continue
+
+        if is_uuid(val):
+            dct[key] = '__IGNORE_THIS_UUID__'
+
+
 class BaseTest(AsyncHTTPTestCase):
 
     def setUp(self):
@@ -67,8 +109,10 @@ class BaseTest(AsyncHTTPTestCase):
 
     def api(self, token, method, url, body=None,
             expected_code=(http.status.OK, http.status.CREATED, http.status.NO_CONTENT), expected_result=None, expected_result_subset=None,
-            expected_result_contain_keys=None, expected_length=None,expected_lenght_for_key: tuple = None,
-            raw_response=False, headers=None, default_timeout=600):
+            expected_result_contain_keys=None, expected_length=None, expected_lenght_for_key: tuple = None,
+            raw_response=False, headers=None, default_timeout=600,
+            ignore_uuid_values=False,
+            ):
 
         if not headers:
             headers = {}
@@ -98,15 +142,15 @@ class BaseTest(AsyncHTTPTestCase):
         stime = time.time()
         self.execution_time = 'n/a'
         try:
-            self.http_client.configure(None, 
-            #connect_timeout=default_timeout, 
-            #request_timeout=default_timeout
-            )
+            self.http_client.configure(None,
+                                       # connect_timeout=default_timeout,
+                                       # request_timeout=default_timeout
+                                       )
 
             response = self.fetch(url, method=method,
                                   body=body,
                                   headers=headers,
-#                                  connect_timeout=default_timeout,
+                                  #                                  connect_timeout=default_timeout,
                                   request_timeout=default_timeout)
         except Exception as e:
             print('error serializing output ', e, e)
@@ -138,6 +182,16 @@ class BaseTest(AsyncHTTPTestCase):
             print("-" * 100)
             self.assertTrue(False)
 
+        import copy
+
+        res4ret = copy.deepcopy(res)
+        if ignore_uuid_values:
+            res = clear_uuid_values(res)
+            if expected_result:
+                expected_result = clear_uuid_values(expected_result)
+            if expected_result_subset:
+                expected_result_subset = clear_uuid_values(expected_result_subset)
+
         if expected_result:
             self.assertEqual(expected_result, res)
 
@@ -156,9 +210,8 @@ class BaseTest(AsyncHTTPTestCase):
         if expected_lenght_for_key is not None:
             self.assertTrue(len(res[expected_lenght_for_key[0]]) == expected_lenght_for_key[1])
 
-
-        self.r = res
-        self.last_result = res
+        self.r = res4ret
+        self.last_result = res4ret
         self.execution_time = time.time() - stime
 
         return res
