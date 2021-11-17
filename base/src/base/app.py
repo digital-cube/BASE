@@ -564,9 +564,9 @@ class api:
 
                     __indent__ -= 1
 
-                    print('- API EXCEPTION -')
-                    print(e)
-                    print('-' * 100)
+                    # print('- API EXCEPTION -')
+                    # print(e)
+                    # print('-' * 100)
 
                     raise
 
