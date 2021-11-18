@@ -68,6 +68,10 @@ def clear_uuid_values_in_list(lst):
 
 
 def clear_uuid_values(dct):
+    if type(dct) == list:
+        clear_uuid_values_in_list(dct)
+        return
+
     for key in dct:
         val = dct[key]
 
@@ -186,7 +190,7 @@ class BaseTest(AsyncHTTPTestCase):
 
         res4ret = copy.deepcopy(res)
         if ignore_uuid_values:
-            res = clear_uuid_values(res)
+            clear_uuid_values(res)
             if expected_result:
                 expected_result = clear_uuid_values(expected_result)
             if expected_result_subset:
