@@ -192,9 +192,9 @@ class BaseTest(AsyncHTTPTestCase):
         if ignore_uuid_values:
             clear_uuid_values(res)
             if expected_result:
-                expected_result = clear_uuid_values(expected_result)
+                clear_uuid_values(expected_result)
             if expected_result_subset:
-                expected_result_subset = clear_uuid_values(expected_result_subset)
+                clear_uuid_values(expected_result_subset)
 
         if expected_result:
             self.assertEqual(expected_result, res)
