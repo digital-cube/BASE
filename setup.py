@@ -46,7 +46,7 @@ setup(
                       'redis',
                       'requests',
                       'SQLAlchemy==1.3.23',
-                      'aerich',
+                      'aerich==0.5.8',
                       'tortoise-orm[asyncpg]',
                       'tortoise-orm[accel]',
                       'aiomysql'
