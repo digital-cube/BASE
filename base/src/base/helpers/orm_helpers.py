@@ -60,7 +60,7 @@ class BaseOrmHelpers:
                 elif _type == tortoise.queryset.QuerySet:
                     await self.fetch_related(field)
                     res[field] = await getattr(self, field).aserialize()
-                    print("STOP HERE")
+                    # print("STOP HERE")
                 else:
                     res[field] = getattr(self, field)
 
