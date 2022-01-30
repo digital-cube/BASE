@@ -59,6 +59,7 @@ class config:
             :param d:
             :return:
             '''
+            pattern = re.compile('.*?\${(\w+)}.*?')
             for key in d:
                 v = d[key]
                 if type(v) == dict:
