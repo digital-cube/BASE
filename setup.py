@@ -48,7 +48,7 @@ setup(
                       'SQLAlchemy==1.3.23',
                       'aerich==0.5.8',
                       'tortoise-orm[asyncpg]',
-                      'tortoise-orm[accel]',
+#                      'tortoise-orm[accel]',
                       'aiomysql'
                       ],
     package_data={
