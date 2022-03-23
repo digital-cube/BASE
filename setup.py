@@ -14,7 +14,7 @@ with open('README.rst') as f:
     long_description = f.read()
 
 setup(
-    name='base3',
+    name='base3imp',
     version=__VERSION__,
     packages=['base',
               'base.src',
