@@ -1,6 +1,7 @@
 import jwt
 import datetime
 from typing import Union
+import tortoise.timezone
 
 from .store import Store
 from base.src.base.registry import public_key
@@ -20,16 +21,17 @@ def token2user(token) -> Union[dict, bool]:
 
     active = Store.get(decoded['id'])
 
-    now = int(datetime.datetime.now().timestamp())
+    # now = int(datetime.datetime.now().timestamp())
+    now = int(tortoise.timezone.now().timestamp())
 
     try:
 
-        if active in (b'1', b'{"active": true}'):
+        if active == True or active in (b'1', b'{"active": true}'):
 
             res = {}
 
-            if 'exp' in decoded and decoded['exp']:
-                if now > decoded['exp']:
+            if 'expires' in decoded and decoded['expires']:
+                if now > decoded['expires']:
                     return False
 
             res['id'] = decoded['id']
