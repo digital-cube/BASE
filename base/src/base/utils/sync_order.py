@@ -72,7 +72,7 @@ def wait4database(db_config, max_attempts=30):
                 sys.exit(0)
 
             print(
-                f"waiting for postgres server {db_config['username']}@{db_config['host']}:{db_config['port']}/{db_config['database']} ...")
+                f"waiting for postgres server {db_config['user']}@{db_config['host']}:{db_config['port']}/{db_config['database']} ...")
             time.sleep(attempt)
 
         return False
